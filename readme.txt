@@ -19,7 +19,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
 = 1.0 =
-*	First released, Publish Version with vTiger and SugarCRM.
+*	First released.
 
 
 == Links ==
