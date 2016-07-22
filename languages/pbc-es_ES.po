@@ -1,0 +1,369 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Product Budget Configurator\n"
+"POT-Creation-Date: 2016-07-21 18:52+0200\n"
+"PO-Revision-Date: 2016-07-21 18:55+0200\n"
+"Last-Translator: David <david@closemarketing.es>\n"
+"Language-Team: David <david@closemarketing.es>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.8\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: pbc.php\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#. Plugin Name of the plugin/theme
+#: pbc.php:82
+msgid "Product Budget Configurator"
+msgstr "Configurador Presupuestos Producto"
+
+#: pbc.php:82
+msgid "PBC"
+msgstr "PBC"
+
+#: pbc.php:91
+msgid "Global Settings"
+msgstr "Configuración Global"
+
+#: pbc.php:118 pbc.php:224 pbc.php:297 pbc.php:323
+msgid "Phase"
+msgstr "Fase"
+
+#: pbc.php:123
+msgid "Add"
+msgstr "Añadir"
+
+#: pbc.php:124
+msgid "Add New"
+msgstr "Agregar Nuevo"
+
+#: pbc.php:125
+msgid "Edit"
+msgstr "Editar"
+
+#: pbc.php:126
+msgid "New"
+msgstr "Nuevo"
+
+#: pbc.php:127
+msgid "View"
+msgstr "Ver"
+
+#: pbc.php:128
+msgid "Search for"
+msgstr "Buscar para"
+
+#: pbc.php:129 pbc.php:130
+msgid "We didn't find any"
+msgstr "No se encontró ninguna"
+
+#: pbc.php:130
+msgid "in the trash"
+msgstr "en la papelera"
+
+#: pbc.php:139
+msgctxt "phase"
+msgid "phase"
+msgstr "fase"
+
+#: pbc.php:150
+msgid "Variations"
+msgstr "Variaciones"
+
+#: pbc.php:151 pbc.php:276 pbc.php:322
+msgid "Variation"
+msgstr "Variación"
+
+#: pbc.php:152
+msgid "Add Variation"
+msgstr "Añadir variación"
+
+#: pbc.php:153
+msgid "Add New variation"
+msgstr "Añadir nueva variación"
+
+#: pbc.php:154
+msgid "Edit Variation"
+msgstr "Editar variación"
+
+#: pbc.php:155
+msgid "New Variation"
+msgstr "Nueva Variación"
+
+#: pbc.php:156
+msgid "View Variation"
+msgstr "Ver Variación"
+
+#: pbc.php:157
+msgid "Search for variations"
+msgstr "Buscar Variantes"
+
+#: pbc.php:158
+msgid "We didn't find any Variation"
+msgstr "No hemos encontrado ninguna variación"
+
+#: pbc.php:159
+msgid "We didn't find any Variation in the trash"
+msgstr "No encontramos ninguna variación en la basura"
+
+#: pbc.php:168
+msgctxt "variation"
+msgid "variation"
+msgstr "variacion"
+
+#: pbc.php:215
+msgid "Options for Variation"
+msgstr "Opciones para la variación"
+
+#: pbc.php:230
+msgid "Select a Phase"
+msgstr "Seleccione una fase"
+
+#: pbc.php:234
+msgid "SKU"
+msgstr "Referencia"
+
+#: pbc.php:244 pbc.php:324
+msgid "Price"
+msgstr "Precio"
+
+#: pbc.php:254
+msgid "Image Product"
+msgstr "Imagen de producto"
+
+#: pbc.php:261
+msgid "Image Icon"
+msgstr "Imagen del icono"
+
+#: pbc.php:268
+msgid "Depends of"
+msgstr "Depende de"
+
+#: pbc.php:282
+msgid "Select a Variation"
+msgstr "Seleccione una variación"
+
+#: pbc.php:298
+msgid "Order"
+msgstr "Orden"
+
+#: vendor/rilwis/meta-box/inc/core.php:40
+msgid "Documentation"
+msgstr "Documentación"
+
+#: vendor/rilwis/meta-box/inc/core.php:41
+msgid "Extensions"
+msgstr "Extensiones"
+
+#: vendor/rilwis/meta-box/inc/field.php:192
+msgid "+ Add more"
+msgstr "+ Añadir más"
+
+#: vendor/rilwis/meta-box/inc/fields/autocomplete.php:23
+#: vendor/rilwis/meta-box/inc/fields/autocomplete.php:87
+#: vendor/rilwis/meta-box/inc/fields/autocomplete.php:104
+msgid "Delete"
+msgstr "Eliminar"
+
+#: vendor/rilwis/meta-box/inc/fields/button.php:29
+msgid "Click me"
+msgstr "Click aquí"
+
+#: vendor/rilwis/meta-box/inc/fields/checkbox.php:82
+msgid "Yes"
+msgstr "Si"
+
+#: vendor/rilwis/meta-box/inc/fields/checkbox.php:82
+msgid "No"
+msgstr "No"
+
+#: vendor/rilwis/meta-box/inc/fields/file-input.php:25
+msgid "Select File"
+msgstr "Seleccionar archivo"
+
+#: vendor/rilwis/meta-box/inc/fields/file-input.php:49
+#: vendor/rilwis/meta-box/inc/fields/select.php:91
+msgid "Select"
+msgstr "Seleccionar"
+
+#: vendor/rilwis/meta-box/inc/fields/file-input.php:51
+msgid "Remove"
+msgstr "Eliminar"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:24
+#, fuzzy, php-format
+msgid "You may only upload maximum %d file"
+msgstr "Sólo puede subir un máximo de %d archivo"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:25
+#, fuzzy, php-format
+msgid "You may only upload maximum %d files"
+msgstr "Sólo puede subir un máximo de %d archivos"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:85
+#, fuzzy
+msgid "Error: Cannot delete file"
+msgstr "Error: No se puede eliminar el archivo"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:98
+#, fuzzy
+msgctxt "file upload"
+msgid "Upload Files"
+msgstr "Subir Archivos"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:99
+msgctxt "file upload"
+msgid "+ Add new file"
+msgstr "+ Añadir nuevo archivo"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:162
+#, fuzzy
+msgctxt "file upload"
+msgid "Delete"
+msgstr "Eliminar"
+
+#: vendor/rilwis/meta-box/inc/fields/file.php:163
+msgctxt "file upload"
+msgid "Edit"
+msgstr "Editar"
+
+#: vendor/rilwis/meta-box/inc/fields/key-value.php:20
+msgid "Key"
+msgstr "Clave secreta de encriptación"
+
+#: vendor/rilwis/meta-box/inc/fields/key-value.php:26
+msgid "Value"
+msgstr "Valor"
+
+#: vendor/rilwis/meta-box/inc/fields/map.php:49
+#, fuzzy
+msgid "Find Address"
+msgstr "Encontrar dirección"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:24
+#, fuzzy
+msgctxt "media"
+msgid "+ Add Media"
+msgstr "+ Añadir Media"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:25
+#, fuzzy
+msgctxt "media"
+msgid " file"
+msgstr "archivo"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:26
+#, fuzzy
+msgctxt "media"
+msgid " files"
+msgstr "archivos"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:27
+#, fuzzy
+msgctxt "media"
+msgid "Remove"
+msgstr "Eliminar"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:28
+#, fuzzy
+msgctxt "media"
+msgid "Edit"
+msgstr "Editar"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:29
+#, fuzzy
+msgctxt "media"
+msgid "View"
+msgstr "Ver"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:30
+#, fuzzy
+msgctxt "media"
+msgid "No Title"
+msgstr "Sin Título"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:33
+#, fuzzy
+msgctxt "media"
+msgid "Select Files"
+msgstr "Seleccionar Archivos"
+
+#: vendor/rilwis/meta-box/inc/fields/media.php:34
+msgctxt "media"
+msgid "Drop files here to upload"
+msgstr ""
+
+#: vendor/rilwis/meta-box/inc/fields/oembed.php:65
+#, fuzzy
+msgid "Embed HTML not available."
+msgstr "HTML incrustado no disponible."
+
+#: vendor/rilwis/meta-box/inc/fields/oembed.php:81
+#, fuzzy
+msgid "Preview"
+msgstr "Vista Previa"
+
+#: vendor/rilwis/meta-box/inc/fields/post.php:34
+#, fuzzy
+msgid "Select a post"
+msgstr "Seleccionar un post"
+
+#: vendor/rilwis/meta-box/inc/fields/post.php:38
+#: vendor/rilwis/meta-box/inc/fields/taxonomy.php:51
+#, fuzzy, php-format
+msgid "Select a %s"
+msgstr "Selecciona un %s"
+
+#: vendor/rilwis/meta-box/inc/fields/select-advanced.php:44
+msgid "Select an item"
+msgstr "Selecciona uno"
+
+#: vendor/rilwis/meta-box/inc/fields/select.php:91
+#, fuzzy
+msgid "All"
+msgstr "Todos"
+
+#: vendor/rilwis/meta-box/inc/fields/select.php:91
+#, fuzzy
+msgid "None"
+msgstr "Ninguno"
+
+#: vendor/rilwis/meta-box/inc/fields/taxonomy.php:47
+msgid "Select a term"
+msgstr "Seleccionar término"
+
+#: vendor/rilwis/meta-box/inc/fields/thickbox-image.php:53
+#, fuzzy
+msgctxt "image upload"
+msgid "Upload Images"
+msgstr "Subir Imágenes"
+
+#: vendor/rilwis/meta-box/inc/fields/user.php:34
+msgid "Select an user"
+msgstr "Selecciona un usuario"
+
+#: vendor/rilwis/meta-box/inc/validation.php:49
+#, fuzzy
+msgid "Please correct the errors highlighted below and try again."
+msgstr "Por favor, corrija los errores resaltados abajo y pruebe de nuevo."
+
+#. Plugin URI of the plugin/theme
+#. Author URI of the plugin/theme
+msgid "https://www.closemarketing.es"
+msgstr "https://www.closemarketing.es"
+
+#. Description of the plugin/theme
+msgid "Creates a configurator for products and create a budget"
+msgstr "Crea un configurador de productos con su un presupuesto"
+
+#. Author of the plugin/theme
+msgid "closemarketing"
+msgstr "closemarketing"
