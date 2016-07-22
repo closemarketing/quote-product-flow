@@ -336,6 +336,16 @@ class PBCPlugin
 
 		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
 		$price = get_post_meta(get_the_id(),'pbc_price',true);
+		$depends_group = rwmb_meta( 'pbc_depends' );
+		$depends_column = '';
+		foreach($depends_group as $depends_item) {
+			$var_post = get_post($depends_item['pbc_depvar']);
+			$phase_id = get_post_meta($var_post->ID, 'pbc_phase', true);
+			$phase_post = get_post($phase_id);
+			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
+        	$depends_column .= $phase_order.' - '.$phase_post->post_title.' - '.$var_post->post_title;
+			$depends_column .= '<br/>';
+		}
 
 	    switch ($column_name) {
 
@@ -347,7 +357,7 @@ class PBCPlugin
 	        echo $price;
 	        break;
 	    case 'depends':
-
+			echo $depends_column;
 	        break;
 	    default:
 	        break;
