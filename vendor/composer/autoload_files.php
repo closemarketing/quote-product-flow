@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'f7d520a7dfd4979ca7d4b88dfbc5d7f5' => $vendorDir . '/rilwis/meta-box/meta-box.php',
+    'a5f882d89ab791a139cd2d37e50cdd80' => $vendorDir . '/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php',
 );

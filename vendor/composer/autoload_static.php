@@ -7,7 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInitf1e0b97bf3be916a3430d384cb18bc3b
 {
     public static $files = array (
-        'f7d520a7dfd4979ca7d4b88dfbc5d7f5' => __DIR__ . '/..' . '/rilwis/meta-box/meta-box.php',
+        'a5f882d89ab791a139cd2d37e50cdd80' => __DIR__ . '/..' . '/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
