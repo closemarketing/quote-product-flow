@@ -404,6 +404,12 @@ function pbc_required_plugins() {
 			'required'  => true,
 			'force_activation'   => true,
 		),
+		array(
+			'name'      => 'Duplicate Post',
+			'slug'      => 'duplicate-post',
+			'required'  => true,
+			'force_activation'   => true,
+		),
 
 	);
 
