@@ -11,6 +11,7 @@ License: GPL
 */
 
 define( 'WPPBC_PLUGIN', __FILE__ );
+define( 'WPPBC_PLUGIN_URL', plugin_dir_url(__FILE__) );
 define( 'WPPBC_PLUGIN_DIR', untrailingslashit( dirname( WPPBC_PLUGIN ) ) );
 
 class PBCPlugin
@@ -45,6 +46,13 @@ class PBCPlugin
 
 		add_filter('manage_edit-variation_columns', array($this,'add_new_var_columns') );
 		add_action('manage_variation_posts_custom_column', array($this,'manage_var_columns'), 10, 2);
+
+		add_filter( 'template_include', array($this,'pbc_custom_page_template'), 99 );
+		add_action( 'wp_ajax_variation_selected', array($this,'variation_selected_action_callback') );
+		add_action( 'wp_ajax_nopriv_variation_selected', array($this,'variation_selected_action_callback') );
+		add_action( 'wp_ajax_configurator_submit', array($this,'configurator_submit_action_callback') );
+		add_action( 'wp_ajax_nopriv_configurator_submit', array($this,'configurator_submit_action_callback') );
+
 	}
 
 	////////////////////////////////////////////////////////////
@@ -364,6 +372,173 @@ class PBCPlugin
 	    } // end switch
 	}
 
+
+	public function pbc_custom_page_template( $template ) {
+		if ( \is_page( 'budget-configurator' )  ) {
+			if(isset($_POST) && isset($_GET['submit']) && $_POST['submit'] == 'email_send'){
+				if(session_id() == ''){
+				    session_start();
+				}
+				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST['email_field']);
+			}
+			if(isset($_GET) && isset($_GET['configurator']) && $_GET['configurator'] == 'pdf')
+            {
+                if (is_file(WPPBC_PLUGIN_DIR.
+                    "/lib/html2pdf/html2pdf.class.php")
+                )
+                {
+                    require_once(WPPBC_PLUGIN_DIR.
+                        '/lib/html2pdf/html2pdf.class.php');
+					if(session_id() == ''){
+					    session_start();
+					}
+					$content = $this->configurator_result_generate_pdf();
+					if($content['type'] == 'error'){
+						echo $content['response'];
+					}else{
+					    try {
+					        $width_mm = 710 * 0.2646;   //1px = 0.2646mm
+					        $height_mm = 900 * 0.2646;
+					        $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
+					        $html2pdf->setTestTdInOnePage(false);
+					        $html2pdf->writeHTML($content['response']);
+					        $html2pdf->Output("Budget Configurator ".date('Y-m-d H:i').".pdf");
+					        $html2pdf->close();
+					    } catch (Html2PdfException $e) {
+					        $formatter = new ExceptionFormatter($e);
+					        echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
+					    }
+					}
+                }else{
+					echo 'Error: PDF Library Not Present';
+				}
+                exit(0);
+            }
+			if ( \locate_template( 'budget-configurator.php' ) )
+				$new_template =  \get_stylesheet_directory().'budget-configurator.php';
+	        else
+				$new_template = WPPBC_PLUGIN_DIR. '/budget-configurator.php';
+			if ( '' != $new_template ) {
+				return $new_template ;
+			}
+		}
+		return $template;
+	}
+
+	public function variation_selected_action_callback(){
+		extract($_REQUEST);
+		if(session_id() == ''){
+			ob_start();
+			session_start();
+		}
+	    if(session_id() == ''){
+	       echo ';;--;;'.json_encode(array('type'=>'error', 'msg'=>'Error: Unable to initialize Session!'));
+	       die(0);
+	    }
+		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
+			$sVar = $pbc_variation[$current_phase];
+			$imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
+			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true)[0];}?>
+		<?php }
+		if(isset($imgprodurl) && $imgprodurl){
+			$return = $imgprodurl;
+		}else{
+			$return = WPPBC_PLUGIN_URL.'preview-img.jpg';
+		}
+		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$return));
+		die(0);
+	}
+	public function configurator_submit_action_callback(){
+		extract($_POST);
+		if(isset($submit) && $submit == 'email_send'){
+			if(session_id() == ''){
+			    session_start();
+			}
+			$_SESSION['pbc_output'] = $this->configurator_result_email_send($email_field);
+		}
+		ob_start();
+		if ( \locate_template( 'budget-configurator.php' ) )
+			\locate_template('budget-configurator.php', true);
+		else
+			include(WPPBC_PLUGIN_DIR. '/budget-configurator.php');
+		$all_details = ob_get_contents();
+		ob_end_clean();
+		echo $all_details;
+		die(0);
+	}
+	public function configurator_result_email_send($email){
+		if(!$email){
+			$result = array('type'=>'error', 'response'=>'Email field empty!');
+		}else{
+			$emails = explode(',', $email);
+			if(!isset($_SESSION['pbc_variation'])){
+				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
+			}else{
+				$subject = get_option('blogname').' Budget Configurator';
+				$message = '<h3>Here are the details of your selection:</h3>'.'<br>';
+				$message .= '<table><tr><th>Phase</th><th>Variation</th><th>Price</th></tr>';
+				$total_price = '';
+				foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
+					$total_price += $details['var']['price'];
+					$message .= '<tr>';
+					$message .= '<td>'.$details['phase']['name'].'</td>';
+					$message .= '<td>'.$details['var']['name'].'</td>';
+					$message .= '<td>'.$details['var']['price'].'</td>';
+					$message .= '</tr>';
+				}
+				if($total_price) $total_price = $total_price.' €';
+				else $total_price = '-';
+				$message .= '<tr>';
+				$output .= '<td>&nbsp;</td><td>Total: </td>';
+				$message .= '<td>'.$total_price.'</td>';
+				$message .= '</tr>';
+				$message .= '</table>';
+				$message .= '<br>Thank You!';
+				$message .= '<br>'.get_option('blogname');
+
+				function set_html_content_type() {
+					return 'text/html';
+				}
+				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
+			    if(!wp_mail( $emails, $subject, $message)){
+					$result = array('type'=>'error', 'response'=>'Error in sending mail. Please try again!');
+				}else
+					$result = array('type'=>'success', 'response'=>'Mail sent!');
+				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
+			}
+		}
+		return $result;
+	}
+	public function configurator_result_generate_pdf(){
+		if(!isset($_SESSION['pbc_variation'])){
+			$result = array('type'=>'error', 'response'=>'Configurator not ready!');
+		}else{
+		    $output .= "<page backcolor='#fafafa'>
+			<h1>".get_option('blogname')." Budget Configurator</h1>
+			<h3>Details of Your Selection</h3>";
+			$output .= '<table><tr><th>Phase</th><th>Variation</th><th>Price</th></tr>';
+			$total_price = '';
+			foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
+				$total_price += $details['var']['price'];
+				$output .= '<tr>';
+				$output .= '<td>'.$details['phase']['name'].'</td>';
+				$output .= '<td>'.$details['var']['name'].'</td>';
+				$output .= '<td>'.$details['var']['price'].'</td>';
+				$output .= '</tr>';
+			}
+			if($total_price) $total_price = $total_price.' €';
+			else $total_price = '-';
+			$output .= '<tr>';
+			$output .= '<td>&nbsp;</td><td>Total: </td>';
+			$output .= '<td>'.$total_price.'</td>';
+			$output .= '</tr>';
+			$output .= '</table>';
+
+			$output .= '</page>';
+			$result = array('type'=>'success', 'response'=>$output);
+		}
+		return $result;
+	}
 }
 
 global $pbc_plugin;
