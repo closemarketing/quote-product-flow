@@ -511,6 +511,7 @@ class PBCPlugin
                     require_once(WPPBC_PLUGIN_DIR.
                         '/lib/html2pdf/html2pdf.class.php');
 					if(session_id() == ''){
+						ob_start();
 					    session_start();
 					}
 					$content = $this->configurator_result_generate_pdf();
@@ -634,6 +635,7 @@ class PBCPlugin
 		if(!isset($_SESSION['pbc_variation'])){
 			$result = array('type'=>'error', 'response'=>'Configurator not ready!');
 		}else{
+			$output = '';
 		    $output .= "<page backcolor='#fafafa'>
 			<h1>".get_option('blogname')." Budget Configurator</h1>
 			<h3>Details of Your Selection</h3>";
