@@ -244,7 +244,7 @@ if(empty($cStep)) $cStep = 1;
                                 <?php }?>
                                 </ul>
                         <?php }else{?>
-                            <div class="error">No Variations Avaiable</div>
+                            <div class="error"><?php _e('No Variations Avaiable','pbc');?></div>
                         <?php }?>
                         </div>
                     </div>
@@ -303,7 +303,7 @@ if(empty($cStep)) $cStep = 1;
                     </div>
                     <div class="configurator_summary">
                         <?php if(isset($_SESSION) && isset($_SESSION['pbc_variation'])){?>
-                            <div class="title">configuracion seleccionada</div>
+                            <div class="title"><?php _e('Actual Configuration','pbc');?></div>
                             <table>
                             <?php
                                 if($cStep == 'calculate'){
@@ -334,7 +334,7 @@ if(empty($cStep)) $cStep = 1;
                             <?php }?>
                             <?php if($cStep == 'calculate'){?>
                                 <tr class="variation_selected phase-total_price">
-                                    <td class="name">Total</td>
+                                    <td class="name"><?php _e('Total','pbc');?></td>
                                     <td class="price">
                                         <?php
                                             if($total_price) echo $total_price.' €';
@@ -348,13 +348,13 @@ if(empty($cStep)) $cStep = 1;
                     </div>
                     <?php if($cStep == 'calculate'){?>
                         <div class="configurator_result_share">
-                            <button type="submit" name="submit" class="btn btn-share" value="result_email">Email</button>
-                            <a href="?phase=calculate&amp;configurator=pdf" target="_blank" class="btn btn-share" title="Generate PDF">PDF</a>
+                            <button type="submit" name="submit" class="btn btn-share" value="result_email"><?php _e('Email','pbc');?></button>
+                            <a href="?phase=calculate&amp;configurator=pdf" target="_blank" class="btn btn-share" title="Generate PDF"><?php _e('PDF','pbc');?></a>
                             <?php if(isset($_POST['submit']) && ($_POST['submit'] == 'result_email' || $_POST['submit'] == 'email_send')){?>
                                 <?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
                                 <div class="email_submit_fields">
                                     <input type="text" name="email_field" placeholder="separate multiple email by comma"/>
-                                    <button type="submit" name="submit" class="btn btn-submit" value="email_send">Send</button>
+                                    <button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
                                 </div>
                                 <?php }?>
                                 <?php if(isset($_SESSION['pbc_output'])){?>
