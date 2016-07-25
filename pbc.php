@@ -644,7 +644,7 @@ class PBCPlugin
 		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
 			$sVar = $pbc_variation[$current_phase];
 			$imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
-			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true)[0];}?>
+			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
 		<?php }
 		if(isset($imgprodurl) && $imgprodurl){
 			$return = $imgprodurl;
