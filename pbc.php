@@ -34,11 +34,12 @@ class PBCPlugin
         // Initial stuff
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'init' ) );
-        add_action( 'admin_menu', array( $this, 'admin_init' ) );
 
         //Custom Post types stuff
-        add_action( 'init', array( $this, 'pbc_register_cpt') );
+ 		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
+		add_action( 'init', array( $this, 'pbc_register_cpt') );
         add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
+
 
 		add_filter('manage_edit-phases_columns', array($this,'add_new_phases_columns') );
 		add_action('manage_phases_posts_custom_column', array($this,'manage_phases_columns'), 10, 2);
@@ -74,40 +75,105 @@ class PBCPlugin
         load_plugin_textdomain( 'pbc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
 	/**
-	 * Admin Initialize
-	 */
-	public function admin_init()
-	{
-		add_menu_page( __('Product Budget Configurator','pbc'), __('PBC','pbc'), 'manage_options', 'pbc_menu', array($this,'pbc_menu_page'), 'dashicons-schedule');
-	}
-    /**
-     * PBC Options Page
+     * Registering menu admin
+     *
      */
-    public function pbc_menu_page()
-    {
-    ?>
-        <div class='wrap'>
-            <h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','cmo');?></h2>
 
-            <?php if($update){?>
-                <div id="message" class="updated fade"><?php echo $update;?></div>
-            <?php }?>
-            <?php if($error){?>
-                <div id="message" class="error"><?php echo $error;?></div>
-            <?php }?>
+    public function pbc_add_admin_menus(){
+
+         // Settings for custom admin menu
+         $page_title = __('Product Budget Configurator','pbc');
+         $menu_title = 'PBC';
+         $capability = 'manage_options';
+         $menu_slug  = 'pbc_menu';
+         $function   = array($this,'pbc_display_admin_page');// Callback function which displays the page content.
+         $icon_url   = 'dashicons-tagcloud';
+         $position   = 2;
+
+         // Add custom admin menu
+         add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
+
+         $submenu_pages = array(
+
+             // Avoid duplicate pages. Add submenu page with same slug as parent slug.
+             array(
+                 'parent_slug'   => 'pbc_menu',
+                 'page_title'    => __('Summary of Product Budget Configurator'),
+                 'menu_title'    => __('Summary','pbc'),
+                 'capability'    => 'manage_options',
+                 'menu_slug'     => 'pbc_menu',
+                 'function'      => array($this,'pbc_display_admin_page'),// Uses the same callback function as parent menu.
+             ),
+
+             // Post Type :: View All Posts
+             array(
+                 'parent_slug'   => 'pbc_menu',
+                 'page_title'    => __('Phases of Configurator','pbc'),
+                 'menu_title'    => __('Phases','pbc'),
+                 'capability'    => 'manage_options',
+                 'menu_slug'     => 'edit.php?post_type=phases',
+                 'function'      => null,// Doesn't need a callback function.
+             ),
+
+			 // Post Type :: View All Posts
+			 array(
+			 	'parent_slug'   => 'pbc_menu',
+			 	'page_title'    => __('Variations in Phases','pbc'),
+			 	'menu_title'    => __('Variations','pbc'),
+			 	'capability'    => 'manage_options',
+			 	'menu_slug'     => 'edit.php?post_type=variation',
+			 	'function'      => null,// Doesn't need a callback function.
+			 ),
+
+             // Taxonomy :: Manage News Categories
+             array(
+                 'parent_slug'   => 'pbc_menu',
+                 'page_title'    => __('Measures in Variation Prices','pbc'),
+                 'menu_title'    => __('Measures','pbc'),
+                 'capability'    => 'manage_options',
+                 'menu_slug'     => 'edit-tags.php?taxonomy=measures&post_type=variation',
+                 'function'      => null,// Doesn't need a callback function.
+             ),
+
+         );
+
+         // Add each submenu item to custom admin menu.
+         foreach($submenu_pages as $submenu){
+
+             add_submenu_page(
+                 $submenu['parent_slug'],
+                 $submenu['page_title'],
+                 $submenu['menu_title'],
+                 $submenu['capability'],
+                 $submenu['menu_slug'],
+                 $submenu['function']
+             );
+
+         }
+
+     }
+
+     /* If you add any extra custom sub menu pages which are not a Custom Post Type
+      * or a Custom Taxonomy, you will need to create a callback function for each
+      * of your custom submenu items you create above.
+      */
+
+    public function pbc_display_admin_page(){ ?>
+        <div class='wrap'>
+            <h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','pbc');?></h2>
 
             <div id="poststuff">
                 <div id="post-body">
                     <div class="postcontent-left">
-                        ?>
+
                     </div>
                     <div class="postcontent-right">
                     </div>
                 </div>
             </div>
         </div>
-    <?php
-    }
+	<?php
+     }
 
     /**
      * Post Type Phases
@@ -131,7 +197,7 @@ class PBCPlugin
         $args = array(
          'labels' => $labels,
          'public' => false,
-         'show_in_menu' => 'pbc_menu',
+         'show_in_menu' => false,
          'publicly_queryable' => false,
          'show_ui' => true,
          'query_var' => true,
@@ -160,7 +226,7 @@ class PBCPlugin
         $args = array(
          'labels' => $labels,
          'public' => false,
-         'show_in_menu' => 'pbc_menu',
+         'show_in_menu' => false,
          'publicly_queryable' => false,
          'show_ui' => true,
          'query_var' => true,
@@ -173,6 +239,26 @@ class PBCPlugin
          'menu_icon' => 'dashicons-tagcloud'
         );
         register_post_type('variation',$args);
+
+		$labels = array(
+		  'name' => __('Measures','pbc'),
+		  'singular_name' => __('Measure','pbc'),
+		  'search_items' =>  __('Search measure','pbc'),
+		  'all_items' => __('All measures','pbc'),
+		  'edit_item' => __('Edit measure','pbc'),
+		  'update_item' => __('Update measure','pbc'),
+		  'add_new_item' => __('Add New measure','pbc'),
+		  'new_item_name' => __('New measure','pbc'),
+		);
+
+		register_taxonomy( 'measures', array( 'variation' ), array(
+		  'hierarchical' => true,
+		  'labels' => $labels,
+          'show_in_menu' => false,
+		  'show_ui' => true,
+		  'query_var' => true,
+		  'rewrite' => array( 'slug' => 'measures' ),
+		));
     }
 
     /**
