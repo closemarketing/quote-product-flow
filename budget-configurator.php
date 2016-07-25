@@ -12,11 +12,13 @@ if(session_id() == ''){
    echo ';;--;;'.json_encode(array('type'=>'error', 'msg'=>'Error: Unable to initialize Session!'));
    die('Error: Unable to initialize Session!');
 }
+$cStep ='';
 $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids');
 if(isset($_POST['submit'])){
     $submit = $_POST['submit'];
-    if(isset($_POSt[$submit.'_phase']))
-        $cStep = (int)$_POST[$submit.'_phase'];
+    if(isset($_POST[$submit.'_phase']))
+        $cStep = $_POST[$submit.'_phase'];
+    else $cStep = 'calculate';
     if(isset($_POST['pbc_variation']) && $_POST['submit']=='next'){
         if(!isset($_SESSION['pbc_variation'])){
             $_SESSION['pbc_variation'] = array();
@@ -36,7 +38,7 @@ if(isset($_POST['submit'])){
         ksort($_SESSION['pbc_variation'], SORT_NUMERIC);
     }
 }elseif(isset($_GET['phase'])) $cStep = $_GET['phase'];
-else $cStep = 1;
+if(empty($cStep)) $cStep = 1;
 ?>
 <?php if(!defined('DOING_AJAX')) get_header(); ?>
 <?php if(!defined('DOING_AJAX')){ ?>
