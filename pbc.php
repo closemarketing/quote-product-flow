@@ -38,8 +38,8 @@ class PBCPlugin
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
 		add_action( 'init', array( $this, 'pbc_register_cpt') );
+		add_action( 'admin_menu' , array($this, 'remove_measure_meta') );
         add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
-
 
 		add_filter('manage_edit-phases_columns', array($this,'add_new_phases_columns') );
 		add_action('manage_phases_posts_custom_column', array($this,'manage_phases_columns'), 10, 2);
@@ -265,6 +265,10 @@ class PBCPlugin
      * Registering meta boxes for variation
      *
      */
+	 function remove_measure_meta() {
+		 remove_meta_box( 'measuresdiv', 'variation', 'side' );
+	}
+
     function pbc_metabox_variation( $meta_boxes )
     {
 		// Phase options
@@ -296,6 +300,16 @@ class PBCPlugin
         	$var_options[$var_item->ID] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
         }
 		asort($var_options);
+		// Phase options
+        $measure_options = array();
+        $measurescpt = get_terms( array(
+		    'taxonomy' => 'measures',
+		    'hide_empty' => false,
+		) );
+        $measurescpt_item = array();
+        foreach ($measurescpt as $measurescpt_item) {
+           $measure_options[$measurescpt_item->term_id] = $measurescpt_item->name;
+        }
 
     	$prefix = 'pbc_';
     	// 1st meta box
@@ -328,16 +342,6 @@ class PBCPlugin
     				'clone' => false,
                     'columns' => 3,
     			),
-    			// TEXT
-    			array(
-    				'name'  => __( 'Price', 'pbc' ),
-    				'id'    => "{$prefix}price",
-    				'desc'  => '',
-    				'type'  => 'text',
-    				'std'   => '',
-    				'clone' => false,
-                    'columns' => 1,
-    			),
     			// IMAGE ADVANCED (WP 3.5+)
     			array(
     				'name'             => esc_html__( 'Image Product', 'pbc' ),
@@ -369,6 +373,37 @@ class PBCPlugin
 		    				'multiple'    => false,
 		    				'std'         => '',
 		    				'placeholder' => __( 'Select a Variation', 'pbc' ),
+		    			),
+					),
+				), //array
+
+
+				array(
+    				'name'   => esc_html__( 'Price', 'pbc' ),
+					'id'     => "{$prefix}pricegroup",
+					'type'   => 'group',
+					'clone'  => true,
+					'sort_clone' => true,
+					'fields' => array(
+						// SELECT BOX VARIATIONS
+						array(
+							'name'        => __( 'Measure', 'pbc' ),
+							'id'          => "{$prefix}meaprice",
+							'type'        => 'select',
+							'options'     => $measure_options,
+							'multiple'    => false,
+							'std'         => '',
+							'placeholder' => __( 'Select a measure', 'pbc' ),
+						),
+		    			// TEXT
+		    			array(
+		    				'name'  => __( 'Price', 'pbc' ),
+		    				'id'    => "{$prefix}pricem",
+		    				'desc'  => '',
+		    				'type'  => 'text',
+		    				'std'   => '',
+		    				'clone' => false,
+		                    'columns' => 1,
 		    			),
 					),
 				), //array
