@@ -226,9 +226,26 @@ if(empty($cStep)) $cStep = 1;
                         <div class="phase_variations">
                         <?php $variations = get_posts('posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value='.$phase_id.'&fields=ids');
                             if(!empty($variations)){
-                                if(isset($_SESSION) && isset($_SESSION['pbc_variation'][$cStep]))
+                                foreach($variations as $key => $variation){
+                                    $pbc_depends = get_post_meta($variation, 'pbc_depends', true);
+                                    if(!empty($pbc_depends)){
+                                        $prevVar = array();
+                                        foreach($pbc_depends as $deps)
+                                            $prevVar[] = $deps['pbc_depvar'];
+                                        if($cStep != 1 && isset($_SESSION['pbc_variation'][$cStep-1])){
+                                            if(!in_array($_SESSION['pbc_variation'][$cStep-1]['var']['id'], $prevVar)){
+                                                unset($variations[$key]);
+                                            }
+                                        }
+                                    }
+                                    sort($variations);
+                                }
+                                if(isset($_SESSION) && isset($_SESSION['pbc_variation'][$cStep]) &&
+                                    in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
+                                )
                                     $sVar = $_SESSION['pbc_variation'][$cStep]['var']['id'];
                                 else $sVar = $variations[0];
+                                if(!empty($variations)){
                                 ?>
                                 <ul>
                                     <?php foreach($variations as $variation){?>
@@ -243,7 +260,8 @@ if(empty($cStep)) $cStep = 1;
                                     </li>
                                 <?php }?>
                                 </ul>
-                        <?php }else{?>
+                            <?php }
+                            }else{?>
                             <div class="error"><?php _e('No Variations Avaiable','pbc');?></div>
                         <?php }?>
                         </div>
