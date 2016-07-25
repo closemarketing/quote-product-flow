@@ -241,7 +241,7 @@ else $cStep = 1;
                                 <?php }?>
                                 </ul>
                         <?php }else{?>
-                            <div class="error">No Variations Avaiable</div>
+                            <div class="error"><?php _e('No Variations Avaiable','pbc');?></div>
                         <?php }?>
                         </div>
                     </div>
