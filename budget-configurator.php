@@ -273,10 +273,10 @@ if(empty($cStep)) $cStep = 1;
                                 $prev_button = '';
                             }elseif($cStep == 'calculate'){
                                 $prev_step = count($phases);
-                                $prev_button = 'Back';
+                                $prev_button = __('Back', 'pbc');
                             }else{
                                 $prev_step = $cStep-1;
-                                $prev_button = 'Back';
+                                $prev_button = __('Back', 'pbc');
                             }
 
                             if($cStep == 'calculate'){
@@ -284,10 +284,10 @@ if(empty($cStep)) $cStep = 1;
                                 $next_button = '';
                             }elseif($cStep == count($phases)){
                                 $next_step = 'calculate';
-                                $next_button = 'Calculate';
+                                $next_button = __('Calculate', 'pbc');
                             }else{
                                 $next_step = $cStep+1;
-                                $next_button = 'Next';
+                                $next_button = __('Next', 'pbc');
                             }
                         ?>
                         <?php if($prev_step && $prev_button){?>
