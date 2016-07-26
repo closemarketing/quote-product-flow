@@ -465,8 +465,6 @@ class PBCPlugin
 	public function manage_var_columns($column_name, $id) {
 	    global $wpdb, $post;
 
-		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
-
 		//* Price group
 		$price_group = rwmb_meta( 'pbc_pricegroup' );
 		$price_column = '';
@@ -490,6 +488,8 @@ class PBCPlugin
         	$depends_column .= $phase_order.' - '.$phase_post->post_title.' - '.$var_post->post_title;
 			$depends_column .= '<br/>';
 		}
+
+		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
 
 	    switch ($column_name) {
 
