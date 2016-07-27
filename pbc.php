@@ -33,26 +33,28 @@ class PBCPlugin
 		register_activation_hook( $this->file, array( $this, 'pbc_install' ) );
 
         // Initial stuff
-		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'admin_init', array( $this, 'init' ) );
+		add_action('init', array( $this, 'init' ) );
+		add_action('admin_init', array( $this, 'init' ) );
 
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
-		add_action( 'init', array( $this, 'pbc_register_cpt') );
-		add_action( 'admin_menu' , array($this, 'remove_measure_meta') );
-        add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
+		add_action('init', array( $this, 'pbc_register_cpt') );
+		add_action('admin_menu' , array($this, 'remove_measure_meta') );
+        add_filter('rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
 
 		add_filter('manage_edit-phases_columns', array($this,'add_new_phases_columns') );
 		add_action('manage_phases_posts_custom_column', array($this,'manage_phases_columns'), 10, 2);
 
 		add_filter('manage_edit-variation_columns', array($this,'add_new_var_columns') );
 		add_action('manage_variation_posts_custom_column', array($this,'manage_var_columns'), 10, 2);
+		add_action('restrict_manage_posts', array($this, 'pbc_admin_posts_filter') );
+		add_filter('parse_query', array($this, 'pbc_posts_filter') );
 
 		add_filter( 'template_include', array($this,'pbc_custom_page_template'), 99 );
-		add_action( 'wp_ajax_variation_selected', array($this,'variation_selected_action_callback') );
-		add_action( 'wp_ajax_nopriv_variation_selected', array($this,'variation_selected_action_callback') );
-		add_action( 'wp_ajax_configurator_submit', array($this,'configurator_submit_action_callback') );
-		add_action( 'wp_ajax_nopriv_configurator_submit', array($this,'configurator_submit_action_callback') );
+		add_action('wp_ajax_variation_selected', array($this,'variation_selected_action_callback') );
+		add_action('wp_ajax_nopriv_variation_selected', array($this,'variation_selected_action_callback') );
+		add_action('wp_ajax_configurator_submit', array($this,'configurator_submit_action_callback') );
+		add_action('wp_ajax_nopriv_configurator_submit', array($this,'configurator_submit_action_callback') );
 
 	}
 
@@ -308,7 +310,7 @@ class PBCPlugin
         	$var_options[$var_item->ID] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
         }
 		asort($var_options);
-		// Phase options
+		// Measure options
         $measure_options = array();
         $measurescpt = get_terms( array(
 		    'taxonomy' => 'measures',
@@ -380,7 +382,7 @@ class PBCPlugin
 		    				'options'     => $var_options,
 		    				'multiple'    => false,
 		    				'std'         => '',
-		    				'placeholder' => __( 'Select a Variation', 'pbc' ),
+		    				'placeholder' => __( 'Not depends of a Variation', 'pbc' ),
 		    			),
 					),
 				), //array
@@ -401,7 +403,7 @@ class PBCPlugin
 							'options'     => $measure_options,
 							'multiple'    => false,
 							'std'         => '',
-							'placeholder' => __( 'Select a measure', 'pbc' ),
+							'placeholder' => __( 'Not have a measure', 'pbc' ),
 						),
 		    			// TEXT
 		    			array(
@@ -463,18 +465,31 @@ class PBCPlugin
 	public function manage_var_columns($column_name, $id) {
 	    global $wpdb, $post;
 
-		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
-		$price = get_post_meta(get_the_id(),'pbc_price',true);
+		//* Price group
+		$price_group = rwmb_meta( 'pbc_pricegroup' );
+		$price_column = '';
+		foreach($price_group as $price_item) {
+			if(isset($price_item['pbc_meaprice'])) {
+			$var_term = get_term($price_item['pbc_meaprice']);
+        	$price_column .= $var_term->name.' - '.$price_item['pbc_pricem'].' €';
+			} else { // Price without any option
+			$price_column .= $price_item['pbc_pricem'].' €';
+			}
+			$price_column .= '<br/>';
+		}
+		//* Depends group
 		$depends_group = rwmb_meta( 'pbc_depends' );
 		$depends_column = '';
 		foreach($depends_group as $depends_item) {
 			$var_post = get_post($depends_item['pbc_depvar']);
-			$phase_id = get_post_meta($var_post->ID, 'pbc_phase', true);
-			$phase_post = get_post($phase_id);
-			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
-        	$depends_column .= $phase_order.' - '.$phase_post->post_title.' - '.$var_post->post_title;
+			$phase_id_dp = get_post_meta($var_post->ID, 'pbc_phase', true);
+			$phase_post_dp = get_post($phase_id_dp);
+			if($phase_post_dp->menu_order<10) $phase_order = '0'.$phase_post_dp->menu_order; else $phase_order = $phase_post_dp->menu_order;
+        	$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$var_post->post_title;
 			$depends_column .= '<br/>';
 		}
+
+		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
 
 	    switch ($column_name) {
 
@@ -483,7 +498,7 @@ class PBCPlugin
 	        echo $phase_post->menu_order.' - '.$phase_post->post_title;
 	        break;
 	    case 'price':
-	        echo $price;
+	        echo $price_column;
 	        break;
 	    case 'depends':
 			echo $depends_column;
@@ -493,6 +508,75 @@ class PBCPlugin
 	    } // end switch
 	}
 
+	/**
+	* Filters columns in variation post type
+	**/
+
+	public function pbc_admin_posts_filter(){
+	    $type = 'variation';
+	    if (isset($_GET['post_type'])) {
+	        $type = $_GET['post_type'];
+	    }
+
+	    //only add filter to post type you want
+	    if ('variation' == $type){
+	        //change this to the list of values you want to show
+	        //in 'label' => 'value' format
+
+			// Phase Filter
+	        $phase_options = array();
+	        $phasescpt = get_posts(array(
+	            'post_type' => 'phases',
+	            'posts_per_page' => -1,
+	            'post_parent'=> 0,
+	            'orderby' => 'menu_order',
+	            'order' => 'ASC'
+	        ));
+	        $phasescpt_item = array();
+	        foreach ($phasescpt as $phasescpt_item) {
+	           $phase_options[$phasescpt_item->menu_order.' - '.$phasescpt_item->post_title] = $phasescpt_item->ID;
+	        }
+
+	        ?>
+	        <select name="pbc_filter_phase">
+	        <option value=""><?php _e('All Phases', 'pbc'); ?></option>
+	        <?php
+	            $current_v = isset($_GET['pbc_filter_phase'])? $_GET['pbc_filter_phase']:'';
+	            foreach ($phase_options as $label => $value) {
+	                printf
+	                    (
+	                        '<option value="%s"%s>%s</option>',
+	                        $value,
+	                        $value == $current_v? ' selected="selected"':'',
+	                        $label
+	                    );
+	                }
+	        ?>
+	        </select>
+	        <?php
+	    }
+	}
+	/**
+	 * if submitted filter by post meta
+	 *
+	 * make sure to change META_KEY to the actual meta key
+	 * and variation to the name of your custom post type
+	 * @author Ohad Raz
+	 * @param  (wp_query object) $query
+	 *
+	 * @return Void
+	 */
+	public function pbc_posts_filter( $query ){
+	    global $pagenow;
+	    $type = 'post';
+	    if (isset($_GET['post_type'])) {
+	        $type = $_GET['post_type'];
+	    }
+	    if ( 'variation' == $type && is_admin() && $pagenow=='edit.php' && isset($_GET['pbc_filter_phase']) && $_GET['pbc_filter_phase'] != '') {
+	        $query->query_vars['meta_key'] = 'pbc_phase';
+	        $query->query_vars['meta_value'] = $_GET['pbc_filter_phase'];
+	    }
+	}
 
 	public function pbc_custom_page_template( $template ) {
 		if ( \is_page( 'budget-configurator' )  ) {
@@ -560,7 +644,7 @@ class PBCPlugin
 		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
 			$sVar = $pbc_variation[$current_phase];
 			$imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
-			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true)[0];}?>
+			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
 		<?php }
 		if(isset($imgprodurl) && $imgprodurl){
 			$return = $imgprodurl;
@@ -678,7 +762,7 @@ $pbc_plugin = new PBCPlugin( __FILE__ );
  */
  require_once dirname( __FILE__ ) . '/vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php';
 
-add_action( 'tgmpa_register', 'pbc_required_plugins' );
+add_action('tgmpa_register', 'pbc_required_plugins' );
 function pbc_required_plugins() {
 	/*
 	 * Array of plugin arrays. Required keys are name and slug.

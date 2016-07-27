@@ -269,7 +269,7 @@ if(empty($cStep)) $cStep = 1;
                                     <li class="variation_list">
                                         <?php $imgicon = get_post_meta($variation, 'pbc_imgicon', true);
                                         if($imgicon){?>
-                                            <div class="variation_img"><img src="<?php echo wp_get_attachment_image_src($imgicon, 'thumbnail', true)[0];?>" alt="variation image"/></div>
+                                            <div class="variation_img"><img src="<?php echo wp_get_attachment_image_src($imgicon, 'thumbnail', true);?>" alt="variation image"/></div>
                                         <?php }?>
                                         <label>
                                             <input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation;?>" <?php if($variation == $sVar) echo 'checked="checked"';?>/> <?php echo get_the_title($variation);?>
@@ -311,12 +311,12 @@ if(empty($cStep)) $cStep = 1;
                             <?php
                             if($sVar){
                                 $imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
-                                if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true)[0];}?>
+                                if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){?>
                                 <img src="<?php echo $imgprodurl;?>" alt="product image"/>
                             <?php }else{?>
-                                <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.jpg';?>" alt="product image"/>
+                                <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
                             <?php }?>
                         </div>
                         <div class="status_loader product_preview_status fixed hidden"></div>
