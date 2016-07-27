@@ -424,6 +424,9 @@ class PBCPlugin
     	return $meta_boxes;
     }
 
+	/*
+	 * Disables dropdown dates
+	 */
 	public function disable_months_dropdown( $false , $post_type ) {
 
 		$disable_months_dropdown = $false;
@@ -439,6 +442,7 @@ class PBCPlugin
 		return $disable_months_dropdown;
 
 	}
+
 	/** Add columns for Phases **/
 	// Add to admin_init function
 	public function add_new_phases_columns($phases_columns) {
