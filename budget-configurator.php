@@ -442,7 +442,6 @@ if(empty($cStep)) $cStep = 1;
                         success: function(response) {
                             var resArr = response.split(';;--;;');
                             var obj = jQuery.parseJSON(resArr[1]);
-                            console.log(response);
                             if(obj.type == 'error'){
                                 $('.product_preview').find('.product_preview_status').html('<div>'+obj.msg+'</div>').show().delay(4000, function(){
                                     window.setTimeout( function(){
@@ -468,7 +467,11 @@ if(empty($cStep)) $cStep = 1;
                         dataType: "html",
                         success: function(response) {
                             $('.page-configurator').html(response);
-                            if('<?php echo $cStep;?>' != 'calculate' && $(document).find('input[type=radio].pbc_variation').length == 0){
+                            if(
+                                '<?php echo $next_step;?>' != 'calculate' &&
+                                (submit_val == 'prev' || submit_val == 'next') && $(document).find('input[type=radio].pbc_variation').length == 0
+                            )
+                            {
                                 $(document).find('button[name=submit][value='+submit_val+']').trigger('click');
                             }else{
                                 $(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
