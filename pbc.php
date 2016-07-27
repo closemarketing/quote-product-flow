@@ -42,6 +42,7 @@ class PBCPlugin
 		add_action('admin_menu' , array($this, 'remove_measure_meta') );
         add_filter('rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
 
+		add_filter( 'disable_months_dropdown' , array($this,'disable_months_dropdown') , 10 , 2 );
 		add_filter('manage_edit-phases_columns', array($this,'add_new_phases_columns') );
 		add_action('manage_phases_posts_custom_column', array($this,'manage_phases_columns'), 10, 2);
 
@@ -138,10 +139,10 @@ class PBCPlugin
              // Taxonomy :: Manage News Categories
              array(
                  'parent_slug'   => 'pbc_menu',
-                 'page_title'    => __('Measures in Variation Prices','pbc'),
-                 'menu_title'    => __('Measures','pbc'),
+                 'page_title'    => __('Price Options in Variation Prices','pbc'),
+                 'menu_title'    => __('Price Options','pbc'),
                  'capability'    => 'manage_options',
-                 'menu_slug'     => 'edit-tags.php?taxonomy=measures&post_type=variation',
+                 'menu_slug'     => 'edit-tags.php?taxonomy=priceoption&post_type=variation',
                  'function'      => null,// Doesn't need a callback function.
              ),
 
@@ -251,23 +252,23 @@ class PBCPlugin
         register_post_type('variation',$args);
 
 		$labels = array(
-		  'name' => __('Measures','pbc'),
-		  'singular_name' => __('Measure','pbc'),
-		  'search_items' =>  __('Search measure','pbc'),
-		  'all_items' => __('All measures','pbc'),
-		  'edit_item' => __('Edit measure','pbc'),
-		  'update_item' => __('Update measure','pbc'),
-		  'add_new_item' => __('Add New measure','pbc'),
-		  'new_item_name' => __('New measure','pbc'),
+		  'name' => __('Price Options','pbc'),
+		  'singular_name' => __('Price Option','pbc'),
+		  'search_items' =>  __('Search Price Option','pbc'),
+		  'all_items' => __('All Price Options','pbc'),
+		  'edit_item' => __('Edit Price Option','pbc'),
+		  'update_item' => __('Update Price Option','pbc'),
+		  'add_new_item' => __('Add New Price Option','pbc'),
+		  'new_item_name' => __('New Price Option','pbc'),
 		);
 
-		register_taxonomy( 'measures', array( 'variation' ), array(
+		register_taxonomy( 'priceoption', array( 'variation' ), array(
 		  'hierarchical' => true,
 		  'labels' => $labels,
           'show_in_menu' => false,
 		  'show_ui' => true,
 		  'query_var' => true,
-		  'rewrite' => array( 'slug' => 'measures' ),
+		  'rewrite' => array( 'slug' => 'price-option' ),
 		));
     }
 
@@ -276,7 +277,7 @@ class PBCPlugin
      *
      */
 	 function remove_measure_meta() {
-		 remove_meta_box( 'measuresdiv', 'variation', 'side' );
+		 remove_meta_box( 'priceoptiondiv', 'variation', 'side' );
 	}
 
     function pbc_metabox_variation( $meta_boxes )
@@ -312,13 +313,13 @@ class PBCPlugin
 		asort($var_options);
 		// Measure options
         $measure_options = array();
-        $measurescpt = get_terms( array(
-		    'taxonomy' => 'measures',
+        $priceoptioncpt = get_terms( array(
+		    'taxonomy' => 'priceoption',
 		    'hide_empty' => false,
 		) );
-        $measurescpt_item = array();
-        foreach ($measurescpt as $measurescpt_item) {
-           $measure_options[$measurescpt_item->term_id] = $measurescpt_item->name;
+        $priceoptioncpt_item = array();
+        foreach ($priceoptioncpt as $priceoptioncpt_item) {
+           $measure_options[$priceoptioncpt_item->term_id] = $priceoptioncpt_item->name;
         }
 
     	$prefix = 'pbc_';
@@ -397,17 +398,17 @@ class PBCPlugin
 					'fields' => array(
 						// SELECT BOX VARIATIONS
 						array(
-							'name'        => __( 'Measure', 'pbc' ),
+							'name'        => __( 'Price Option', 'pbc' ),
 							'id'          => "{$prefix}meaprice",
 							'type'        => 'select',
 							'options'     => $measure_options,
 							'multiple'    => false,
 							'std'         => '',
-							'placeholder' => __( 'Not have a measure', 'pbc' ),
+							'placeholder' => __( 'Not have a Price Option', 'pbc' ),
 						),
 		    			// TEXT
 		    			array(
-		    				'name'  => __( 'Price', 'pbc' ),
+		    				'name'  => __( 'Price (excluded VAT)', 'pbc' ),
 		    				'id'    => "{$prefix}pricem",
 		    				'desc'  => '',
 		    				'type'  => 'text',
@@ -423,7 +424,21 @@ class PBCPlugin
     	return $meta_boxes;
     }
 
+	public function disable_months_dropdown( $false , $post_type ) {
 
+		$disable_months_dropdown = $false;
+
+		$disable_post_types = array( 'variation' , 'phases' );
+
+		if( in_array( $post_type , $disable_post_types ) ) {
+
+			$disable_months_dropdown = true;
+
+		}
+
+		return $disable_months_dropdown;
+
+	}
 	/** Add columns for Phases **/
 	// Add to admin_init function
 	public function add_new_phases_columns($phases_columns) {
