@@ -27,12 +27,29 @@ if(isset($_POST['submit'])){
         foreach($_POST['pbc_variation'] as $key => $pbc_variation)
         {
             if(!empty($phases)){
+                $price = $option_name = '';
+                $pricegroup = get_post_meta($pbc_variation, 'pbc_pricegroup', true);
+                if(isset($pbc_pricevar)){
+                    $term = get_term_by( 'id', $pbc_pricevar, 'measures');
+                    if(!empty($term)){
+                        foreach($pricegroup as $details ){
+                            if($term->term_id == $details['pbc_meaprice']){
+                                $option_name = $term->name;
+                                $price = $details['pbc_pricem'];
+                            }
+                        }
+                    }
+                }else{
+                    if(isset($pricegroup[0]['pbc_pricem']))
+                        $price = $pricegroup[0]['pbc_pricem'];
+                }
                 $phase_id = $phases[((int)$key-1)];
                 $_SESSION['pbc_variation'][$key]['phase']['id'] = $phase_id;
-                $_SESSION['pbc_variation'][$key]['phase']['name'] = get_the_title($phase_id);;
+                $_SESSION['pbc_variation'][$key]['phase']['name'] = get_the_title($phase_id);
                 $_SESSION['pbc_variation'][$key]['var']['id'] = $pbc_variation;
                 $_SESSION['pbc_variation'][$key]['var']['name'] = get_the_title($pbc_variation);
-                $_SESSION['pbc_variation'][$key]['var']['price'] = get_post_meta($pbc_variation, 'pbc_price', true);
+                if($option_name) $_SESSION['pbc_variation'][$key]['var']['name'].= ' ['.$option_name.']';
+                $_SESSION['pbc_variation'][$key]['var']['price'] = $price;
             }
         }
         ksort($_SESSION['pbc_variation'], SORT_NUMERIC);
@@ -162,7 +179,7 @@ if(empty($cStep)) $cStep = 1;
         padding-top: 15px;
     }
     .configurator_form_action .prev, .configurator_form_action .next{display: inline-block;}
-    .status_loader.fixed{position: fixed;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.8);vertical-align: middle;text-align: center;top: 0;z-index: 9999;}
+    .status_loader.fixed{position: fixed;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.8);vertical-align: middle;text-align: center;top: 0;z-index: 9999;left:0;}
     .status_loader.product_preview_status.fixed{position: absolute;}
     .status_loader.fixed > div {
         position: relative;
@@ -257,6 +274,27 @@ if(empty($cStep)) $cStep = 1;
                                         <label>
                                             <input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation;?>" <?php if($variation == $sVar) echo 'checked="checked"';?>/> <?php echo get_the_title($variation);?>
                                         </label>
+                                        <?php
+                                        $priceVar = array();
+                                        $pricegroup = get_post_meta($variation, 'pbc_pricegroup', true);
+                                        if(!empty($pricegroup) && isset($pricegroup[0]['pbc_meaprice'])){
+                                            foreach($pricegroup as $key => $details){
+                                                if(!empty($details['pbc_meaprice'])){
+                                                    $term = get_term_by( 'id', $details['pbc_meaprice'], 'measures');
+                                                    if(!empty($term)){
+                                                        $priceVar[$term->term_id] = $term->name;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if(!empty($priceVar)){?>
+                                            <div class="pbc_pricevarwrap"><select name="pbc_pricevar">
+                                                <?php foreach($priceVar as $termid => $termname){?>
+                                                <option value="<?php echo $termid;?>"><?php echo $termname;?></option>
+                                                <?php }?>
+                                            </select></div>
+                                        <?php
+                                        }?>
                                     </li>
                                 <?php }?>
                                 </ul>
