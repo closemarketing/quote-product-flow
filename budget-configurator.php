@@ -247,12 +247,15 @@ if(empty($cStep)) $cStep = 1;
                                     $pbc_depends = get_post_meta($variation, 'pbc_depends', true);
                                     if(!empty($pbc_depends)){
                                         $prevVar = array();
-                                        foreach($pbc_depends as $deps)
+                                        foreach($pbc_depends as $deps){
                                             $prevVar[] = $deps['pbc_depvar'];
+                                        }
                                         if($cStep != 1 && isset($_SESSION['pbc_variation'][$cStep-1])){
-                                            if(!in_array($_SESSION['pbc_variation'][$cStep-1]['var']['id'], $prevVar)){
-                                                unset($variations[$key]);
-                                            }
+                                            //foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations){
+                                                if(!in_array($_SESSION['pbc_variation'][$cStep-1]['var']['id'], $prevVar)){
+                                                    unset($variations[$key]);
+                                                }
+                                            //}
                                         }
                                     }
                                     sort($variations);
@@ -464,10 +467,15 @@ if(empty($cStep)) $cStep = 1;
                         data: $('#'+form_id).serialize()+'&current_phase=<?php echo $cStep;?>&submit='+submit_val+'&action=configurator_submit',
                         dataType: "html",
                         success: function(response) {
-                            $(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
                             $('.page-configurator').html(response);
-                            if($(document).find('.result_submit_action').length > 0){
-                                $(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
+                            if('<?php echo $cStep;?>' != 'calculate' && $(document).find('input[type=radio].pbc_variation').length == 0){
+                                $(document).find('button[name=submit][value='+submit_val+']').trigger('click');
+                            }else{
+                                $(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+                                //$('.page-configurator').html(response);
+                                if($(document).find('.result_submit_action').length > 0){
+                                    $(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
+                                }
                             }
                         }
                     });
