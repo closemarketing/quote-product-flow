@@ -308,7 +308,8 @@ class PBCPlugin
 			$phase_id = get_post_meta($var_item->ID, 'pbc_phase', true);
 			$phase_post = get_post($phase_id);
 			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
-        	$var_options[$var_item->ID] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
+			$var_value = $phase_order.'|'.$var_item->ID;
+        	$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
         }
 		asort($var_options);
 		// Measure options
