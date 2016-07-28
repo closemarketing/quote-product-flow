@@ -242,20 +242,31 @@ if(empty($cStep)) $cStep = 1;
                         </div>
                         <div class="phase_variations">
                         <?php $variations = get_posts('posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value='.$phase_id.'&fields=ids');
-                            if(!empty($variations)){
-                                foreach($variations as $key => $variation){
+                            if(!empty($variations))
+                            {
+                                foreach($variations as $key => $variation)
+                                {
                                     $pbc_depends = get_post_meta($variation, 'pbc_depends', true);
-                                    if(!empty($pbc_depends)){
+                                    if(!empty($pbc_depends))
+                                    {
                                         $prevVar = array();
-                                        foreach($pbc_depends as $deps){
-                                            $prevVar[] = $deps['pbc_depvar'];
+                                        foreach($pbc_depends as $deps)
+                                        {
+                                            $arr = explode('|', $deps['pbc_depvar']);
+                                            if(!empty($arr[0]) && !empty($arr[1])){
+                                                $prevVar[(int)$arr[0]][] = $arr[1];
+                                            }
                                         }
-                                        if($cStep != 1 && isset($_SESSION['pbc_variation'][$cStep-1])){
-                                            //foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations){
-                                                if(!in_array($_SESSION['pbc_variation'][$cStep-1]['var']['id'], $prevVar)){
+                                        if($cStep != 1 && isset($_SESSION['pbc_variation'][$cStep-1]))
+                                        {
+                                            foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+                                            {
+                                                if(isset($prevVar[$sPhaseKey]) && !in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+                                                {
                                                     unset($variations[$key]);
+                                                    break;
                                                 }
-                                            //}
+                                            }
                                         }
                                     }
                                     sort($variations);
