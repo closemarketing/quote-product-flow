@@ -501,7 +501,7 @@ class PBCPlugin
 		$depends_column = '';
 		foreach($depends_group as $depends_item) {
 			$var_post = get_post($depends_item['pbc_depvar']);
-			$phase_id_dp = get_post_meta($var_post->ID, 'pbc_phase', true);
+			$phase_id_dp = get_post_meta($depends_item['pbc_depvar'], 'pbc_phase', true);
 			$phase_post_dp = get_post($phase_id_dp);
 			if($phase_post_dp->menu_order<10) $phase_order = '0'.$phase_post_dp->menu_order; else $phase_order = $phase_post_dp->menu_order;
         	$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$var_post->post_title;
