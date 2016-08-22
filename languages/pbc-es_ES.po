@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Product Budget Configurator\n"
 "POT-Creation-Date: 2016-08-05 13:55+0200\n"
-"PO-Revision-Date: 2016-08-05 13:57+0200\n"
+"PO-Revision-Date: 2016-08-22 17:48+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
 "Language: es_ES\n"
@@ -62,14 +62,12 @@ msgid "Product Budget Configurator"
 msgstr "Configurador Presupuestos Producto"
 
 #: pbc.php:112
-#, fuzzy
 msgid "Summary of Product Budget Configurator"
-msgstr "Configurador Presupuestos Producto"
+msgstr "Resumen Configurador Productos"
 
 #: pbc.php:113
-#, fuzzy
 msgid "Summary"
-msgstr "Sumario de eventos(nombre)"
+msgstr "Resumen"
 
 #: pbc.php:122
 msgid "Phases of Configurator"
@@ -88,14 +86,12 @@ msgid "Variations"
 msgstr "Variaciones"
 
 #: pbc.php:142
-#, fuzzy
 msgid "Price Options in Variation Prices"
-msgstr "Medidas en los Precios de la Variación"
+msgstr "Opciones de variación de precios"
 
 #: pbc.php:143 pbc.php:255
-#, fuzzy
 msgid "Price Options"
-msgstr "Variaciones"
+msgstr "Opciones de Precio"
 
 #: pbc.php:174
 msgid "Global Settings"
@@ -196,18 +192,16 @@ msgid "All Price Options"
 msgstr "Todas las opciones de precio"
 
 #: pbc.php:259
-#, fuzzy
 msgid "Edit Price Option"
-msgstr "Editar variación"
+msgstr "Editar Opción de precio"
 
 #: pbc.php:260
 msgid "Update Price Option"
 msgstr "Actualizar Opción de Precio"
 
 #: pbc.php:261
-#, fuzzy
 msgid "Add New Price Option"
-msgstr "Añadir nueva variación"
+msgstr "Añadir nueva opción"
 
 #: pbc.php:262
 msgid "New Price Option"
@@ -246,9 +240,8 @@ msgid "Price"
 msgstr "Precio"
 
 #: pbc.php:408
-#, fuzzy
 msgid "Not have a Price Option"
-msgstr "No tiene medida"
+msgstr "No tiene opción"
 
 #: pbc.php:412
 msgid "Price (excluded VAT)"
@@ -421,7 +414,7 @@ msgstr ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2626
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3673
 msgid "Return to the Dashboard"
-msgstr ""
+msgstr "Regresa al Escritorio"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:607
 msgid "This plugin needs to be updated to be compatible with your theme."
@@ -429,7 +422,7 @@ msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:608
 msgid "Update Required"
-msgstr ""
+msgstr "Actualización requerida"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:725
 msgid "Set the parent_slug config variable instead."
@@ -498,7 +491,6 @@ msgid "Active"
 msgstr "Activo"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2420
-#, fuzzy
 msgid "Required Update not Available"
 msgstr "La actualización requerida no está disponible"
 
@@ -507,15 +499,14 @@ msgid "Requires Update"
 msgstr "Requiere Actualización"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2426
-#, fuzzy
 msgid "Update recommended"
 msgstr "Actualización recomendada"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2435
-#, fuzzy, php-format
+#, php-format
 msgctxt "Install/Update Status"
 msgid "%1$s, %2$s"
-msgstr "%1$s %2$s"
+msgstr "%1$s, %2$s [Estado de Actualización/Instalación]"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2481
 #, php-format
@@ -547,17 +538,15 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2575
-#, fuzzy
 msgctxt "as in: \"version nr unknown\""
 msgid "unknown"
-msgstr "Desconcido"
+msgstr "desconocida"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2583
 msgid "Installed version:"
 msgstr "Versión instalada:"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2591
-#, fuzzy
 msgid "Minimum required version:"
 msgstr "Versión mínima requerida:"
 
@@ -654,7 +643,7 @@ msgid "Updating Plugin %1$s (%2$d/%3$d)"
 msgstr "Actualizando plugin %1$s (%2$d/%3$d)"
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3594
-#, fuzzy, php-format
+#, php-format
 msgid "An error occurred while installing %1$s: <strong>%2$s</strong>."
 msgstr ""
 "Se produjo un error durante la instalación de %1$s: <strong>%2$s</strong>."
