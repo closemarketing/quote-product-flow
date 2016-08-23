@@ -886,8 +886,9 @@ class PBCPlugin
 				</tr>
 			<?php endwhile; ?>
 			<?php wp_reset_postdata(); ?>
-			<?php endif; ?>
+
 			</table>
+			<?php endif; ?>
 		<?php }
 		$content = ob_get_contents();
 		ob_end_clean();
