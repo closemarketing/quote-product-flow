@@ -807,7 +807,8 @@ class PBCPlugin
 						var resArr = result.split(';;--;;');
 						var obj = jQuery.parseJSON(resArr[1]);
 						if(obj.type=='success'){
-							window.prompt('PDF is generated, Please copy the link below!',obj.msg);
+							//window.prompt('PDF is generated, Please copy the link below!',obj.msg);
+							window.open(obj.msg, '_blank');
 							ids =[];
 							$('#print-message').html('');
 						}else{
