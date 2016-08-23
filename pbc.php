@@ -825,14 +825,70 @@ class PBCPlugin
 	}
 	public function print_pdf_action_callback(){
 		extract($_REQUEST);
-		if(empty($ids)){
+		/*if(empty($ids)){
 			$ids = get_posts('posts_per_page=-1&post_type=variation&fields=ids');
 		}else{
 			$ids = explode(',',$ids);
-		}
+		}*/
 
 		ob_start();
-		echo '<pre>';print_r($ids);echo '</pre>';
+		/*Content of PDF file*/
+
+		$phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
+		foreach ($phases as $phase) {
+			echo '<h1>'.$phase->menu_order.' . '.$phase->post_title.'</h1>';
+
+			$args = array(
+			  'numberposts' => -1,
+			  'post_type' => 'variation',
+			  'meta_query' => array (
+				array (
+				  'key' => 'pbc_phase',
+				  'value' => $phase->ID,
+				)
+			  ) );
+
+			$variation_in_phase = new WP_Query( $args ); ?>
+			<?php if ( $variation_in_phase->have_posts() ) : ?>
+			<table>
+
+			<!-- the loop -->
+			<?php while ( $variation_in_phase->have_posts() ) : $variation_in_phase->the_post(); ?>
+				<tr>
+					<td><?php //* Title ?>
+						<h2><?php the_title(); ?></h2>
+					</td>
+					<td><?php //* Price group
+						$price_group = rwmb_meta( 'pbc_pricegroup' );
+						$price_column = '';
+						foreach($price_group as $price_item) {
+							if(isset($price_item['pbc_meaprice'])) {
+							$var_term = get_term($price_item['pbc_meaprice']);
+							$price_column .= $var_term->name.' - '.$price_item['pbc_pricem'].' €';
+							} else { // Price without any option
+							$price_column .= $price_item['pbc_pricem'].' €';
+							}
+							$price_column .= '<br/>';
+						}
+						echo $price_column;
+						?>
+					</td>
+					<td><?php //* Image Product
+						$imgicon_group = rwmb_meta( 'pbc_imgicon' );
+						print_r( $imgicon_group );
+						?>
+					</td>
+					<td><?php //* Image Product
+						$imgicon = rwmb_meta( 'pbc_imgicon' );
+						print_r ($imgicon_group);
+						?>
+					</td>
+				</tr>
+			<?php endwhile; ?>
+			<?php wp_reset_postdata(); ?>
+			<?php endif; ?>
+			</table>
+		<?php }
 		$content = ob_get_contents();
 		ob_end_clean();
 
