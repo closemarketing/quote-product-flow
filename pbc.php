@@ -815,9 +815,15 @@ class PBCPlugin
 					data: 'action=print_pdf&ids='+ids,
 					dataType: "html",
 					success: function(result) {
-						console.log(result);
-						ids =[];
-						$('#print-message').html('PDF is generated!').show().delay(3000).fadeOut(500);
+						var resArr = result.split(';;--;;');
+						var obj = jQuery.parseJSON(resArr[1]);
+						if(obj.type=='success'){
+							window.prompt('PDF is generated, Please copy the link below!',obj.msg);
+							ids =[];
+							$('#print-message').html('');
+						}else{
+							$('#print-message').html(obj.msg).show().delay(3000).fadeOut(500);
+						}
 					}
 				});
 				return false;
@@ -834,8 +840,41 @@ class PBCPlugin
 		}else{
 			$ids = explode(',',$ids);
 		}
+
+		ob_start();
 		echo '<pre>';print_r($ids);echo '</pre>';
-		echo ';;--;;'.json_encode(array('type'=>'success', 'msg'=>count($ids)));
+		$content = ob_get_contents();
+		ob_end_clean();
+
+		if (is_file(WPPBC_PLUGIN_DIR.
+			"/lib/html2pdf/html2pdf.class.php")
+		)
+		{
+			require_once(WPPBC_PLUGIN_DIR.
+				'/lib/html2pdf/html2pdf.class.php');
+			try {
+				$files = glob(WPPBC_PLUGIN_DIR."/pdf/*"); // get all file names
+				foreach($files as $file){ // iterate files
+				  if(is_file($file))
+				    unlink($file); // delete file
+				}
+				$filename = "Variations with prices ".date('Y-m-d H:i');
+				$width_mm = 710 * 0.2646;   //1px = 0.2646mm
+				$height_mm = 900 * 0.2646;
+				$html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
+				$html2pdf->setTestTdInOnePage(false);
+				$html2pdf->writeHTML($content);
+				$html2pdf->Output(WPPBC_PLUGIN_DIR."/pdf/$filename.pdf", 'F');
+				//$html2pdf->close();
+				$return = array('type'=>'success', 'msg'=>WPPBC_PLUGIN_URL."/pdf/$filename.pdf");
+			} catch (Html2PdfException $e) {
+				$formatter = new ExceptionFormatter($e);
+				$return = array('type'=>'error', 'msg'=>"Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage());
+			}
+		}else{
+			$return = array('type'=>'error', 'msg'=>'Error: PDF Library Not Present');
+		}
+		echo ';;--;;'.json_encode($return);
 		die(0);
 	}
 }
