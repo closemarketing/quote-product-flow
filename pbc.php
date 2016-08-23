@@ -56,6 +56,10 @@ class PBCPlugin
 		add_action('wp_ajax_nopriv_variation_selected', array($this,'variation_selected_action_callback') );
 		add_action('wp_ajax_configurator_submit', array($this,'configurator_submit_action_callback') );
 		add_action('wp_ajax_nopriv_configurator_submit', array($this,'configurator_submit_action_callback') );
+		//on variation-lists admin screen
+		add_filter( 'views_edit-variation', array($this,'pbc_add_print_pdf_button') );
+		add_action( 'admin_head-edit.php', array($this,'pbc_move_print_pdf_button') );
+		add_action('wp_ajax_print_pdf', array($this,'print_pdf_action_callback') );
 
 	}
 
@@ -766,6 +770,63 @@ class PBCPlugin
 			$result = array('type'=>'success', 'response'=>$output);
 		}
 		return $result;
+	}
+
+	//add print-pdf button
+	public function pbc_add_print_pdf_button( $views )
+	{
+		$views['pdf-button'] = '<button id="print-pdf" type="button" class="button" title="Print PDF" style="margin:0 5px">Print PDF</button><span id="print-message"></span>';
+		return $views;
+	}
+	public function pbc_move_print_pdf_button( )
+	{
+		global $current_screen;
+		// only variation post type, exit earlier
+		if( 'variation' != $current_screen->post_type )
+			return;
+		?>
+		<script type="text/javascript">
+			var ids = new Array();
+			jQuery(function($){
+				$('#print-pdf').insertAfter('#post-query-submit');
+				$('#print-message').insertAfter('#print-pdf');
+				$("#print-pdf").click(function(){
+					$("input[name='post[]']:checked").each(function (index, element){
+						ids.push($(element).val());
+					});
+				// if(ids ==''){
+				// 	$('#print-message').html('Please select a post!').show().delay(3000).fadeOut(500);
+				// 	return false;
+				// }
+				$('#print-message').html('<img src="<?php echo WPPBC_PLUGIN_URL;?>loading.gif"/>');
+				$.ajax({
+					type: "POST",
+					url: '<?php echo admin_url('admin-ajax.php');?>',
+					data: 'action=print_pdf&ids='+ids,
+					dataType: "html",
+					success: function(result) {
+						console.log(result);
+						ids =[];
+						$('#print-message').html('PDF is generated!').show().delay(3000).fadeOut(500);
+					}
+				});
+				return false;
+				});
+			});
+
+		</script>
+		<?php
+	}
+	public function print_pdf_action_callback(){
+		extract($_REQUEST);
+		if(empty($ids)){
+			$ids = get_posts('posts_per_page=-1&post_type=variation&fields=ids');
+		}else{
+			$ids = explode(',',$ids);
+		}
+		echo '<pre>';print_r($ids);echo '</pre>';
+		echo ';;--;;'.json_encode(array('type'=>'success', 'msg'=>count($ids)));
+		die(0);
 	}
 }
 
