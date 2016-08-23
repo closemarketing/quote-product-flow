@@ -61,6 +61,7 @@ class PBCPlugin
 		add_action( 'admin_head-edit.php', array($this,'pbc_move_print_pdf_button') );
 		add_action('wp_ajax_print_pdf', array($this,'print_pdf_action_callback') );
 
+		add_filter('admin_head', array($this, 'add_button_pdf_filter') );
 	}
 
 	////////////////////////////////////////////////////////////
@@ -533,6 +534,15 @@ class PBCPlugin
 	    } // end switch
 	}
 
+	public function add_button_pdf_filter($views){
+		?>
+	    <script>
+	    jQuery(function(){
+	        jQuery("body.post-type-variation .wrap h1").append('<a href="index.php?param=your-action" class="page-title-action"><?php _e('Create List Price','pbc');?></a>');
+	    });
+	    </script>
+	    <?php
+	}
 	/**
 	* Filters columns in variation post type
 	**/
