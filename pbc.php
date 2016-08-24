@@ -886,8 +886,9 @@ class PBCPlugin
 				</tr>
 			<?php endwhile; ?>
 			<?php wp_reset_postdata(); ?>
-			<?php endif; ?>
+
 			</table>
+			<?php endif; ?>
 		<?php }
 		$content = ob_get_contents();
 		ob_end_clean();
@@ -912,7 +913,7 @@ class PBCPlugin
 				$html2pdf->writeHTML($content);
 				$html2pdf->Output(WPPBC_PLUGIN_DIR."/pdf/$filename.pdf", 'F');
 				//$html2pdf->close();
-				$return = array('type'=>'success', 'msg'=>WPPBC_PLUGIN_URL."/pdf/$filename.pdf");
+				$return = array('type'=>'success', 'msg'=>WPPBC_PLUGIN_URL."pdf/$filename.pdf");
 			} catch (Html2PdfException $e) {
 				$formatter = new ExceptionFormatter($e);
 				$return = array('type'=>'error', 'msg'=>"Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage());
