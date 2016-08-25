@@ -87,6 +87,12 @@ class PBCPlugin
          * Localization
          */
         load_plugin_textdomain( 'pbc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+        /**
+         * Image Sizes
+         */
+        add_image_size( 'pbc_icon', 210, 150, true );
+
 	}
 	/**
      * Registering menu admin
