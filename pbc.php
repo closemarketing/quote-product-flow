@@ -486,6 +486,8 @@ class PBCPlugin
 	    $new_columns['phase'] = __('Phase','pbc');
 	    $new_columns['price'] = __('Price','pbc');
 	    $new_columns['depends'] = __('Depends of','pbc');
+	    $new_columns['imgicon'] = __('Icon','pbc');
+	    $new_columns['imgprod'] = __('Image','pbc');
 
 	    return $new_columns;
 	}
@@ -518,8 +520,19 @@ class PBCPlugin
         	$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$variation_post->post_title;
 			$depends_column .= '<br/>';
 		}
-
 		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
+
+		//* Image icon
+		$imgicon = get_post_meta(get_the_id(), 'pbc_imgicon', true);
+        if($imgicon){
+            $icon_image = wp_get_attachment_image_src($imgicon, array(120,120), true);
+		}
+
+		//* Image Product
+		$imgprod = get_post_meta(get_the_id(), 'pbc_imgprod', true);
+        if($imgprod){
+            $icon_imageprod = wp_get_attachment_image_src($imgprod, array(120,120), true);
+		}
 
 	    switch ($column_name) {
 
@@ -532,6 +545,12 @@ class PBCPlugin
 	        break;
 	    case 'depends':
 			echo $depends_column;
+	        break;
+	    case 'imgicon':
+			if(isset($icon_image) ) echo '<img src="'.$icon_image[0].'" />';
+	        break;
+	    case 'imgprod':
+			if(isset($icon_imageprod) ) echo '<img src="'.$icon_imageprod[0].'" />';
 	        break;
 	    default:
 	        break;
