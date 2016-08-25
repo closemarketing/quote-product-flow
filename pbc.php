@@ -858,11 +858,39 @@ class PBCPlugin
 
 		ob_start();
 		/*Content of PDF file*/
+		?>
+		<style>
+			table {
+				border-collapse: collapse;
+				width: 112%;
+				font-size: 12pt;
+			}
+			table, th, td {
+				border: 1px solid black;
+				padding: 10px;
+			}
+			tr.table_header {
+				background-color: black;
+				color: white;
+			}
+			.imagepdf {
+				width: 80px;
+			}
+		</style>
 
-		$phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
-		foreach ($phases as $phase) {
-			echo '<h1>'.$phase->menu_order.' . '.$phase->post_title.'</h1>';
-
+		<h1><?php _e('List Price for','pbc'); echo ' '.get_bloginfo( 'name');?></h1>
+		<p><strong><?php _e('Date','pbc'); echo ': '.date('d-m-Y');?></strong></p>
+		<?php $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
+		foreach ($phases as $phase) { ?>
+			<table>
+			<tr class="table_header">
+				<td style="width: 30%; text-align: left"><?php echo $phase->menu_order.' . '.$phase->post_title;?></td>
+				<td style="width: 20%; text-align: left"><?php _e('Price','pbc');?></td>
+				<td style="width: 20%; text-align: left"><?php _e('Depends of','pbc');?></td>
+				<td style="width: 10%; text-align: left"><?php _e('Icon','pbc');?></td>
+				<td style="width: 10%; text-align: left"><?php _e('Product','pbc');?></td>
+			</tr>
+			<?php
 			$args = array(
 			  'numberposts' => -1,
 			  'post_type' => 'variation',
@@ -875,15 +903,15 @@ class PBCPlugin
 
 			$variation_in_phase = new WP_Query( $args ); ?>
 			<?php if ( $variation_in_phase->have_posts() ) : ?>
-			<table>
+
 
 			<!-- the loop -->
 			<?php while ( $variation_in_phase->have_posts() ) : $variation_in_phase->the_post(); ?>
 				<tr>
-					<td><?php //* Title ?>
-						<h2><?php the_title(); ?></h2>
+					<td style="width: 30%; text-align: left"><?php //* Title ?>
+						<strong><?php the_title(); ?></strong>
 					</td>
-					<td><?php //* Price group
+					<td style="width: 20%; text-align: left"><?php //* Price group
 						$price_group = rwmb_meta( 'pbc_pricegroup' );
 						$price_column = '';
 						foreach($price_group as $price_item) {
@@ -898,22 +926,43 @@ class PBCPlugin
 						echo $price_column;
 						?>
 					</td>
-					<td><?php //* Image Product
-						$imgicon_group = rwmb_meta( 'pbc_imgicon' );
-						print_r( $imgicon_group );
+					<td style="width: 20%; text-align: left"><?php //* Depends of
+						$depends_group = rwmb_meta( 'pbc_depends' );
+						$depends_column = '';
+						foreach($depends_group as $depends_item) {
+							$variation_id = substr($depends_item['pbc_depvar'], 3);
+							$variation_post = get_post($variation_id);
+							$phase_id_dp = get_post_meta($variation_id, 'pbc_phase', true);
+							$phase_post_dp = get_post($phase_id_dp);
+							if($phase_post_dp->menu_order<10) $phase_order = '0'.$phase_post_dp->menu_order; else $phase_order = $phase_post_dp->menu_order;
+				        	$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$variation_post->post_title;
+							$depends_column .= '<br/>';
+						}
+						echo $depends_column;
 						?>
 					</td>
-					<td><?php //* Image Product
-						$imgicon = rwmb_meta( 'pbc_imgicon' );
-						print_r ($imgicon_group);
+					<td style="width: 10%; text-align: left"><?php //* Image Icon
+						$imgicon = get_post_meta(get_the_id(), 'pbc_imgicon', true);
+						if($imgicon){
+							$icon_image = wp_get_attachment_image_src($imgicon, array(105,75), true);
+							echo '<img class="imagepdf" src="'.$icon_image[0].'" />';
+						}
+						?>
+					</td>
+					<td style="width: 10%; text-align: left"><?php //* Image Product
+						$imgprod = get_post_meta(get_the_id(), 'pbc_imgprod', true);
+						if($imgprod){
+							$icon_image = wp_get_attachment_image_src($imgprod, array(105,75), true);
+							echo '<img class="imagepdf" src="'.$icon_image[0].'" />';
+						}
 						?>
 					</td>
 				</tr>
 			<?php endwhile; ?>
 			<?php wp_reset_postdata(); ?>
 
-			</table>
 			<?php endif; ?>
+			</table>
 		<?php }
 		$content = ob_get_contents();
 		ob_end_clean();
