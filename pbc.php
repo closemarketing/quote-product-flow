@@ -979,7 +979,7 @@ class PBCPlugin
 				  if(is_file($file))
 				    unlink($file); // delete file
 				}
-				$filename = "Variations with prices ".date('Y-m-d H:i');
+				$filename = __('List Price','pbc').' '.get_bloginfo('name').' '.date('Y-m-d H:i');
 				$width_mm = 710 * 0.2646;   //1px = 0.2646mm
 				$height_mm = 900 * 0.2646;
 				$html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
