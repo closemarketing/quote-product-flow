@@ -863,7 +863,7 @@ class PBCPlugin
 			table {
 				border-collapse: collapse;
 				width: 112%;
-				font-size: 12pt;
+				font-size: 11pt;
 			}
 			table, th, td {
 				border: 1px solid black;
@@ -874,7 +874,7 @@ class PBCPlugin
 				color: white;
 			}
 			.imagepdf {
-				width: 80px;
+				width: 60px;
 			}
 		</style>
 
@@ -885,8 +885,8 @@ class PBCPlugin
 			<table>
 			<tr class="table_header">
 				<td style="width: 30%; text-align: left"><?php echo $phase->menu_order.' . '.$phase->post_title;?></td>
-				<td style="width: 20%; text-align: left"><?php _e('Price','pbc');?></td>
-				<td style="width: 20%; text-align: left"><?php _e('Depends of','pbc');?></td>
+				<td style="width: 10%; text-align: left"><?php _e('Price','pbc');?></td>
+				<td style="width: 30%; text-align: left"><?php _e('Depends of','pbc');?></td>
 				<td style="width: 10%; text-align: left"><?php _e('Icon','pbc');?></td>
 				<td style="width: 10%; text-align: left"><?php _e('Product','pbc');?></td>
 			</tr>
@@ -911,7 +911,7 @@ class PBCPlugin
 					<td style="width: 30%; text-align: left"><?php //* Title ?>
 						<strong><?php the_title(); ?></strong>
 					</td>
-					<td style="width: 20%; text-align: left"><?php //* Price group
+					<td style="width: 10%; text-align: left"><?php //* Price group
 						$price_group = rwmb_meta( 'pbc_pricegroup' );
 						$price_column = '';
 						foreach($price_group as $price_item) {
@@ -926,7 +926,7 @@ class PBCPlugin
 						echo $price_column;
 						?>
 					</td>
-					<td style="width: 20%; text-align: left"><?php //* Depends of
+					<td style="width: 30%; text-align: left; font-size: 9pt;"><?php //* Depends of
 						$depends_group = rwmb_meta( 'pbc_depends' );
 						$depends_column = '';
 						foreach($depends_group as $depends_item) {
