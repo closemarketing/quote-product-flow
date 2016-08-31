@@ -91,7 +91,8 @@ class PBCPlugin
         /**
          * Image Sizes
          */
-        add_image_size( 'pbc_icon', 210, 150, true );
+        add_image_size( 'pbc_icon', 150, 110, true );
+	    add_image_size( 'pbc_product', 570, 460, true );
 
 	}
 	/**
