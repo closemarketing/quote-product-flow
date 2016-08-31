@@ -138,9 +138,11 @@ if(empty($cStep)) $cStep = 1;
     .phase_variations{margin-top: 40px;}
     .phase_variations ul{margin: 0; list-style: none;}
     .phase_variations ul li.variation_list {
-        width: 30%;
-        display: inline-block;
-        font-size: 14px;
+    width: 24%;
+    display: inline-block;
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: center;
     }
     .product_preview {
         position: relative;
