@@ -283,8 +283,10 @@ if(empty($cStep)) $cStep = 1;
                                     <?php foreach($variations as $variation){?>
                                     <li class="variation_list">
                                         <?php $imgicon = get_post_meta($variation, 'pbc_imgicon', true);
-                                        if($imgicon){?>
-                                            <div class="variation_img"><img src="<?php echo wp_get_attachment_image_src($imgicon, 'thumbnail', true);?>" alt="variation image"/></div>
+                                        if($imgicon){
+                                            $icon_image = wp_get_attachment_image_src($imgicon, 'pbc_icon', true);
+                                        ?>
+                                            <div class="variation_img"><img src="<?php echo $icon_image[0];?>" width="<?php echo $icon_image[1]; ?>" height="<?php echo $icon_image[2]; ?>" /></div>
                                         <?php }?>
                                         <label>
                                             <input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation;?>" <?php if($variation == $sVar) echo 'checked="checked"';?>/> <?php echo get_the_title($variation);?>

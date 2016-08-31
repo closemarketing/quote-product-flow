@@ -1,18 +1,18 @@
+#, fuzzy
 msgid ""
 msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2016-08-26 22:26+0200\n"
-"PO-Revision-Date: 2016-08-26 22:26+0200\n"
+"POT-Creation-Date: 2016-08-26 22:27+0200\n"
+"PO-Revision-Date: 2016-08-26 22:27+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
-"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.8\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: pbc.php\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
 "esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
@@ -22,293 +22,293 @@ msgstr ""
 
 #: budget-configurator.php:319
 msgid "No Variations Avaiable"
-msgstr "No hay variaciones disponibles"
+msgstr ""
 
 #: budget-configurator.php:348 budget-configurator.php:351
 msgid "Back"
-msgstr "Atrás"
+msgstr ""
 
 #: budget-configurator.php:359
 msgid "Calculate"
-msgstr "Calcular"
+msgstr ""
 
 #: budget-configurator.php:362
 msgid "Next"
-msgstr "Siguente"
+msgstr ""
 
 #: budget-configurator.php:378
 msgid "Actual Configuration"
-msgstr "Configuración Actual"
+msgstr ""
 
 #: budget-configurator.php:409
 msgid "Total"
-msgstr "Total"
+msgstr ""
 
 #: budget-configurator.php:423
 msgid "Email"
-msgstr "Correo electrónico"
+msgstr ""
 
 #: budget-configurator.php:424
 msgid "PDF"
-msgstr "PDF"
+msgstr ""
 
 #: budget-configurator.php:429
 msgid "Send"
-msgstr "Enviar"
+msgstr ""
 
 #. Plugin Name of the plugin/theme
 #: pbc.php:105
 msgid "Product Budget Configurator"
-msgstr "Configurador Presupuestos Producto"
+msgstr ""
 
 #: pbc.php:121
 msgid "Summary of Product Budget Configurator"
-msgstr "Resumen Configurador Productos"
+msgstr ""
 
 #: pbc.php:122
 msgid "Summary"
-msgstr "Resumen"
+msgstr ""
 
 #: pbc.php:131
 msgid "Phases of Configurator"
-msgstr "Fases del configurador"
+msgstr ""
 
 #: pbc.php:132
 msgid "Phases"
-msgstr "Fases"
+msgstr ""
 
 #: pbc.php:141
 msgid "Variations in Phases"
-msgstr "Variaciones en Fases"
+msgstr ""
 
 #: pbc.php:142 pbc.php:235
 msgid "Variations"
-msgstr "Variaciones"
+msgstr ""
 
 #: pbc.php:151
 msgid "Price Options in Variation Prices"
-msgstr "Opciones de variación de precios"
+msgstr ""
 
 #: pbc.php:152 pbc.php:264
 msgid "Price Options"
-msgstr "Opciones de Precio"
+msgstr ""
 
 #: pbc.php:183
 msgid "Global Settings"
-msgstr "Configuración Global"
+msgstr ""
 
 #: pbc.php:203 pbc.php:348 pbc.php:460 pbc.php:486
 msgid "Phase"
-msgstr "Fase"
+msgstr ""
 
 #: pbc.php:208
 msgid "Add"
-msgstr "Añadir"
+msgstr ""
 
 #: pbc.php:209
 msgid "Add New"
-msgstr "Agregar Nuevo"
+msgstr ""
 
 #: pbc.php:210
 msgid "Edit"
-msgstr "Editar"
+msgstr ""
 
 #: pbc.php:211
 msgid "New"
-msgstr "Nuevo"
+msgstr ""
 
 #: pbc.php:212
 msgid "View"
-msgstr "Ver"
+msgstr ""
 
 #: pbc.php:213
 msgid "Search for"
-msgstr "Buscar para"
+msgstr ""
 
 #: pbc.php:214 pbc.php:215
 msgid "We didn't find any"
-msgstr "No se encontró ninguna"
+msgstr ""
 
 #: pbc.php:215
 msgid "in the trash"
-msgstr "en la papelera"
+msgstr ""
 
 #: pbc.php:224
 msgctxt "phase"
 msgid "phase"
-msgstr "fase"
+msgstr ""
 
 #: pbc.php:236 pbc.php:390 pbc.php:485
 msgid "Variation"
-msgstr "Variación"
+msgstr ""
 
 #: pbc.php:237
 msgid "Add Variation"
-msgstr "Añadir variación"
+msgstr ""
 
 #: pbc.php:238
 msgid "Add New variation"
-msgstr "Añadir nueva variación"
+msgstr ""
 
 #: pbc.php:239
 msgid "Edit Variation"
-msgstr "Editar variación"
+msgstr ""
 
 #: pbc.php:240
 msgid "New Variation"
-msgstr "Nueva Variación"
+msgstr ""
 
 #: pbc.php:241
 msgid "View Variation"
-msgstr "Ver Variación"
+msgstr ""
 
 #: pbc.php:242
 msgid "Search for variations"
-msgstr "Buscar Variantes"
+msgstr ""
 
 #: pbc.php:243
 msgid "We didn't find any Variation"
-msgstr "No hemos encontrado ninguna variación"
+msgstr ""
 
 #: pbc.php:244
 msgid "We didn't find any Variation in the trash"
-msgstr "No encontramos ninguna variación en la basura"
+msgstr ""
 
 #: pbc.php:253
 msgctxt "variation"
 msgid "variation"
-msgstr "variacion"
+msgstr ""
 
 #: pbc.php:265 pbc.php:411
 msgid "Price Option"
-msgstr "Opción de precio"
+msgstr ""
 
 #: pbc.php:266
 msgid "Search Price Option"
-msgstr "Buscar Opciones de precios"
+msgstr ""
 
 #: pbc.php:267
 msgid "All Price Options"
-msgstr "Todas las opciones de precio"
+msgstr ""
 
 #: pbc.php:268
 msgid "Edit Price Option"
-msgstr "Editar Opción de precio"
+msgstr ""
 
 #: pbc.php:269
 msgid "Update Price Option"
-msgstr "Actualizar Opción de Precio"
+msgstr ""
 
 #: pbc.php:270
 msgid "Add New Price Option"
-msgstr "Añadir nueva opción"
+msgstr ""
 
 #: pbc.php:271
 msgid "New Price Option"
-msgstr "Nueva Opción de Precio"
+msgstr ""
 
 #: pbc.php:339
 msgid "Options for Variation"
-msgstr "Opciones para la variación"
+msgstr ""
 
 #: pbc.php:354
 msgid "Select a Phase"
-msgstr "Seleccione una fase"
+msgstr ""
 
 #: pbc.php:358
 msgid "SKU"
-msgstr "Referencia"
+msgstr ""
 
 #: pbc.php:368
 msgid "Image Product"
-msgstr "Imagen de producto"
+msgstr ""
 
 #: pbc.php:375
 msgid "Image Icon"
-msgstr "Imagen del icono"
+msgstr ""
 
 #: pbc.php:382 pbc.php:488 pbc.php:889
 msgid "Depends of"
-msgstr "Depende de"
+msgstr ""
 
 #: pbc.php:396
 msgid "Not depends of a Variation"
-msgstr "No depende de una variación"
+msgstr ""
 
 #: pbc.php:403 pbc.php:487 pbc.php:888
 msgid "Price"
-msgstr "Precio"
+msgstr ""
 
 #: pbc.php:417
 msgid "Not have a Price Option"
-msgstr "No tiene opción"
+msgstr ""
 
 #: pbc.php:421
 msgid "Price (excluded VAT)"
-msgstr "Precio (IVA no incluido)"
+msgstr ""
 
 #: pbc.php:461
 msgid "Order"
-msgstr "Orden"
+msgstr ""
 
 #: pbc.php:489 pbc.php:890
 msgid "Icon"
-msgstr "Icono"
+msgstr ""
 
 #: pbc.php:490
 msgid "Image"
-msgstr "Imagen"
+msgstr ""
 
 #: pbc.php:591
 msgid "All Phases"
-msgstr "Todas las Fases"
+msgstr ""
 
 #: pbc.php:802
 msgid "Create List Price"
-msgstr "Crear Tarifa Precios"
+msgstr ""
 
 #: pbc.php:881
 msgid "List Price for"
-msgstr "Tarifa Precios de"
+msgstr ""
 
 #: pbc.php:882
 msgid "Date"
-msgstr "Fecha"
+msgstr ""
 
 #: pbc.php:891
 msgid "Product"
-msgstr "Producto"
+msgstr ""
 
 #: pbc.php:982
 msgid "List Price"
-msgstr "Tarifa Precios"
+msgstr ""
 
 #: pbc.php:1071
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:334
 msgid "Install Required Plugins"
-msgstr "Instalar Plugins requeridos"
+msgstr ""
 
 #: pbc.php:1072
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:335
 msgid "Install Plugins"
-msgstr "Instalar Plugins"
+msgstr ""
 
 #: pbc.php:1074
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:337
 #, php-format
 msgid "Installing Plugin: %s"
-msgstr "Instalando Plugin: %s"
+msgstr ""
 
 #: pbc.php:1076
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:339
 #, php-format
 msgid "Updating Plugin: %s"
-msgstr "Actualizando plugin: %s"
+msgstr ""
 
 #: pbc.php:1077
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:340
 msgid "Something went wrong with the plugin API."
-msgstr "Algo no ha funcionado con la API del plugin."
+msgstr ""
 
 #: pbc.php:1080
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:343
@@ -366,8 +366,8 @@ msgstr[1] ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:378
 msgid "Begin installing plugin"
 msgid_plural "Begin installing plugins"
-msgstr[0] "Comenzar instalación del plugin"
-msgstr[1] "Comenzar instalación de los plugin"
+msgstr[0] ""
+msgstr[1] ""
 
 #: pbc.php:1120
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:383
@@ -380,25 +380,28 @@ msgstr[1] ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:388
 msgid "Begin activating plugin"
 msgid_plural "Begin activating plugins"
-msgstr[0] "Comenzar activación de plugin"
-msgstr[1] "Comenzar activación de los plugins"
+msgstr[0] ""
+msgstr[1] ""
 
 #: pbc.php:1129
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:392
 msgid "Return to Required Plugins Installer"
-msgstr "Volver al Instalador de plugins requeridos"
+msgstr ""
 
 #: pbc.php:1130
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:394
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3252
 msgid "Plugin activated successfully."
-msgstr "Plugin activado correctamente ."
+msgstr ""
 
 #: pbc.php:1131
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:395
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3045
+#, fuzzy
 msgid "The following plugin was activated successfully:"
-msgstr "El siguiente plugin se ha activado correctamente:"
+msgstr ""
+"#-#-#-#-#  1extracted.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+"#-#-#-#-#  2extracted.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 
 #: pbc.php:1133
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:397
@@ -423,7 +426,7 @@ msgstr ""
 #: pbc.php:1138
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:402
 msgid "Dismiss this notice"
-msgstr "Descartar este aviso"
+msgstr ""
 
 #: pbc.php:1139
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:403
@@ -442,7 +445,7 @@ msgstr ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2626
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3673
 msgid "Return to the Dashboard"
-msgstr "Regresa al Escritorio"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:607
 msgid "This plugin needs to be updated to be compatible with your theme."
@@ -450,7 +453,7 @@ msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:608
 msgid "Update Required"
-msgstr "Actualización requerida"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:725
 msgid "Set the parent_slug config variable instead."
@@ -484,57 +487,57 @@ msgstr ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2075
 #, php-format
 msgid "TGMPA v%s"
-msgstr "TGMPA v%s"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2366
 msgid "Required"
-msgstr "Requerido"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2369
 msgid "Recommended"
-msgstr "Recomendado"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2385
 msgid "WordPress Repository"
-msgstr "Repositorio WordPress"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2388
 msgid "External Source"
-msgstr "Fuente Externa"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2391
 msgid "Pre-Packaged"
-msgstr "Pre-Empaquetado"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2408
 msgid "Not Installed"
-msgstr "No instalado"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2412
 msgid "Installed But Not Activated"
-msgstr "Instalados pero no activados"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2414
 msgid "Active"
-msgstr "Activo"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2420
 msgid "Required Update not Available"
-msgstr "La actualización requerida no está disponible"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2423
 msgid "Requires Update"
-msgstr "Requiere Actualización"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2426
 msgid "Update recommended"
-msgstr "Actualización recomendada"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2435
 #, php-format
 msgctxt "Install/Update Status"
 msgid "%1$s, %2$s"
-msgstr "%1$s, %2$s [Estado de Actualización/Instalación]"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2481
 #, php-format
@@ -568,19 +571,19 @@ msgstr[1] ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2575
 msgctxt "as in: \"version nr unknown\""
 msgid "unknown"
-msgstr "desconocida"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2583
 msgid "Installed version:"
-msgstr "Versión instalada:"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2591
 msgid "Minimum required version:"
-msgstr "Versión mínima requerida:"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2603
 msgid "Available version:"
-msgstr "Versión disponible:"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2626
 msgid "No plugins to install, update or activate."
@@ -588,54 +591,54 @@ msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2640
 msgid "Plugin"
-msgstr "Plugin"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2641
 msgid "Source"
-msgstr "Fuente"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2642
 msgid "Type"
-msgstr "Tipo"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2646
 msgid "Version"
-msgstr "Versión"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2647
 msgid "Status"
-msgstr "Estado"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2696
 #, php-format
 msgid "Install %2$s"
-msgstr "Instalar %2$s"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2701
 #, php-format
 msgid "Update %2$s"
-msgstr "Actualizar %2$s"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2707
 #, php-format
 msgid "Activate %2$s"
-msgstr "Activar %2$s"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2777
 msgid "Upgrade message from the plugin author:"
-msgstr "Mensaje actualizado del autor del plugin:"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2810
 msgid "Install"
-msgstr "Instalar"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2816
 msgid "Update"
-msgstr "Actualizar"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2819
 msgid "Activate"
-msgstr "Activar"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:2850
 msgid "No plugins were selected to be installed. No action taken."
@@ -663,23 +666,22 @@ msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3251
 msgid "Plugin activation failed."
-msgstr "La activación del plugin ha fallado."
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3591
 #, php-format
 msgid "Updating Plugin %1$s (%2$d/%3$d)"
-msgstr "Actualizando plugin %1$s (%2$d/%3$d)"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3594
 #, php-format
 msgid "An error occurred while installing %1$s: <strong>%2$s</strong>."
 msgstr ""
-"Se produjo un error durante la instalación de %1$s: <strong>%2$s</strong>."
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3596
 #, php-format
 msgid "The installation of %1$s failed."
-msgstr "La instalación de %1$s ha fallado."
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3600
 msgid ""
@@ -695,12 +697,12 @@ msgstr ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3602
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3610
 msgid "Show Details"
-msgstr "Mostrar detalles"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3602
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3610
 msgid "Hide Details"
-msgstr "Ocultar detalles"
+msgstr ""
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3603
 msgid "All installations and activations have been completed."
@@ -734,197 +736,12 @@ msgstr ""
 #. Plugin URI of the plugin/theme
 #. Author URI of the plugin/theme
 msgid "https://www.closemarketing.es"
-msgstr "https://www.closemarketing.es"
+msgstr ""
 
 #. Description of the plugin/theme
 msgid "Creates a configurator for products and create a budget"
-msgstr "Crea un configurador de productos con su un presupuesto"
+msgstr ""
 
 #. Author of the plugin/theme
 msgid "closemarketing"
-msgstr "closemarketing"
-
-#~ msgid "Measures"
-#~ msgstr "Medidas"
-
-#~ msgid "Measure"
-#~ msgstr "Medida"
-
-#~ msgid "Search measure"
-#~ msgstr "Buscar medida"
-
-#~ msgid "All measures"
-#~ msgstr "Todas las medidas"
-
-#~ msgid "Edit measure"
-#~ msgstr "Editar medida"
-
-#~ msgid "Update measure"
-#~ msgstr "Actualizar medida"
-
-#~ msgid "Add New measure"
-#~ msgstr "Agregar una nueva medida"
-
-#~ msgid "New measure"
-#~ msgstr "Nueva medida"
-
-#~ msgid "Select a Variation"
-#~ msgstr "Seleccione una variación"
-
-#~ msgid "Select a measure"
-#~ msgstr "Seleccionar una medida"
-
-#~ msgid "PBC"
-#~ msgstr "PBC"
-
-#~ msgid "Documentation"
-#~ msgstr "Documentación"
-
-#~ msgid "Extensions"
-#~ msgstr "Extensiones"
-
-#~ msgid "+ Add more"
-#~ msgstr "+ Añadir más"
-
-#~ msgid "Delete"
-#~ msgstr "Eliminar"
-
-#~ msgid "Click me"
-#~ msgstr "Click aquí"
-
-#~ msgid "Yes"
-#~ msgstr "Si"
-
-#~ msgid "No"
-#~ msgstr "No"
-
-#~ msgid "Select File"
-#~ msgstr "Seleccionar archivo"
-
-#~ msgid "Select"
-#~ msgstr "Seleccionar"
-
-#~ msgid "Remove"
-#~ msgstr "Eliminar"
-
-#, fuzzy
-#~ msgid "You may only upload maximum %d file"
-#~ msgstr "Sólo puede subir un máximo de %d archivo"
-
-#, fuzzy
-#~ msgid "You may only upload maximum %d files"
-#~ msgstr "Sólo puede subir un máximo de %d archivos"
-
-#, fuzzy
-#~ msgid "Error: Cannot delete file"
-#~ msgstr "Error: No se puede eliminar el archivo"
-
-#, fuzzy
-#~ msgctxt "file upload"
-#~ msgid "Upload Files"
-#~ msgstr "Subir Archivos"
-
-#~ msgctxt "file upload"
-#~ msgid "+ Add new file"
-#~ msgstr "+ Añadir nuevo archivo"
-
-#, fuzzy
-#~ msgctxt "file upload"
-#~ msgid "Delete"
-#~ msgstr "Eliminar"
-
-#~ msgctxt "file upload"
-#~ msgid "Edit"
-#~ msgstr "Editar"
-
-#~ msgid "Key"
-#~ msgstr "Clave secreta de encriptación"
-
-#~ msgid "Value"
-#~ msgstr "Valor"
-
-#, fuzzy
-#~ msgid "Find Address"
-#~ msgstr "Encontrar dirección"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid "+ Add Media"
-#~ msgstr "+ Añadir Media"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid " file"
-#~ msgstr "archivo"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid " files"
-#~ msgstr "archivos"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid "Remove"
-#~ msgstr "Eliminar"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid "Edit"
-#~ msgstr "Editar"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid "View"
-#~ msgstr "Ver"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid "No Title"
-#~ msgstr "Sin Título"
-
-#, fuzzy
-#~ msgctxt "media"
-#~ msgid "Select Files"
-#~ msgstr "Seleccionar Archivos"
-
-#, fuzzy
-#~ msgid "Embed HTML not available."
-#~ msgstr "HTML incrustado no disponible."
-
-#, fuzzy
-#~ msgid "Preview"
-#~ msgstr "Vista Previa"
-
-#, fuzzy
-#~ msgid "Select a post"
-#~ msgstr "Seleccionar un post"
-
-#, fuzzy
-#~ msgid "Select a %s"
-#~ msgstr "Selecciona un %s"
-
-#~ msgid "Select an item"
-#~ msgstr "Selecciona uno"
-
-#, fuzzy
-#~ msgid "All"
-#~ msgstr "Todos"
-
-#, fuzzy
-#~ msgid "None"
-#~ msgstr "Ninguno"
-
-#~ msgid "Select a term"
-#~ msgstr "Seleccionar término"
-
-#, fuzzy
-#~ msgctxt "image upload"
-#~ msgid "Upload Images"
-#~ msgstr "Subir Imágenes"
-
-#~ msgid "Select an user"
-#~ msgstr "Selecciona un usuario"
-
-#, fuzzy
-#~ msgid "Please correct the errors highlighted below and try again."
-#~ msgstr "Por favor, corrija los errores resaltados abajo y pruebe de nuevo."
+msgstr ""
