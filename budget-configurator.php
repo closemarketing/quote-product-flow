@@ -363,6 +363,7 @@ if(empty($cStep)) $cStep = 1;
                                 $next_button = __('Next', 'pbc');
                             }
                         ?>
+                        <input type="hidden" name="pbc_current_phase" value="<?php echo $cStep;?>"/>
                         <?php if($prev_step && $prev_button){?>
                         <div class="prev <?php if(empty($prev_step)) echo 'hidden';?>">
             			    <input type="hidden" name="prev_phase" value="<?php echo $prev_step;?>"/>
@@ -443,6 +444,7 @@ if(empty($cStep)) $cStep = 1;
                 <?php }//$cStep != 'calculate'?>
                 </form>
             </div>
+
             <?php if(!defined('DOING_AJAX')){?>
             <script type="text/javascript">
             jQuery(function($){
@@ -451,7 +453,7 @@ if(empty($cStep)) $cStep = 1;
                     $.ajax({
                         url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
                         type: 'POST',
-                        data: $('#configurator-form').serialize()+'&current_phase=<?php echo $cStep;?>&action=variation_selected',
+                        data: $('#configurator-form').serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&action=variation_selected',
                         dataType: "html",
                         success: function(response) {
                             var resArr = response.split(';;--;;');
@@ -477,7 +479,7 @@ if(empty($cStep)) $cStep = 1;
                     $.ajax({
                         url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
                         type: 'POST',
-                        data: $('#'+form_id).serialize()+'&current_phase=<?php echo $cStep;?>&submit='+submit_val+'&action=configurator_submit',
+                        data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit',
                         dataType: "html",
                         success: function(response) {
                             $('.page-configurator').html(response);
