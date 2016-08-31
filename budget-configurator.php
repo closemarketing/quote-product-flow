@@ -125,12 +125,12 @@ if(empty($cStep)) $cStep = 1;
     }
     .configurator_steps_nav li.configurator_steps.active .step-arrow-button{background: #949697;}
     .configurator-left {
-        width: 60%;
+        width: 50%;
         float: left;
     }
     .configurator-right {
         display: block;
-        width: 35%;
+        width: 49%;
         float: right;
         vertical-align: top;
     }
@@ -147,10 +147,10 @@ if(empty($cStep)) $cStep = 1;
     .product_preview {
         position: relative;
         text-align: left;
-        max-width: 250px;
+        max-width: 570px;
         overflow: hidden;
     }
-    .product_preview .image-wrap img{width: 100%;max-width: 250px;}
+    .product_preview .image-wrap img{width: 100%;max-width: 570px;}
     .configurator_form_action {
         text-align: right;
         clear: both;
