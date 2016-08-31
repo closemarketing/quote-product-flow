@@ -699,7 +699,8 @@ class PBCPlugin
 		if(isset($imgprodurl) && $imgprodurl){
 			$return = $imgprodurl[0];
 		}else{
-			$return = WPPBC_PLUGIN_URL.'preview-img.jpg';
+			//$return = WPPBC_PLUGIN_URL.'preview-img.jpg';
+			$return = '';
 		}
 		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$return));
 		die(0);

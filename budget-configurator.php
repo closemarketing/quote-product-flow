@@ -20,7 +20,7 @@ if(isset($_POST['submit'])){
         $cStep = $_POST[$submit.'_phase'];
     else $cStep = 'calculate';
     if(isset($_POST['pbc_variation']) && $_POST['submit']=='next'){
-        if(!isset($_SESSION['pbc_variation'])){
+        if(!isset($_SESSION['pbc_variation']) || !is_array($_SESSION['pbc_variation'])){
             $_SESSION['pbc_variation'] = array();
         }
         //unset($_SESSION['pbc_variation']);
@@ -271,9 +271,10 @@ if(empty($cStep)) $cStep = 1;
                                             }
                                         }
                                     }
-                                    sort(array_values($variations));
+                                    $variations = array_values($variations);
+                                    sort($variations);
                                 }
-                                if(isset($_SESSION) && isset($_SESSION['pbc_variation'][$cStep]) &&
+                                if(isset($_SESSION) && is_array($_SESSION['pbc_variation']) && isset($_SESSION['pbc_variation'][$cStep]) &&
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
                                 )
                                     $sVar = $_SESSION['pbc_variation'][$cStep]['var']['id'];
@@ -333,9 +334,10 @@ if(empty($cStep)) $cStep = 1;
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){?>
                                 <img src="<?php echo $imgprodurl[0];?>" alt="product image"/>
-                            <?php }else{?>
+                            <?php }
+                            /* else{?>
                                 <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
-                            <?php }?>
+                            <?php }*/?>
                         </div>
                         <div class="status_loader product_preview_status fixed hidden"></div>
                     </div>
@@ -377,7 +379,7 @@ if(empty($cStep)) $cStep = 1;
             		    </div>
                     </div>
                     <div class="configurator_summary">
-                        <?php if(isset($_SESSION) && isset($_SESSION['pbc_variation'])){?>
+                        <?php if(isset($_SESSION) && isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation'])){?>
                             <div class="title"><?php _e('Actual Configuration','pbc');?></div>
                             <table>
                             <?php
@@ -467,7 +469,8 @@ if(empty($cStep)) $cStep = 1;
                                 });
                             }else if(obj.type == 'success'){
                                 $('.product_preview').find('.product_preview_status').addClass('hidden');
-                                $('.product_preview').find('.image-wrap').html('<img src="'+obj.url+'" alt="product image"/>').show();
+                                if(obj.url)
+                                    $('.product_preview').find('.image-wrap').html('<img src="'+obj.url+'" alt="product image"/>').show();
                             }
                         }
                     });
