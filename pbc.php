@@ -697,7 +697,7 @@ class PBCPlugin
 			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
 		<?php }
 		if(isset($imgprodurl) && $imgprodurl){
-			$return = $imgprodurl;
+			$return = $imgprodurl[0];
 		}else{
 			$return = WPPBC_PLUGIN_URL.'preview-img.jpg';
 		}

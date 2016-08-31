@@ -331,7 +331,7 @@ if(empty($cStep)) $cStep = 1;
                                 if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){?>
-                                <img src="<?php echo $imgprodurl;?>" alt="product image"/>
+                                <img src="<?php echo $imgprodurl[0];?>" alt="product image"/>
                             <?php }else{?>
                                 <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
                             <?php }?>
