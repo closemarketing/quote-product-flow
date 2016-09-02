@@ -879,8 +879,7 @@ class PBCPlugin
 						$price_column = '';
 						foreach($price_group as $price_item) {
 							if(isset($price_item['pbc_meaprice'])) {
-							$var_term = get_term($price_item['pbc_meaprice']);
-							$price_column .= $var_term->name.' - '.$price_item['pbc_pricem'].' €';
+							$price_column .= $price_item['pbc_meaprice'].' - '.$price_item['pbc_pricem'].' €';
 							} else { // Price without any option
 							$price_column .= $price_item['pbc_pricem'].' €';
 							}
