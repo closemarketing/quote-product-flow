@@ -39,7 +39,6 @@ class PBCPlugin
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
 		add_action('init', array( $this, 'pbc_register_cpt') );
-		add_action('admin_menu' , array($this, 'remove_measure_meta') );
         add_filter('rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
 
 		add_filter( 'disable_months_dropdown' , array($this,'disable_months_dropdown') , 10 , 2 );
@@ -145,16 +144,6 @@ class PBCPlugin
 			 	'menu_slug'     => 'edit.php?post_type=variation',
 			 	'function'      => null,// Doesn't need a callback function.
 			 ),
-
-             // Taxonomy :: Manage News Categories
-             array(
-                 'parent_slug'   => 'pbc_menu',
-                 'page_title'    => __('Price Options in Variation Prices','pbc'),
-                 'menu_title'    => __('Price Options','pbc'),
-                 'capability'    => 'manage_options',
-                 'menu_slug'     => 'edit-tags.php?taxonomy=priceoption&post_type=variation',
-                 'function'      => null,// Doesn't need a callback function.
-             ),
 
          );
 
@@ -271,24 +260,7 @@ class PBCPlugin
 		  'add_new_item' => __('Add New Price Option','pbc'),
 		  'new_item_name' => __('New Price Option','pbc'),
 		);
-
-		register_taxonomy( 'priceoption', array( 'variation' ), array(
-		  'hierarchical' => true,
-		  'labels' => $labels,
-          'show_in_menu' => false,
-		  'show_ui' => true,
-		  'query_var' => true,
-		  'rewrite' => array( 'slug' => 'price-option' ),
-		));
     }
-
-    /**
-     * Registering meta boxes for variation
-     *
-     */
-	 function remove_measure_meta() {
-		 remove_meta_box( 'priceoptiondiv', 'variation', 'side' );
-	}
 
     function pbc_metabox_variation( $meta_boxes )
     {
@@ -322,16 +294,6 @@ class PBCPlugin
         	$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
         }
 		asort($var_options);
-		// Measure options
-        $measure_options = array();
-        $priceoptioncpt = get_terms( array(
-		    'taxonomy' => 'priceoption',
-		    'hide_empty' => false,
-		) );
-        $priceoptioncpt_item = array();
-        foreach ($priceoptioncpt as $priceoptioncpt_item) {
-           $measure_options[$priceoptioncpt_item->term_id] = $priceoptioncpt_item->name;
-        }
 
     	$prefix = 'pbc_';
     	// 1st meta box
@@ -407,16 +369,16 @@ class PBCPlugin
 					'clone'  => true,
 					'sort_clone' => true,
 					'fields' => array(
-						// SELECT BOX VARIATIONS
-						array(
-							'name'        => __( 'Price Option', 'pbc' ),
-							'id'          => "{$prefix}meaprice",
-							'type'        => 'select',
-							'options'     => $measure_options,
-							'multiple'    => false,
-							'std'         => '',
-							'placeholder' => __( 'Not have a Price Option', 'pbc' ),
-						),
+		    			// TEXT
+		    			array(
+		    				'name'  => __( 'Price Option', 'pbc' ),
+		    				'id'    => "{$prefix}meaprice",
+		    				'desc'  => '',
+		    				'type'  => 'text',
+		    				'std'   => '',
+		    				'clone' => false,
+		                    'columns' => 3,
+		    			),
 		    			// TEXT
 		    			array(
 		    				'name'  => __( 'Price (excluded VAT)', 'pbc' ),
