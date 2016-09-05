@@ -328,13 +328,6 @@ class PBCPlugin
     			),
     			// IMAGE ADVANCED (WP 3.5+)
     			array(
-    				'name'             => esc_html__( 'Image Product', 'pbc' ),
-    				'id'               => "{$prefix}imgprod",
-    				'type'             => 'image_advanced',
-    				'max_file_uploads' => 1,
-    			),
-    			// IMAGE ADVANCED (WP 3.5+)
-    			array(
     				'name'             => esc_html__( 'Image Icon', 'pbc' ),
     				'id'               => "{$prefix}imgicon",
     				'type'             => 'image_advanced',
@@ -361,7 +354,32 @@ class PBCPlugin
 					),
 				), //array
 
-
+				array(
+    				'name'   => esc_html__( 'Group Image Product', 'pbc' ),
+					'id'     => "{$prefix}imgprodgroup",
+					'type'   => 'group',
+					'clone'  => true,
+					'sort_clone' => true,
+					'fields' => array(
+		    			// SELECT BOX VARIATIONS
+		    			array(
+		    				'name'        => __( 'Variation', 'pbc' ),
+		    				'id'          => "{$prefix}depvarimgprod",
+		    				'type'        => 'select',
+		    				'options'     => $var_options,
+		    				'multiple'    => false,
+		    				'std'         => '',
+		    				'placeholder' => __( 'Not depends of a Variation', 'pbc' ),
+		    			),
+		    			// IMAGE ADVANCED (WP 3.5+)
+		    			array(
+		    				'name'             => esc_html__( 'Image Product', 'pbc' ),
+		    				'id'               => "{$prefix}imgprod",
+		    				'type'             => 'image_advanced',
+		    				'max_file_uploads' => 1,
+		    			),
+					),
+				), //array
 				array(
     				'name'   => esc_html__( 'Price', 'pbc' ),
 					'id'     => "{$prefix}pricegroup",
