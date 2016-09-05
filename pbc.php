@@ -59,6 +59,7 @@ class PBCPlugin
 		add_filter( 'views_edit-variation', array($this,'pbc_add_print_pdf_button') );
 		add_action( 'admin_head-edit.php', array($this,'pbc_move_print_pdf_button') );
 		add_action('wp_ajax_print_pdf', array($this,'print_pdf_action_callback') );
+		add_action('pre_get_posts', array($this,'pbc_posts_filter_ordering') );
 	}
 
 	////////////////////////////////////////////////////////////
@@ -977,6 +978,21 @@ class PBCPlugin
 		}
 		echo ';;--;;'.json_encode($return);
 		die(0);
+	}
+
+	/**
+	 * PBC Posts Filter Ordering
+	 *
+	 * Action before posts are listed
+	 */
+	public function pbc_posts_filter_ordering($query) {
+	  if (is_admin()) {
+	    $post_type = $query->query['post_type'];
+	    if ( $post_type == 'variation' || $post_type == 'phases') {
+	      $query->set('orderby', 'title');
+	      $query->set('order', 'ASC');
+	    }
+	  }
 	}
 }
 
