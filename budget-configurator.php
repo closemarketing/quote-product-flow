@@ -453,10 +453,11 @@ if(empty($cStep)) $cStep = 1;
             jQuery(function($){
                 $(document).on('click', 'input[type=radio].pbc_variation', function(){
                     $('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>loading.gif"/></div>').show();
+                    var cPhase = $('input[name=pbc_current_phase]').val();
                     $.ajax({
                         url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
                         type: 'POST',
-                        data: $('#configurator-form').serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&action=variation_selected',
+                        data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
                         dataType: "html",
                         success: function(response) {
                             var resArr = response.split(';;--;;');
@@ -471,6 +472,15 @@ if(empty($cStep)) $cStep = 1;
                                 $('.product_preview').find('.product_preview_status').addClass('hidden');
                                 if(obj.url)
                                     $('.product_preview').find('.image-wrap').html('<img src="'+obj.url+'" alt="product image"/>').show();
+                                if(obj.option || obj.price){
+                                    if($('.variation_selected.phase-'+cPhase).length == 0){
+                                        $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
+                                    }else{
+                                        $('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
+                                        $('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
+                                    }
+                                }
+
                             }
                         }
                     });

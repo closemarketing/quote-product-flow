@@ -35,7 +35,8 @@ class PBCPlugin
         // Initial stuff
 		add_action('init', array( $this, 'init' ) );
 		add_action('admin_init', array( $this, 'init' ) );
-		add_action( 'admin_footer', array($this,'plugins_admin_scripts') );
+		add_action('admin_footer', array($this,'pbc_admin_scripts') );
+		add_action('pre_get_posts', array($this,'pbc_posts_filter_ordering') );
 
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
@@ -60,7 +61,6 @@ class PBCPlugin
 		add_filter( 'views_edit-variation', array($this,'pbc_add_print_pdf_button') );
 		add_action( 'admin_head-edit.php', array($this,'pbc_move_print_pdf_button') );
 		add_action('wp_ajax_print_pdf', array($this,'print_pdf_action_callback') );
-		add_action('pre_get_posts', array($this,'pbc_posts_filter_ordering') );
 	}
 
 	////////////////////////////////////////////////////////////
@@ -97,9 +97,9 @@ class PBCPlugin
 
 	}
 	/**
-	 * Plugins Admin Scripts
+	 * PBC Admin Scripts
 	 */
-	public function plugins_admin_scripts()
+	public function pbc_admin_scripts()
 	{
 		$screen = get_current_screen();
 		if( !empty($screen) && ($screen->parent_base == 'pbc_menu'))
@@ -175,6 +175,21 @@ class PBCPlugin
 		});
 		</script>
 		<?php
+	}
+
+	/**
+	 * PBC Posts Filter Ordering
+	 *
+	 * Action before posts are listed
+	 */
+	public function pbc_posts_filter_ordering($query) {
+		if (is_admin() && $query->is_main_query()){
+			$post_type = $query->query['post_type'];
+			if ( $post_type == 'variation' && $post_type == 'phases') {
+				$query->set('orderby', 'title');
+				$query->set('order', 'ASC');
+			}
+		}
 	}
 	/**
      * Registering menu admin
@@ -857,15 +872,38 @@ class PBCPlugin
 		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
 			$sVar = $pbc_variation[$current_phase];
 			$imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
-			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
-		<?php }
+			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}
+
+			$pricegroup = get_post_meta($sVar, 'pbc_pricegroup', true);
+			if(isset($pbc_pricevar)){
+				$term = get_term_by( 'id', $pbc_pricevar, 'measures');
+				if(!empty($term)){
+					foreach($pricegroup as $details ){
+						if($term->term_id == $details['pbc_meaprice']){
+							$option_name = $term->name;
+							$price = $details['pbc_pricem'];
+						}
+					}
+				}
+			}else{
+				if(isset($pricegroup[0]['pbc_pricem']))
+					$price = $pricegroup[0]['pbc_pricem'];
+			}
+			$option = get_the_title($sVar);
+		}
 		if(isset($imgprodurl) && $imgprodurl){
-			$return = $imgprodurl[0];
+			$url = $imgprodurl[0];
 		}else{
 			//$return = WPPBC_PLUGIN_URL.'preview-img.jpg';
-			$return = '';
+			$url = '';
 		}
-		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$return));
+		if(!isset($price) || empty($price)){
+			$price = '-';
+		}else $price .= ' €';
+		
+		if(!isset($option))
+			$option = '-';
+		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$return, 'option'=>$option, 'price'=>$price));
 		die(0);
 	}
 	public function configurator_submit_action_callback(){
@@ -1169,21 +1207,6 @@ class PBCPlugin
 		}
 		echo ';;--;;'.json_encode($return);
 		die(0);
-	}
-
-	/**
-	 * PBC Posts Filter Ordering
-	 *
-	 * Action before posts are listed
-	 */
-	public function pbc_posts_filter_ordering($query) {
-	  if (is_admin()) {
-	    $post_type = $query->query['post_type'];
-	    if ( $post_type == 'variation' || $post_type == 'phases') {
-	      $query->set('orderby', 'title');
-	      $query->set('order', 'ASC');
-	    }
-	  }
 	}
 }
 
