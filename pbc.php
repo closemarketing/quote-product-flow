@@ -35,6 +35,7 @@ class PBCPlugin
         // Initial stuff
 		add_action('init', array( $this, 'init' ) );
 		add_action('admin_init', array( $this, 'init' ) );
+		add_action( 'admin_footer', array($this,'plugins_admin_scripts') );
 
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
@@ -94,6 +95,86 @@ class PBCPlugin
         add_image_size( 'pbc_icon', 150, 230, false );
 	    add_image_size( 'pbc_product', 570, 460, true );
 
+	}
+	/**
+	 * Plugins Admin Scripts
+	 */
+	public function plugins_admin_scripts()
+	{
+		$screen = get_current_screen();
+		if( !empty($screen) && ($screen->parent_base == 'pbc_menu'))
+		{
+			wp_enqueue_script('post');
+			$this->plugin_admin_scripts();
+		}
+		return null;
+	}
+
+	public function plugin_admin_scripts()
+	{
+		?>
+		<style>
+			.postcontent-left, .postcontent-right{width: 46%;margin-right: 2%;display: inline-block;vertical-align: top;}
+			fieldset{ padding: 2px 0;margin-bottom:5px;}
+			fieldset label.inline{min-width: 140px;display: inline-block;}
+			fieldset label.block{width: 100%;display: block;margin-bottom: 2px;}
+			.save_bar{padding: 0 10px;text-align: right;margin-bottom: 20px;}
+			.content.left-content, .content.right-content {width: 45%;display: inline-block;vertical-align: top;}
+			.content.left-content { border-right: 1px solid #EEEEEE;margin-right: 2%;}
+			.phases-lists-table th, .phases-lists-table td{text-align: left;}
+			.phases-col{width: 60%;}
+			.order-col, .variations-col{width: 20%;}
+		</style>
+
+		<script type="text/javascript">
+		jQuery(function($){
+			$(document).on('click', '.select-image', function(event){
+				var current_button = $(this);
+	            event.preventDefault();
+
+	            // check for media manager instance
+	            if(wp.media.frames.pbc) {
+	                wp.media.frames.pbc.open();
+	                return;
+	            }
+	            // configuration of the media manager new instance
+	            wp.media.frames.pbc = wp.media({
+	                title: 'Select image',
+	                multiple: false,
+	                library: {
+	                    type: 'image'
+	                },
+	                button: {
+	                    text: 'Use selected image'
+	                }
+	            });
+
+	            // Function used for the image selection and media manager closing
+	            var gk_media_set_image = function() {
+	                var selection = wp.media.frames.pbc.state().get('selection');
+
+	                // no selection
+	                if (!selection) {
+	                    return;
+	                }
+
+	                // iterate through selected elements
+	                selection.each(function(attachment) {
+	                    var url = attachment.attributes.url;
+	                    current_button.prev('[name=pdf_image_selected]').val(url);
+	                });
+	            };
+
+	            // closing event for media manger
+	            wp.media.frames.pbc.on('close', gk_media_set_image);
+	            // image selection event
+	            wp.media.frames.pbc.on('select', gk_media_set_image);
+	            // showing media manager
+	            wp.media.frames.pbc.open();
+			});
+		});
+		</script>
+		<?php
 	}
 	/**
      * Registering menu admin
@@ -169,22 +250,123 @@ class PBCPlugin
       * of your custom submenu items you create above.
       */
 
-    public function pbc_display_admin_page(){ ?>
-        <div class='wrap'>
-            <h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','pbc');?></h2>
+    public function pbc_display_admin_page(){
 
-            <div id="poststuff">
-                <div id="post-body">
-                    <div class="postcontent-left">
+		if(isset($_POST['select_budget_page'])){
+			update_option('pbc_budget_configurator_page', $_POST['select_budget_page']);
+			$update = __("Successfully Saved!",'pbc');
+		}
+		if ( isset( $_POST['pdf_image_selected'] ) ){
+			update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
+			$update = __("Successfully Saved!",'pbc');
+		}
+	?>
+		<div class='wrap'>
+			<h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','pbc');?></h2>
 
-                    </div>
-                    <div class="postcontent-right">
-                    </div>
-                </div>
-            </div>
-        </div>
+			<?php if(isset($update)){?>
+				<div id="message" class="updated fade"><?php echo $update;?></div>
+			<?php }?>
+			<?php if(isset($error)){?>
+				<div id="message" class="error"><?php echo $error;?></div>
+			<?php }?>
+
+			<div id="poststuff">
+				<div id="post-body">
+					<div class="postcontent-left">
+						<?php
+						add_meta_box("phases_lists_meta_box", __("All Phases Lists", "pbc"), array($this, "phases_lists_meta_box_callback"), "pbc_import_left");
+		                do_meta_boxes('pbc_import_left','advanced', null);
+						?>
+					</div>
+					<div class="postcontent-right">
+						<?php
+						add_meta_box("general_settings_meta_box", __("General Settings","pbc"), array($this, "general_settings_meta_box_callback"), "pbc_import_right");
+		                do_meta_boxes('pbc_import_right','advanced',null);
+						?>
+					</div>
+				</div>
+			</div>
+		</div>
 	<?php
-     }
+    }
+	/**
+	 * Import Meta Box Callback
+	 *
+	 * Callback function for add_meta_box import section
+	 */
+	public function phases_lists_meta_box_callback()
+	{
+	?>
+	<table class="phases-lists-table">
+		<tr>
+			<th class="order-col"><?php _e('Order','pbc');?></th>
+			<th class="phases-col"><?php _e('Phases','pbc');?></th>
+			<th class="variations-col"><?php _e('Number of Variations','pbc');?></th>
+		</tr>
+		<?php $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
+		if(!empty($phases)){
+			foreach($phases as $phase){?>
+				<tr>
+					<td class="order-col"><?php echo $phase->menu_order;?></td>
+					<td class="phases-col"><?php echo $phase->post_title;?></td>
+					<td class="variations-col"><?php $variations = get_posts('posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value='.$phase->ID.'&fields=ids');
+					if(!empty($variations)) echo count($variations);
+					?></td>
+				</tr>
+			<?php
+			}
+		}?>
+	</table>
+    <?php
+	}
+
+	/**
+	 * General Settings Meta Box Callback
+	 *
+	 * Callback function for add_meta_box import section
+	 */
+	public function general_settings_meta_box_callback()
+	{
+	?>
+	<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
+		<div class="content">
+			<fieldset>
+				<label class="block" for="select_budget_page"><?php _e("Budget Configurator Page", 'pbc');?></label>
+				<?php
+				$budget_configurator = get_option('pbc_budget_configurator_page');
+				$pages = get_pages();
+				if(!empty($pages))
+				{
+					echo '<select name="select_budget_page">
+						<option value="">Select a Page</option>';
+					foreach ( $pages as $page ) {
+						$option = '<option value="' .( $page->ID ) . '"';
+						$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
+						$option .= '>'.$page->post_title.'</option>';
+						echo $option;
+					}
+					echo '</select>';
+				}
+				?>
+				&nbsp;&nbsp;<?php _e('or','pbc');?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' );?>" title="<?php _e('Create New Page', 'pbc');?>"><?php _e('Create Page', 'pbc');?></a>
+			</fieldset>
+			<fieldset>
+				<label class="block" for="select_PDF_image"><?php _e("Set PDF Image", 'pbc');?></label>
+				<?php
+					wp_enqueue_media();
+					$pdf_image_selected = get_option('pbc_pdf_image_selected');
+				?>
+				<input type="text" name="pdf_image_selected" value="<?php if($pdf_image_selected) echo $pdf_image_selected;?>" /><button class="select-image button">Select image</button>
+			</fieldset>
+		</div>
+
+		<div class="save_bar">
+			<input type="submit" value="<?php _e('Save', 'pbc');?>" class="button button-primary submit-button" />
+		</div>
+	</form>
+    <?php
+	}
 
     /**
      * Post Type Phases
@@ -609,7 +791,8 @@ class PBCPlugin
 	}
 
 	public function pbc_custom_page_template( $template ) {
-		if ( \is_page( 'budget-configurator' )  ) {
+		$budget_configurator = get_option('pbc_budget_configurator_page');
+		if ( !empty($budget_configurator) && \is_page( $budget_configurator )  ) {
 			if(isset($_POST) && isset($_GET['submit']) && $_POST['submit'] == 'email_send'){
 				if(session_id() == ''){
 				    session_start();
@@ -751,8 +934,12 @@ class PBCPlugin
 			$result = array('type'=>'error', 'response'=>'Configurator not ready!');
 		}else{
 			$output = '';
-		    $output .= "<page backcolor='#fafafa'>
-			<h1>".get_option('blogname')." Budget Configurator</h1>
+		    $output .= "<page backcolor='#fafafa'>";
+			$pdf_image_selected = get_option('pbc_pdf_image_selected');
+			if($pdf_image_selected)
+				$output .="<img src='".$pdf_image_selected."' width='200'/>";
+
+			$output .="<h1>".get_option('blogname')." Budget Configurator</h1>
 			<h3>Details of Your Selection</h3>";
 			$output .= '<table><tr><th>Phase</th><th>Variation</th><th>Price</th></tr>';
 			$total_price = '';
@@ -859,7 +1046,11 @@ class PBCPlugin
 				width: 60px;
 			}
 		</style>
-
+		<?php
+		$pdf_image_selected = get_option('pbc_pdf_image_selected');
+		if($pdf_image_selected){?>
+			<img src="<?php echo $pdf_image_selected;?>" width='200'/>
+		<?php }?>
 		<h1><?php _e('List Price for','pbc'); echo ' '.get_bloginfo( 'name');?></h1>
 		<p><strong><?php _e('Date','pbc'); echo ': '.date('d-m-Y');?></strong></p>
 		<?php $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
