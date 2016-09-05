@@ -873,7 +873,6 @@ class PBCPlugin
 			$sVar = $pbc_variation[$current_phase];
 			$imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
 			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}
-
 			$pricegroup = get_post_meta($sVar, 'pbc_pricegroup', true);
 			if(isset($pbc_pricevar)){
 				$term = get_term_by( 'id', $pbc_pricevar, 'measures');
@@ -900,10 +899,10 @@ class PBCPlugin
 		if(!isset($price) || empty($price)){
 			$price = '-';
 		}else $price .= ' €';
-		
+
 		if(!isset($option))
 			$option = '-';
-		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$return, 'option'=>$option, 'price'=>$price));
+		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$url, 'option'=>$option, 'price'=>$price));
 		die(0);
 	}
 	public function configurator_submit_action_callback(){

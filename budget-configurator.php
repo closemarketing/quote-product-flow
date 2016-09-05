@@ -471,7 +471,7 @@ if(empty($cStep)) $cStep = 1;
                             }else if(obj.type == 'success'){
                                 $('.product_preview').find('.product_preview_status').addClass('hidden');
                                 if(obj.url)
-                                    $('.product_preview').find('.image-wrap').html('<img src="'+obj.url+'" alt="product image"/>').show();
+                                    $('.product_preview').find('.image-wrap').html('').html('<img src="'+obj.url+'" alt="product image"/>').show();
                                 if(obj.option || obj.price){
                                     if($('.variation_selected.phase-'+cPhase).length == 0){
                                         $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
