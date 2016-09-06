@@ -243,7 +243,7 @@ if(empty($cStep)) $cStep = 1;
                                 echo $post_object->post_content;?>
                         </div>
                         <div class="phase_variations">
-                        <?php $variations = get_posts('posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value='.$phase_id.'&fields=ids');
+                        <?php $variations = get_posts('posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value='.$phase_id.'&fields=ids&orderby=title&order=asc');
                             if(!empty($variations))
                             {
                                 foreach($variations as $key => $variation)

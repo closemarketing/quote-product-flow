@@ -36,7 +36,6 @@ class PBCPlugin
 		add_action('init', array( $this, 'init' ) );
 		add_action('admin_init', array( $this, 'init' ) );
 		add_action('admin_footer', array($this,'pbc_admin_scripts') );
-		add_action('pre_get_posts', array($this,'pbc_posts_filter_ordering') );
 
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
@@ -177,20 +176,6 @@ class PBCPlugin
 		<?php
 	}
 
-	/**
-	 * PBC Posts Filter Ordering
-	 *
-	 * Action before posts are listed
-	 */
-	public function pbc_posts_filter_ordering($query) {
-		if (is_admin() && $query->is_main_query()){
-			$post_type = $query->query['post_type'];
-			if ( $post_type == 'variation' && $post_type == 'phases') {
-				$query->set('orderby', 'title');
-				$query->set('order', 'ASC');
-			}
-		}
-	}
 	/**
      * Registering menu admin
      *
