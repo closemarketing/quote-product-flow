@@ -856,8 +856,22 @@ class PBCPlugin
 	    }
 		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
 			$sVar = $pbc_variation[$current_phase];
-			$imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
-			if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}
+			$imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
+			if(!empty($imgprodgroup)){
+				foreach($imgprodgroup as $imgvar){
+					if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+						$arr = explode('|', $imgvar['pbc_depvarimgprod']);
+						if(!empty($arr[0]) && !empty($arr[1]) &&
+						isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
+							$imgprodid = $imgvar['pbc_imgprod'][0];
+						}
+					}elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+						$imgprodid = $imgvar['pbc_imgprod'][0];
+						break;
+					}
+				}
+			}
+			if($imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
 			$pricegroup = get_post_meta($sVar, 'pbc_pricegroup', true);
 			if(isset($pbc_pricevar)){
 				$term = get_term_by( 'id', $pbc_pricevar, 'measures');

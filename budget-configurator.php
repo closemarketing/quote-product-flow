@@ -329,8 +329,22 @@ if(empty($cStep)) $cStep = 1;
                         <div class="image-wrap">
                             <?php
                             if($sVar){
-                                $imgprod = get_post_meta($sVar, 'pbc_imgprod', true);
-                                if($imgprod){ $imgprodurl = wp_get_attachment_image_src($imgprod, 'full', true);}?>
+                                $imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
+                                if(!empty($imgprodgroup)){
+                                    foreach($imgprodgroup as $imgvar){
+                                        if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+                                            $arr = explode('|', $imgvar['pbc_depvarimgprod']);
+                                            if(!empty($arr[0]) && !empty($arr[1]) &&
+                                            isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
+                                                $imgprodid = $imgvar['pbc_imgprod'][0];
+                                            }
+                                        }elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+                                            $imgprodid = $imgvar['pbc_imgprod'][0];
+                                            break;
+                                        }
+                                    }
+                                }
+                                if($imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){?>
                                 <img src="<?php echo $imgprodurl[0];?>" alt="product image"/>
@@ -472,6 +486,8 @@ if(empty($cStep)) $cStep = 1;
                                 $('.product_preview').find('.product_preview_status').addClass('hidden');
                                 if(obj.url)
                                     $('.product_preview').find('.image-wrap').html('').html('<img src="'+obj.url+'" alt="product image"/>').show();
+                                else
+                                    $('.product_preview').find('.image-wrap').html('').hide();
                                 if(obj.option || obj.price){
                                     if($('.variation_selected.phase-'+cPhase).length == 0){
                                         $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
