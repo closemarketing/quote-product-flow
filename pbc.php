@@ -212,16 +212,6 @@ class PBCPlugin
 
          $submenu_pages = array(
 
-             // Avoid duplicate pages. Add submenu page with same slug as parent slug.
-             array(
-                 'parent_slug'   => 'pbc_menu',
-                 'page_title'    => __('Summary of Product Budget Configurator'),
-                 'menu_title'    => __('Summary','pbc'),
-                 'capability'    => 'manage_options',
-                 'menu_slug'     => 'pbc_menu',
-                 'function'      => array($this,'pbc_display_admin_page'),// Uses the same callback function as parent menu.
-             ),
-
              // Post Type :: View All Posts
              array(
                  'parent_slug'   => 'pbc_menu',
@@ -241,6 +231,16 @@ class PBCPlugin
 			 	'menu_slug'     => 'edit.php?post_type=variation',
 			 	'function'      => null,// Doesn't need a callback function.
 			 ),
+
+             // Avoid duplicate pages. Add submenu page with same slug as parent slug.
+             array(
+                 'parent_slug'   => 'pbc_menu',
+                 'page_title'    => __('Product Budget Configurator','pbc'),
+                 'menu_title'    => __('Settings','pbc'),
+                 'capability'    => 'manage_options',
+                 'menu_slug'     => 'pbc_menu',
+                 'function'      => array($this,'pbc_display_admin_page'),// Uses the same callback function as parent menu.
+             ),
 
          );
 

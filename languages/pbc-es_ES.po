@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2016-09-06 08:30+0200\n"
-"PO-Revision-Date: 2016-09-06 08:34+0200\n"
+"POT-Creation-Date: 2016-09-06 08:36+0200\n"
+"PO-Revision-Date: 2016-09-06 08:37+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
 "Language: es_ES\n"
@@ -57,33 +57,29 @@ msgid "Send"
 msgstr "Enviar"
 
 #. Plugin Name of the plugin/theme
-#: pbc.php:202
+#: pbc.php:202 pbc.php:238
 msgid "Product Budget Configurator"
 msgstr "Configurador Presupuestos Producto"
 
 #: pbc.php:218
-msgid "Summary of Product Budget Configurator"
-msgstr "Resumen Configurador Productos"
-
-#: pbc.php:219
-msgid "Summary"
-msgstr "Resumen"
-
-#: pbc.php:228
 msgid "Phases of Configurator"
 msgstr "Fases del configurador"
 
-#: pbc.php:229 pbc.php:319
+#: pbc.php:219 pbc.php:319
 msgid "Phases"
 msgstr "Fases"
 
-#: pbc.php:238
+#: pbc.php:228
 msgid "Variations in Phases"
 msgstr "Variaciones en Fases"
 
-#: pbc.php:239 pbc.php:423
+#: pbc.php:229 pbc.php:423
 msgid "Variations"
 msgstr "Variaciones"
+
+#: pbc.php:239
+msgid "Settings"
+msgstr "Configuración"
 
 #: pbc.php:272 pbc.php:276
 msgid "Successfully Saved!"
@@ -756,7 +752,7 @@ msgstr ""
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3610
 #, php-format
 msgid "%1$s installed successfully."
-msgstr ""
+msgstr "%1$s instalado correctamente."
 
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3611
 msgid "All installations have been completed."
@@ -779,6 +775,12 @@ msgstr "Crea un configurador de productos con su un presupuesto"
 #. Author of the plugin/theme
 msgid "closemarketing"
 msgstr "closemarketing"
+
+#~ msgid "Summary of Product Budget Configurator"
+#~ msgstr "Resumen Configurador Productos"
+
+#~ msgid "Summary"
+#~ msgstr "Resumen"
 
 #~ msgid "Price Options in Variation Prices"
 #~ msgstr "Opciones de variación de precios"
