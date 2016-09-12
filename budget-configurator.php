@@ -274,7 +274,7 @@ if(empty($cStep)) $cStep = 1;
                                     //$variations = array_values($variations);
                                     sort(array_values($variations));
                                 }
-                                if(isset($_SESSION) && is_array($_SESSION['pbc_variation']) && isset($_SESSION['pbc_variation'][$cStep]) &&
+                                if(isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation']) && isset($_SESSION['pbc_variation'][$cStep]) &&
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
                                 )
                                     $sVar = $_SESSION['pbc_variation'][$cStep]['var']['id'];
@@ -344,7 +344,7 @@ if(empty($cStep)) $cStep = 1;
                                         }
                                     }
                                 }
-                                if($imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
+                                if(isset($imgprodid)){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){?>
                                 <img src="<?php echo $imgprodurl[0];?>" alt="product image"/>
