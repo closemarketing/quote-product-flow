@@ -138,11 +138,12 @@ if(empty($cStep)) $cStep = 1;
     .phase_variations{margin-top: 40px;}
     .phase_variations ul{margin: 0; list-style: none;}
     .phase_variations ul li.variation_list {
-    width: 24%;
-    display: inline-block;
-    font-size: 14px;
-    margin-bottom: 20px;
-    text-align: center;
+        width: 24%;
+        display: inline-block;
+        font-size: 14px;
+        margin-bottom: 20px;
+        text-align: center;
+        vertical-align: top;
     }
     .product_preview {
         position: relative;
@@ -150,7 +151,8 @@ if(empty($cStep)) $cStep = 1;
         max-width: 570px;
         overflow: hidden;
     }
-    .product_preview .image-wrap img{width: 100%;max-width: 570px;}
+    .product_preview .image-wrap img:first-child{position: relative;}
+    .product_preview .image-wrap img{width: 100%;max-width: 570px;position: absolute;top: 0;left: 0;}
     .configurator_form_action {
         text-align: right;
         clear: both;
@@ -319,7 +321,7 @@ if(empty($cStep)) $cStep = 1;
                                 </ul>
                             <?php }
                             }else{?>
-                            <div class="error"><?php _e('No Variations Avaiable','pbc');?></div>
+                            <div class="error"><?php _e('No Variations Available','pbc');?></div>
                         <?php }?>
                         </div>
                     </div>
@@ -328,6 +330,38 @@ if(empty($cStep)) $cStep = 1;
                     <div class="product_preview">
                         <div class="image-wrap">
                             <?php
+                            //echo '<pre>';print_r($_SESSION['pbc_variation']);echo '</pre>';
+                            if(isset($_SESSION['pbc_variation']) && !empty($_SESSION['pbc_variation']))
+                            {
+                                for ($i = 1; $i < (int)$cStep; $i++)
+                                {
+                                    $imgprodid = $imgprodurl = '';
+                                    if(isset($_SESSION['pbc_variation'][$i]))
+                                    {
+                                        $ssVar = $_SESSION['pbc_variation'][$i]['var']['id'];
+                                        $imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
+                                        if(!empty($imgprodgroup)){
+                                            foreach($imgprodgroup as $imgvar){
+                                                if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+                                                    $arr = explode('|', $imgvar['pbc_depvarimgprod']);
+                                                    if(!empty($arr[0]) && !empty($arr[1]) &&
+                                                    isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
+                                                        $imgprodid = $imgvar['pbc_imgprod'][0];
+                                                    }
+                                                }elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+                                                    $imgprodid = $imgvar['pbc_imgprod'][0];
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
+                                        if(isset($imgprodurl) && $imgprodurl){?>
+                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" alt="product image"/>
+                                        <?php }
+                                    }
+                                }
+                            }
+                            $imgprodid = $imgprodurl = '';
                             if($sVar){
                                 $imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
                                 if(!empty($imgprodgroup)){
@@ -344,10 +378,10 @@ if(empty($cStep)) $cStep = 1;
                                         }
                                     }
                                 }
-                                if(isset($imgprodid)){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
+                                if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){?>
-                                <img src="<?php echo $imgprodurl[0];?>" alt="product image"/>
+                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" alt="product image"/>
                             <?php }
                             /* else{?>
                                 <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
@@ -484,10 +518,17 @@ if(empty($cStep)) $cStep = 1;
                                 });
                             }else if(obj.type == 'success'){
                                 $('.product_preview').find('.product_preview_status').addClass('hidden');
-                                if(obj.url)
-                                    $('.product_preview').find('.image-wrap').html('').html('<img src="'+obj.url+'" alt="product image"/>').show();
+                                if(obj.url){
+                                    if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
+                                        $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
+                                    }else{
+                                        $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" src="'+obj.url+'" alt="product image"/>').show();
+                                    }
+                                }
                                 else
-                                    $('.product_preview').find('.image-wrap').html('').hide();
+                                    if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
+                                        $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').remove();
+                                    }
                                 if(obj.option || obj.price){
                                     if($('.variation_selected.phase-'+cPhase).length == 0){
                                         $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
