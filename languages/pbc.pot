@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2016-09-06 08:28+0200\n"
+"POT-Creation-Date: 2016-09-19 09:42+0200\n"
 "PO-Revision-Date: 2016-08-26 22:27+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: pbc.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -24,329 +24,325 @@ msgstr ""
 msgid "No Variations Avaiable"
 msgstr ""
 
-#: budget-configurator.php:352 budget-configurator.php:355
+#: budget-configurator.php:366 budget-configurator.php:369
 msgid "Back"
 msgstr ""
 
-#: budget-configurator.php:363
+#: budget-configurator.php:377
 msgid "Calculate"
 msgstr ""
 
-#: budget-configurator.php:366
+#: budget-configurator.php:380
 msgid "Next"
 msgstr ""
 
-#: budget-configurator.php:383
+#: budget-configurator.php:397
 msgid "Actual Configuration"
 msgstr ""
 
-#: budget-configurator.php:414
+#: budget-configurator.php:428
 msgid "Total"
 msgstr ""
 
-#: budget-configurator.php:428
+#: budget-configurator.php:442
 msgid "Email"
 msgstr ""
 
-#: budget-configurator.php:429
+#: budget-configurator.php:443
 msgid "PDF"
 msgstr ""
 
-#: budget-configurator.php:434
+#: budget-configurator.php:448
 msgid "Send"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
-#: pbc.php:202
+#: pbc.php:187 pbc.php:203
 msgid "Product Budget Configurator"
 msgstr ""
 
-#: pbc.php:218
-msgid "Summary of Product Budget Configurator"
+#: pbc.php:204
+msgid "Settings"
 msgstr ""
 
-#: pbc.php:219
-msgid "Summary"
-msgstr ""
-
-#: pbc.php:228
+#: pbc.php:213
 msgid "Phases of Configurator"
 msgstr ""
 
-#: pbc.php:229 pbc.php:319
+#: pbc.php:214 pbc.php:304
 msgid "Phases"
 msgstr ""
 
-#: pbc.php:238
+#: pbc.php:223
 msgid "Variations in Phases"
 msgstr ""
 
-#: pbc.php:239 pbc.php:423
+#: pbc.php:224 pbc.php:408
 msgid "Variations"
 msgstr ""
 
-#: pbc.php:272 pbc.php:276
+#: pbc.php:257 pbc.php:261
 msgid "Successfully Saved!"
 msgstr ""
 
-#: pbc.php:280
+#: pbc.php:265
 msgid "Global Settings"
 msgstr ""
 
-#: pbc.php:293
+#: pbc.php:278
 msgid "All Phases Lists"
 msgstr ""
 
-#: pbc.php:299
+#: pbc.php:284
 msgid "General Settings"
 msgstr ""
 
-#: pbc.php:318 pbc.php:640
+#: pbc.php:303 pbc.php:625
 msgid "Order"
 msgstr ""
 
-#: pbc.php:320
+#: pbc.php:305
 msgid "Number of Variations"
 msgstr ""
 
-#: pbc.php:350
+#: pbc.php:335
 msgid "Budget Configurator Page"
 msgstr ""
 
-#: pbc.php:367
+#: pbc.php:352
 msgid "or"
 msgstr ""
 
-#: pbc.php:367
+#: pbc.php:352
 msgid "Create New Page"
 msgstr ""
 
-#: pbc.php:367
+#: pbc.php:352
 msgid "Create Page"
 msgstr ""
 
-#: pbc.php:370
+#: pbc.php:355
 msgid "Set PDF Image"
 msgstr ""
 
-#: pbc.php:380
+#: pbc.php:365
 msgid "Save"
 msgstr ""
 
-#: pbc.php:391 pbc.php:509 pbc.php:639 pbc.php:665
+#: pbc.php:376 pbc.php:494 pbc.php:624 pbc.php:650
 msgid "Phase"
 msgstr ""
 
-#: pbc.php:396
+#: pbc.php:381
 msgid "Add"
 msgstr ""
 
-#: pbc.php:397
+#: pbc.php:382
 msgid "Add New"
 msgstr ""
 
-#: pbc.php:398
+#: pbc.php:383
 msgid "Edit"
 msgstr ""
 
-#: pbc.php:399
+#: pbc.php:384
 msgid "New"
 msgstr ""
 
-#: pbc.php:400
+#: pbc.php:385
 msgid "View"
 msgstr ""
 
-#: pbc.php:401
+#: pbc.php:386
 msgid "Search for"
 msgstr ""
 
-#: pbc.php:402 pbc.php:403
+#: pbc.php:387 pbc.php:388
 msgid "We didn't find any"
 msgstr ""
 
-#: pbc.php:403
+#: pbc.php:388
 msgid "in the trash"
 msgstr ""
 
-#: pbc.php:412
+#: pbc.php:397
 msgctxt "phase"
 msgid "phase"
 msgstr ""
 
-#: pbc.php:424 pbc.php:544 pbc.php:564 pbc.php:664
+#: pbc.php:409 pbc.php:529 pbc.php:549 pbc.php:649
 msgid "Variation"
 msgstr ""
 
-#: pbc.php:425
+#: pbc.php:410
 msgid "Add Variation"
 msgstr ""
 
-#: pbc.php:426
+#: pbc.php:411
 msgid "Add New variation"
 msgstr ""
 
-#: pbc.php:427
+#: pbc.php:412
 msgid "Edit Variation"
 msgstr ""
 
-#: pbc.php:428
+#: pbc.php:413
 msgid "New Variation"
 msgstr ""
 
-#: pbc.php:429
+#: pbc.php:414
 msgid "View Variation"
 msgstr ""
 
-#: pbc.php:430
+#: pbc.php:415
 msgid "Search for variations"
 msgstr ""
 
-#: pbc.php:431
+#: pbc.php:416
 msgid "We didn't find any Variation"
 msgstr ""
 
-#: pbc.php:432
+#: pbc.php:417
 msgid "We didn't find any Variation in the trash"
 msgstr ""
 
-#: pbc.php:441
+#: pbc.php:426
 msgctxt "variation"
 msgid "variation"
 msgstr ""
 
-#: pbc.php:452
+#: pbc.php:437
 msgid "Price Options"
 msgstr ""
 
-#: pbc.php:453 pbc.php:590
+#: pbc.php:438 pbc.php:575
 msgid "Price Option"
 msgstr ""
 
-#: pbc.php:454
+#: pbc.php:439
 msgid "Search Price Option"
 msgstr ""
 
-#: pbc.php:455
+#: pbc.php:440
 msgid "All Price Options"
 msgstr ""
 
-#: pbc.php:456
+#: pbc.php:441
 msgid "Edit Price Option"
 msgstr ""
 
-#: pbc.php:457
+#: pbc.php:442
 msgid "Update Price Option"
 msgstr ""
 
-#: pbc.php:458
+#: pbc.php:443
 msgid "Add New Price Option"
 msgstr ""
 
-#: pbc.php:459
+#: pbc.php:444
 msgid "New Price Option"
 msgstr ""
 
-#: pbc.php:500
+#: pbc.php:485
 msgid "Options for Variation"
 msgstr ""
 
-#: pbc.php:515
+#: pbc.php:500
 msgid "Select a Phase"
 msgstr ""
 
-#: pbc.php:519
+#: pbc.php:504
 msgid "SKU"
 msgstr ""
 
-#: pbc.php:529
+#: pbc.php:514
 msgid "Image Icon"
 msgstr ""
 
-#: pbc.php:536 pbc.php:667 pbc.php:1099
+#: pbc.php:521 pbc.php:652 pbc.php:1098
 msgid "Depends of"
 msgstr ""
 
-#: pbc.php:550 pbc.php:570
+#: pbc.php:535 pbc.php:555
 msgid "Not depends of a Variation"
 msgstr ""
 
-#: pbc.php:556
+#: pbc.php:541
 msgid "Group Image Product"
 msgstr ""
 
-#: pbc.php:574
+#: pbc.php:559
 msgid "Image Product"
 msgstr ""
 
-#: pbc.php:582 pbc.php:666 pbc.php:1098
+#: pbc.php:567 pbc.php:651 pbc.php:1097
 msgid "Price"
 msgstr ""
 
-#: pbc.php:600
+#: pbc.php:585
 msgid "Price (excluded VAT)"
 msgstr ""
 
-#: pbc.php:668 pbc.php:1100
+#: pbc.php:653 pbc.php:1099
 msgid "Icon"
 msgstr ""
 
-#: pbc.php:669
+#: pbc.php:654
 msgid "Image"
 msgstr ""
 
-#: pbc.php:769
+#: pbc.php:754
 msgid "All Phases"
 msgstr ""
 
-#: pbc.php:1008
+#: pbc.php:1007
 msgid "Create List Price"
 msgstr ""
 
-#: pbc.php:1091
+#: pbc.php:1090
 msgid "List Price for"
 msgstr ""
 
-#: pbc.php:1092
+#: pbc.php:1091
 msgid "Date"
 msgstr ""
 
-#: pbc.php:1101
+#: pbc.php:1100
 msgid "Product"
 msgstr ""
 
-#: pbc.php:1191
+#: pbc.php:1190
 msgid "List Price"
 msgstr ""
 
-#: pbc.php:1280
+#: pbc.php:1279
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:334
 msgid "Install Required Plugins"
 msgstr ""
 
-#: pbc.php:1281
+#: pbc.php:1280
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:335
 msgid "Install Plugins"
 msgstr ""
 
-#: pbc.php:1283
+#: pbc.php:1282
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:337
 #, php-format
 msgid "Installing Plugin: %s"
 msgstr ""
 
-#: pbc.php:1285
+#: pbc.php:1284
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:339
 #, php-format
 msgid "Updating Plugin: %s"
 msgstr ""
 
-#: pbc.php:1286
+#: pbc.php:1285
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:340
 msgid "Something went wrong with the plugin API."
 msgstr ""
 
-#: pbc.php:1289
+#: pbc.php:1288
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:343
 #, php-format
 msgid "This theme requires the following plugin: %1$s."
@@ -354,7 +350,7 @@ msgid_plural "This theme requires the following plugins: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1295
+#: pbc.php:1294
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:349
 #, php-format
 msgid "This theme recommends the following plugin: %1$s."
@@ -362,7 +358,7 @@ msgid_plural "This theme recommends the following plugins: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1301
+#: pbc.php:1300
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:355
 #, php-format
 msgid ""
@@ -374,7 +370,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1307
+#: pbc.php:1306
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:361
 #, php-format
 msgid "There is an update available for: %1$s."
@@ -382,7 +378,7 @@ msgid_plural "There are updates available for the following plugins: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1313
+#: pbc.php:1312
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:367
 #, php-format
 msgid "The following required plugin is currently inactive: %1$s."
@@ -390,7 +386,7 @@ msgid_plural "The following required plugins are currently inactive: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1319
+#: pbc.php:1318
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:373
 #, php-format
 msgid "The following recommended plugin is currently inactive: %1$s."
@@ -398,39 +394,39 @@ msgid_plural "The following recommended plugins are currently inactive: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1324
+#: pbc.php:1323
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:378
 msgid "Begin installing plugin"
 msgid_plural "Begin installing plugins"
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1329
+#: pbc.php:1328
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:383
 msgid "Begin updating plugin"
 msgid_plural "Begin updating plugins"
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1334
+#: pbc.php:1333
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:388
 msgid "Begin activating plugin"
 msgid_plural "Begin activating plugins"
 msgstr[0] ""
 msgstr[1] ""
 
-#: pbc.php:1338
+#: pbc.php:1337
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:392
 msgid "Return to Required Plugins Installer"
 msgstr ""
 
-#: pbc.php:1339
+#: pbc.php:1338
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:394
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3252
 msgid "Plugin activated successfully."
 msgstr ""
 
-#: pbc.php:1340
+#: pbc.php:1339
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:395
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3045
 #, fuzzy
@@ -439,13 +435,13 @@ msgstr ""
 "#-#-#-#-#  1extracted.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 "#-#-#-#-#  2extracted.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 
-#: pbc.php:1342
+#: pbc.php:1341
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:397
 #, php-format
 msgid "No action taken. Plugin %1$s was already active."
 msgstr ""
 
-#: pbc.php:1344
+#: pbc.php:1343
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:399
 #, php-format
 msgid ""
@@ -453,25 +449,25 @@ msgid ""
 "Please update the plugin."
 msgstr ""
 
-#: pbc.php:1346
+#: pbc.php:1345
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:401
 #, php-format
 msgid "All plugins installed and activated successfully. %1$s"
 msgstr ""
 
-#: pbc.php:1347
+#: pbc.php:1346
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:402
 msgid "Dismiss this notice"
 msgstr ""
 
-#: pbc.php:1348
+#: pbc.php:1347
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:403
 msgid ""
 "There are one or more required or recommended plugins to install, update or "
 "activate."
 msgstr ""
 
-#: pbc.php:1349
+#: pbc.php:1348
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:404
 msgid "Please contact the administrator of this site for help."
 msgstr ""
