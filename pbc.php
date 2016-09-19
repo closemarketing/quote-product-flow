@@ -651,7 +651,7 @@ class PBCPlugin
 	    $new_columns['price'] = __('Price','pbc');
 	    $new_columns['depends'] = __('Depends of','pbc');
 	    $new_columns['imgicon'] = __('Icon','pbc');
-	    $new_columns['imgprod'] = __('Image','pbc');
+	    $new_columns['imgprod'] = __('Product Images','pbc');
 
 	    return $new_columns;
 	}
@@ -691,11 +691,8 @@ class PBCPlugin
             $icon_image = wp_get_attachment_image_src($imgicon, array(120,120), true);
 		}
 
-		//* Image Product
-		$imgprod = get_post_meta(get_the_id(), 'pbc_imgprod', true);
-        if($imgprod){
-            $icon_imageprod = wp_get_attachment_image_src($imgprod, array(120,120), true);
-		}
+		//* Image Group Product
+		$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 
 	    switch ($column_name) {
 
@@ -713,7 +710,13 @@ class PBCPlugin
 			if(isset($icon_image) ) echo '<img src="'.$icon_image[0].'" />';
 	        break;
 	    case 'imgprod':
-			if(isset($icon_imageprod) ) echo '<img src="'.$icon_imageprod[0].'" />';
+			if(isset($image_group)) {
+				if(count($image_group)>0) echo count($image_group).'<br>';
+				foreach($image_group as $imageg_item) {
+					$icon_imageprod = wp_get_attachment_image_src($imageg_item['pbc_imgprod'][0], array(57,46), true);
+					echo '<img src="'.$icon_imageprod[0].'" width="57" height="46"/>';
+				}
+			}
 	        break;
 	    default:
 	        break;
