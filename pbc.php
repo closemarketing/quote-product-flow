@@ -475,7 +475,10 @@ class PBCPlugin
 			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
 			$var_value = $phase_order.'|'.$var_item->ID;
 			$var_sku = get_post_meta($var_item->ID, 'pbc_sku', true);
-        	$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
+			if($var_sku)
+        		$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
+			else
+        		$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
         }
 		asort($var_options);
 
