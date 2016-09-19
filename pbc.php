@@ -357,7 +357,7 @@ class PBCPlugin
 					wp_enqueue_media();
 					$pdf_image_selected = get_option('pbc_pdf_image_selected');
 				?>
-				<input type="text" name="pdf_image_selected" value="<?php if($pdf_image_selected) echo $pdf_image_selected;?>" /><button class="select-image button">Select image</button>
+				<input type="text" name="pdf_image_selected" value="<?php if($pdf_image_selected) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
 			</fieldset>
 		</div>
 
@@ -474,7 +474,8 @@ class PBCPlugin
 			$phase_post = get_post($phase_id);
 			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
 			$var_value = $phase_order.'|'.$var_item->ID;
-        	$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
+			$var_sku = get_post_meta($var_item->ID, 'pbc_sku', true);
+        	$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
         }
 		asort($var_options);
 
