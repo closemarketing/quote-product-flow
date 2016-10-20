@@ -717,8 +717,10 @@ class PBCPlugin
 			if(isset($image_group)) {
 				if(count($image_group)>0) echo count($image_group).'<br>';
 				foreach($image_group as $imageg_item) {
+					if(isset($imageg_item['pbc_imgprod'][0])) {
 					$icon_imageprod = wp_get_attachment_image_src($imageg_item['pbc_imgprod'][0], array(57,46), true);
 					echo '<img src="'.$icon_imageprod[0].'" width="57" height="46"/>';
+					}
 				}
 			}
 	        break;
@@ -938,8 +940,8 @@ class PBCPlugin
 				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
 			}else{
 				$subject = get_option('blogname').' Budget Configurator';
-				$message = '<h3>Here are the details of your selection:</h3>'.'<br>';
-				$message .= '<table><tr><th>Phase</th><th>Variation</th><th>Price</th></tr>';
+				$message = '<h3>'.__('Here are the details of your selection:','pbc').'</h3>'.'<br>';
+				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 				$total_price = '';
 				foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
 					$total_price += $details['var']['price'];
@@ -956,7 +958,6 @@ class PBCPlugin
 				$message .= '<td>'.$total_price.'</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
-				$message .= '<br>Thank You!';
 				$message .= '<br>'.get_option('blogname');
 
 				function set_html_content_type() {
@@ -964,7 +965,7 @@ class PBCPlugin
 				}
 				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
 			    if(!wp_mail( $emails, $subject, $message)){
-					$result = array('type'=>'error', 'response'=>'Error in sending mail. Please try again!');
+					$result = array('type'=>'error', 'response'=>__('Error in sending mail. Please try again!','pbc'));
 				}else
 					$result = array('type'=>'success', 'response'=>'Mail sent!');
 				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
@@ -974,7 +975,7 @@ class PBCPlugin
 	}
 	public function configurator_result_generate_pdf(){
 		if(!isset($_SESSION['pbc_variation'])){
-			$result = array('type'=>'error', 'response'=>'Configurator not ready!');
+			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
 			$output = '';
 		    $output .= "<page backcolor='#fafafa'>";
@@ -982,9 +983,9 @@ class PBCPlugin
 			if($pdf_image_selected)
 				$output .="<img src='".$pdf_image_selected."' width='200'/>";
 
-			$output .="<h1>".get_option('blogname')." Budget Configurator</h1>
-			<h3>Details of Your Selection</h3>";
-			$output .= '<table><tr><th>Phase</th><th>Variation</th><th>Price</th></tr>';
+			$output .="<h1>".get_option('blogname')."</h1>";
+			$output .="<h3>".__('Details of Your Selection','pbc')."</h3>";
+			$output .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 			$total_price = '';
 			foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
 				$total_price += $details['var']['price'];
@@ -997,7 +998,7 @@ class PBCPlugin
 			if($total_price) $total_price = $total_price.' €';
 			else $total_price = '-';
 			$output .= '<tr>';
-			$output .= '<td>&nbsp;</td><td>Total: </td>';
+			$output .= '<td>&nbsp;</td><td>'.__('Total:','pbc').'</td>';
 			$output .= '<td>'.$total_price.'</td>';
 			$output .= '</tr>';
 			$output .= '</table>';
