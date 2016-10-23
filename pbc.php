@@ -515,14 +515,14 @@ class PBCPlugin
     			),
     			// IMAGE ADVANCED (WP 3.5+)
     			array(
-    				'name'             => esc_html__( 'Image Icon', 'pbc' ),
+    				'name'             => __( 'Image Icon', 'pbc' ),
     				'id'               => "{$prefix}imgicon",
     				'type'             => 'image_advanced',
     				'max_file_uploads' => 1,
     			),
 
 				array(
-    				'name'   => esc_html__( 'Depends of', 'pbc' ),
+    				'name'   => __( 'Depends of', 'pbc' ),
 					'id'     => "{$prefix}depends",
 					'type'   => 'group',
 					'clone'  => true,
@@ -542,7 +542,7 @@ class PBCPlugin
 				), //array
 
 				array(
-    				'name'   => esc_html__( 'Group Image Product', 'pbc' ),
+    			'name'   => __( 'Group Image Product', 'pbc' ),
 					'id'     => "{$prefix}imgprodgroup",
 					'type'   => 'group',
 					'clone'  => true,
@@ -554,13 +554,13 @@ class PBCPlugin
 		    				'id'          => "{$prefix}depvarimgprod",
 		    				'type'        => 'select',
 		    				'options'     => $var_options,
-		    				'multiple'    => false,
+		    				'multiple'    => true,
 		    				'std'         => '',
 		    				'placeholder' => __( 'Not depends of a Variation', 'pbc' ),
 		    			),
 		    			// IMAGE ADVANCED (WP 3.5+)
 		    			array(
-		    				'name'             => esc_html__( 'Image Product', 'pbc' ),
+		    				'name'             => __( 'Image Product', 'pbc' ),
 		    				'id'               => "{$prefix}imgprod",
 		    				'type'             => 'image_advanced',
 		    				'max_file_uploads' => 1,
@@ -568,7 +568,7 @@ class PBCPlugin
 					),
 				), //array
 				array(
-    				'name'   => esc_html__( 'Price', 'pbc' ),
+    				'name'   => __( 'Price', 'pbc' ),
 					'id'     => "{$prefix}pricegroup",
 					'type'   => 'group',
 					'clone'  => true,
@@ -774,6 +774,46 @@ class PBCPlugin
 	                }
 	        ?>
 	        </select>
+					<?
+
+			//Variations Options
+	        $var_options = array();
+	        $variationscpt = get_posts(array(
+	            'post_type' => 'variation',
+	            'posts_per_page' => -1,
+	            'orderby' => 'name',
+	            'order' => 'ASC'
+	        ));
+	        $variationscpt_item = array();
+	        foreach ($variationscpt as $var_item) {
+				$phase_id = get_post_meta($var_item->ID, 'pbc_phase', true);
+				$phase_post = get_post($phase_id);
+				if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
+				$var_value = $phase_order.'|'.$var_item->ID;
+				$var_sku = get_post_meta($var_item->ID, 'pbc_sku', true);
+				if($var_sku)
+	        		$var_options[$phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')'] = $var_value;
+				else
+	        		$var_options[$phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title] = $var_value;
+	        }
+					asort($var_options);
+					?>
+
+	        <select name="pbc_filter_depends">
+	        <option value=""><?php _e('All Depends', 'pbc'); ?></option>
+	        <?php
+	            $current_v = isset($_GET['pbc_filter_depends'])? $_GET['pbc_filter_depends']:'';
+	            foreach ($var_options as $label => $value) {
+	                printf
+	                    (
+	                        '<option value="%s"%s>%s</option>',
+	                        $value,
+	                        $value == $current_v? ' selected="selected"':'',
+	                        $label
+	                    );
+	                }
+	        ?>
+	        </select>
 	        <?php
 	    }
 	}
@@ -793,10 +833,19 @@ class PBCPlugin
 	    if (isset($_GET['post_type'])) {
 	        $type = $_GET['post_type'];
 	    }
-	    if ( 'variation' == $type && is_admin() && $pagenow=='edit.php' && isset($_GET['pbc_filter_phase']) && $_GET['pbc_filter_phase'] != '') {
+
+			if ( 'variation' == $type && is_admin() && $pagenow=='edit.php' ) {
+				if(isset($_GET['pbc_filter_phase']) && $_GET['pbc_filter_phase'] != '') {
 	        $query->query_vars['meta_key'] = 'pbc_phase';
 	        $query->query_vars['meta_value'] = $_GET['pbc_filter_phase'];
-	    }
+				}
+				if(isset($_GET['pbc_filter_depends']) && $_GET['pbc_filter_depends'] != '') {
+	        $query->query_vars['meta_key'] = 'pbc_depends';
+	        $query->query_vars['meta_value'] = $_GET['pbc_filter_depends'];
+    			$query->query_vars['meta_compare'] = '=';
+				}
+
+			}
 	}
 
 	public function pbc_custom_page_template( $template ) {
