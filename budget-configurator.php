@@ -183,7 +183,9 @@ if(empty($cStep)) $cStep = 1;
         padding-top: 15px;
     }
     .configurator_form_action .prev, .configurator_form_action .next{display: inline-block;}
-    .status_loader.fixed{position: fixed;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.8);vertical-align: middle;text-align: center;top: 0;z-index: 9999;left:0;}
+    .status_loader.fixed{position: fixed;width: 100%;height: 100%;
+        /*background: rgba(0, 0, 0, 0.8);*/
+        vertical-align: middle;text-align: center;top: 0;z-index: 9999;left:0;}
     .status_loader.product_preview_status.fixed{position: absolute;}
     .status_loader.fixed > div {
         position: relative;
