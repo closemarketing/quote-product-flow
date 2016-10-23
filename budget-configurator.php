@@ -280,7 +280,7 @@ if(empty($cStep)) $cStep = 1;
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
                                 )
                                     $sVar = $_SESSION['pbc_variation'][$cStep]['var']['id'];
-                                else $sVar = $variations[0];
+                                else{ $sVar = $variations[current(array_keys($variations))];}
                                 if(!empty($variations)){
                                 ?>
                                 <ul>
