@@ -486,7 +486,7 @@ class PBCPlugin
     	// 1st meta box
     	$meta_boxes[] = array(
     		'id'         => 'standard',
-    		'title'      => __( 'Options for Variation', 'pbc' ),
+    		'title'      => __('Options for Variation','pbc'),
     		'post_types' => array( 'variation' ),
     		'context'    => 'normal',
     		'priority'   => 'high',
@@ -495,17 +495,17 @@ class PBCPlugin
     		'fields'     => array(
     			// SELECT BOX PHASE
     			array(
-    				'name'        => __( 'Phase', 'pbc' ),
+    				'name'        => __('Phase','pbc'),
     				'id'          => "{$prefix}phase",
     				'type'        => 'select',
     				'options'     => $phase_options,
     				'multiple'    => false,
     				'std'         => '',
-    				'placeholder' => __( 'Select a Phase', 'pbc' ),
+    				'placeholder' => __('Select a Phase','pbc'),
     			),
     			// TEXT
     			array(
-    				'name'  => __( 'SKU', 'pbc' ),
+    				'name'  => __('SKU','pbc'),
     				'id'    => "{$prefix}sku",
     				'desc'  => '',
     				'type'  => 'text',
@@ -515,14 +515,14 @@ class PBCPlugin
     			),
     			// IMAGE ADVANCED (WP 3.5+)
     			array(
-    				'name'             => __( 'Image Icon', 'pbc' ),
+    				'name'             => __('Image Icon','pbc'),
     				'id'               => "{$prefix}imgicon",
     				'type'             => 'image_advanced',
     				'max_file_uploads' => 1,
     			),
 
 				array(
-    				'name'   => __( 'Depends of', 'pbc' ),
+    				'name'   => __('Depends of','pbc'),
 					'id'     => "{$prefix}depends",
 					'type'   => 'group',
 					'clone'  => true,
@@ -530,19 +530,19 @@ class PBCPlugin
 					'fields' => array(
 		    			// SELECT BOX VARIATIONS
 		    			array(
-		    				'name'        => __( 'Variation', 'pbc' ),
+		    				'name'        => __('Variation','pbc'),
 		    				'id'          => "{$prefix}depvar",
 		    				'type'        => 'select',
 		    				'options'     => $var_options,
 		    				'multiple'    => false,
 		    				'std'         => '',
-		    				'placeholder' => __( 'Not depends of a Variation', 'pbc' ),
+		    				'placeholder' => __('Not depends of a Variation','pbc'),
 		    			),
 					),
 				), //array
 
 				array(
-    			'name'   => __( 'Group Image Product', 'pbc' ),
+    			'name'   => __('Group Image Product','pbc'),
 					'id'     => "{$prefix}imgprodgroup",
 					'type'   => 'group',
 					'clone'  => true,
@@ -550,17 +550,17 @@ class PBCPlugin
 					'fields' => array(
 		    			// SELECT BOX VARIATIONS
 		    			array(
-		    				'name'        => __( 'Variation', 'pbc' ),
+		    				'name'        => __('Variation','pbc'),
 		    				'id'          => "{$prefix}depvarimgprod",
 		    				'type'        => 'select',
 		    				'options'     => $var_options,
 		    				'multiple'    => true,
 		    				'std'         => '',
-		    				'placeholder' => __( 'Not depends of a Variation', 'pbc' ),
+		    				'placeholder' => __('Not depends of a Variation','pbc'),
 		    			),
 		    			// IMAGE ADVANCED (WP 3.5+)
 		    			array(
-		    				'name'             => __( 'Image Product', 'pbc' ),
+		    				'name'             => __('Image Product','pbc'),
 		    				'id'               => "{$prefix}imgprod",
 		    				'type'             => 'image_advanced',
 		    				'max_file_uploads' => 1,
@@ -568,7 +568,7 @@ class PBCPlugin
 					),
 				), //array
 				array(
-    				'name'   => __( 'Price', 'pbc' ),
+    				'name'   => __('Price','pbc'),
 					'id'     => "{$prefix}pricegroup",
 					'type'   => 'group',
 					'clone'  => true,
@@ -576,7 +576,7 @@ class PBCPlugin
 					'fields' => array(
 		    			// TEXT
 		    			array(
-		    				'name'  => __( 'Price Option', 'pbc' ),
+		    				'name'  => __('Price Option','pbc'),
 		    				'id'    => "{$prefix}meaprice",
 		    				'desc'  => '',
 		    				'type'  => 'text',
@@ -586,7 +586,7 @@ class PBCPlugin
 		    			),
 		    			// TEXT
 		    			array(
-		    				'name'  => __( 'Price (excluded VAT)', 'pbc' ),
+		    				'name'  => __('Price (excluded VAT)','pbc'),
 		    				'id'    => "{$prefix}pricem",
 		    				'desc'  => '',
 		    				'type'  => 'text',
@@ -1333,13 +1333,13 @@ function pbc_required_plugins() {
 		'is_automatic' => false,                   // Automatically activate plugins after installation or not.
 		'message'      => '',                      // Message to output right before the plugins table.
 		'strings'      => array(
-			'page_title'                      => __( 'Install Required Plugins', 'pbc' ),
-			'menu_title'                      => __( 'Install Plugins', 'pbc' ),
+			'page_title'                      => __('Install Required Plugins','pbc'),
+			'menu_title'                      => __('Install Plugins','pbc'),
 			/* translators: %s: plugin name. */
-			'installing'                      => __( 'Installing Plugin: %s', 'pbc' ),
+			'installing'                      => __('Installing Plugin: %s','pbc'),
 			/* translators: %s: plugin name. */
-			'updating'                        => __( 'Updating Plugin: %s', 'pbc' ),
-			'oops'                            => __( 'Something went wrong with the plugin API.', 'pbc' ),
+			'updating'                        => __('Updating Plugin: %s','pbc'),
+			'oops'                            => __('Something went wrong with the plugin API.','pbc'),
 			'notice_can_install_required'     => _n_noop(
 				/* translators: 1: plugin name(s). */
 				'This theme requires the following plugin: %1$s.',
@@ -1391,18 +1391,18 @@ function pbc_required_plugins() {
 				'Begin activating plugins',
 				'pbc'
 			),
-			'return'                          => __( 'Return to Required Plugins Installer', 'pbc' ),
-			'plugin_activated'                => __( 'Plugin activated successfully.', 'pbc' ),
-			'activated_successfully'          => __( 'The following plugin was activated successfully:', 'pbc' ),
+			'return'                          => __('Return to Required Plugins Installer','pbc'),
+			'plugin_activated'                => __('Plugin activated successfully.','pbc'),
+			'activated_successfully'          => __('The following plugin was activated successfully:','pbc'),
 			/* translators: 1: plugin name. */
-			'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'pbc' ),
+			'plugin_already_active'           => __('No action taken. Plugin %1$s was already active.','pbc'),
 			/* translators: 1: plugin name. */
-			'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.', 'pbc' ),
+			'plugin_needs_higher_version'     => __('Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.','pbc'),
 			/* translators: 1: dashboard link. */
-			'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'pbc' ),
-			'dismiss'                         => __( 'Dismiss this notice', 'pbc' ),
-			'notice_cannot_install_activate'  => __( 'There are one or more required or recommended plugins to install, update or activate.', 'pbc' ),
-			'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'pbc' ),
+			'complete'                        => __('All plugins installed and activated successfully. %1$s','pbc'),
+			'dismiss'                         => __('Dismiss this notice','pbc'),
+			'notice_cannot_install_activate'  => __('There are one or more required or recommended plugins to install, update or activate.','pbc'),
+			'contact_admin'                   => __('Please contact the administrator of this site for help.','pbc'),
 
 			'nag_type'                        => '', // Determines admin notice type - can only be one of the typical WP notice classes, such as 'updated', 'update-nag', 'notice-warning', 'notice-info' or 'error'. Some of which may not work as expected in older WP versions.
 		),

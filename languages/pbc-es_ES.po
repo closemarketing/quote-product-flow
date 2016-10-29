@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
-"POT-Creation-Date: 2016-10-20 10:24+0200\n"
+"POT-Creation-Date: 2016-10-27 18:04+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: \n"
@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.9\n"
+"X-Generator: Poedit 1.8.11\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: budget-configurator.php:324
@@ -125,7 +125,7 @@ msgstr "Seleccionar imagen"
 msgid "Save"
 msgstr "Guardar"
 
-#: pbc.php:376 pbc.php:498 pbc.php:628 pbc.php:654 pbc.php:944 pbc.php:988
+#: pbc.php:376 pbc.php:498 pbc.php:628 pbc.php:654 pbc.php:993 pbc.php:1037
 msgid "Phase"
 msgstr "Fase"
 
@@ -166,7 +166,7 @@ msgctxt "phase"
 msgid "phase"
 msgstr "fase"
 
-#: pbc.php:409 pbc.php:533 pbc.php:553 pbc.php:653 pbc.php:944 pbc.php:988
+#: pbc.php:409 pbc.php:533 pbc.php:553 pbc.php:653 pbc.php:993 pbc.php:1037
 msgid "Variation"
 msgstr "Variación"
 
@@ -255,7 +255,7 @@ msgstr "Referencia"
 msgid "Image Icon"
 msgstr "Imagen del icono"
 
-#: pbc.php:525 pbc.php:656 pbc.php:1106
+#: pbc.php:525 pbc.php:656 pbc.php:1155
 msgid "Depends of"
 msgstr "Depende de"
 
@@ -271,7 +271,7 @@ msgstr "Grupos de Imagen Producto"
 msgid "Image Product"
 msgstr "Imagen de producto"
 
-#: pbc.php:571 pbc.php:655 pbc.php:944 pbc.php:988 pbc.php:1105
+#: pbc.php:571 pbc.php:655 pbc.php:993 pbc.php:1037 pbc.php:1154
 msgid "Price"
 msgstr "Precio"
 
@@ -279,7 +279,7 @@ msgstr "Precio"
 msgid "Price (excluded VAT)"
 msgstr "Precio (IVA no incluido)"
 
-#: pbc.php:657 pbc.php:1107
+#: pbc.php:657 pbc.php:1156
 msgid "Icon"
 msgstr "Icono"
 
@@ -291,74 +291,78 @@ msgstr "Imágenes de producto"
 msgid "All Phases"
 msgstr "Todas las Fases"
 
-#: pbc.php:943
+#: pbc.php:803
+msgid "All Depends"
+msgstr "Todas las dependencias"
+
+#: pbc.php:992
 msgid "Here are the details of your selection:"
 msgstr "Aquí tienes los detalles de tu selección:"
 
-#: pbc.php:968
+#: pbc.php:1017
 msgid "Error in sending mail. Please try again!"
 msgstr "Error enviando el email, por favor intenta mas tarde."
 
-#: pbc.php:978
+#: pbc.php:1027
 msgid "Configurator not ready!"
 msgstr "¡Configurador no está funcionando!"
 
-#: pbc.php:987
+#: pbc.php:1036
 msgid "Details of Your Selection"
 msgstr "Detalles de tu selección"
 
-#: pbc.php:1001
+#: pbc.php:1050
 msgid "Total:"
 msgstr "Total:"
 
-#: pbc.php:1015
+#: pbc.php:1064
 msgid "Create List Price"
 msgstr "Crear Tarifa Precios"
 
-#: pbc.php:1098
+#: pbc.php:1147
 msgid "List Price for"
 msgstr "Tarifa Precios de"
 
-#: pbc.php:1099
+#: pbc.php:1148
 msgid "Date"
 msgstr "Fecha"
 
-#: pbc.php:1108
+#: pbc.php:1157
 msgid "Product"
 msgstr "Producto"
 
-#: pbc.php:1198
+#: pbc.php:1247
 msgid "List Price"
 msgstr "Tarifa Precios"
 
-#: pbc.php:1287
+#: pbc.php:1336
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:334
 msgid "Install Required Plugins"
 msgstr "Instalar Plugins requeridos"
 
-#: pbc.php:1288
+#: pbc.php:1337
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:335
 msgid "Install Plugins"
 msgstr "Instalar Plugins"
 
-#: pbc.php:1290
+#: pbc.php:1339
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:337
 #, php-format
 msgid "Installing Plugin: %s"
 msgstr "Instalando Plugin: %s"
 
-#: pbc.php:1292
+#: pbc.php:1341
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:339
 #, php-format
 msgid "Updating Plugin: %s"
 msgstr "Actualizando plugin: %s"
 
-#: pbc.php:1293
+#: pbc.php:1342
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:340
 msgid "Something went wrong with the plugin API."
 msgstr "Algo no ha funcionado con la API del plugin."
 
-#: pbc.php:1296
+#: pbc.php:1345
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:343
 #, php-format
 msgid "This theme requires the following plugin: %1$s."
@@ -366,7 +370,7 @@ msgid_plural "This theme requires the following plugins: %1$s."
 msgstr[0] "Este tema requiere el siguiente plugin: %1$s."
 msgstr[1] "Este tema requiere los siguientes plugin: %1$s."
 
-#: pbc.php:1302
+#: pbc.php:1351
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:349
 #, php-format
 msgid "This theme recommends the following plugin: %1$s."
@@ -374,7 +378,7 @@ msgid_plural "This theme recommends the following plugins: %1$s."
 msgstr[0] "Este tema recomienda el siguiente plugin: %1$s."
 msgstr[1] "Este tema recomienda los siguientes plugin: %1$s."
 
-#: pbc.php:1308
+#: pbc.php:1357
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:355
 #, php-format
 msgid ""
@@ -390,7 +394,7 @@ msgstr[1] ""
 "Los siguientes plugins necesitan ser actualizados a su última versión para "
 "garantizar la máxima compatibilidad con este tema: %1$s."
 
-#: pbc.php:1314
+#: pbc.php:1363
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:361
 #, php-format
 msgid "There is an update available for: %1$s."
@@ -398,7 +402,7 @@ msgid_plural "There are updates available for the following plugins: %1$s."
 msgstr[0] "Hay una actualización disponible para: %1$s."
 msgstr[1] "Hay actualizaciones disponibles para: %1$s."
 
-#: pbc.php:1320
+#: pbc.php:1369
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:367
 #, php-format
 msgid "The following required plugin is currently inactive: %1$s."
@@ -406,7 +410,7 @@ msgid_plural "The following required plugins are currently inactive: %1$s."
 msgstr[0] "El siguiente plugin requerido esta inactivo: %1$s."
 msgstr[1] "Los siguientes plugins requeridos estan inactivos: %1$s."
 
-#: pbc.php:1326
+#: pbc.php:1375
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:373
 #, php-format
 msgid "The following recommended plugin is currently inactive: %1$s."
@@ -414,51 +418,51 @@ msgid_plural "The following recommended plugins are currently inactive: %1$s."
 msgstr[0] "El siguiente plugin recomendado esta inactivo: %1$s."
 msgstr[1] "Los siguientes plugins recomendados estan inactivos: %1$s."
 
-#: pbc.php:1331
+#: pbc.php:1380
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:378
 msgid "Begin installing plugin"
 msgid_plural "Begin installing plugins"
 msgstr[0] "Comenzar instalación del plugin"
 msgstr[1] "Comenzar instalación de los plugin"
 
-#: pbc.php:1336
+#: pbc.php:1385
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:383
 msgid "Begin updating plugin"
 msgid_plural "Begin updating plugins"
 msgstr[0] "Empezamos actualizando el plugin"
 msgstr[1] "Empezamos actualizando los plugins"
 
-#: pbc.php:1341
+#: pbc.php:1390
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:388
 msgid "Begin activating plugin"
 msgid_plural "Begin activating plugins"
 msgstr[0] "Comenzar activación de plugin"
 msgstr[1] "Comenzar activación de los plugins"
 
-#: pbc.php:1345
+#: pbc.php:1394
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:392
 msgid "Return to Required Plugins Installer"
 msgstr "Volver al Instalador de plugins requeridos"
 
-#: pbc.php:1346
+#: pbc.php:1395
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:394
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3252
 msgid "Plugin activated successfully."
 msgstr "Plugin activado correctamente ."
 
-#: pbc.php:1347
+#: pbc.php:1396
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:395
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:3045
 msgid "The following plugin was activated successfully:"
 msgstr "El siguiente plugin se ha activado correctamente:"
 
-#: pbc.php:1349
+#: pbc.php:1398
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:397
 #, php-format
 msgid "No action taken. Plugin %1$s was already active."
 msgstr "Sin acción. El plugin %1$s ya se encuentra activo."
 
-#: pbc.php:1351
+#: pbc.php:1400
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:399
 #, php-format
 msgid ""
@@ -468,18 +472,18 @@ msgstr ""
 "Plugin no activado. Este tema necesita una versión superior de %s. Por "
 "favor, actualiza el plugin."
 
-#: pbc.php:1353
+#: pbc.php:1402
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:401
 #, php-format
 msgid "All plugins installed and activated successfully. %1$s"
 msgstr "Todos los plugins se instalaron y activaron correctamente. %1$s"
 
-#: pbc.php:1354
+#: pbc.php:1403
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:402
 msgid "Dismiss this notice"
 msgstr "Descartar este aviso"
 
-#: pbc.php:1355
+#: pbc.php:1404
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:403
 msgid ""
 "There are one or more required or recommended plugins to install, update or "
@@ -488,7 +492,7 @@ msgstr ""
 "Hay uno o más plugins requeridos o recomendados para instalar, actualizar o "
 "activar."
 
-#: pbc.php:1356
+#: pbc.php:1405
 #: vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php:404
 msgid "Please contact the administrator of this site for help."
 msgstr "Para más ayuda, contacta con el administrador de la web."
