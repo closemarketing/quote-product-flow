@@ -183,7 +183,9 @@ if(empty($cStep)) $cStep = 1;
         padding-top: 15px;
     }
     .configurator_form_action .prev, .configurator_form_action .next{display: inline-block;}
-    .status_loader.fixed{position: fixed;width: 100%;height: 100%;vertical-align: middle;text-align: center;top: 0;z-index: 9999;left:0;}
+    .status_loader.fixed{position: fixed;width: 100%;height: 100%;
+        /*background: rgba(0, 0, 0, 0.8);*/
+        vertical-align: middle;text-align: center;top: 0;z-index: 9999;left:0;}
     .status_loader.product_preview_status.fixed{position: absolute;}
     .status_loader.fixed > div {
         position: relative;
@@ -280,7 +282,7 @@ if(empty($cStep)) $cStep = 1;
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
                                 )
                                     $sVar = $_SESSION['pbc_variation'][$cStep]['var']['id'];
-                                else $sVar = $variations[0];
+                                else{ $sVar = $variations[current(array_keys($variations))];}
                                 if(!empty($variations)){
                                 ?>
                                 <ul>
@@ -330,7 +332,6 @@ if(empty($cStep)) $cStep = 1;
                     <div class="product_preview">
                         <div class="image-wrap">
                             <?php
-                            //echo '<pre>';print_r($_SESSION['pbc_variation']);echo '</pre>';
                             if(isset($_SESSION['pbc_variation']) && !empty($_SESSION['pbc_variation']))
                             {
                                 for ($i = 1; $i < (int)$cStep; $i++)
@@ -341,18 +342,50 @@ if(empty($cStep)) $cStep = 1;
                                         $ssVar = $_SESSION['pbc_variation'][$i]['var']['id'];
                                         $imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
                                         if(!empty($imgprodgroup)){
-                                            foreach($imgprodgroup as $imgvar){
-                                                if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
-                                                    $arr = explode('|', $imgvar['pbc_depvarimgprod']);
-                                                    if(!empty($arr[0]) && !empty($arr[1]) &&
-                                                    isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
-                                                        $imgprodid = $imgvar['pbc_imgprod'][0];
+                                            foreach($imgprodgroup as $deps)
+                                            {
+                                                if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
+                                                {
+                                                    $prevVar = array();
+                                                    foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
+                                                    {
+                                                        $arr = explode('|', $depvarimgprod);
+                                                        if(!empty($arr[0]) && !empty($arr[1])){
+                                                            $prevVar[(int)$arr[0]][] = $arr[1];
+                                                        }
                                                     }
-                                                }elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
-                                                    $imgprodid = $imgvar['pbc_imgprod'][0];
+                                                    if(isset($_SESSION['pbc_variation'][$cStep-1]))
+                                                    {
+                                                        foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+                                                        {
+                                                            if(isset($prevVar[$sPhaseKey]) &&
+                                                            isset($_SESSION['pbc_variation'][$sPhaseKey]) && in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+                                                            {
+                                                                $imgprodid = $deps['pbc_imgprod'][0];
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                }elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
+                                                    $imgprodid = $deps['pbc_imgprod'][0];
                                                     break;
                                                 }
                                             }
+
+                                            // foreach($imgprodgroup as $imgvar){
+                                            //     if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+                                            //         foreach($imgvar['pbc_depvarimgprod'] as $depvarimgprod){
+                                            //             $arr = explode('|', $depvarimgprod);
+                                            //             if(!empty($arr[0]) && !empty($arr[1]) &&
+                                            //             isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
+                                            //                 $imgprodid = $imgvar['pbc_imgprod'][0];
+                                            //             }
+                                            //         }
+                                            //     }elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
+                                            //         $imgprodid = $imgvar['pbc_imgprod'][0];
+                                            //         break;
+                                            //     }
+                                            // }
                                         }
                                         if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
                                         if(isset($imgprodurl) && $imgprodurl){?>
@@ -365,15 +398,32 @@ if(empty($cStep)) $cStep = 1;
                             if($sVar){
                                 $imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
                                 if(!empty($imgprodgroup)){
-                                    foreach($imgprodgroup as $imgvar){
-                                        if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
-                                            $arr = explode('|', $imgvar['pbc_depvarimgprod']);
-                                            if(!empty($arr[0]) && !empty($arr[1]) &&
-                                            isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
-                                                $imgprodid = $imgvar['pbc_imgprod'][0];
+                                    foreach($imgprodgroup as $deps)
+                                    {
+                                        if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
+                                        {
+                                            $prevVar = array();
+                                            foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
+                                            {
+                                                $arr = explode('|', $depvarimgprod);
+                                                if(!empty($arr[0]) && !empty($arr[1])){
+                                                    $prevVar[(int)$arr[0]][] = $arr[1];
+                                                }
                                             }
-                                        }elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
-                                            $imgprodid = $imgvar['pbc_imgprod'][0];
+                                            if(isset($_SESSION['pbc_variation'][$cStep-1]))
+                                            {
+                                                foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+                                                {
+                                                    if(isset($prevVar[$sPhaseKey]) &&
+                                                    isset($_SESSION['pbc_variation'][$sPhaseKey]) && in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+                                                    {
+                                                        $imgprodid = $deps['pbc_imgprod'][0];
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
+                                            $imgprodid = $deps['pbc_imgprod'][0];
                                             break;
                                         }
                                     }
