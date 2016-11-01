@@ -30,13 +30,10 @@ if(isset($_POST['submit'])){
                 $price = $option_name = '';
                 $pricegroup = get_post_meta($pbc_variation, 'pbc_pricegroup', true);
                 if(isset($pbc_pricevar)){
-                    $term = get_term_by( 'id', $pbc_pricevar, 'measures');
-                    if(!empty($term)){
-                        foreach($pricegroup as $details ){
-                            if($term->term_id == $details['pbc_meaprice']){
-                                $option_name = $term->name;
-                                $price = $details['pbc_pricem'];
-                            }
+                    foreach($pricegroup as $key => $details){
+                        if($details['pbc_meaprice'] == $pbc_pricevar){
+                            $option_name = $pbc_pricevar;
+                            $price = $details['pbc_pricem'];
                         }
                     }
                 }else{
@@ -300,21 +297,13 @@ if(empty($cStep)) $cStep = 1;
                                         <?php
                                         $priceVar = array();
                                         $pricegroup = get_post_meta($variation, 'pbc_pricegroup', true);
-                                        if(!empty($pricegroup) && isset($pricegroup[0]['pbc_meaprice'])){
-                                            foreach($pricegroup as $key => $details){
-                                                if(!empty($details['pbc_meaprice'])){
-                                                    $term = get_term_by( 'id', $details['pbc_meaprice'], 'measures');
-                                                    if(!empty($term)){
-                                                        $priceVar[$term->term_id] = $term->name;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if(!empty($priceVar)){?>
+                                        if(!empty($pricegroup) && isset($pricegroup[0]['pbc_meaprice'])){?>
                                             <div class="pbc_pricevarwrap"><select name="pbc_pricevar">
-                                                <?php foreach($priceVar as $termid => $termname){?>
-                                                <option value="<?php echo $termid;?>"><?php echo $termname;?></option>
-                                                <?php }?>
+                                            <?php foreach($pricegroup as $key => $details){
+                                                if(!empty($details['pbc_meaprice']) && !empty($details['pbc_pricem'])){
+                                                    echo '<option value="'.$details["pbc_meaprice"].'">'.$details["pbc_meaprice"].'</option>';
+                                                }
+                                            }?>
                                             </select></div>
                                         <?php
                                         }?>
@@ -550,6 +539,49 @@ if(empty($cStep)) $cStep = 1;
             <script type="text/javascript">
             jQuery(function($){
                 $(document).on('click', 'input[type=radio].pbc_variation', function(){
+                    $('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>loading.gif"/></div>').show();
+                    var cPhase = $('input[name=pbc_current_phase]').val();
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
+                        type: 'POST',
+                        data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
+                        dataType: "html",
+                        success: function(response) {
+                            var resArr = response.split(';;--;;');
+                            var obj = jQuery.parseJSON(resArr[1]);
+                            if(obj.type == 'error'){
+                                $('.product_preview').find('.product_preview_status').html('<div>'+obj.msg+'</div>').show().delay(4000, function(){
+                                    window.setTimeout( function(){
+                                        $('.product_preview').find('.product_preview_status').html('').addClass('hidden');
+                                    }, 1000 );
+                                });
+                            }else if(obj.type == 'success'){
+                                $('.product_preview').find('.product_preview_status').addClass('hidden');
+                                if(obj.url){
+                                    if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
+                                        $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
+                                    }else{
+                                        $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" src="'+obj.url+'" alt="product image"/>').show();
+                                    }
+                                }
+                                else
+                                    if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
+                                        $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').remove();
+                                    }
+                                if(obj.option || obj.price){
+                                    if($('.variation_selected.phase-'+cPhase).length == 0){
+                                        $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
+                                    }else{
+                                        $('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
+                                        $('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
+                                    }
+                                }
+
+                            }
+                        }
+                    });
+                });
+                $(document).on('change', 'select[name=pbc_pricevar]', function(){
                     $('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>loading.gif"/></div>').show();
                     var cPhase = $('input[name=pbc_current_phase]').val();
                     $.ajax({

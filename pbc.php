@@ -950,13 +950,10 @@ class PBCPlugin
 			if($imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
 			$pricegroup = get_post_meta($sVar, 'pbc_pricegroup', true);
 			if(isset($pbc_pricevar)){
-				$term = get_term_by( 'id', $pbc_pricevar, 'measures');
-				if(!empty($term)){
-					foreach($pricegroup as $details ){
-						if($term->term_id == $details['pbc_meaprice']){
-							$option_name = $term->name;
-							$price = $details['pbc_pricem'];
-						}
+				foreach($pricegroup as $key => $details){
+					if($details['pbc_meaprice'] == $pbc_pricevar){
+						$option_name = $pbc_pricevar;
+						$price = $details['pbc_pricem'];
 					}
 				}
 			}else{
