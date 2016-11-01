@@ -928,7 +928,7 @@ class PBCPlugin
 								$prevVar[(int)$arr[0]][] = $arr[1];
 							}
 						}
-						if(isset($_SESSION['pbc_variation'][$current_phase-1]))
+						if(!empty($_SESSION['pbc_variation']))
 						{
 							foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
 							{

@@ -354,7 +354,7 @@ if(empty($cStep)) $cStep = 1;
                                                             $prevVar[(int)$arr[0]][] = $arr[1];
                                                         }
                                                     }
-                                                    if(isset($_SESSION['pbc_variation'][$cStep-1]))
+                                                    if(!empty($_SESSION['pbc_variation']))
                                                     {
                                                         foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
                                                         {
@@ -410,7 +410,7 @@ if(empty($cStep)) $cStep = 1;
                                                     $prevVar[(int)$arr[0]][] = $arr[1];
                                                 }
                                             }
-                                            if(isset($_SESSION['pbc_variation'][$cStep-1]))
+                                            if(!empty($_SESSION['pbc_variation']))
                                             {
                                                 foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
                                                 {
