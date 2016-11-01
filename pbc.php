@@ -1046,9 +1046,65 @@ class PBCPlugin
 		}else{
 			$output = '';
 		    $output .= "<page backcolor='#fafafa'>";
-			$pdf_image_selected = get_option('pbc_pdf_image_selected');
-			if($pdf_image_selected)
-				$output .="<img src='".$pdf_image_selected."' width='200'/>";
+			$output .= "<style>
+			.product_preview {
+		        position: relative;
+		        text-align: left;
+				width: 500px;
+		        max-width: 500px;
+		    }
+		    .product_preview .image-wrap img:first-child{position: relative;}
+		    .product_preview .image-wrap img{width: 100%;max-width: 500px;position: absolute;top: 0;left: 0;}
+			</style>";
+			// $pdf_image_selected = get_option('pbc_pdf_image_selected');
+			// if($pdf_image_selected)
+			// 	$output .="<img src='".$pdf_image_selected."' width='200'/>";
+			$output .= "<div class=\"product_preview\"><div class=\"image-wrap\">";
+			for ($i = 1; $i <= count($_SESSION['pbc_variation']); $i++)
+			{
+				$imgprodid = $imgprodurl = '';
+				if(isset($_SESSION['pbc_variation'][$i]))
+				{
+					$ssVar = $_SESSION['pbc_variation'][$i]['var']['id'];
+					$imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
+					if(!empty($imgprodgroup)){
+						foreach($imgprodgroup as $deps)
+						{
+							if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
+							{
+								$prevVar = array();
+								foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
+								{
+									$arr = explode('|', $depvarimgprod);
+									if(!empty($arr[0]) && !empty($arr[1])){
+										$prevVar[(int)$arr[0]][] = $arr[1];
+									}
+								}
+								if(!empty($_SESSION['pbc_variation']))
+								{
+									foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+									{
+										if(isset($prevVar[$sPhaseKey]) &&
+										isset($_SESSION['pbc_variation'][$sPhaseKey]) && in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+										{
+											$imgprodid = $deps['pbc_imgprod'][0];
+											break;
+										}
+									}
+								}
+							}elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
+								$imgprodid = $deps['pbc_imgprod'][0];
+								break;
+							}
+						}
+					}
+					if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
+					if(isset($imgprodurl) && $imgprodurl){
+						$output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
+					}
+				}
+			}
+			$output .= "</div></div>";
 
 			$output .="<h1>".get_option('blogname')."</h1>";
 			$output .="<h3>".__('Details of Your Selection','pbc')."</h3>";
