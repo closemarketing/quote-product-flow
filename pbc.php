@@ -951,7 +951,7 @@ class PBCPlugin
 			$pricegroup = get_post_meta($sVar, 'pbc_pricegroup', true);
 			$pricevar = $_REQUEST["pbc_pricevar_$sVar"];
 			if($pricevar){
-				foreach($pricegroup as $key => $details){
+				foreach($pricegroup as $details){
 					if($details['pbc_meaprice'] == $pricevar){
 						$option_name = $pricevar;
 						$price = $details['pbc_pricem'];
@@ -962,6 +962,7 @@ class PBCPlugin
 					$price = $pricegroup[0]['pbc_pricem'];
 			}
 			$option = get_the_title($sVar);
+			if(isset($option_name) && $option_name) $option .= ' ['.$option_name.']';
 		}
 		if(isset($imgprodurl) && $imgprodurl){
 			$url = $imgprodurl[0];

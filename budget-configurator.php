@@ -31,7 +31,7 @@ if(isset($_POST['submit'])){
                 $pricegroup = get_post_meta($pbc_variation, 'pbc_pricegroup', true);
                 $pricevar = $_POST["pbc_pricevar_$pbc_variation"];
                 if(isset($pricevar)){
-                    foreach($pricegroup as $key => $details){
+                    foreach($pricegroup as $details){
                         if($details['pbc_meaprice'] == $pricevar){
                             $option_name = $pricevar;
                             $price = $details['pbc_pricem'];
