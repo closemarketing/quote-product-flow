@@ -486,7 +486,7 @@ class PBCPlugin
     	// 1st meta box
     	$meta_boxes[] = array(
     		'id'         => 'standard',
-    		'title'      => __('Options for Variation','pbc'),
+    		'title'      => 'Opciones para la variación',
     		'post_types' => array( 'variation' ),
     		'context'    => 'normal',
     		'priority'   => 'high',
@@ -495,17 +495,17 @@ class PBCPlugin
     		'fields'     => array(
     			// SELECT BOX PHASE
     			array(
-    				'name'        => __('Phase','pbc'),
+    				'name'        => 'Fase',
     				'id'          => "{$prefix}phase",
     				'type'        => 'select',
     				'options'     => $phase_options,
     				'multiple'    => false,
     				'std'         => '',
-    				'placeholder' => __('Select a Phase','pbc'),
+    				'placeholder' => 'Selecciona una Fase',
     			),
     			// TEXT
     			array(
-    				'name'  => __('SKU','pbc'),
+    				'name'  => 'Referencia',
     				'id'    => "{$prefix}sku",
     				'desc'  => '',
     				'type'  => 'text',
@@ -515,14 +515,14 @@ class PBCPlugin
     			),
     			// IMAGE ADVANCED (WP 3.5+)
     			array(
-    				'name'             => __('Image Icon','pbc'),
+    				'name'             => 'Imagen icono',
     				'id'               => "{$prefix}imgicon",
     				'type'             => 'image_advanced',
     				'max_file_uploads' => 1,
     			),
 
 				array(
-    				'name'   => __('Depends of','pbc'),
+    				'name'   => 'Depende de',
 					'id'     => "{$prefix}depends",
 					'type'   => 'group',
 					'clone'  => true,
@@ -530,19 +530,19 @@ class PBCPlugin
 					'fields' => array(
 		    			// SELECT BOX VARIATIONS
 		    			array(
-		    				'name'        => __('Variation','pbc'),
+		    				'name'        => 'Variación',
 		    				'id'          => "{$prefix}depvar",
 		    				'type'        => 'select',
 		    				'options'     => $var_options,
 		    				'multiple'    => false,
 		    				'std'         => '',
-		    				'placeholder' => __('Not depends of a Variation','pbc'),
+		    				'placeholder' => 'No depende de una variación',
 		    			),
 					),
 				), //array
 
 				array(
-    			'name'   => __('Group Image Product','pbc'),
+    			'name'   => 'Grupos Imagen Producto',
 					'id'     => "{$prefix}imgprodgroup",
 					'type'   => 'group',
 					'clone'  => true,
@@ -550,17 +550,17 @@ class PBCPlugin
 					'fields' => array(
 		    			// SELECT BOX VARIATIONS
 		    			array(
-		    				'name'        => __('Variation','pbc'),
+		    				'name'        => 'Variación',
 		    				'id'          => "{$prefix}depvarimgprod",
 		    				'type'        => 'select',
 		    				'options'     => $var_options,
 		    				'multiple'    => true,
 		    				'std'         => '',
-		    				'placeholder' => __('Not depends of a Variation','pbc'),
+		    				'placeholder' => 'No depende de una variación',
 		    			),
 		    			// IMAGE ADVANCED (WP 3.5+)
 		    			array(
-		    				'name'             => __('Image Product','pbc'),
+		    				'name'             => 'Imagen del producto',
 		    				'id'               => "{$prefix}imgprod",
 		    				'type'             => 'image_advanced',
 		    				'max_file_uploads' => 1,
@@ -568,7 +568,7 @@ class PBCPlugin
 					),
 				), //array
 				array(
-    				'name'   => __('Price','pbc'),
+    				'name'   => 'Precio',
 					'id'     => "{$prefix}pricegroup",
 					'type'   => 'group',
 					'clone'  => true,
@@ -576,7 +576,7 @@ class PBCPlugin
 					'fields' => array(
 		    			// TEXT
 		    			array(
-		    				'name'  => __('Price Option','pbc'),
+		    				'name'  => 'Opción del precio',
 		    				'id'    => "{$prefix}meaprice",
 		    				'desc'  => '',
 		    				'type'  => 'text',
@@ -586,7 +586,7 @@ class PBCPlugin
 		    			),
 		    			// TEXT
 		    			array(
-		    				'name'  => __('Price (excluded VAT)','pbc'),
+		    				'name'  => 'Precio (IVA No incluido)',
 		    				'id'    => "{$prefix}pricem",
 		    				'desc'  => '',
 		    				'type'  => 'text',
