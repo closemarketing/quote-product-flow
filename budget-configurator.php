@@ -148,7 +148,10 @@ if(empty($cStep)) $cStep = 1;
         text-align: left;
         max-width: 570px;
         overflow: hidden;
+        display: inline-block;
+        vertical-align: top;
     }
+    .product_preview.wrap-left{margin-right: 20px;}
     .product_preview .image-wrap img:first-child{position: relative;}
     .product_preview .image-wrap img{width: 100%;max-width: 570px;position: absolute;top: 0;left: 0;}
     .configurator_form_action {
@@ -162,6 +165,8 @@ if(empty($cStep)) $cStep = 1;
         padding: 10px;
         margin: 0 auto;
         max-width: 400px;
+        min-width: 400px;
+        display: inline-block;
     }
     .configurator_result_share{max-width: 400px;margin: 20px auto;text-align: center;}
     .email_submit_fields{margin-top: 20px;}
@@ -320,12 +325,20 @@ if(empty($cStep)) $cStep = 1;
                     </div>
                 <div class="configurator-right">
                 <?php }//cStep!=calculate?>
-                    <div class="product_preview">
+
+                <?php if($cStep !='calculate'){ ?>
+                    <script type="text/javascript">jQuery('.configurator_form_action').insertAfter('.product_preview');</script>
+                <?php }else if($cStep =='calculate'){ ?>
+                    <script type="text/javascript">jQuery('.configurator_form_action').insertBefore('.product_preview');</script>
+                <?php }?>
+                    <div class="product_preview <?php if($cStep =='calculate'){ echo 'wrap-left';}?>">
                         <div class="image-wrap">
                             <?php
                             if(isset($_SESSION['pbc_variation']) && !empty($_SESSION['pbc_variation']))
                             {
-                                for ($i = 1; $i < (int)$cStep; $i++)
+                                $to = (int)$cStep;
+                                if($cStep == 'calculate') $to = count($_SESSION['pbc_variation'])+1;
+                                for ($i = 1; $i < $to; $i++)
                                 {
                                     $imgprodid = $imgprodurl = '';
                                     if(isset($_SESSION['pbc_variation'][$i]))
