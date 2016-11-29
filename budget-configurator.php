@@ -273,8 +273,8 @@ if(empty($cStep)) $cStep = 1;
                                             }
                                         }
                                     }
-                                    //$variations = array_values($variations);
-                                    sort(array_values($variations));
+                                    array_values($variations);
+                                    sort($variations);
                                 }
                                 if(isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation']) && isset($_SESSION['pbc_variation'][$cStep]) &&
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
