@@ -507,6 +507,10 @@ if(empty($cStep)) $cStep = 1;
                                         ?>
                                     </td>
                                 </tr>
+                                <tr class="variation_selected phase-total_price">
+                                    <td class="name"><?php _e('VAT not included','pbc');?></td>
+                                    <td class="price"></td>                            
+                                </tr>
                             <?php }?>
                             </table>
                         <?php }?>
