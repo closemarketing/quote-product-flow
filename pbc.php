@@ -774,48 +774,8 @@ class PBCPlugin
 	                }
 	        ?>
 	        </select>
-					<?
-
-			//Variations Options
-	        $var_options = array();
-	        $variationscpt = get_posts(array(
-	            'post_type' => 'variation',
-	            'posts_per_page' => -1,
-	            'orderby' => 'name',
-	            'order' => 'ASC'
-	        ));
-	        $variationscpt_item = array();
-	        foreach ($variationscpt as $var_item) {
-				$phase_id = get_post_meta($var_item->ID, 'pbc_phase', true);
-				$phase_post = get_post($phase_id);
-				if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
-				$var_value = $phase_order.'|'.$var_item->ID;
-				$var_sku = get_post_meta($var_item->ID, 'pbc_sku', true);
-				if($var_sku)
-	        		$var_options[$phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')'] = $var_value;
-				else
-	        		$var_options[$phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title] = $var_value;
-	        }
-					asort($var_options);
-					?>
-
-	        <select name="pbc_filter_depends">
-	        <option value=""><?php _e('All Depends', 'pbc'); ?></option>
-	        <?php
-	            $current_v = isset($_GET['pbc_filter_depends'])? $_GET['pbc_filter_depends']:'';
-	            foreach ($var_options as $label => $value) {
-	                printf
-	                    (
-	                        '<option value="%s"%s>%s</option>',
-	                        $value,
-	                        $value == $current_v? ' selected="selected"':'',
-	                        $label
-	                    );
-	                }
-	        ?>
-	        </select>
-	        <?php
-	    }
+	<?php
+	    } //variation type
 	}
 	/**
 	 * if submitted filter by post meta
@@ -838,11 +798,6 @@ class PBCPlugin
 				if(isset($_GET['pbc_filter_phase']) && $_GET['pbc_filter_phase'] != '') {
 	        $query->query_vars['meta_key'] = 'pbc_phase';
 	        $query->query_vars['meta_value'] = $_GET['pbc_filter_phase'];
-				}
-				if(isset($_GET['pbc_filter_depends']) && $_GET['pbc_filter_depends'] != '') {
-	        $query->query_vars['meta_key'] = 'pbc_depends';
-	        $query->query_vars['meta_value'] = $_GET['pbc_filter_depends'];
-    			$query->query_vars['meta_compare'] = '=';
 				}
 
 			}
