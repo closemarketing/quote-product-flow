@@ -266,7 +266,7 @@ if(empty($cStep)) $cStep = 1;
                                                 $prevVar[(int)$arr[0]][] = $arr[1];
                                             }
                                         }
-                                        if($cStep != 1 && isset($_SESSION['pbc_variation'][$cStep-1]))
+                                        if($cStep != 1 && !empty($_SESSION['pbc_variation']))
                                         {
                                             foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
                                             {
@@ -523,7 +523,7 @@ if(empty($cStep)) $cStep = 1;
                                 </tr>
                                 <tr class="variation_selected phase-total_price">
                                     <td class="name"><?php _e('VAT not included','pbc');?></td>
-                                    <td class="price"></td>                            
+                                    <td class="price"></td>
                                 </tr>
                             <?php }?>
                             </table>
