@@ -66,6 +66,49 @@ if(empty($cStep)) $cStep = 1;
         background: #c0c0c0;
         color: #333;
     }
+    .btn {
+      position: relative;
+      margin: 0;
+      padding-left: 14px;
+      padding-right: 14px;
+      padding-top: 2.8px;
+      padding-bottom: 2.8px;
+      background: #9a781f;
+      color: white;
+      font-size: 14px;
+      border: none;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: 0;
+    }
+    .btn:hover {
+      background: black;
+    }
+    .next .btn::after,
+    .prev .btn::after {
+      border-style: solid;
+    }
+    .next .btn::after {
+      right: -24px;
+      border-width: 12px;
+      border-color: transparent transparent transparent #9a781f;
+    }
+    .next .btn:hover::after {
+      border-left-color: black;
+    }
+    .prev .btn::after {
+      left: -24px;
+      border-color: transparent #9a781f transparent transparent;
+      border-width: 12px;
+    }
+    .prev .btn:hover::after {
+      border-right-color: black;
+    }
+
     .hidden{display: none !important;}
     #content{max-width: 1200px;margin: 0 auto 40px;}
     .configurator_steps_nav{width: 100%;margin: 10px auto;float: left;padding-right: 15px;}
