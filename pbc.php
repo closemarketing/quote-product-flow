@@ -260,6 +260,8 @@ class PBCPlugin
 			update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
 			$update = __("Successfully Saved!",'pbc');
 		}
+		$flip_image_horizontal = isset( $_POST['flip_image_horizontal'] ) ? $_POST['flip_image_horizontal'] : '';
+		update_option( 'flip_image_horizontal', $flip_image_horizontal );
 	?>
 		<div class='wrap'>
 			<h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','pbc');?></h2>
@@ -358,6 +360,14 @@ class PBCPlugin
 					$pdf_image_selected = get_option('pbc_pdf_image_selected');
 				?>
 				<input type="text" name="pdf_image_selected" value="<?php if($pdf_image_selected) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
+			</fieldset>
+			<fieldset>
+				<br/>
+				<label for="flip_image_horizontal">
+				<?php
+					$flip_image_horizontal = get_option('flip_image_horizontal');
+				?>
+				<input type="checkbox" name="flip_image_horizontal" value="yes" <?php if($flip_image_horizontal == 'yes') echo 'checked="checked"';?> /><?php _e("Flip Images Horizontal", 'pbc');?></label>
 			</fieldset>
 		</div>
 

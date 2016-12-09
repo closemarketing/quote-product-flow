@@ -203,6 +203,14 @@ if(empty($cStep)) $cStep = 1;
         -webkit-animation-fill-mode: both;
         animation-fill-mode: both;
     }
+    img.flipped{
+        -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        filter: FlipH;
+        -ms-filter: "FlipH";
+    }
     @media (max-width:768px) {
         .configurator_steps_nav{padding-right: 0px;}
         .configurator_steps_nav li.configurator_steps{overflow: hidden;padding: 5px;}
@@ -375,25 +383,12 @@ if(empty($cStep)) $cStep = 1;
                                                     break;
                                                 }
                                             }
-
-                                            // foreach($imgprodgroup as $imgvar){
-                                            //     if(isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
-                                            //         foreach($imgvar['pbc_depvarimgprod'] as $depvarimgprod){
-                                            //             $arr = explode('|', $depvarimgprod);
-                                            //             if(!empty($arr[0]) && !empty($arr[1]) &&
-                                            //             isset($_SESSION['pbc_variation'][(int)$arr[0]]) && ($_SESSION['pbc_variation'][(int)$arr[0]]['var']['id'] == $arr[1])){
-                                            //                 $imgprodid = $imgvar['pbc_imgprod'][0];
-                                            //             }
-                                            //         }
-                                            //     }elseif(!isset($imgvar['pbc_depvarimgprod']) && isset($imgvar['pbc_imgprod']) ){
-                                            //         $imgprodid = $imgvar['pbc_imgprod'][0];
-                                            //         break;
-                                            //     }
-                                            // }
                                         }
                                         if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
-                                        if(isset($imgprodurl) && $imgprodurl){?>
-                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" alt="product image"/>
+                                        if(isset($imgprodurl) && $imgprodurl){
+                                            $flip_image_horizontal = get_option('flip_image_horizontal');
+                                        ?>
+                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>" alt="product image"/>
                                         <?php }
                                     }
                                 }
@@ -434,8 +429,10 @@ if(empty($cStep)) $cStep = 1;
                                 }
                                 if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
                             <?php }
-                            if(isset($imgprodurl) && $imgprodurl){?>
-                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" alt="product image"/>
+                            if(isset($imgprodurl) && $imgprodurl){
+                                $flip_image_horizontal = get_option('flip_image_horizontal');
+                            ?>
+                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>" alt="product image"/>
                             <?php }
                             /* else{?>
                                 <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
@@ -580,7 +577,8 @@ if(empty($cStep)) $cStep = 1;
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
                                         $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
                                     }else{
-                                        $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" src="'+obj.url+'" alt="product image"/>').show();
+                                        var className = "<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>";
+                                        $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
                                 }
                                 else
@@ -623,7 +621,8 @@ if(empty($cStep)) $cStep = 1;
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
                                         $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
                                     }else{
-                                        $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" src="'+obj.url+'" alt="product image"/>').show();
+                                        var className = "<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>";
+                                        $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
                                 }
                                 else
