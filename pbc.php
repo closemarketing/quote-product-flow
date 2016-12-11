@@ -1411,6 +1411,18 @@ function pbc_required_plugins() {
 			'force_activation'   => true,
 		),
 
+		array(
+			'name'               => 'Meta Box Settings', // The plugin name.
+			'slug'               => 'mb-settings-page', // The plugin slug (typically the folder name).
+			'source'             => dirname( __FILE__ ) . '/lib/plugins/mb-settings-page.zip',
+			'required'           => true,
+			'version'            => '',
+			'force_activation'   => true,
+			'force_deactivation' => false,
+			'external_url'       => '',
+			'is_callable'        => '',
+		),
+
 	);
 
 	/*
