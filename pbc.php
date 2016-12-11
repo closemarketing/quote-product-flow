@@ -254,16 +254,19 @@ class PBCPlugin
 
     public function pbc_display_admin_page(){
 
-		if(isset($_POST['select_budget_page'])){
-			update_option('pbc_budget_configurator_page', $_POST['select_budget_page']);
-			$update = __("Successfully Saved!",'pbc');
+		if(isset($_POST['form_submit']))
+		{
+			if(isset($_POST['select_budget_page'])){
+				update_option('pbc_budget_configurator_page', $_POST['select_budget_page']);
+				$update = __("Successfully Saved!",'pbc');
+			}
+			if ( isset( $_POST['pdf_image_selected'] ) ){
+				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
+				$update = __("Successfully Saved!",'pbc');
+			}
+			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
+			update_option( 'variations_images_flipped', $variations_images_flipped );
 		}
-		if ( isset( $_POST['pdf_image_selected'] ) ){
-			update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
-			$update = __("Successfully Saved!",'pbc');
-		}
-		$flip_image_horizontal = isset( $_POST['flip_image_horizontal'] ) ? $_POST['flip_image_horizontal'] : '';
-		update_option( 'flip_image_horizontal', $flip_image_horizontal );
 	?>
 		<div class='wrap'>
 			<h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','pbc');?></h2>
@@ -426,15 +429,31 @@ class PBCPlugin
 			</fieldset>
 			<fieldset>
 				<br/>
-				<label for="flip_image_horizontal">
+				<label class="block" for="variations_images_flipped"><?php _e("Flip Images Horizontal", 'pbc');?></label>
 				<?php
-					$flip_image_horizontal = get_option('flip_image_horizontal');
+					$variations_images_flipped = get_option('variations_images_flipped');
+					$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
+					if(!empty($phases)){
+						echo '<select multiple="multiple" name="variations_images_flipped[]" size="5">';
+						foreach($phases as $phase){
+							$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
+							if(!empty($variations)){
+								foreach($variations as $var){
+									if(!empty($variations_images_flipped) && in_array($var->ID, $variations_images_flipped))
+										$selected = 'selected="selected"';
+									else $selected = '';
+									echo '<option value="'.$var->ID.'" '.$selected.'>'.str_pad($phase->menu_order, 2, '0', STR_PAD_LEFT).' - '.$phase->post_title.' - '.$var->post_title.'</option>';
+								}
+							}
+						}
+						echo '</select>';
+					}
 				?>
-				<input type="checkbox" name="flip_image_horizontal" value="yes" <?php if($flip_image_horizontal == 'yes') echo 'checked="checked"';?> /><?php _e("Flip Images Horizontal", 'pbc');?></label>
 			</fieldset>
 		</div>
 
 		<div class="save_bar">
+			<input type="hidden" name="form_submit" value="true"/>
 			<input type="submit" value="<?php _e('Save', 'pbc');?>" class="button button-primary submit-button" />
 		</div>
 	</form>
@@ -991,6 +1010,10 @@ class PBCPlugin
 			}
 			$option = get_the_title($sVar);
 			if(isset($option_name) && $option_name) $option .= ' ['.$option_name.']';
+
+			$variations_images_flipped = get_option('variations_images_flipped');
+			if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped))
+				$flipped = true;
 		}
 		if(isset($imgprodurl) && $imgprodurl){
 			$url = $imgprodurl[0];
@@ -1004,7 +1027,9 @@ class PBCPlugin
 
 		if(!isset($option))
 			$option = '-';
-		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$url, 'option'=>$option, 'price'=>$price));
+		if(!isset($flipped))
+			$flipped = false;
+		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$url, 'option'=>$option, 'flipped'=>$flipped, 'price'=>$price));
 		die(0);
 	}
 	public function configurator_submit_action_callback(){

@@ -429,9 +429,9 @@ if(empty($cStep)) $cStep = 1;
                                         }
                                         if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
                                         if(isset($imgprodurl) && $imgprodurl){
-                                            $flip_image_horizontal = get_option('flip_image_horizontal');
+                                            $variations_images_flipped = get_option('variations_images_flipped');
                                         ?>
-                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>" alt="product image"/>
+                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if(!empty($variations_images_flipped) && in_array($ssVar, $variations_images_flipped)) echo 'flipped';?>" alt="product image"/>
                                         <?php }
                                     }
                                 }
@@ -473,9 +473,9 @@ if(empty($cStep)) $cStep = 1;
                                 if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){
-                                $flip_image_horizontal = get_option('flip_image_horizontal');
+                                $variations_images_flipped = get_option('variations_images_flipped');
                             ?>
-                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>" alt="product image"/>
+                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped)) echo 'flipped';?>" alt="product image"/>
                             <?php }
                             /* else{?>
                                 <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
@@ -620,7 +620,9 @@ if(empty($cStep)) $cStep = 1;
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
                                         $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
                                     }else{
-                                        var className = "<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>";
+                                        if(obj.flipped)
+                                            var className = 'flipped';
+                                        else className = '';
                                         $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
                                 }
@@ -664,7 +666,10 @@ if(empty($cStep)) $cStep = 1;
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
                                         $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
                                     }else{
-                                        var className = "<?php if($flip_image_horizontal == 'yes') echo 'flipped';?>";
+                                        if(obj.flipped)
+                                            var className = 'flipped';
+                                        else className = '';
+                                        var className = "flipped";
                                         $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
                                 }
