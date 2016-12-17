@@ -1012,8 +1012,16 @@ class PBCPlugin
 			if(isset($option_name) && $option_name) $option .= ' ['.$option_name.']';
 
 			$variations_images_flipped = get_option('variations_images_flipped');
-			if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped))
-				$flipped = true;
+			if(!empty($variations_images_flipped)) {
+				for ($j = 1; $j < (int)$current_phase; $j++)
+				{
+					if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
+						$flipped = true;
+					}
+				}
+				if(in_array($sVar, $variations_images_flipped))
+					$flipped = true;
+			}
 		}
 		if(isset($imgprodurl) && $imgprodurl){
 			$url = $imgprodurl[0];

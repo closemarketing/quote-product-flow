@@ -429,9 +429,18 @@ if(empty($cStep)) $cStep = 1;
                                         }
                                         if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
                                         if(isset($imgprodurl) && $imgprodurl){
+                                            $addclass = '';
                                             $variations_images_flipped = get_option('variations_images_flipped');
+                                            if(!empty($variations_images_flipped)) {
+                                                for ($j = 1; $j <= $to; $j++)
+                                                {
+                                                    if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
+                                                        $addclass = 'flipped';
+                                                    }
+                                                }
+                                            }
                                         ?>
-                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if(!empty($variations_images_flipped) && in_array($ssVar, $variations_images_flipped)) echo 'flipped';?>" alt="product image"/>
+                                            <img phaseid="<?php echo $i;?>" src="<?php echo $imgprodurl[0];?>" class="<?php echo $addclass;?>" alt="product image"/>
                                         <?php }
                                     }
                                 }
@@ -625,6 +634,18 @@ if(empty($cStep)) $cStep = 1;
                                         else className = '';
                                         $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
+                                    if(obj.flipped){
+                                        $('.product_preview').find('.image-wrap img').each(function(){
+                                            if(!$(this).hasClass('flipped'))
+                                            $(this).addClass('flipped');
+                                        });
+                                    }
+                                    else{
+                                        $('.product_preview').find('.image-wrap img').each(function(){
+                                            if($(this).hasClass('flipped'))
+                                            $(this).removeClass('flipped');
+                                        });
+                                    }
                                 }
                                 else
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
@@ -669,8 +690,19 @@ if(empty($cStep)) $cStep = 1;
                                         if(obj.flipped)
                                             var className = 'flipped';
                                         else className = '';
-                                        var className = "flipped";
                                         $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
+                                    }
+                                    if(obj.flipped){
+                                        $('.product_preview').find('.image-wrap img').each(function(){
+                                            if(!$(this).hasClass('flipped'))
+                                            $(this).addClass('flipped');
+                                        });
+                                    }
+                                    else{
+                                        $('.product_preview').find('.image-wrap img').each(function(){
+                                            if($(this).hasClass('flipped'))
+                                            $(this).removeClass('flipped');
+                                        });
                                     }
                                 }
                                 else
