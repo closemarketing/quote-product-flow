@@ -36,8 +36,6 @@ class PBCPlugin
 		add_action('init', array( $this, 'init' ) );
 		add_action('admin_init', array( $this, 'init' ) );
 		add_action('admin_footer', array($this,'pbc_admin_scripts') );
-		add_filter( 'mb_settings_pages', array($this, 'pbc_settings_pages') );
-		add_filter( 'rwmb_meta_boxes', array($this, 'pbc_options_meta_boxes') );
 
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
@@ -297,67 +295,6 @@ class PBCPlugin
 		</div>
 	<?php
     }
-
-	/**
-	 * Options Metabox
-	 *
-	 *
-	 */
-
-	function pbc_settings_pages( $settings_pages )
-	{
-		$settings_pages[] = array(
-			'id'            => 'options_flip',
-			'parent'				=> 'pbc_menu',
-			'option_name'   => 'options_flip',
-			'menu_title'    => __( 'Image Effect flip conditions', 'pbc' ),
-			'icon_url'      => 'dashicons-images-alt',
-			'submenu_title' => __( 'Settings', 'pbc' ),
-		);
-		return $settings_pages;
-	}
-	function pbc_options_meta_boxes( $meta_boxes )
-	{
-		//Variations Options
-				$var_options = array();
-				$variationscpt = get_posts(array(
-						'post_type' => 'variation',
-						'posts_per_page' => -1,
-						'orderby' => 'name',
-						'order' => 'ASC'
-				));
-				$variationscpt_item = array();
-				foreach ($variationscpt as $var_item) {
-			$phase_id = get_post_meta($var_item->ID, 'pbc_phase', true);
-			$phase_post = get_post($phase_id);
-			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
-			$var_value = $phase_order.'|'.$var_item->ID;
-			$var_sku = get_post_meta($var_item->ID, 'pbc_sku', true);
-			if($var_sku)
-						$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
-			else
-						$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
-				}
-		asort($var_options);
-		$meta_boxes[] = array(
-			'id'             => 'general',
-			'title'          => __( 'General', 'textdomain' ),
-			'settings_pages' => 'options_flip',
-			'fields'         => array(
-    			// SELECT BOX VARIATIONS
-    			array(
-    				'name'        => 'Variación',
-    				'id'          => "pbc_depvar_flip",
-    				'type'        => 'select',
-    				'options'     => $var_options,
-    				'multiple'    => true,
-    				'std'         => '',
-    				'placeholder' => 'No depende de una variación',
-    			),
-			), //array fields
-		);
-		return $meta_boxes;
-	}
 	/**
 	 * Import Meta Box Callback
 	 *
@@ -434,7 +371,7 @@ class PBCPlugin
 					$variations_images_flipped = get_option('variations_images_flipped');
 					$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
 					if(!empty($phases)){
-						echo '<select multiple="multiple" name="variations_images_flipped[]" size="5">';
+						echo '<select multiple="multiple" name="variations_images_flipped[]" size="6" style="width:100%;">';
 						foreach($phases as $phase){
 							$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
 							if(!empty($variations)){
