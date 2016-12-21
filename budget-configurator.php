@@ -483,12 +483,12 @@ if(empty($cStep)) $cStep = 1;
                             <?php }
                             if(isset($imgprodurl) && $imgprodurl){
                                 $variations_images_flipped = get_option('variations_images_flipped');
+                                if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped))
+                                    $addclass = 'flipped';
+                                if(!isset($addclass)) $addclass = '';
                             ?>
-                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" class="<?php if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped)) echo 'flipped';?>" alt="product image"/>
-                            <?php }
-                            /* else{?>
-                                <img src="<?php echo WPPBC_PLUGIN_URL.'preview-img.png';?>" alt="product image"/>
-                            <?php }*/?>
+                                <img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" class="<?php echo $addclass;?>" alt="product image"/>
+                            <?php }?>
                         </div>
                         <div class="status_loader product_preview_status fixed hidden"></div>
                     </div>
@@ -634,23 +634,23 @@ if(empty($cStep)) $cStep = 1;
                                         else className = '';
                                         $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
-                                    if(obj.flipped){
-                                        $('.product_preview').find('.image-wrap img').each(function(){
-                                            if(!$(this).hasClass('flipped'))
-                                            $(this).addClass('flipped');
-                                        });
-                                    }
-                                    else{
-                                        $('.product_preview').find('.image-wrap img').each(function(){
-                                            if($(this).hasClass('flipped'))
-                                            $(this).removeClass('flipped');
-                                        });
-                                    }
                                 }
                                 else
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
                                         $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').remove();
                                     }
+                                if(obj.flipped){
+                                    $('.product_preview').find('.image-wrap img').each(function(){
+                                        if(!$(this).hasClass('flipped'))
+                                        $(this).addClass('flipped');
+                                    });
+                                }
+                                else{
+                                    $('.product_preview').find('.image-wrap img').each(function(){
+                                        if($(this).hasClass('flipped'))
+                                        $(this).removeClass('flipped');
+                                    });
+                                }
                                 if(obj.option || obj.price){
                                     if($('.variation_selected.phase-'+cPhase).length == 0){
                                         $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
@@ -692,23 +692,23 @@ if(empty($cStep)) $cStep = 1;
                                         else className = '';
                                         $('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
                                     }
-                                    if(obj.flipped){
-                                        $('.product_preview').find('.image-wrap img').each(function(){
-                                            if(!$(this).hasClass('flipped'))
-                                            $(this).addClass('flipped');
-                                        });
-                                    }
-                                    else{
-                                        $('.product_preview').find('.image-wrap img').each(function(){
-                                            if($(this).hasClass('flipped'))
-                                            $(this).removeClass('flipped');
-                                        });
-                                    }
                                 }
                                 else
                                     if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
                                         $('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').remove();
                                     }
+                                if(obj.flipped){
+                                    $('.product_preview').find('.image-wrap img').each(function(){
+                                        if(!$(this).hasClass('flipped'))
+                                        $(this).addClass('flipped');
+                                    });
+                                }
+                                else{
+                                    $('.product_preview').find('.image-wrap img').each(function(){
+                                        if($(this).hasClass('flipped'))
+                                        $(this).removeClass('flipped');
+                                    });
+                                }
                                 if(obj.option || obj.price){
                                     if($('.variation_selected.phase-'+cPhase).length == 0){
                                         $('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
