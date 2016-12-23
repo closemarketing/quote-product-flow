@@ -1124,9 +1124,9 @@ class PBCPlugin
 						    break;
 							default:
 								//jpg, jpeg, gif others
-								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), "output.png");
-								list($width, $height) = getimagesize('output.png');
-								$img = imagecreatefrompng('output.png');
+								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
+								list($width, $height) = getimagesize(WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
+								$img = imagecreatefrompng(WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
 						}
 
 						// Flip it vertically
