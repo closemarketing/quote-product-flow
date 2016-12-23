@@ -1042,21 +1042,40 @@ class PBCPlugin
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
 			$output = '';
-		    $output .= "<page backcolor='#fafafa'>";
+		    $output .= "<page backcolor='#fff'>";
 			$output .= "<style>
-			.product_preview {
-		        position: relative;
-		        text-align: left;
-				width: 500px;
-		        max-width: 500px;
-		    }
-		    .product_preview .image-wrap img:first-child{position: relative;}
-		    .product_preview .image-wrap img{width: 100%;max-width: 500px;position: absolute;top: 0;left: 0;}
+			.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
+			.product .product-preview{ width:300px; }
+			.product .image-wrap{ position:relative; }
+		    .product .image-wrap img:first-child{ position:relative; }
+		    .product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
+			table.summary, table.summary-total{ width:600px;border-collapse:collapse;border:0;}
+			table td.title{ width:500px;padding:5px 0 5px 15px; }
+			table td.value{ width:70px;padding:5px 15px 5px 0; }
+			table td.right{text-align:right;}
+			table.summary td.background, table.summary td.background{ background-color:#ffebcb; }
+			table.summary-total td.empty{width:450px;}
+			table.summary-total td.title{width:50px;}
+			img.header_image{ width:700px;height:120px; }
+			img.footer_image{ width:700px;height:70px; }
 			</style>";
 			// $pdf_image_selected = get_option('pbc_pdf_image_selected');
 			// if($pdf_image_selected)
 			// 	$output .="<img src='".$pdf_image_selected."' width='200'/>";
-			$output .= "<div class=\"product_preview\"><div class=\"image-wrap\">";
+			$output .="<table class='header'><tr><td><img src='".WPPBC_PLUGIN_DIR."/pdf-header.png' class='header_image'/></td></tr></table><br/>";
+			$output .= "<table class='product'><tr><td class='product-title'><img width='350' src='".WPPBC_PLUGIN_DIR."/pdf-title.png' class='title_image'/><p>Relación de características del modelo seleccionado.</p></td><td class='product-preview'><div class='image-wrap'>";
+			$flipped = false;
+			$variations_images_flipped = get_option('variations_images_flipped');
+			if(!empty($variations_images_flipped)) {
+				for ($j = 1; $j <= count($_SESSION['pbc_variation']); $j++)
+				{
+					if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
+						$flipped = true;
+					}
+				}
+			}
+
+			$outputImage = imagecreatetruecolor(300, 300);
 			for ($i = 1; $i <= count($_SESSION['pbc_variation']); $i++)
 			{
 				$imgprodid = $imgprodurl = '';
@@ -1097,31 +1116,69 @@ class PBCPlugin
 					}
 					if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
 					if(isset($imgprodurl) && $imgprodurl){
-						$output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
+						$extension = pathinfo($imgprodurl[0], PATHINFO_EXTENSION);
+						switch ($extension) {
+						    case 'png':
+						       $img = imagecreatefrompng($imgprodurl[0]);
+							   list($width, $height) = getimagesize($imgprodurl[0]);
+						    break;
+							default:
+								//jpg, jpeg, gif others
+								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), "output.png");
+								list($width, $height) = getimagesize('output.png');
+								$img = imagecreatefrompng('output.png');
+						}
+
+						// Flip it vertically
+						if($flipped){
+							imageflip($img, IMG_FLIP_HORIZONTAL);
+						}
+						imagecopyresized($outputImage,$img,0,0,0,0,300,300,$width,$height);
+						//$output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
 					}
 				}
 			}
-			$output .= "</div></div>";
+			$filename = 'pdfimage'.round(microtime(true) * 1000).'.png';
+			imagepng($outputImage, WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
+			imagedestroy($outputImage);
+			$output .= '<img phaseid="'.$i.'" src="'.WPPBC_PLUGIN_DIR.'/product-image-for-pdf.png" alt="product image"/>';
 
-			$output .="<h1>".get_option('blogname')."</h1>";
-			$output .="<h3>".__('Details of Your Selection','pbc')."</h3>";
-			$output .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
+			$output .= "</div></td></tr></table><br/><br/>";
+
+			$output .= '<table class="summary">';
 			$total_price = '';
+			$i = 0;
 			foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
-				$total_price += $details['var']['price'];
+				if(($i%2) == 0) $bg = 'background';
+				else $bg = '';
+				$price = (double)($details['var']['price']);
+				$total_price += $price;
 				$output .= '<tr>';
-				$output .= '<td>'.$details['phase']['name'].'</td>';
-				$output .= '<td>'.$details['var']['name'].'</td>';
-				$output .= '<td>'.$details['var']['price'].'</td>';
+				$output .= '<td class="title '.$bg.'">'.$details['phase']['name'].' '.$details['var']['name'].'</td>';
+				$output .= '<td class="value right '.$bg.'">'.number_format($price, 2, ',', ' ').' €</td>';
 				$output .= '</tr>';
+				$i++;
 			}
-			if($total_price) $total_price = $total_price.' €';
-			else $total_price = '-';
-			$output .= '<tr>';
-			$output .= '<td>&nbsp;</td><td>'.__('Total:','pbc').'</td>';
-			$output .= '<td>'.$total_price.'</td>';
-			$output .= '</tr>';
+			if($total_price){
+				$total_price = number_format($total_price, 2, ',', ' ').' €';
+				$tax = number_format(($total_price*0.21), 2, ',', ' ').' €';
+			}
+			else{
+				$total_price = '00,00 €';
+				$tax = '00,00 €';
+			}
 			$output .= '</table>';
+			$output .= '<table class="summary-total"><tr>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right">Iva 21%</td>';
+			$output .= '<td class="value right">'.$tax.'</td>';
+			$output .= '</tr>';
+			$output .= '<tr>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:#835536;color:#fff;">Total</td>';
+			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">'.$total_price.'</td>';
+			$output .= '</tr>';
+			$output .= '</table><br/>';
+
+			$output .="<table class='footer'><tr><td><img src='".WPPBC_PLUGIN_DIR."/pdf-footer.png' class='footer_image'/></td></tr></table>";
 
 			$output .= '</page>';
 			$result = array('type'=>'success', 'response'=>$output);
