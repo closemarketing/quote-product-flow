@@ -1044,12 +1044,13 @@ class PBCPlugin
 			$output = '';
 		    $output .= "<page backcolor='#fff'>";
 			$output .= "<style>
+			.header, .product .product-title {margin-left: 20px;}
 			.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
 			.product .product-preview{ width:300px; }
 			.product .image-wrap{ position:relative; }
 		    .product .image-wrap img:first-child{ position:relative; }
 		    .product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
-			table.summary, table.summary-total{ width:600px;border-collapse:collapse;border:0;}
+			table.summary, table.summary-total{ width:600px;border-collapse:collapse;border:0; margin-left:50px;}
 			table td.title{ width:500px;padding:5px 0 5px 15px; }
 			table td.value{ width:70px;padding:5px 15px 5px 0; }
 			table td.right{text-align:right;}
@@ -1057,13 +1058,13 @@ class PBCPlugin
 			table.summary-total td.empty{width:450px;}
 			table.summary-total td.title{width:50px;}
 			img.header_image{ width:700px;height:120px; }
-			img.footer_image{ width:700px;height:70px; }
+			img.footer_image{ width:700px;height:70px; margin: 50px 0 0 30px;}
 			</style>";
 			// $pdf_image_selected = get_option('pbc_pdf_image_selected');
 			// if($pdf_image_selected)
 			// 	$output .="<img src='".$pdf_image_selected."' width='200'/>";
 			$output .="<table class='header'><tr><td><img src='".WPPBC_PLUGIN_DIR."/pdf-header.png' class='header_image'/></td></tr></table><br/>";
-			$output .= "<table class='product'><tr><td class='product-title'><img width='350' src='".WPPBC_PLUGIN_DIR."/pdf-title.png' class='title_image'/><p>Relación de características del modelo seleccionado.</p></td><td class='product-preview'><div class='image-wrap'>";
+			$output .= "<table class='product'><tr><td class='product-title'><img width='350' src='".WPPBC_PLUGIN_DIR."/pdf-title.png' class='title_image'/><p>Relaci&oacute;n de caracter&iacute;sticas del modelo seleccionado.</p></td><td class='product-preview'><div class='image-wrap'>";
 			$flipped = false;
 			$variations_images_flipped = get_option('variations_images_flipped');
 			if(!empty($variations_images_flipped)) {
@@ -1159,22 +1160,25 @@ class PBCPlugin
 				$output .= '</tr>';
 				$i++;
 			}
-			if($total_price){
-				$total_price = number_format($total_price, 2, ',', ' ').' €';
-				$tax = number_format(($total_price*0.21), 2, ',', ' ').' €';
+			if(!$total_price){
+				$total_price = 0;
+				$tax = 0;
 			}
-			else{
-				$total_price = '00,00 €';
-				$tax = '00,00 €';
-			}
+			$tax = $total_price*0.21;
+			$total_pricevat = $total_price + $total_price*0.21;
+
 			$output .= '</table>';
 			$output .= '<table class="summary-total"><tr>';
-			$output .= '<td class="empty">&nbsp;</td><td class="title right">Iva 21%</td>';
-			$output .= '<td class="value right">'.$tax.'</td>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
+			$output .= '<td class="value right">'.number_format($tax, 2, ',', '.').' €'.'</td>';
+			$output .= '</tr>';
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
+			$output .= '<td class="value right">'.number_format($total_price, 2, ',', '.').' €'.'</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:#835536;color:#fff;">Total</td>';
-			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">'.$total_price.'</td>';
+
+			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">'.number_format($total_pricevat, 2, ',', '.').' €'.'</td>';
 			$output .= '</tr>';
 			$output .= '</table><br/>';
 
