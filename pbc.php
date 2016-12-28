@@ -1076,6 +1076,9 @@ class PBCPlugin
 			}
 
 			$outputImage = imagecreatetruecolor(300, 300);
+			$black = imagecolorallocate($outputImage, 0, 0, 0);
+			// Make the background transparent
+			imagecolortransparent($outputImage, $black);
 			for ($i = 1; $i <= count($_SESSION['pbc_variation']); $i++)
 			{
 				$imgprodid = $imgprodurl = '';
