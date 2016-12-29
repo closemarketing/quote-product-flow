@@ -864,7 +864,7 @@ class PBCPlugin
 					        $html2pdf->setTestTdInOnePage(false);
 					        $html2pdf->writeHTML($content['response']);
 					        $html2pdf->Output("Budget Configurator ".date('Y-m-d H:i').".pdf");
-					        $html2pdf->close();
+					        //$html2pdf->close();
 					    } catch (Html2PdfException $e) {
 					        $formatter = new ExceptionFormatter($e);
 					        echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
