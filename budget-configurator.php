@@ -259,6 +259,9 @@ if(empty($cStep)) $cStep = 1;
         .configurator_steps_nav li.configurator_steps{overflow: hidden;padding: 5px;}
         .configurator_steps_nav li.configurator_steps .step-arrow-button{display: none;}
     }
+    .email_submit_fields input {
+    width: 325px;
+    }
 </style>
 
 <?php $queried_object = get_queried_object();?>
