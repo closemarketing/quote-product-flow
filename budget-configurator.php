@@ -549,12 +549,13 @@ if(empty($cStep)) $cStep = 1;
                                     $varId = $_SESSION['pbc_variation'][$i]['var']['id'];
                                     $varName = $_SESSION['pbc_variation'][$i]['var']['name'];
                                     $varPrice = $_SESSION['pbc_variation'][$i]['var']['price'];
+                                    $phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
                                     if($cStep == 'calculate'){
                                         $total_price += (int) $varPrice;
                                     }
                                 ?>
                                 <tr class="variation_selected phase-<?php echo $phaseKey;?>">
-                                    <td class="name"><?php echo $phaseKey.'. '.get_the_title($phase_id).': '.$varName;?></td>
+                                    <td class="name"><?php  echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
                                     <td class="price">
                                         <?php
                                             if($varPrice) echo $varPrice.' €';
