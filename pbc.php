@@ -899,6 +899,7 @@ class PBCPlugin
 		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
 			$sVar = $pbc_variation[$current_phase];
 			$imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
+			$imgprodid = '';
 			if(!empty($imgprodgroup)){
 				foreach($imgprodgroup as $deps)
 				{
@@ -912,15 +913,17 @@ class PBCPlugin
 								$prevVar[(int)$arr[0]][] = $arr[1];
 							}
 						}
-						if(!empty($_SESSION['pbc_variation']))
+						if(!empty($_SESSION['pbc_variation']) && !empty($prevVar))
 						{
-							foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+							foreach($prevVar as $sPhaseKey => $sVariations)
 							{
 								if(isset($prevVar[$sPhaseKey]) &&
 								isset($_SESSION['pbc_variation'][$sPhaseKey]) &&
 								in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
 								{
 									$imgprodid = $deps['pbc_imgprod'][0];
+								}else{
+									$imgprodid = '';
 									break;
 								}
 							}
@@ -929,6 +932,8 @@ class PBCPlugin
 						$imgprodid = $deps['pbc_imgprod'][0];
 						break;
 					}
+					if($imgprodid)
+						break;
 				}
 			}
 			if($imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}

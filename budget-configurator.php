@@ -397,36 +397,41 @@ if(empty($cStep)) $cStep = 1;
                                         $ssVar = $_SESSION['pbc_variation'][$i]['var']['id'];
                                         $imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
                                         if(!empty($imgprodgroup)){
-                                            foreach($imgprodgroup as $deps)
-                                            {
-                                                if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
-                                                {
-                                                    $prevVar = array();
-                                                    foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
-                                                    {
-                                                        $arr = explode('|', $depvarimgprod);
-                                                        if(!empty($arr[0]) && !empty($arr[1])){
-                                                            $prevVar[(int)$arr[0]][] = $arr[1];
-                                                        }
-                                                    }
-                                                    if(!empty($_SESSION['pbc_variation']))
-                                                    {
-                                                        foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
-                                                        {
-                                                            if(isset($prevVar[$sPhaseKey]) &&
-                                                            isset($_SESSION['pbc_variation'][$sPhaseKey]) && in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
-                                                            {
-                                                                $imgprodid = $deps['pbc_imgprod'][0];
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
-                                                    $imgprodid = $deps['pbc_imgprod'][0];
-                                                    break;
-                                                }
-                                            }
-                                        }
+                            				foreach($imgprodgroup as $deps)
+                            				{
+                            					if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
+                            					{
+                            						$prevVar = array();
+                            						foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
+                            						{
+                            							$arr = explode('|', $depvarimgprod);
+                            							if(!empty($arr[0]) && !empty($arr[1])){
+                            								$prevVar[(int)$arr[0]][] = $arr[1];
+                            							}
+                            						}
+                            						if(!empty($_SESSION['pbc_variation']) && !empty($prevVar))
+                            						{
+                            							foreach($prevVar as $sPhaseKey => $sVariations)
+                            							{
+                            								if(isset($prevVar[$sPhaseKey]) &&
+                            								isset($_SESSION['pbc_variation'][$sPhaseKey]) &&
+                            								in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+                            								{
+                            									$imgprodid = $deps['pbc_imgprod'][0];
+                            								}else{
+                            									$imgprodid = '';
+                            									break;
+                            								}
+                            							}
+                            						}
+                            					}elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
+                            						$imgprodid = $deps['pbc_imgprod'][0];
+                            						break;
+                            					}
+                            					if($imgprodid)
+                            						break;
+                            				}
+                            			}
                                         if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
                                         if(isset($imgprodurl) && $imgprodurl){
                                             $addclass = '';
@@ -461,14 +466,17 @@ if(empty($cStep)) $cStep = 1;
                                                     $prevVar[(int)$arr[0]][] = $arr[1];
                                                 }
                                             }
-                                            if(!empty($_SESSION['pbc_variation']))
+                                            if(!empty($_SESSION['pbc_variation']) && !empty($prevVar))
                                             {
-                                                foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+                                                foreach($prevVar as $sPhaseKey => $sVariations)
                                                 {
                                                     if(isset($prevVar[$sPhaseKey]) &&
-                                                    isset($_SESSION['pbc_variation'][$sPhaseKey]) && in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+                                                    isset($_SESSION['pbc_variation'][$sPhaseKey]) &&
+                                                    in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
                                                     {
                                                         $imgprodid = $deps['pbc_imgprod'][0];
+                                                    }else{
+                                                        $imgprodid = '';
                                                         break;
                                                     }
                                                 }
@@ -477,6 +485,8 @@ if(empty($cStep)) $cStep = 1;
                                             $imgprodid = $deps['pbc_imgprod'][0];
                                             break;
                                         }
+                                        if($imgprodid)
+                                            break;
                                     }
                                 }
                                 if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
