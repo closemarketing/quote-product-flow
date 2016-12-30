@@ -259,6 +259,9 @@ if(empty($cStep)) $cStep = 1;
         .configurator_steps_nav li.configurator_steps{overflow: hidden;padding: 5px;}
         .configurator_steps_nav li.configurator_steps .step-arrow-button{display: none;}
     }
+    .email_submit_fields input {
+    width: 325px;
+    }
 </style>
 
 <?php $queried_object = get_queried_object();?>
@@ -556,12 +559,13 @@ if(empty($cStep)) $cStep = 1;
                                     $varId = $_SESSION['pbc_variation'][$i]['var']['id'];
                                     $varName = $_SESSION['pbc_variation'][$i]['var']['name'];
                                     $varPrice = $_SESSION['pbc_variation'][$i]['var']['price'];
+                                    $phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
                                     if($cStep == 'calculate'){
                                         $total_price += (int) $varPrice;
                                     }
                                 ?>
                                 <tr class="variation_selected phase-<?php echo $phaseKey;?>">
-                                    <td class="name"><?php echo $varName;?></td>
+                                    <td class="name"><?php  echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
                                     <td class="price">
                                         <?php
                                             if($varPrice) echo $varPrice.' €';
@@ -595,7 +599,7 @@ if(empty($cStep)) $cStep = 1;
                             <?php if(isset($_POST['submit']) && ($_POST['submit'] == 'result_email' || $_POST['submit'] == 'email_send')){?>
                                 <?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
                                 <div class="email_submit_fields">
-                                    <input type="text" name="email_field" placeholder="separate multiple email by comma"/>
+                                    <input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/>
                                     <button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
                                 </div>
                                 <?php }?>
