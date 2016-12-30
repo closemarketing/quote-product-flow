@@ -554,7 +554,7 @@ if(empty($cStep)) $cStep = 1;
                                     }
                                 ?>
                                 <tr class="variation_selected phase-<?php echo $phaseKey;?>">
-                                    <td class="name"><?php echo $varName;?></td>
+                                    <td class="name"><?php echo $phaseKey.'. '.get_the_title($phase_id).': '.$varName;?></td>
                                     <td class="price">
                                         <?php
                                             if($varPrice) echo $varPrice.' €';
