@@ -207,8 +207,8 @@ if(empty($cStep)) $cStep = 1;
         border: 1px solid #949697;
         padding: 10px;
         margin: 0 auto;
-        max-width: 400px;
-        min-width: 400px;
+        max-width: 600px;
+        min-width: 600px;
         display: inline-block;
     }
     .configurator_result_share{max-width: 400px;margin: 20px auto;text-align: center;}

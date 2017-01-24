@@ -583,7 +583,7 @@ class PBCPlugin
 		    			array(
 		    				'name'        => 'Variación',
 		    				'id'          => "{$prefix}depvarimgprod",
-		    				'type'        => 'select',
+		    				'type'        => 'select_advanced',
 		    				'options'     => $var_options,
 		    				'multiple'    => true,
 		    				'std'         => '',
