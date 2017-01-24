@@ -40,7 +40,7 @@ class PBCPlugin
         //Custom Post types stuff
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
 		add_action('init', array( $this, 'pbc_register_cpt') );
-    add_filter('rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
+    	add_filter('rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
 
 		add_filter( 'disable_months_dropdown' , array($this,'disable_months_dropdown') , 10 , 2 );
 		add_filter('manage_edit-phases_columns', array($this,'add_new_phases_columns') );
@@ -56,6 +56,8 @@ class PBCPlugin
 		add_action('wp_ajax_nopriv_variation_selected', array($this,'variation_selected_action_callback') );
 		add_action('wp_ajax_configurator_submit', array($this,'configurator_submit_action_callback') );
 		add_action('wp_ajax_nopriv_configurator_submit', array($this,'configurator_submit_action_callback') );
+		add_action('wp_ajax_configurator_login', array($this,'configurator_login_action_callback') );
+		add_action('wp_ajax_nopriv_configurator_login', array($this,'configurator_login_action_callback') );
 		//on variation-lists admin screen
 		add_filter( 'views_edit-variation', array($this,'pbc_add_print_pdf_button') );
 		add_action( 'admin_head-edit.php', array($this,'pbc_move_print_pdf_button') );
@@ -1000,6 +1002,23 @@ class PBCPlugin
 		echo $all_details;
 		die(0);
 	}
+	public function configurator_login_action_callback(){
+		extract($_POST);
+		$login = wp_signon( array( 'user_login' => $username, 'user_password' => $password, 'remember' => true ), false );
+		if( $login->ID ) {
+			ob_start();
+			if ( \locate_template( 'budget-configurator.php' ) )
+				\locate_template('budget-configurator.php', true);
+			else
+				include(WPPBC_PLUGIN_DIR. '/budget-configurator.php');
+			$all_details = ob_get_contents();
+			ob_end_clean();
+			echo $all_details;
+		}elseif ( is_wp_error( $login ) ){
+			echo ';;-;;error;;-;;'.$login->get_error_message();
+		}
+		die(0);
+	}
 	public function configurator_result_email_send($email){
 		if(!$email){
 			$result = array('type'=>'error', 'response'=>'Email field empty!');
@@ -1156,6 +1175,7 @@ class PBCPlugin
 
 			$output .= '<table class="summary">';
 			$total_price = '';
+			$logged_in = is_user_logged_in();
 			$i = 0;
 			foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
 				if(($i%2) == 0) $bg = 'background';
@@ -1164,7 +1184,9 @@ class PBCPlugin
 				$total_price += $price;
 				$output .= '<tr>';
 				$output .= '<td class="title '.$bg.'">'.$details['phase']['name'].' '.$details['var']['name'].'</td>';
-				$output .= '<td class="value right '.$bg.'">'.number_format($price, 2, ',', ' ').' €</td>';
+				$output .= '<td class="value right '.$bg.'">';
+				if($logged_in) $output .= number_format($price, 2, ',', ' ').' €'; else $output .= '-';
+				$output .= '</td>';
 				$output .= '</tr>';
 				$i++;
 			}
@@ -1178,15 +1200,21 @@ class PBCPlugin
 			$output .= '</table>';
 			$output .= '<table class="summary-total"><tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
-			$output .= '<td class="value right">'.number_format($tax, 2, ',', '.').' €'.'</td>';
+			$output .= '<td class="value right">';
+			if($logged_in) $output .= number_format($tax, 2, ',', '.').' €'; else $output .= '-';
+			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
-			$output .= '<td class="value right">'.number_format($total_price, 2, ',', '.').' €'.'</td>';
+			$output .= '<td class="value right">';
+			if($logged_in) $output .= number_format($total_price, 2, ',', '.').' €';else $output .= '-';
+			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:#835536;color:#fff;">Total</td>';
 
-			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">'.number_format($total_pricevat, 2, ',', '.').' €'.'</td>';
+			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">';
+			if($logged_in) $output .= number_format($total_pricevat, 2, ',', '.').' €'; else $output .= '-';
+			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '</table><br/>';
 

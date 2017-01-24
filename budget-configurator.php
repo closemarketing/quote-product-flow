@@ -254,13 +254,22 @@ if(empty($cStep)) $cStep = 1;
         filter: FlipH;
         -ms-filter: "FlipH";
     }
+    .email_submit_fields input {
+        width: 325px;
+    }
+    .configurator_login{
+        clear: both;
+        width: 49%;
+        float: right;
+        margin: 20px 0;
+    }
+    .configurator_login .form_wrapper{max-width: 400px;border: 1px solid;padding: 10px;}
+    .configurator_login .et_pb_contact_submit{border: 2px solid transparent;background: rgba(0, 0, 0, 0.05);}
+    .configurator_login .et_pb_contact_submit:hover{background: transparent;border: 2px solid #A08621;}
     @media (max-width:768px) {
         .configurator_steps_nav{padding-right: 0px;}
         .configurator_steps_nav li.configurator_steps{overflow: hidden;padding: 5px;}
         .configurator_steps_nav li.configurator_steps .step-arrow-button{display: none;}
-    }
-    .email_submit_fields input {
-    width: 325px;
     }
 </style>
 
@@ -563,12 +572,13 @@ if(empty($cStep)) $cStep = 1;
                                     if($cStep == 'calculate'){
                                         $total_price += (int) $varPrice;
                                     }
+                                    $logged_in = is_user_logged_in();
                                 ?>
                                 <tr class="variation_selected phase-<?php echo $phaseKey;?>">
                                     <td class="name"><?php  echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
                                     <td class="price">
                                         <?php
-                                            if($varPrice) echo $varPrice.' €';
+                                            if($varPrice && $logged_in) echo $varPrice.' €';
                                             else echo '-';
                                         ?>
                                     </td>
@@ -579,7 +589,7 @@ if(empty($cStep)) $cStep = 1;
                                     <td class="name"><?php _e('Total','pbc');?></td>
                                     <td class="price">
                                         <?php
-                                            if($total_price) echo $total_price.' €';
+                                            if($total_price && $logged_in) echo $total_price.' €';
                                             else echo '-';
                                         ?>
                                     </td>
@@ -617,6 +627,23 @@ if(empty($cStep)) $cStep = 1;
                 </form>
             </div>
 
+            <?php if(!is_user_logged_in()){?>
+            <div class="configurator_login">
+                <div class="form_wrapper et_pb_contact">
+                    <h1 class="et_pb_contact_main_title"><?php _e('Login to See Prices','pbc');?></h1>
+                    <form name="configurator_login_form" id="configurator_login_form" method="post" action="">
+                        <p class="et_pb_contact_field">
+                            <input type="text" required name="username" placeholder="Username"/>
+                        </p><br>
+                        <p class="et_pb_contact_field">
+                            <input type="password" required name="password" placeholder="Password"/>
+                        </p>
+                        <input type="submit" name="submit" value="<?php _e('Sign In','pbc');?>" class="et_pb_contact_submit et_pb_button"/>
+                        <div class="message"></div>
+                    </form>
+                </div>
+            </div>
+            <?php }?>
             <?php if(!defined('DOING_AJAX')){?>
             <script type="text/javascript">
             jQuery(function($){
@@ -760,6 +787,28 @@ if(empty($cStep)) $cStep = 1;
                                 if($(document).find('.result_submit_action').length > 0){
                                     $(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
                                 }
+                            }
+                        }
+                    });
+                });
+                $(document).on('submit', '#configurator_login_form', function(e){
+            		e.preventDefault();
+            		var form_id = 'configurator_login_form';
+                    $(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>loading.gif"/></div>').show();
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
+                        type: 'POST',
+                        data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&action=configurator_login',
+                        dataType: "html",
+                        success: function(response) {
+                            var arr = response.split(';;-;;');
+                            if(arr[1]=='error'){
+                                $(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+                                $('#'+form_id).find('.message').html(arr[2]).show().delay(3000).fadeOut(400);
+                            }else{
+                                location.reload(true);
+                                $('.page-configurator').html(response);
+                                $(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
                             }
                         }
                     });
