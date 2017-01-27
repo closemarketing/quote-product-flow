@@ -1038,19 +1038,20 @@ class PBCPlugin
 					$message .= '<td>'.$details['phase']['name'].'</td>';
 					$message .= '<td>'.$details['var']['name'].'</td>';
 					$message .= '<td>';
-					if($logged_in) $message .= number_format($details['var']['price'], 2, ',', ' ').' €'; else $message .= '-';
+					if($logged_in) $message .= $details['var']['price'].' €'; else $message .= '-';
 					$message .= '</td>';
 					$message .= '</tr>';
 				}
-				if($total_price && $logged_in) $total_price = number_format($total_price, 2, ',', ' ').' €';
+				if($total_price && $logged_in) $total_price = $total_price.' €';
 				else $total_price = '-';
 				$message .= '<tr>';
-				$output .= '<td>&nbsp;</td><td>Total: </td>';
+				$message .= '<td>&nbsp;</td><td>Total: </td>';
 				$message .= '<td>'.$total_price.'</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
 				$message .= '<br>'.get_option('blogname');
-				$attachments = '';
+				$headers = array('Content-Type: text/html; charset=UTF-8');
+				$attachments = array('');
 
 				if (is_file(WPPBC_PLUGIN_DIR.
                     "/lib/html2pdf/html2pdf.class.php")
@@ -1082,7 +1083,7 @@ class PBCPlugin
 					    }
 					}
 					if(is_file(WPPBC_PLUGIN_DIR."/$filename")){
-						$attachments = WPPBC_PLUGIN_DIR."/$filename";
+						$attachments = array(plugin_dir_path( __FILE__)."$filename");
 					}
                 }
 
@@ -1090,10 +1091,10 @@ class PBCPlugin
 					return 'text/html';
 				}
 				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
-			    if(!wp_mail( $emails, $subject, $message, $attachments)){
+			    if(!wp_mail( $emails, $subject, $message, $headers, $attachments)){
 					$result = array('type'=>'error', 'response'=>__('Error in sending mail. Please try again!','pbc'));
 				}else{
-					if($attachments) unlink(plugin_dir_path( __FILE__)."$filename");
+					if(!empty($attachments)) unlink(plugin_dir_path( __FILE__)."$filename");
 					$result = array('type'=>'success', 'response'=>'Mail sent!');
 				}
 				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
