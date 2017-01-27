@@ -271,6 +271,12 @@ if(empty($cStep)) $cStep = 1;
         .configurator_steps_nav li.configurator_steps{overflow: hidden;padding: 5px;}
         .configurator_steps_nav li.configurator_steps .step-arrow-button{display: none;}
     }
+    .configurator_login .message,.configurator_login h2 {
+        margin: 30px 20px;
+    }
+    .configurator_login h2 {
+        margin: 20px 20px 0;
+    }
 </style>
 
 <?php $queried_object = get_queried_object();?>
@@ -553,7 +559,7 @@ if(empty($cStep)) $cStep = 1;
                     </div>
                     <div class="configurator_summary">
                         <?php if(isset($_SESSION) && isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation'])){?>
-                            <div class="title"><?php _e('Actual Configuration','pbc');?></div>
+                            <h1 class="title"><?php _e('Actual Configuration','pbc');?></h1>
                             <table>
                             <?php
                                 if($cStep == 'calculate'){
@@ -630,16 +636,16 @@ if(empty($cStep)) $cStep = 1;
             <?php if(!is_user_logged_in()){?>
             <div class="configurator_login">
                 <div class="form_wrapper et_pb_contact">
-                    <h1 class="et_pb_contact_main_title"><?php _e('Login to See Prices','pbc');?></h1>
+                    <h2 class="et_pb_contact_main_title"><?php _e('Account','pbc');?></h2>
                     <form name="configurator_login_form" id="configurator_login_form" method="post" action="">
                         <p class="et_pb_contact_field">
-                            <input type="text" required name="username" placeholder="Username"/>
+                            <input type="text" required name="username" placeholder="<?php _e('Username','pbc');?>"/>
                         </p><br>
                         <p class="et_pb_contact_field">
-                            <input type="password" required name="password" placeholder="Password"/>
+                            <input type="password" required name="password" placeholder="<?php _e('Password','pbc');?>"/>
                         </p>
+                        <div class="message"><a href="/como-comprar/"><?php _e( 'How to buy?', 'pbc' );?></a></div>
                         <input type="submit" name="submit" value="<?php _e('Sign In','pbc');?>" class="et_pb_contact_submit et_pb_button"/>
-                        <div class="message"></div>
                     </form>
                 </div>
             </div>
