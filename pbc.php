@@ -1031,31 +1031,72 @@ class PBCPlugin
 				$message = '<h3>'.__('Here are the details of your selection:','pbc').'</h3>'.'<br>';
 				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 				$total_price = '';
+				$logged_in = is_user_logged_in();
 				foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
 					$total_price += $details['var']['price'];
 					$message .= '<tr>';
 					$message .= '<td>'.$details['phase']['name'].'</td>';
 					$message .= '<td>'.$details['var']['name'].'</td>';
-					$message .= '<td>'.$details['var']['price'].'</td>';
+					$message .= '<td>';
+					if($logged_in) $message .= $details['var']['price'].' €'; else $message .= '-';
+					$message .= '</td>';
 					$message .= '</tr>';
 				}
-				if($total_price) $total_price = $total_price.' €';
+				if($total_price && $logged_in) $total_price = $total_price.' €';
 				else $total_price = '-';
 				$message .= '<tr>';
-				$output .= '<td>&nbsp;</td><td>Total: </td>';
+				$message .= '<td>&nbsp;</td><td>Total: </td>';
 				$message .= '<td>'.$total_price.'</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
 				$message .= '<br>'.get_option('blogname');
+				$headers = array('Content-Type: text/html; charset=UTF-8');
+				$attachments = array('');
+
+				if (is_file(WPPBC_PLUGIN_DIR.
+                    "/lib/html2pdf/html2pdf.class.php")
+                )
+                {
+                    require_once(WPPBC_PLUGIN_DIR.
+                        '/lib/html2pdf/html2pdf.class.php');
+					if(session_id() == ''){
+						ob_start();
+					    session_start();
+					}
+					$filename = "Budget-Configurator-".date('Y-m-d-H:i').".pdf";
+					$content = $this->configurator_result_generate_pdf();
+					if($content['type'] == 'error'){
+						//error echo $content['response'];
+					}else{
+					    try {
+					        $width_mm = 710 * 0.2646;   //1px = 0.2646mm
+					        $height_mm = 900 * 0.2646;
+					        $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
+					        $html2pdf->setTestTdInOnePage(false);
+					        $html2pdf->writeHTML($content['response']);
+					        $html2pdf->Output(WPPBC_PLUGIN_DIR."/$filename", "F");
+					        //$html2pdf->close();
+					    } catch (Html2PdfException $e) {
+							//error
+					        //$formatter = new ExceptionFormatter($e);
+					        //echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
+					    }
+					}
+					if(is_file(WPPBC_PLUGIN_DIR."/$filename")){
+						$attachments = array(plugin_dir_path( __FILE__)."$filename");
+					}
+                }
 
 				function set_html_content_type() {
 					return 'text/html';
 				}
 				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
-			    if(!wp_mail( $emails, $subject, $message)){
+			    if(!wp_mail( $emails, $subject, $message, $headers, $attachments)){
 					$result = array('type'=>'error', 'response'=>__('Error in sending mail. Please try again!','pbc'));
-				}else
+				}else{
+					if(!empty($attachments)) unlink(plugin_dir_path( __FILE__)."$filename");
 					$result = array('type'=>'success', 'response'=>'Mail sent!');
+				}
 				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
 			}
 		}
