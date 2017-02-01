@@ -277,6 +277,15 @@ if(empty($cStep)) $cStep = 1;
     .configurator_login h2 {
         margin: 20px 20px 0;
     }
+    .configurator_login {
+    text-align: center;
+    }
+    .configurator_login img {
+        width: 300px;
+    }
+    .page-header {
+    margin-top: 15px;
+    }
 </style>
 
 <?php $queried_object = get_queried_object();?>
@@ -635,19 +644,9 @@ if(empty($cStep)) $cStep = 1;
 
             <?php if(!is_user_logged_in()){?>
             <div class="configurator_login">
-                <div class="form_wrapper et_pb_contact">
-                    <h2 class="et_pb_contact_main_title"><?php _e('Account','pbc');?></h2>
-                    <form name="configurator_login_form" id="configurator_login_form" method="post" action="">
-                        <p class="et_pb_contact_field">
-                            <input type="text" required name="username" placeholder="<?php _e('Username','pbc');?>"/>
-                        </p><br>
-                        <p class="et_pb_contact_field">
-                            <input type="password" required name="password" placeholder="<?php _e('Password','pbc');?>"/>
-                        </p>
-                        <div class="message"><a href="/como-comprar/"><?php _e( 'How to buy?', 'pbc' );?></a></div>
-                        <input type="submit" name="submit" value="<?php _e('Sign In','pbc');?>" class="et_pb_contact_submit et_pb_button"/>
-                    </form>
-                </div>
+                <a href="<?php bloginfo('url');?>/como-comprar/">
+                <img src="<?php echo WPPBC_PLUGIN_URL;?>/lib/banner-comprar.png"/>
+                </a>
             </div>
             <?php }?>
             <?php if(!defined('DOING_AJAX')){?>
