@@ -1141,7 +1141,7 @@ class PBCPlugin
 				}
 			}
 
-			$outputImage = imagecreatetruecolor(300, 300);
+			$outputImage = imagecreatetruecolor(300, 243);
 			$black = imagecolorallocate($outputImage, 0, 0, 0);
 			// Make the background transparent
 			imagecolortransparent($outputImage, $black);
@@ -1202,7 +1202,7 @@ class PBCPlugin
 						if($flipped){
 							imageflip($img, IMG_FLIP_HORIZONTAL);
 						}
-						imagecopyresized($outputImage,$img,0,0,0,0,300,300,$width,$height);
+						imagecopyresized($outputImage,$img,0,0,0,0,300,243,$width,$height);
 						//$output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
 					}
 				}
