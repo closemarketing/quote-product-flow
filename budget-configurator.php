@@ -14,6 +14,10 @@ if(session_id() == ''){
 }
 $cStep ='';
 $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids');
+if(is_user_logged_in()){
+    $user_id = get_current_user_id();
+}
+
 if(isset($_POST['submit'])){
     $submit = $_POST['submit'];
     if(isset($_POST[$submit.'_phase']))
@@ -30,6 +34,11 @@ if(isset($_POST['submit'])){
                 $price = $option_name = '';
                 $pricegroup = get_post_meta($pbc_variation, 'pbc_pricegroup', true);
                 $pricevar = $_POST["pbc_pricevar_$pbc_variation"];
+                if(isset($user_id)){
+    				$phase_param['var'] = $pbc_variation;
+    				$phase_param['pricevar'] = ($pricevar)?($pricevar):'';
+    				update_user_meta($user_id, 'pbc_phase_'.$key, $phase_param);
+    			}
                 if(isset($pricevar)){
                     foreach($pricegroup as $details){
                         if($details['pbc_meaprice'] == $pricevar){
@@ -359,12 +368,20 @@ if(empty($cStep)) $cStep = 1;
                                 }
                                 $variations = array_values($variations);
                                 sort($variations);
-
+                                
                                 if(isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation']) && isset($_SESSION['pbc_variation'][$cStep]) &&
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
                                 )
                                     $sVar = $_SESSION['pbc_variation'][$cStep]['var']['id'];
-                                else{ $sVar = $variations[current(array_keys($variations))];}
+                                else{
+                                    if(isset($user_id)){
+                                        $pbc_phase = get_user_meta($user_id, 'pbc_phase_'.$cStep, true);
+                                        if(!empty($pbc_phase) && !empty($pbc_phase['var']))
+                                            $sVar = $pbc_phase['var'];
+                                    }
+                                    if(empty($sVar))
+                                        $sVar = $variations[current(array_keys($variations))];
+                                }
                                 if(!empty($variations)){
                                 ?>
                                 <ul>

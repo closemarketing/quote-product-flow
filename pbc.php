@@ -987,6 +987,13 @@ class PBCPlugin
 	    }
 		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
 			$sVar = $pbc_variation[$current_phase];
+			if(is_user_logged_in()){
+				$user_id = get_current_user_id();
+				$phase_param['var'] = $sVar;
+				$phase_param['pricevar'] = ($_REQUEST["pbc_pricevar_$sVar"])?($_REQUEST["pbc_pricevar_$sVar"]):'';
+				update_user_meta($user_id, 'pbc_phase_'.$current_phase,$phase_param);
+			}
+
 			$imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
 			$imgprodid = '';
 			if(!empty($imgprodgroup)){
