@@ -624,7 +624,9 @@ if(empty($cStep)) $cStep = 1;
                             <?php if(isset($_POST['submit']) && ($_POST['submit'] == 'result_email' || $_POST['submit'] == 'email_send')){?>
                                 <?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
                                 <div class="email_submit_fields">
-                                    <input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/>
+                                    <input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/><br/>
+                                    <input type="text" name="name_field" style="width:150px;" placeholder="<?php _e('Your name','pbc');?>"/>
+                                    <input type="text" name="phone_field" style="width:150px;" placeholder="<?php _e('Phone number','pbc');?>"/><br/>
                                     <button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
                                 </div>
                                 <?php }?>

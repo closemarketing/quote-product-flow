@@ -41,6 +41,7 @@ class PBCPlugin
  		add_action('admin_menu', array($this, 'pbc_add_admin_menus'), 1);
 		add_action('init', array( $this, 'pbc_register_cpt') );
     	add_filter('rwmb_meta_boxes', array( $this, 'pbc_metabox_variation') );
+		add_filter('add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry') );
 
 		add_filter( 'disable_months_dropdown' , array($this,'disable_months_dropdown') , 10 , 2 );
 		add_filter('manage_edit-phases_columns', array($this,'add_new_phases_columns') );
@@ -226,6 +227,15 @@ class PBCPlugin
 			 	'menu_title'    => __('Variations','pbc'),
 			 	'capability'    => 'manage_options',
 			 	'menu_slug'     => 'edit.php?post_type=variation',
+			 	'function'      => null,// Doesn't need a callback function.
+			 ),
+			 // Post Type :: View All Posts
+			 array(
+			 	'parent_slug'   => 'pbc_menu',
+			 	'page_title'    => __('Enquiries Received','pbc'),
+			 	'menu_title'    => __('Enquiries','pbc'),
+			 	'capability'    => 'manage_options',
+			 	'menu_slug'     => 'edit.php?post_type=enquiry',
 			 	'function'      => null,// Doesn't need a callback function.
 			 ),
 
@@ -465,6 +475,35 @@ class PBCPlugin
         register_post_type('variation',$args);
 
 		$labels = array(
+         'name' =>__('Enquiries','pbc'),
+         'singular_name' => __('Enquiry','pbc'),
+         'add_new' => __('Add Enquiry','pbc'),
+         'add_new_item' => __('Add New Enquiry','pbc'),
+         'edit_item' => __('Edit Enquiry','pbc'),
+         'new_item' => __('New Enquiry','pbc'),
+         'view_item' => __('View Enquiry','pbc'),
+         'search_items' => __('Search for Enquiry','pbc').'s',
+         'not_found' =>  __("We didn't find any Enquiry",'pbc'),
+         'not_found_in_trash' => __("We didn't find any Enquiry in the trash",'pbc'),
+        );
+        $args = array(
+         'labels' => $labels,
+         'public' => false,
+         'show_in_menu' => false,
+         'publicly_queryable' => false,
+         'show_ui' => true,
+         'query_var' => true,
+         'rewrite' => array( 'slug' => _x('Enquiry','enquiry','pbc'),'with_front' => 'true' ),
+         'has_archive' => false,
+         'capability_type' => 'post',
+         'hierarchical' => false,
+         'menu_position' => 5,
+         'supports' => array('title'),
+         'menu_icon' => 'dashicons-tagcloud'
+        );
+        register_post_type('enquiry',$args);
+
+		$labels = array(
 		  'name' => __('Price Options','pbc'),
 		  'singular_name' => __('Price Option','pbc'),
 		  'search_items' =>  __('Search Price Option','pbc'),
@@ -632,6 +671,54 @@ class PBCPlugin
 
     	return $meta_boxes;
     }
+
+	public function pbc_metabox_enquiry(){
+
+		add_meta_box(
+	        'enquiry-details',
+	        __( 'Enquiry Details' ),
+	        array($this,'render_enquiry_details'),
+	        'enquiry',
+	        'normal',
+	        'default'
+	    );
+
+		add_meta_box(
+	        'configuration-details',
+	        __( 'Budget Configuration' ),
+	        array($this,'render_budget_configuration'),
+	        'enquiry',
+	        'normal',
+	        'default'
+	    );
+	}
+	public function render_enquiry_details($post){?>
+		<div><label>Name: <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
+		<div><label>Phone: <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
+		<div><label>Email: <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
+	<?php
+	}
+	public function render_budget_configuration($post){?>
+		<table>
+			<thead>
+				<tr>
+					<th style="width:20%" class="sn">#</th>
+					<th style="width:50%" class="phase-variation">Phase/Variation</th>
+					<th style="width:30%" class="price">Price</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php for($i=0;$i<16;$i++){?>
+				<tr>
+					<td class="sn"><?php echo $i;?></td>
+					<td class="phase-variation"><?php echo get_post_meta($post->ID, 'pbc_phase_var_'.$i,true);?></td>
+					<td class="price"><?php echo get_post_meta($post->ID,'pbc_price_'.$i,true);?></td>
+				</tr>
+				<?php }?>
+			</tbody>
+		</table>
+	<?php
+	}
 
 	/*
 	 * Disables dropdown dates
@@ -841,7 +928,7 @@ class PBCPlugin
 				if(session_id() == ''){
 				    session_start();
 				}
-				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST['email_field']);
+				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
 			}
 			if(isset($_GET) && isset($_GET['configurator']) && $_GET['configurator'] == 'pdf')
             {
@@ -990,7 +1077,7 @@ class PBCPlugin
 			if(session_id() == ''){
 			    session_start();
 			}
-			$_SESSION['pbc_output'] = $this->configurator_result_email_send($email_field);
+			$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
 		}
 		ob_start();
 		if ( \locate_template( 'budget-configurator.php' ) )
@@ -1019,11 +1106,12 @@ class PBCPlugin
 		}
 		die(0);
 	}
-	public function configurator_result_email_send($email){
-		if(!$email){
+	public function configurator_result_email_send($post_requests){
+		extract($post_requests);
+		if(!$email_field){
 			$result = array('type'=>'error', 'response'=>'Email field empty!');
 		}else{
-			$emails = explode(',', $email);
+			$emails = explode(',', $email_field);
 			if(!isset($_SESSION['pbc_variation'])){
 				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
 			}else{
@@ -1032,6 +1120,8 @@ class PBCPlugin
 				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 				$total_price = '';
 				$logged_in = is_user_logged_in();
+				$enquiry_entries = array();
+				$i=0;
 				foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
 					$total_price += $details['var']['price'];
 					$message .= '<tr>';
@@ -1041,6 +1131,9 @@ class PBCPlugin
 					if($logged_in) $message .= $details['var']['price'].' €'; else $message .= '-';
 					$message .= '</td>';
 					$message .= '</tr>';
+					$enquiry_entries[$i]['phase_var'] = $details['phase']['name'].': '.$details['var']['name'];
+					$enquiry_entries[$i]['price'] = $details['var']['price'];
+					$i++;
 				}
 				if($total_price && $logged_in) $total_price = $total_price.' €';
 				else $total_price = '-';
@@ -1086,6 +1179,28 @@ class PBCPlugin
 						$attachments = array(plugin_dir_path( __FILE__)."$filename");
 					}
                 }
+
+				//insert_enquiry Post
+				$my_post = array(
+				    'post_title'    => $name_field.'-'.$phone_field,
+				    'post_status'   => 'publish',
+					'post_type'		=> 'enquiry'
+				);
+				$post_id = wp_insert_post( $my_post );
+				if($post_id){
+					if(!empty($enquiry_entries)){
+						$i=0;
+						foreach($enquiry_entries as $entries){
+							update_post_meta($post_id, 'pbc_phase_var_'.$i,$entries['phase_var']);
+							update_post_meta($post_id, 'pbc_price_'.$i,$entries['price']);
+							update_post_meta($post_id, 'pbc_enquiry_name',$name_field);
+							update_post_meta($post_id, 'pbc_enquiry_phone',$phone_field);
+							update_post_meta($post_id, 'pbc_enquiry_email',$email_field);
+							$i++;
+						}
+					}
+				}
+
 
 				function set_html_content_type() {
 					return 'text/html';
