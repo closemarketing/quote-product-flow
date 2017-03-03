@@ -276,6 +276,8 @@ class PBCPlugin
 			}
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
 			update_option( 'variations_images_flipped', $variations_images_flipped );
+			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array('');
+			update_option( 'pbc_admin_email_notification', $admin_email_notification );
 		}
 	?>
 		<div class='wrap'>
@@ -398,6 +400,13 @@ class PBCPlugin
 						echo '</select>';
 					}
 				?>
+			</fieldset>
+			<fieldset>
+				<label class="block" for="admin_email_notification"><?php _e("Email Notification", 'pbc');?></label>
+				<?php
+					$admin_email_notification = get_option('pbc_admin_email_notification');
+				?>
+				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if($admin_email_notification) echo $admin_email_notification;?>" placeholder="separate multiple emails by comma" />
 			</fieldset>
 		</div>
 
@@ -696,6 +705,8 @@ class PBCPlugin
 		<div><label>Name: <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
 		<div><label>Phone: <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
 		<div><label>Email: <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
+		<div><label>City: <?php echo get_post_meta($post->ID, 'pbc_enquiry_city',true);?></label></div>
+		<div><label>State: <?php echo get_post_meta($post->ID, 'pbc_enquiry_state',true);?></label></div>
 	<?php
 	}
 	public function render_budget_configuration($post){?>
@@ -1117,13 +1128,24 @@ class PBCPlugin
 		extract($post_requests);
 		if(!$email_field){
 			$result = array('type'=>'error', 'response'=>'Email field empty!');
+		}elseif(!$name_field){
+			$result = array('type'=>'error', 'response'=>'Name field is empty!');
+		}elseif(!$phone_field){
+			$result = array('type'=>'error', 'response'=>'Phone field is empty!');
 		}else{
 			$emails = explode(',', $email_field);
+			$admin_emails = get_option('pbc_admin_email_notification');
+			if($admin_emails){
+				$admin_emails = explode(',', $admin_emails);
+				$emails = array_merge($emails, $admin_emails);
+			}
+			$emails = array_map('trim', $emails);
 			if(!isset($_SESSION['pbc_variation'])){
 				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
 			}else{
 				$subject = get_option('blogname').' Budget Configurator';
-				$message = '<h3>'.__('Here are the details of your selection:','pbc').'</h3>'.'<br>';
+				$message .= '<div><h2>Enquiry details:</h2><br/><strong>Name:</strong>'.$name_field.'<br/><strong>Email:</strong>'.$email_field.'<br/><strong>Phone:</strong>'.$phone_field.'<br/><strong>City:</strong>'.$city_field.'<br/><strong>State:</strong>'.$state_field.'<br/><br/></div>';
+				$message = '<h4>'.__('Configuration details:','pbc').'</h4>'.'<br>';
 				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 				$total_price = '';
 				$logged_in = is_user_logged_in();
@@ -1195,19 +1217,20 @@ class PBCPlugin
 				);
 				$post_id = wp_insert_post( $my_post );
 				if($post_id){
+					update_post_meta($post_id, 'pbc_enquiry_name',$name_field);
+					update_post_meta($post_id, 'pbc_enquiry_phone',$phone_field);
+					update_post_meta($post_id, 'pbc_enquiry_email',$email_field);
+					update_post_meta($post_id, 'pbc_enquiry_city',$city_field);
+					update_post_meta($post_id, 'pbc_enquiry_state',$state_field);
 					if(!empty($enquiry_entries)){
 						$i=0;
 						foreach($enquiry_entries as $entries){
 							update_post_meta($post_id, 'pbc_phase_var_'.$i,$entries['phase_var']);
 							update_post_meta($post_id, 'pbc_price_'.$i,$entries['price']);
-							update_post_meta($post_id, 'pbc_enquiry_name',$name_field);
-							update_post_meta($post_id, 'pbc_enquiry_phone',$phone_field);
-							update_post_meta($post_id, 'pbc_enquiry_email',$email_field);
 							$i++;
 						}
 					}
 				}
-
 
 				function set_html_content_type() {
 					return 'text/html';

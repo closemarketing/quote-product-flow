@@ -368,7 +368,7 @@ if(empty($cStep)) $cStep = 1;
                                 }
                                 $variations = array_values($variations);
                                 sort($variations);
-                                
+
                                 if(isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation']) && isset($_SESSION['pbc_variation'][$cStep]) &&
                                     in_array($_SESSION['pbc_variation'][$cStep]['var']['id'], $variations)
                                 )
@@ -644,6 +644,8 @@ if(empty($cStep)) $cStep = 1;
                                     <input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/><br/>
                                     <input type="text" name="name_field" style="width:150px;" placeholder="<?php _e('Your name','pbc');?>"/>
                                     <input type="text" name="phone_field" style="width:150px;" placeholder="<?php _e('Phone number','pbc');?>"/><br/>
+                                    <input type="text" name="city_field" style="width:150px;" placeholder="<?php _e('Your City','pbc');?>"/>
+                                    <input type="text" name="state_field" style="width:150px;" placeholder="<?php _e('Phone State','pbc');?>"/><br/>
                                     <button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
                                 </div>
                                 <?php }?>
