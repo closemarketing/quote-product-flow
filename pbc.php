@@ -693,9 +693,9 @@ class PBCPlugin
 	    );
 	}
 	public function render_enquiry_details($post){?>
-		<div><label>Name: <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
-		<div><label>Phone: <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
-		<div><label>Email: <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
+		<div><label><?php _e('Name','pbc');?>: <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
+		<div><label><?php _e('Phone','pbc');?>: <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
+		<div><label><?php _e('Email','pbc');?>: <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
 	<?php
 	}
 	public function render_budget_configuration($post){?>
@@ -703,8 +703,8 @@ class PBCPlugin
 			<thead>
 				<tr>
 					<th style="width:20%" class="sn">#</th>
-					<th style="width:50%" class="phase-variation">Phase/Variation</th>
-					<th style="width:30%" class="price">Price</th>
+					<th style="width:50%" class="phase-variation"><?php _e('Phase/Variation','pbc');?></th>
+					<th style="width:30%" class="price"><?php _e('Price','pbc');?></th>
 				</tr>
 			</thead>
 			<tbody>
