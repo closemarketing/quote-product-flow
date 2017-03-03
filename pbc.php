@@ -685,7 +685,7 @@ class PBCPlugin
 
 		add_meta_box(
 	        'enquiry-details',
-	        __( 'Enquiry Details' ),
+	        __( 'Enquiry Details','pbc' ),
 	        array($this,'render_enquiry_details'),
 	        'enquiry',
 	        'normal',
@@ -694,7 +694,7 @@ class PBCPlugin
 
 		add_meta_box(
 	        'configuration-details',
-	        __( 'Budget Configuration' ),
+	        __( 'Budget Configuration','pbc' ),
 	        array($this,'render_budget_configuration'),
 	        'enquiry',
 	        'normal',
@@ -714,8 +714,8 @@ class PBCPlugin
 			<thead>
 				<tr>
 					<th style="width:20%" class="sn">#</th>
-					<th style="width:50%" class="phase-variation">Phase/Variation</th>
-					<th style="width:30%" class="price">Price</th>
+					<th style="width:50%" class="phase-variation"><?php _e('Phase/Variation','pbc');?></th>
+					<th style="width:30%" class="price"><?php _e('Price','pbc');?></th>
 				</tr>
 			</thead>
 			<tbody>
