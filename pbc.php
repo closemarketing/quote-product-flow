@@ -676,7 +676,7 @@ class PBCPlugin
 
 		add_meta_box(
 	        'enquiry-details',
-	        __( 'Enquiry Details' ),
+	        __( 'Enquiry Details','pbc' ),
 	        array($this,'render_enquiry_details'),
 	        'enquiry',
 	        'normal',
@@ -685,7 +685,7 @@ class PBCPlugin
 
 		add_meta_box(
 	        'configuration-details',
-	        __( 'Budget Configuration' ),
+	        __( 'Budget Configuration','pbc' ),
 	        array($this,'render_budget_configuration'),
 	        'enquiry',
 	        'normal',
