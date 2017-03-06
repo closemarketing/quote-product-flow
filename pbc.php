@@ -406,7 +406,7 @@ class PBCPlugin
 				<?php
 					$admin_email_notification = get_option('pbc_admin_email_notification');
 				?>
-				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if($admin_email_notification) echo $admin_email_notification;?>" placeholder="separate multiple emails by comma" />
+				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if($admin_email_notification) echo $admin_email_notification;?>" placeholder="<?php _e("separate multiple emails by comma", 'pbc');?>" />
 			</fieldset>
 		</div>
 
@@ -702,11 +702,11 @@ class PBCPlugin
 	    );
 	}
 	public function render_enquiry_details($post){?>
-		<div><label>Name: <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
-		<div><label>Phone: <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
-		<div><label>Email: <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
-		<div><label>City: <?php echo get_post_meta($post->ID, 'pbc_enquiry_city',true);?></label></div>
-		<div><label>State: <?php echo get_post_meta($post->ID, 'pbc_enquiry_state',true);?></label></div>
+		<div><label><?php _e('Name:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
+		<div><label><?php _e('Phone:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
+		<div><label><?php _e('Email:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
+		<div><label><?php _e('City:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_city',true);?></label></div>
+		<div><label><?php _e('State:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_state',true);?></label></div>
 	<?php
 	}
 	public function render_budget_configuration($post){?>

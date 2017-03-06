@@ -645,7 +645,7 @@ if(empty($cStep)) $cStep = 1;
                                     <input type="text" name="name_field" style="width:150px;" placeholder="<?php _e('Your name','pbc');?>"/>
                                     <input type="text" name="phone_field" style="width:150px;" placeholder="<?php _e('Phone number','pbc');?>"/><br/>
                                     <input type="text" name="city_field" style="width:150px;" placeholder="<?php _e('Your City','pbc');?>"/>
-                                    <input type="text" name="state_field" style="width:150px;" placeholder="<?php _e('Phone State','pbc');?>"/><br/>
+                                    <input type="text" name="state_field" style="width:150px;" placeholder="<?php _e('State','pbc');?>"/><br/>
                                     <button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
                                 </div>
                                 <?php }?>
