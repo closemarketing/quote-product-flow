@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2017-03-17 09:34+0100\n"
+"POT-Creation-Date: 2017-03-17 09:52+0100\n"
 "PO-Revision-Date: 2016-08-26 22:27+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
@@ -388,6 +388,26 @@ msgstr ""
 msgid "All Phases"
 msgstr ""
 
+#: pbc.php:1130
+msgid "Email field empty!"
+msgstr ""
+
+#: pbc.php:1132
+msgid "Name field is empty!"
+msgstr ""
+
+#: pbc.php:1134
+msgid "Phone field is empty!"
+msgstr ""
+
+#: pbc.php:1144 pbc.php:1252
+msgid "Configurator not ready!"
+msgstr ""
+
+#: pbc.php:1146
+msgid "Budget Configurator"
+msgstr ""
+
 #: pbc.php:1147
 msgid "Enquiry details:"
 msgstr ""
@@ -396,12 +416,12 @@ msgstr ""
 msgid "Configuration details:"
 msgstr ""
 
-#: pbc.php:1240
-msgid "Error in sending mail. Please try again!"
+#: pbc.php:1170
+msgid "Total:"
 msgstr ""
 
-#: pbc.php:1252
-msgid "Configurator not ready!"
+#: pbc.php:1240
+msgid "Error in sending mail. Please try again!"
 msgstr ""
 
 #: pbc.php:1418

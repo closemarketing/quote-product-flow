@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
-"POT-Creation-Date: 2017-03-17 09:34+0100\n"
+"POT-Creation-Date: 2017-03-17 09:52+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: \n"
@@ -380,6 +380,26 @@ msgstr "Imágenes de producto"
 msgid "All Phases"
 msgstr "Todas las Fases"
 
+#: pbc.php:1130
+msgid "Email field empty!"
+msgstr "El campo de correo está vacío."
+
+#: pbc.php:1132
+msgid "Name field is empty!"
+msgstr "El campo de nombre está vacío."
+
+#: pbc.php:1134
+msgid "Phone field is empty!"
+msgstr "El campo de teléfono está vacío."
+
+#: pbc.php:1144 pbc.php:1252
+msgid "Configurator not ready!"
+msgstr "¡Configurador no está funcionando!"
+
+#: pbc.php:1146
+msgid "Budget Configurator"
+msgstr "Configurador Presupuestos"
+
 #: pbc.php:1147
 msgid "Enquiry details:"
 msgstr "Detalles del Presupuesto:"
@@ -388,13 +408,13 @@ msgstr "Detalles del Presupuesto:"
 msgid "Configuration details:"
 msgstr "Detalles de configuración:"
 
+#: pbc.php:1170
+msgid "Total:"
+msgstr "Total:"
+
 #: pbc.php:1240
 msgid "Error in sending mail. Please try again!"
 msgstr "Error enviando el email, por favor intenta mas tarde."
-
-#: pbc.php:1252
-msgid "Configurator not ready!"
-msgstr "¡Configurador no está funcionando!"
 
 #: pbc.php:1418
 msgid "Create List Price"
@@ -924,9 +944,6 @@ msgstr "closemarketing"
 
 #~ msgid "Details of Your Selection"
 #~ msgstr "Detalles de tu selección"
-
-#~ msgid "Total:"
-#~ msgstr "Total:"
 
 #~ msgid "Options for Variation"
 #~ msgstr "Opciones para la variación"

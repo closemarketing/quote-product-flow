@@ -1127,11 +1127,11 @@ class PBCPlugin
 	public function configurator_result_email_send($post_requests){
 		extract($post_requests);
 		if(!$email_field){
-			$result = array('type'=>'error', 'response'=>'Email field empty!');
+			$result = array('type'=>'error', 'response'=>__('Email field empty!','pbc') );
 		}elseif(!$name_field){
-			$result = array('type'=>'error', 'response'=>'Name field is empty!');
+			$result = array('type'=>'error', 'response'=>__('Name field is empty!','pbc') );
 		}elseif(!$phone_field){
-			$result = array('type'=>'error', 'response'=>'Phone field is empty!');
+			$result = array('type'=>'error', 'response'=>__('Phone field is empty!','pbc') );
 		}else{
 			$emails = explode(',', $email_field);
 			$admin_emails = get_option('pbc_admin_email_notification');
@@ -1141,9 +1141,9 @@ class PBCPlugin
 			}
 			$emails = array_map('trim', $emails);
 			if(!isset($_SESSION['pbc_variation'])){
-				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
+				$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc') );
 			}else{
-				$subject = get_option('blogname').' Budget Configurator';
+				$subject = __('Budget Configurator','pbc').' - '.get_option('blogname');
 				$message .= '<div><h2>'.__('Enquiry details:','pbc').'</h2><br/><strong>'.__('Name:','pbc').'</strong>'.$name_field.'<br/><strong>'.__('Email:','pbc').'</strong>'.$email_field.'<br/><strong>'.__('Phone:','pbc').'</strong>'.$phone_field.'<br/><strong>'.__('City:','pbc').'</strong>'.$city_field.'<br/><strong>'.__('State:','pbc').'</strong>'.$state_field.'<br/><br/></div>';
 				$message = '<h4>'.__('Configuration details:','pbc').'</h4>'.'<br>';
 				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
@@ -1167,7 +1167,7 @@ class PBCPlugin
 				if($total_price && $logged_in) $total_price = $total_price.' €';
 				else $total_price = '-';
 				$message .= '<tr>';
-				$message .= '<td>&nbsp;</td><td>Total: </td>';
+				$message .= '<td>&nbsp;</td><td>'.__('Total:','pbc').'</td>';
 				$message .= '<td>'.$total_price.'</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
