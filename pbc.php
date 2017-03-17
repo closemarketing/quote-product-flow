@@ -358,7 +358,7 @@ class PBCPlugin
 				if(!empty($pages))
 				{
 					echo '<select name="select_budget_page">
-						<option value="">Select a Page</option>';
+						<option value="">'.__('Select a Page','pbc').'</option>';
 					foreach ( $pages as $page ) {
 						$option = '<option value="' .( $page->ID ) . '"';
 						$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
@@ -1144,7 +1144,7 @@ class PBCPlugin
 				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
 			}else{
 				$subject = get_option('blogname').' Budget Configurator';
-				$message .= '<div><h2>Enquiry details:</h2><br/><strong>Name:</strong>'.$name_field.'<br/><strong>Email:</strong>'.$email_field.'<br/><strong>Phone:</strong>'.$phone_field.'<br/><strong>City:</strong>'.$city_field.'<br/><strong>State:</strong>'.$state_field.'<br/><br/></div>';
+				$message .= '<div><h2>'.__('Enquiry details:','pbc').'</h2><br/><strong>'.__('Name:','pbc').'</strong>'.$name_field.'<br/><strong>'.__('Email:','pbc').'</strong>'.$email_field.'<br/><strong>'.__('Phone:','pbc').'</strong>'.$phone_field.'<br/><strong>'.__('City:','pbc').'</strong>'.$city_field.'<br/><strong>'.__('State:','pbc').'</strong>'.$state_field.'<br/><br/></div>';
 				$message = '<h4>'.__('Configuration details:','pbc').'</h4>'.'<br>';
 				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 				$total_price = '';
