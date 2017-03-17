@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2017-03-06 14:15+0100\n"
+"POT-Creation-Date: 2017-03-17 09:34+0100\n"
 "PO-Revision-Date: 2016-08-26 22:27+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
@@ -139,6 +139,10 @@ msgstr ""
 
 #: pbc.php:354
 msgid "Budget Configurator Page"
+msgstr ""
+
+#: pbc.php:361
+msgid "Select a Page"
 msgstr ""
 
 #: pbc.php:371
@@ -340,23 +344,23 @@ msgstr ""
 msgid "Budget Configuration"
 msgstr ""
 
-#: pbc.php:705
+#: pbc.php:705 pbc.php:1147
 msgid "Name:"
 msgstr ""
 
-#: pbc.php:706
+#: pbc.php:706 pbc.php:1147
 msgid "Phone:"
 msgstr ""
 
-#: pbc.php:707
+#: pbc.php:707 pbc.php:1147
 msgid "Email:"
 msgstr ""
 
-#: pbc.php:708
+#: pbc.php:708 pbc.php:1147
 msgid "City:"
 msgstr ""
 
-#: pbc.php:709
+#: pbc.php:709 pbc.php:1147
 msgid "State:"
 msgstr ""
 
@@ -382,6 +386,10 @@ msgstr ""
 
 #: pbc.php:892
 msgid "All Phases"
+msgstr ""
+
+#: pbc.php:1147
+msgid "Enquiry details:"
 msgstr ""
 
 #: pbc.php:1148

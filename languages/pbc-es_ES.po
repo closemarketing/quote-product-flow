@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
-"POT-Creation-Date: 2017-03-06 14:16+0100\n"
+"POT-Creation-Date: 2017-03-17 09:34+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: \n"
@@ -132,6 +132,10 @@ msgstr "Número de variaciones"
 #: pbc.php:354
 msgid "Budget Configurator Page"
 msgstr "Página Configurador"
+
+#: pbc.php:361
+msgid "Select a Page"
+msgstr "Selecciona una página"
 
 #: pbc.php:371
 msgid "or"
@@ -332,23 +336,23 @@ msgstr "Detalles del Presupuesto"
 msgid "Budget Configuration"
 msgstr "Configuración del presupuesto"
 
-#: pbc.php:705
+#: pbc.php:705 pbc.php:1147
 msgid "Name:"
 msgstr "Nombre:"
 
-#: pbc.php:706
+#: pbc.php:706 pbc.php:1147
 msgid "Phone:"
 msgstr "Teléfono:"
 
-#: pbc.php:707
+#: pbc.php:707 pbc.php:1147
 msgid "Email:"
 msgstr "Correo:"
 
-#: pbc.php:708
+#: pbc.php:708 pbc.php:1147
 msgid "City:"
 msgstr "Ciudad:"
 
-#: pbc.php:709
+#: pbc.php:709 pbc.php:1147
 msgid "State:"
 msgstr "Provincia:"
 
@@ -375,6 +379,10 @@ msgstr "Imágenes de producto"
 #: pbc.php:892
 msgid "All Phases"
 msgstr "Todas las Fases"
+
+#: pbc.php:1147
+msgid "Enquiry details:"
+msgstr "Detalles del Presupuesto:"
 
 #: pbc.php:1148
 msgid "Configuration details:"
@@ -922,9 +930,6 @@ msgstr "closemarketing"
 
 #~ msgid "Options for Variation"
 #~ msgstr "Opciones para la variación"
-
-#~ msgid "Select a Phase"
-#~ msgstr "Seleccione una fase"
 
 #~ msgid "SKU"
 #~ msgstr "Referencia"
