@@ -276,6 +276,8 @@ class PBCPlugin
 			}
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
 			update_option( 'variations_images_flipped', $variations_images_flipped );
+			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array('');
+			update_option( 'pbc_admin_email_notification', $admin_email_notification );
 		}
 	?>
 		<div class='wrap'>
@@ -356,7 +358,7 @@ class PBCPlugin
 				if(!empty($pages))
 				{
 					echo '<select name="select_budget_page">
-						<option value="">Select a Page</option>';
+						<option value="">'.__('Select a Page','pbc').'</option>';
 					foreach ( $pages as $page ) {
 						$option = '<option value="' .( $page->ID ) . '"';
 						$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
@@ -398,6 +400,13 @@ class PBCPlugin
 						echo '</select>';
 					}
 				?>
+			</fieldset>
+			<fieldset>
+				<label class="block" for="admin_email_notification"><?php _e("Email Notification", 'pbc');?></label>
+				<?php
+					$admin_email_notification = get_option('pbc_admin_email_notification');
+				?>
+				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if($admin_email_notification) echo $admin_email_notification;?>" placeholder="<?php _e("separate multiple emails by comma", 'pbc');?>" />
 			</fieldset>
 		</div>
 
@@ -693,9 +702,11 @@ class PBCPlugin
 	    );
 	}
 	public function render_enquiry_details($post){?>
-		<div><label>Name: <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
-		<div><label>Phone: <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
-		<div><label>Email: <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
+		<div><label><?php _e('Name:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
+		<div><label><?php _e('Phone:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
+		<div><label><?php _e('Email:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
+		<div><label><?php _e('City:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_city',true);?></label></div>
+		<div><label><?php _e('State:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_state',true);?></label></div>
 	<?php
 	}
 	public function render_budget_configuration($post){?>
@@ -703,8 +714,8 @@ class PBCPlugin
 			<thead>
 				<tr>
 					<th style="width:20%" class="sn">#</th>
-					<th style="width:50%" class="phase-variation">Phase/Variation</th>
-					<th style="width:30%" class="price">Price</th>
+					<th style="width:50%" class="phase-variation"><?php _e('Phase/Variation','pbc');?></th>
+					<th style="width:30%" class="price"><?php _e('Price','pbc');?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -952,7 +963,7 @@ class PBCPlugin
 					        $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
 					        $html2pdf->setTestTdInOnePage(false);
 					        $html2pdf->writeHTML($content['response']);
-					        $html2pdf->Output("Budget Configurator ".date('Y-m-d H:i').".pdf");
+					        $html2pdf->Output("Budget Configurator ".date('Y-m-d H:i').".pdf","D");
 					        //$html2pdf->close();
 					    } catch (Html2PdfException $e) {
 					        $formatter = new ExceptionFormatter($e);
@@ -1116,14 +1127,25 @@ class PBCPlugin
 	public function configurator_result_email_send($post_requests){
 		extract($post_requests);
 		if(!$email_field){
-			$result = array('type'=>'error', 'response'=>'Email field empty!');
+			$result = array('type'=>'error', 'response'=>__('Email field empty!','pbc') );
+		}elseif(!$name_field){
+			$result = array('type'=>'error', 'response'=>__('Name field is empty!','pbc') );
+		}elseif(!$phone_field){
+			$result = array('type'=>'error', 'response'=>__('Phone field is empty!','pbc') );
 		}else{
 			$emails = explode(',', $email_field);
+			$admin_emails = get_option('pbc_admin_email_notification');
+			if($admin_emails){
+				$admin_emails = explode(',', $admin_emails);
+				$emails = array_merge($emails, $admin_emails);
+			}
+			$emails = array_map('trim', $emails);
 			if(!isset($_SESSION['pbc_variation'])){
-				$result = array('type'=>'error', 'response'=>'Configurator not ready!');
+				$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc') );
 			}else{
-				$subject = get_option('blogname').' Budget Configurator';
-				$message = '<h3>'.__('Here are the details of your selection:','pbc').'</h3>'.'<br>';
+				$subject = __('Budget Configurator','pbc').' - '.get_option('blogname');
+				$message = '<div><h2>'.__('Enquiry details:','pbc').'</h2><br/><strong>'.__('Name:','pbc').'</strong>'.$name_field.'<br/><strong>'.__('Email:','pbc').'</strong>'.$email_field.'<br/><strong>'.__('Phone:','pbc').'</strong>'.$phone_field.'<br/><strong>'.__('City:','pbc').'</strong>'.$city_field.'<br/><strong>'.__('State:','pbc').'</strong>'.$state_field.'<br/><br/></div>';
+				$message .= '<h4>'.__('Configuration details:','pbc').'</h4>'.'<br>';
 				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
 				$total_price = '';
 				$logged_in = is_user_logged_in();
@@ -1145,7 +1167,7 @@ class PBCPlugin
 				if($total_price && $logged_in) $total_price = $total_price.' €';
 				else $total_price = '-';
 				$message .= '<tr>';
-				$message .= '<td>&nbsp;</td><td>Total: </td>';
+				$message .= '<td>&nbsp;</td><td>'.__('Total:','pbc').'</td>';
 				$message .= '<td>'.$total_price.'</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
@@ -1195,19 +1217,20 @@ class PBCPlugin
 				);
 				$post_id = wp_insert_post( $my_post );
 				if($post_id){
+					update_post_meta($post_id, 'pbc_enquiry_name',$name_field);
+					update_post_meta($post_id, 'pbc_enquiry_phone',$phone_field);
+					update_post_meta($post_id, 'pbc_enquiry_email',$email_field);
+					update_post_meta($post_id, 'pbc_enquiry_city',$city_field);
+					update_post_meta($post_id, 'pbc_enquiry_state',$state_field);
 					if(!empty($enquiry_entries)){
 						$i=0;
 						foreach($enquiry_entries as $entries){
 							update_post_meta($post_id, 'pbc_phase_var_'.$i,$entries['phase_var']);
 							update_post_meta($post_id, 'pbc_price_'.$i,$entries['price']);
-							update_post_meta($post_id, 'pbc_enquiry_name',$name_field);
-							update_post_meta($post_id, 'pbc_enquiry_phone',$phone_field);
-							update_post_meta($post_id, 'pbc_enquiry_email',$email_field);
 							$i++;
 						}
 					}
 				}
-
 
 				function set_html_content_type() {
 					return 'text/html';
@@ -1449,6 +1472,7 @@ class PBCPlugin
 			$ids = explode(',',$ids);
 		}*/
 
+		ini_set('max_execution_time', 0);
 		ob_start();
 		/*Content of PDF file*/
 		?>
