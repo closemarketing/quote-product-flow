@@ -3,7 +3,7 @@
  * Plugin Name: Product Budget Configurator
  * Plugin URI:  https://close.technology/wordpress-plugins/product-budget-configurator/
  * Description: Creates a configurator for complex products and makes a budget.
- * Version:     1.1
+ * Version:     1.1.0-beta.1
  * Author:      Closetechnology
  * Author URI:  https://close.technology
  * Text Domain: pbc

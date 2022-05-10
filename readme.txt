@@ -2,9 +2,9 @@
 Contributors: closemarketing, davidperez
 Tags: budget, configurator
 Requires at least: 4.0
-Tested up to: 4.5.3
-Stable tag: 1.0
-Version: 1.0
+Tested up to: 6.0
+Stable tag: 1.1.0-beta.1
+Version: 1.1.0-beta.1
 =======
 
 Creates a configurator with all variables.
@@ -23,9 +23,6 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 
 == Links ==
-*	[Closemarketing](https://www.closemarketing.es/)
+*	[Closemarketing](https://close.marketing/)
+*	[Closetechnology](https://close.technology/)
 
-
-== Closemarketing plugins ==
-*	[Send SMS to WordPress Users via Arsys](http://wordpress.org/plugins/send-sms-arsys/)
-*	[Clean HTML Code in the Editor](http://wordpress.org/plugins/clean-html/)
