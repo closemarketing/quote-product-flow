@@ -667,25 +667,22 @@ if ( ! empty( $phases ) ) {
 			</div>
 			<?php if($cStep == 'calculate'){?>
 				<div class="configurator_result_share">
-						<button type="submit" name="submit" class="btn btn-share" value="result_email"><?php _e('Email','pbc');?></button>
-						<a href="?phase=calculate&amp;configurator=pdf" target="_blank" class="btn btn-share" title="Generate PDF"><?php _e('PDF','pbc');?></a>
-						<?php if(isset($_POST['submit']) && ($_POST['submit'] == 'result_email' || $_POST['submit'] == 'email_send')){?>
-							<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
-							<div class="email_submit_fields">
-								<input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/><br/>
-								<input type="text" name="name_field" style="width:150px;" placeholder="<?php _e('Your name','pbc');?>"/>
-								<input type="text" name="phone_field" style="width:150px;" placeholder="<?php _e('Phone number','pbc');?>"/><br/>
-								<input type="text" name="city_field" style="width:150px;" placeholder="<?php _e('Your City','pbc');?>"/>
-								<input type="text" name="state_field" style="width:150px;" placeholder="<?php _e('State','pbc');?>"/><br/>
-								<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
-							</div>
-							<?php }?>
-							<?php if(isset($_SESSION['pbc_output'])){?>
-								<div class="result_submit_action <?php echo $_SESSION['pbc_output']['type'];?>">
-										<?php echo $_SESSION['pbc_output']['response'];?>
-								</div>
-							<?php unset($_SESSION['pbc_output']);}?>
-						<?php }?>
+					<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
+					<div class="email_submit_fields">
+						<h2><?php esc_html('Send the budget to an email:', 'pbc' ); ?></h2>
+						<input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/><br/>
+						<input type="text" name="name_field" style="width:150px;" placeholder="<?php _e('Your name','pbc');?>"/>
+						<input type="text" name="phone_field" style="width:150px;" placeholder="<?php _e('Phone number','pbc');?>"/><br/>
+						<input type="text" name="city_field" style="width:150px;" placeholder="<?php _e('Your City','pbc');?>"/>
+						<input type="text" name="state_field" style="width:150px;" placeholder="<?php _e('State','pbc');?>"/><br/>
+						<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
+					</div>
+					<?php }?>
+					<?php if(isset($_SESSION['pbc_output'])){?>
+						<div class="result_submit_action <?php echo $_SESSION['pbc_output']['type'];?>">
+								<?php echo $_SESSION['pbc_output']['response'];?>
+						</div>
+					<?php unset($_SESSION['pbc_output']);}?>
 				</div>
 			<?php }?>
 		<?php if($cStep != 'calculate'){?>
@@ -694,64 +691,70 @@ if ( ! empty( $phases ) ) {
 		</form>
 	</div>
 
-	<?php if(!defined('DOING_AJAX')){?>
+	<?php
+	if ( ! defined( 'DOING_AJAX' ) ) {
+		$show_prices = get_option( 'pbc_budget_show_prices' );
+	?>
 	<script type="text/javascript">
 	jQuery(function($){
 			$(document).on('click', 'input[type=radio].pbc_variation', function(){
 				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
 				var cPhase = $('input[name=pbc_current_phase]').val();
+				var show_prices = '<?php echo $show_prices; ?>';
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
 					type: 'POST',
 					data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
 					dataType: "html",
 					success: function(response) {
-							var resArr = response.split(';;--;;');
-							var obj = jQuery.parseJSON(resArr[1]);
-							if(obj.type == 'error'){
-								$('.product_preview').find('.product_preview_status').html('<div>'+obj.msg+'</div>').show().delay(4000, function(){
-									window.setTimeout( function(){
-											$('.product_preview').find('.product_preview_status').html('').addClass('hidden');
-									}, 1000 );
-								});
-							}else if(obj.type == 'success'){
-								$('.product_preview').find('.product_preview_status').addClass('hidden');
-								if(obj.url){
-									if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
-											$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
-									}else{
-											if(obj.flipped)
-												var className = 'flipped';
-											else className = '';
-											$('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
-									}
+						var resArr = response.split(';;--;;');
+						var obj = jQuery.parseJSON(resArr[1]);
+						if(obj.type == 'error'){
+							$('.product_preview').find('.product_preview_status').html('<div>'+obj.msg+'</div>').show().delay(4000, function(){
+								window.setTimeout( function(){
+										$('.product_preview').find('.product_preview_status').html('').addClass('hidden');
+								}, 1000 );
+							});
+						}else if(obj.type == 'success'){
+							$('.product_preview').find('.product_preview_status').addClass('hidden');
+							if(obj.url){
+								if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
+										$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
+								}else{
+										if(obj.flipped)
+											var className = 'flipped';
+										else className = '';
+										$('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
 								}
-								else
-									if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
-											$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').remove();
-									}
-								if(obj.flipped){
-									$('.product_preview').find('.image-wrap img').each(function(){
-											if(!$(this).hasClass('flipped'))
-											$(this).addClass('flipped');
-									});
-								}
-								else{
-									$('.product_preview').find('.image-wrap img').each(function(){
-											if($(this).hasClass('flipped'))
-											$(this).removeClass('flipped');
-									});
-								}
-								if(obj.option || obj.price){
-									if($('.variation_selected.phase-'+cPhase).length == 0){
-											$('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
-									}else{
-											$('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
-											$('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
-									}
-								}
-
 							}
+							else
+								if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
+										$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').remove();
+								}
+							if(obj.flipped){
+								$('.product_preview').find('.image-wrap img').each(function(){
+										if(!$(this).hasClass('flipped'))
+										$(this).addClass('flipped');
+								});
+							}
+							else{
+								$('.product_preview').find('.image-wrap img').each(function(){
+										if($(this).hasClass('flipped'))
+										$(this).removeClass('flipped');
+								});
+							}
+							if(obj.option || obj.price){
+								if($('.variation_selected.phase-'+cPhase).length == 0){
+										$('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
+								}else{
+										$('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
+									if ( show_prices !== 'no' ) {
+										$('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
+									}
+								}
+							}
+
+						}
 					}
 				});
 			});
@@ -804,8 +807,10 @@ if ( ! empty( $phases ) ) {
 									if($('.variation_selected.phase-'+cPhase).length == 0){
 											$('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
 									}else{
-											$('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
+										$('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
+										if ( show_prices !== 'no' ) {
 											$('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
+										}
 									}
 								}
 
