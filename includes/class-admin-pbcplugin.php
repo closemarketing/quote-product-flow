@@ -219,15 +219,18 @@ class Admin_PBCPlugin {
 
     public function pbc_display_admin_page(){
 
-		if(isset($_POST['form_submit']))
-		{
-			if(isset($_POST['select_budget_page'])){
-				update_option('pbc_budget_configurator_page', $_POST['select_budget_page']);
-				$update = __("Successfully Saved!",'pbc');
+		if ( isset( $_POST['form_submit'] ) ) {
+			if ( isset( $_POST['select_budget_page'] ) ) {
+				update_option( 'pbc_budget_configurator_page', $_POST['select_budget_page'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}
+			if ( isset( $_POST['option_show_prices'] ) ) {
+				update_option( 'pbc_budget_show_prices', $_POST['option_show_prices'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
 			}
 			if ( isset( $_POST['pdf_image_selected'] ) ){
 				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
-				$update = __("Successfully Saved!",'pbc');
+				$update = __( 'Successfully Saved!', 'pbc' );
 			}
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
 			update_option( 'variations_images_flipped', $variations_images_flipped );
@@ -365,9 +368,22 @@ class Admin_PBCPlugin {
 			<fieldset>
 				<label class="block" for="admin_email_notification"><?php _e("Email Notification", 'pbc');?></label>
 				<?php
-					$admin_email_notification = get_option('pbc_admin_email_notification');
+					$admin_email_notification = get_option( 'pbc_admin_email_notification' );
 				?>
-				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if($admin_email_notification) echo $admin_email_notification;?>" placeholder="<?php _e("separate multiple emails by comma", 'pbc');?>" />
+				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if( $admin_email_notification ) echo $admin_email_notification; ?>" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+			</fieldset>
+			<fieldset>
+				<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
+				<?php
+				$show_prices = get_option( 'pbc_budget_show_prices' );
+				$pages = get_pages();
+				if ( ! empty( $pages ) ) {
+					echo '<select name="option_show_prices">';
+					echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . __( 'Yes', 'pbc' ) . '</option>';
+					echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . __( 'No', 'pbc' ) . '</option>';
+					echo '</select>';
+				}
+				?>
 			</fieldset>
 		</div>
 

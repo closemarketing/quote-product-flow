@@ -2,8 +2,7 @@
 /*
  * Template Name: Budget Configurator
  */
-?>
-<?php
+
 if ( session_id() == '' ) {
 	ob_start();
 	session_start();
@@ -76,7 +75,7 @@ if ( empty( $cStep ) ) {
 	$cStep = 1;
 }
 ?>
-<?php if(!defined('DOING_AJAX')) get_header(); ?>
+<?php if ( ! defined( 'DOING_AJAX' ) ) get_header(); ?>
 <?php
 if ( ! defined( 'DOING_AJAX' ) ) {
 	?>
@@ -637,21 +636,25 @@ if ( ! empty( $phases ) ) {
 							<tr class="variation_selected phase-<?php echo $phaseKey;?>">
 								<td class="name"><?php  echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
 								<td class="price">
-										<?php
-											if($varPrice && $logged_in) echo $varPrice.' €';
-											else echo '-';
-										?>
+									<?php
+									$show_prices = get_option( 'pbc_budget_show_prices' );
+									if ( ( $varPrice && $logged_in ) || 'no' !== $show_prices ) {
+										echo $varPrice.' €';
+									}
+									?>
 								</td>
 							</tr>
 						<?php }?>
-						<?php if($cStep == 'calculate'){?>
+						<?php
+						if ( $cStep == 'calculate' ) { ?>
 							<tr class="variation_selected phase-total_price">
 								<td class="name"><?php _e('Total','pbc');?></td>
 								<td class="price">
-										<?php
-											if($total_price && $logged_in) echo $total_price.' €';
-											else echo '-';
-										?>
+									<?php
+									if ( ( $varPrice && $logged_in ) || 'no' !== $show_prices ) {
+										echo $varPrice.' €';
+									}
+									?>
 								</td>
 							</tr>
 							<tr class="variation_selected phase-total_price">
