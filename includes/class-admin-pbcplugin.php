@@ -163,34 +163,29 @@ class Admin_PBCPlugin {
 		);
 
 		$submenu_pages = array(
-			// Avoid duplicate pages. Add submenu page with same slug as parent slug.
 			array(
 				'parent_slug' => 'pbc_menu',
-				'page_title'  => __('Product Budget Configurator','pbc'),
-				'menu_title'  => __('Settings','pbc'),
-				'capability'    => 'manage_options',
-				'menu_slug'     => 'pbc_menu',
-				'function'      => array( $this, 'pbc_display_admin_page' ),// Uses the same callback function as parent menu.
+				'page_title'  => __( 'Product Budget Configurator', 'pbc' ),
+				'menu_title'  => __( 'Settings', 'pbc' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'pbc_menu',
+				'function'    => array( $this, 'pbc_display_admin_page' ),
 			),
-
-			// Post Type :: View All Posts
 			array(
-				'parent_slug'   => 'pbc_menu',
-				'page_title'    => __('Phases of Configurator','pbc'),
-				'menu_title'    => __('Phases','pbc'),
-				'capability'    => 'manage_options',
-				'menu_slug'     => 'edit.php?post_type=phases',
-				'function'      => null,// Doesn't need a callback function.
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __( 'Phases of Configurator', 'pbc' ),
+				'menu_title'  => __( 'Phases', 'pbc' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'edit.php?post_type=phases',
+				'function'    => null,
 			),
-
-			// Post Type :: View All Posts
 			array(
-			'parent_slug'   => 'pbc_menu',
-			'page_title'    => __('Variations in Phases','pbc'),
-			'menu_title'    => __('Variations','pbc'),
-			'capability'    => 'manage_options',
-			'menu_slug'     => 'edit.php?post_type=variation',
-			'function'      => null,// Doesn't need a callback function.
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __('Variations in Phases','pbc'),
+				'menu_title'  => __('Variations','pbc'),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'edit.php?post_type=variation',
+				'function'    => null,
 			),
 			// Post Type :: View All Posts.
 			array(
@@ -282,21 +277,29 @@ class Admin_PBCPlugin {
 			<th class="phases-col"><?php esc_html_e( 'Phases', 'pbc' ); ?></th>
 			<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' );?></th>
 		</tr>
-		<?php $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
-		if(!empty($phases)){
-			foreach($phases as $phase){?>
+		<?php
+		$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+		if ( ! empty( $phases ) ) {
+			foreach ( $phases as $phase ) {
+				?>
 				<tr>
-					<td class="order-col"><?php echo $phase->menu_order;?></td>
-					<td class="phases-col"><?php echo $phase->post_title;?></td>
-					<td class="variations-col"><?php $variations = get_posts('posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value='.$phase->ID.'&fields=ids');
-					if(!empty($variations)) echo count($variations);
-					?></td>
+					<td class="order-col"><?php echo esc_html( $phase->menu_order ); ?></td>
+					<td class="phases-col"><?php echo esc_html( $phase->post_title ); ?></td>
+					<td class="variations-col">
+						<?php
+						$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase->ID . '&fields=ids' );
+						if ( ! empty( $variations ) ) {
+							echo count( $variations );
+						}
+						?>
+					</td>
 				</tr>
-			<?php
+				<?php
 			}
-		}?>
+		}
+		?>
 	</table>
-    <?php
+   <?php
 	}
 
 	/**
@@ -310,12 +313,11 @@ class Admin_PBCPlugin {
 	<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
 		<div class="content">
 			<fieldset>
-				<label class="block" for="select_budget_page"><?php _e("Budget Configurator Page", 'pbc');?></label>
+				<label class="block" for="select_budget_page"><?php esc_html_e( 'Budget Configurator Page', 'pbc' ); ?></label>
 				<?php
-				$budget_configurator = get_option('pbc_budget_configurator_page');
+				$budget_configurator = get_option( 'pbc_budget_configurator_page' );
 				$pages = get_pages();
-				if(!empty($pages))
-				{
+				if ( ! empty( $pages ) ) {
 					echo '<select name="select_budget_page">
 						<option value="">'.__('Select a Page','pbc').'</option>';
 					foreach ( $pages as $page ) {
@@ -333,9 +335,9 @@ class Admin_PBCPlugin {
 				<label class="block" for="select_PDF_image"><?php _e("Set PDF Image", 'pbc');?></label>
 				<?php
 					wp_enqueue_media();
-					$pdf_image_selected = get_option('pbc_pdf_image_selected');
+					$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 				?>
-				<input type="text" name="pdf_image_selected" value="<?php if($pdf_image_selected) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
+				<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
 			</fieldset>
 			<fieldset>
 				<br/>
@@ -371,7 +373,7 @@ class Admin_PBCPlugin {
 
 		<div class="save_bar">
 			<input type="hidden" name="form_submit" value="true"/>
-			<input type="submit" value="<?php _e('Save', 'pbc');?>" class="button button-primary submit-button" />
+			<input type="submit" value="<?php esc_html_e( 'Save', 'pbc' ); ?>" class="button button-primary submit-button" />
 		</div>
 	</form>
     <?php
