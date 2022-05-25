@@ -355,7 +355,7 @@ if ( ! empty( $phases ) ) {
 		if($cStep !='calculate'){
 			$phase_id = $phases[((int)$cStep-1)];?>
 			<div class="configurator-left">
-				<div class="phase_title"><?php echo get_the_title($phase_id);?></div>
+				<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
 				<div class="phase_content">
 						<?php $post_object = get_post( $phase_id );
 							echo $post_object->post_content;?>

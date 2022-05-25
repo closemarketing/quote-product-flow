@@ -181,8 +181,8 @@ class Admin_PBCPlugin {
 			),
 			array(
 				'parent_slug' => 'pbc_menu',
-				'page_title'  => __('Variations in Phases','pbc'),
-				'menu_title'  => __('Variations','pbc'),
+				'page_title'  => __( 'Variations in Phases', 'pbc' ),
+				'menu_title'  => __( 'Variations', 'pbc' ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => 'edit.php?post_type=variation',
 				'function'    => null,
@@ -193,7 +193,7 @@ class Admin_PBCPlugin {
 				'page_title'  => __( 'Enquiries Received', 'pbc' ),
 				'menu_title'  => __( 'Enquiries', 'pbc' ),
 				'capability'  => 'manage_options',
-				'menu_slug'   => 'edit.php?post_type = enquiry',
+				'menu_slug'   => 'edit.php?post_type=enquiry',
 				'function'    => null, // Doesn't need a callback function.
 			),
 
@@ -1106,7 +1106,7 @@ class Admin_PBCPlugin {
 		}
 		die(0);
 	}
-	public function configurator_result_email_send($post_requests){
+	public function configurator_result_email_send( $post_requests ){
 		extract($post_requests);
 		if(!$email_field){
 			$result = array('type'=>'error', 'response'=>__('Email field empty!','pbc') );
@@ -1157,39 +1157,38 @@ class Admin_PBCPlugin {
 				$headers = array('Content-Type: text/html; charset=UTF-8');
 				$attachments = array('');
 
-				if (is_file(WPPBC_PLUGIN_DIR.
-                    "/lib/html2pdf/html2pdf.class.php")
-                )
-                {
-                    require_once(WPPBC_PLUGIN_DIR.
-                        '/lib/html2pdf/html2pdf.class.php');
+				if ( is_file( WPPBC_PLUGIN_DIR . "/lib/html2pdf/html2pdf.class.php" ) ) {
+               require_once ( WPPBC_PLUGIN_DIR . '/lib/html2pdf/html2pdf.class.php' );
 					if(session_id() == ''){
 						ob_start();
 					    session_start();
 					}
-					$filename = "Budget-Configurator-".date('Y-m-d-H:i').".pdf";
+					$filename   = __( 'budget', 'pbc' ) . '-' . get_bloginfo( 'name' ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
+					$dirname = $this->get_budget_path();
+					$filename_path = $dirname . $filename;
+
 					$content = $this->configurator_result_generate_pdf();
-					if($content['type'] == 'error'){
+					if ( $content['type'] == 'error' ) {
 						//error echo $content['response'];
-					}else{
+					} else {
 					    try {
 					        $width_mm = 710 * 0.2646;   //1px = 0.2646mm
 					        $height_mm = 900 * 0.2646;
 					        $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
 					        $html2pdf->setTestTdInOnePage(false);
 					        $html2pdf->writeHTML($content['response']);
-					        $html2pdf->Output(WPPBC_PLUGIN_DIR."/$filename", "F");
+					        $html2pdf->Output( $filename_path, "F");
 					        //$html2pdf->close();
-					    } catch (Html2PdfException $e) {
+					    } catch ( Html2PdfException $e ) {
 							//error
 					        //$formatter = new ExceptionFormatter($e);
 					        //echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
 					    }
 					}
-					if(is_file(WPPBC_PLUGIN_DIR."/$filename")){
-						$attachments = array(plugin_dir_path( __FILE__)."$filename");
+					if ( is_file( $filename_path ) ) {
+						$attachments = array( $filename_path );
 					}
-                }
+            }
 
 				//insert_enquiry Post
 				$my_post = array(
@@ -1198,17 +1197,17 @@ class Admin_PBCPlugin {
 					'post_type'		=> 'enquiry'
 				);
 				$post_id = wp_insert_post( $my_post );
-				if($post_id){
-					update_post_meta($post_id, 'pbc_enquiry_name',$name_field);
-					update_post_meta($post_id, 'pbc_enquiry_phone',$phone_field);
-					update_post_meta($post_id, 'pbc_enquiry_email',$email_field);
-					update_post_meta($post_id, 'pbc_enquiry_city',$city_field);
-					update_post_meta($post_id, 'pbc_enquiry_state',$state_field);
-					if(!empty($enquiry_entries)){
+				if ( $post_id ) {
+					update_post_meta( $post_id, 'pbc_enquiry_name', $name_field );
+					update_post_meta( $post_id, 'pbc_enquiry_phone', $phone_field );
+					update_post_meta( $post_id, 'pbc_enquiry_email', $email_field );
+					update_post_meta( $post_id, 'pbc_enquiry_city', $city_field );
+					update_post_meta( $post_id, 'pbc_enquiry_state', $state_field );
+					if ( ! empty( $enquiry_entries ) ) {
 						$i=0;
-						foreach($enquiry_entries as $entries){
-							update_post_meta($post_id, 'pbc_phase_var_'.$i,$entries['phase_var']);
-							update_post_meta($post_id, 'pbc_price_'.$i,$entries['price']);
+						foreach ( $enquiry_entries as $entries ) {
+							update_post_meta( $post_id, 'pbc_phase_var_' . $i, $entries['phase_var'] );
+							update_post_meta( $post_id, 'pbc_price_' . $i, $entries['price'] );
 							$i++;
 						}
 					}
@@ -1229,6 +1228,22 @@ class Admin_PBCPlugin {
 		}
 		return $result;
 	}
+
+	/**
+	 * Returns the filename created in folder
+	 *
+	 * @return string Filename and path
+	 */
+	private function get_budget_path() {
+		$upload_dir = wp_upload_dir();
+		$dir_name   = $upload_dir['basedir'] . '/pbc/';
+		if ( ! file_exists( $dir_name ) ) {
+			wp_mkdir_p( $dir_name );
+		}
+
+		return $dir_name;
+	}
+
 	public function configurator_result_generate_pdf(){
 		if(!isset($_SESSION['pbc_variation'])){
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
@@ -1320,9 +1335,10 @@ class Admin_PBCPlugin {
 						    break;
 							default:
 								//jpg, jpeg, gif others
-								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
-								list($width, $height) = getimagesize(WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
-								$img = imagecreatefrompng(WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
+								$dirname = $this->get_budget_path();
+								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), $dirname . 'product-image-for-pdf.png' );
+								list($width, $height) = getimagesize( $dirname . '/product-image-for-pdf.png' );
+								$img = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
 						}
 
 						// Flip it vertically
