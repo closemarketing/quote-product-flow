@@ -31,7 +31,9 @@ class Admin_PBCPlugin {
 
 		add_filter( 'disable_months_dropdown', array( $this, 'disable_months_dropdown' ), 10, 2 );
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
-		add_action( 'manage_phases_posts_custom_column', array( $this, 'manage_phases_columns' ), 10, 2 );
+
+		add_filter( 'manage_edit-enquiry_columns', array( $this, 'add_new_budgets_columns' ) );
+		add_action( 'manage_enquiry_posts_custom_column', array( $this, 'manage_budgets_columns' ), 10, 2 );
 
 		add_filter( 'manage_edit-variation_columns', array( $this, 'add_new_var_columns' ) );
 		add_action( 'manage_variation_posts_custom_column', array( $this, 'manage_var_columns' ), 10, 2 );
@@ -788,15 +790,24 @@ class Admin_PBCPlugin {
 	        'default'
 	    );
 	}
-	public function render_enquiry_details($post){?>
-		<div><label><?php _e('Name:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_name',true);?></label></div>
-		<div><label><?php _e('Phone:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_phone',true);?></label></div>
-		<div><label><?php _e('Email:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_email',true);?></label></div>
-		<div><label><?php _e('City:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_city',true);?></label></div>
-		<div><label><?php _e('State:', 'pbc');?> <?php echo get_post_meta($post->ID, 'pbc_enquiry_state',true);?></label></div>
+	public function render_enquiry_details( $post ) {
+		$post_id = is_object( $post ) ? $post->ID : $post; ?>
+		<div><label><?php _e('Name:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_name',true);?></label></div>
+		<div><label><?php _e('Phone:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_phone',true);?></label></div>
+		<div><label><?php _e('Email:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_email',true);?></label></div>
+		<div><label><?php _e('City:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_city',true);?></label></div>
+		<div><label><?php _e('State:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_state',true);?></label></div>
 	<?php
 	}
-	public function render_budget_configuration($post){?>
+
+	/**
+	 * Renders the budget Configuration
+	 *
+	 * @param [type] $post
+	 * @return void
+	 */
+	public function render_budget_configuration( $post ) {
+		$post_id = is_object( $post ) ? $post->ID : $post; ?>
 		<table>
 			<thead>
 				<tr>
@@ -806,16 +817,35 @@ class Admin_PBCPlugin {
 				</tr>
 			</thead>
 			<tbody>
-				<?php for($i=0;$i<16;$i++){?>
-				<tr>
-					<td class="sn"><?php echo $i;?></td>
-					<td class="phase-variation"><?php echo get_post_meta($post->ID, 'pbc_phase_var_'.$i,true);?></td>
-					<td class="price"><?php echo get_post_meta($post->ID,'pbc_price_'.$i,true);?></td>
-				</tr>
-				<?php }?>
+				<?php
+				for( $i=0; $i < 50; $i++ ) {
+					$phase_var = get_post_meta( $post_id, 'pbc_phase_var_' . $i, true );
+					if ( $phase_var ) {
+						?>
+						<tr>
+							<td class="sn"><?php echo $i;?></td>
+							<td class="phase-variation"><?php echo $phase_var; ?></td>
+							<td class="price"><?php echo get_post_meta( $post_id, 'pbc_price_' . $i, true ); ?></td>
+						</tr>
+						<?php
+					}
+				} ?>
 			</tbody>
 		</table>
 	<?php
+	}
+
+	private function get_total_from_enquiry( $post_id ) {
+		$metas = get_post_meta( $post_id );
+		$total_price = 0;
+		foreach ( $metas as $key => $value ) {
+			if ( false !== strpos( $key, 'pbc_price_' ) ) {
+				$price = isset( $value[0] ) ? (int) $value[0] : 0;
+				$total_price = $total_price + $price;
+			}
+		}
+
+		return $total_price;
 	}
 
 	/*
@@ -848,17 +878,42 @@ class Admin_PBCPlugin {
 	}
 
 
+	public function add_new_budgets_columns($phases_columns) {
+		$new_columns['cb']              = '<input type = "checkbox" />';
+		$new_columns['enquiry_name']    = __( 'Budget', 'pbc' );
+		$new_columns['enquiry_details'] = __( 'Details', 'pbc' );
+		$new_columns['enquiry_conf']    = __( 'Configuration', 'pbc' );
+		$new_columns['enquiry_date']    = __( 'Date', 'pbc' );
 
-	public function manage_phases_columns($column_name, $id) {
-	    global $wpdb, $post;
+		return $new_columns;
+	}
 
-	    switch ($column_name) {
+	/**
+	 * Manages columns for Budget
+	 *
+	 * @param string $column_name
+	 * @param integer $id
+	 * @return void
+	 */
+	public function manage_budgets_columns( $column_name, $id ) {
 
-	    case 'menu_order':
-	        echo $post->menu_order;
-	        break;
-	    default:
-	        break;
+	    switch ( $column_name) {
+			case 'enquiry_name':
+				echo '<a href="' . get_edit_post_link( $id ) . '" class="row-title">';
+				echo get_post_meta( $id, 'pbc_enquiry_name', true );
+				echo '</a>';
+				break;
+			case 'enquiry_details':
+				$this->render_enquiry_details( $id );
+				break;
+			case 'enquiry_conf':
+				echo $this->get_total_from_enquiry( $id ) . ' € ' . __( 'VAT not included', 'pbc' );
+				break;
+			case 'enquiry_date':
+				echo get_the_date( 'd-m-Y H:i', $id );
+				break;
+			default:
+				break;
 	    } // end switch
 	}
 
@@ -877,8 +932,7 @@ class Admin_PBCPlugin {
 	}
 
 
-	public function manage_var_columns($column_name, $id) {
-	    global $wpdb, $post;
+	public function manage_var_columns( $column_name, $id ) {
 
 		//* Price group
 		$price_group = rwmb_meta( 'pbc_pricegroup' );
