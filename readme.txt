@@ -21,6 +21,8 @@ WordPress installation and then activate the Plugin from Plugins page.
 = 1.1 =
 *	Coding standards.
 *  Added option to show prices.
+*  Save budgets in /uploads/pbc/
+*  Updated Metabox Group 1.3.14
 
 = 1.0 =
 *	First released.
