@@ -1337,12 +1337,12 @@ class Admin_PBCPlugin {
 								//jpg, jpeg, gif others
 								$dirname = $this->get_budget_path();
 								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), $dirname . 'product-image-for-pdf.png' );
-								list($width, $height) = getimagesize( $dirname . '/product-image-for-pdf.png' );
+								list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
 								$img = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
 						}
 
 						// Flip it vertically
-						if($flipped){
+						if ( $flipped ) {
 							imageflip($img, IMG_FLIP_HORIZONTAL);
 						}
 						imagecopyresized($outputImage,$img,0,0,0,0,300,243,$width,$height);
