@@ -50,6 +50,15 @@ class Admin_PBCPlugin {
 		add_filter( 'views_edit-variation', array( $this, 'pbc_add_print_pdf_button' ) );
 		add_action( 'admin_head-edit.php', array( $this, 'pbc_move_print_pdf_button' ) );
 		add_action( 'wp_ajax_print_pdf', array( $this, 'print_pdf_action_callback' ) );
+
+		// Creates license activation.
+		register_activation_hook( WPPBC_PLUGIN, array( $this, 'license_instance_activation' ) );
+		// Check for external connection blocking.
+		add_action( 'admin_notices', array( $this, 'check_external_blocking' ) );
+
+		if ( 'Activated' !== get_site_option( 'pbc_license_activated' ) ) {
+			add_action( 'admin_notices', array( $this, 'inactive_notice' ) );
+		}
 	}
 
 	/**
@@ -212,12 +221,12 @@ class Admin_PBCPlugin {
 		}
    }
 
-     /* If you add any extra custom sub menu pages which are not a Custom Post Type
-      * or a Custom Taxonomy, you will need to create a callback function for each
-      * of your custom submenu items you create above.
-      */
-
-    public function pbc_display_admin_page(){
+	/**
+	 * Page settings with metaboxes
+	 *
+	 * @return void
+	 */
+   public function pbc_display_admin_page(){
 
 		if ( isset( $_POST['form_submit'] ) ) {
 			if ( isset( $_POST['select_budget_page'] ) ) {
@@ -237,9 +246,18 @@ class Admin_PBCPlugin {
 			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array('');
 			update_option( 'pbc_admin_email_notification', $admin_email_notification );
 		}
-	?>
+
+		if ( isset( $_POST['submit_license'] ) ) {
+			$license_apikey = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field(  $_POST['pbc_license_apikey'] ) : '';
+			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field(  $_POST['pbc_license_product_id'] ) : '';
+
+			update_option( 'pbc_license_apikey', $license_apikey );
+			update_option( 'pbc_license_product_id', $license_product_id );
+			$this->validate_license( $_POST );
+		}
+		?>
 		<div class='wrap'>
-			<h2><?php echo $GLOBALS['title'] ?> - <?php _e('Global Settings','pbc');?></h2>
+			<h2><?php echo $GLOBALS['title'] ?> - <?php esc_html_e( 'Global Settings', 'pbc' ); ?></h2>
 
 			<?php if(isset($update)){?>
 				<div id="message" class="updated fade"><?php echo $update;?></div>
@@ -252,57 +270,92 @@ class Admin_PBCPlugin {
 				<div id="post-body">
 					<div class="postcontent-left">
 						<?php
-						add_meta_box("phases_lists_meta_box", __("All Phases Lists", "pbc"), array($this, "phases_lists_meta_box_callback"), "pbc_import_left");
-		                do_meta_boxes('pbc_import_left','advanced', null);
+						add_meta_box(
+							'phases_lists_meta_box',
+							__( 'All Phases Lists', 'pbc' ),
+							array(
+								$this,
+								'phases_lists_meta_box_callback',
+							),
+							'pbc_import_left'
+						);
+
+						add_meta_box(
+							'license_meta_box',
+							__( 'License', 'pbc' ),
+							array(
+								$this,
+								'license_meta_box_callback',
+							),
+							'pbc_import_left'
+						);
+
+						do_meta_boxes(
+							'pbc_import_left',
+							'advanced',
+							null
+						);
 						?>
 					</div>
 					<div class="postcontent-right">
 						<?php
-						add_meta_box("general_settings_meta_box", __("General Settings","pbc"), array($this, "general_settings_meta_box_callback"), "pbc_import_right");
-		                do_meta_boxes('pbc_import_right','advanced',null);
+						add_meta_box(
+							'general_settings_meta_box',
+							__( 'General Settings', 'pbc' ),
+							array(
+								$this,
+								'general_settings_meta_box_callback',
+							),
+							'pbc_import_right'
+						);
+						do_meta_boxes(
+							'pbc_import_right',
+							'advanced',
+							null
+						);
 						?>
 					</div>
 				</div>
 			</div>
 		</div>
-	<?php
-    }
+		<?php
+	}
 	/**
 	 * Import Meta Box Callback
 	 *
 	 * Callback function for add_meta_box import section
 	 */
 	public function phases_lists_meta_box_callback() {
-	?>
-	<table class="phases-lists-table">
-		<tr>
-			<th class="order-col"><?php esc_html_e( 'Order', 'pbc' ); ?></th>
-			<th class="phases-col"><?php esc_html_e( 'Phases', 'pbc' ); ?></th>
-			<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' );?></th>
-		</tr>
-		<?php
-		$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
-		if ( ! empty( $phases ) ) {
-			foreach ( $phases as $phase ) {
-				?>
-				<tr>
-					<td class="order-col"><?php echo esc_html( $phase->menu_order ); ?></td>
-					<td class="phases-col"><?php echo esc_html( $phase->post_title ); ?></td>
-					<td class="variations-col">
-						<?php
-						$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase->ID . '&fields=ids' );
-						if ( ! empty( $variations ) ) {
-							echo count( $variations );
-						}
-						?>
-					</td>
-				</tr>
-				<?php
-			}
-		}
 		?>
-	</table>
-   <?php
+		<table class="phases-lists-table">
+			<tr>
+				<th class="order-col"><?php esc_html_e( 'Order', 'pbc' ); ?></th>
+				<th class="phases-col"><?php esc_html_e( 'Phases', 'pbc' ); ?></th>
+				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' ); ?></th>
+			</tr>
+			<?php
+			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+			if ( ! empty( $phases ) ) {
+				foreach ( $phases as $phase ) {
+					?>
+					<tr>
+						<td class="order-col"><?php echo esc_html( $phase->menu_order ); ?></td>
+						<td class="phases-col"><?php echo esc_html( $phase->post_title ); ?></td>
+						<td class="variations-col">
+							<?php
+							$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase->ID . '&fields=ids' );
+							if ( ! empty( $variations ) ) {
+								echo count( $variations );
+							}
+							?>
+						</td>
+					</tr>
+					<?php
+				}
+			}
+			?>
+		</table>
+		<?php
 	}
 
 	/**
@@ -310,89 +363,141 @@ class Admin_PBCPlugin {
 	 *
 	 * Callback function for add_meta_box import section
 	 */
-	public function general_settings_meta_box_callback()
-	{
-	?>
-	<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
-		<div class="content">
-			<fieldset>
-				<label class="block" for="select_budget_page"><?php esc_html_e( 'Budget Configurator Page', 'pbc' ); ?></label>
-				<?php
-				$budget_configurator = get_option( 'pbc_budget_configurator_page' );
-				$pages = get_pages();
-				if ( ! empty( $pages ) ) {
-					echo '<select name="select_budget_page">
-						<option value="">'.__('Select a Page','pbc').'</option>';
-					foreach ( $pages as $page ) {
-						$option = '<option value="' .( $page->ID ) . '"';
-						$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
-						$option .= '>'.$page->post_title.'</option>';
-						echo $option;
-					}
-					echo '</select>';
-				}
-				?>
-				&nbsp;&nbsp;<?php _e('or','pbc');?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' );?>" title="<?php _e('Create New Page', 'pbc');?>"><?php _e('Create Page', 'pbc');?></a>
-			</fieldset>
-			<fieldset>
-				<label class="block" for="select_PDF_image"><?php _e("Set PDF Image", 'pbc');?></label>
-				<?php
-					wp_enqueue_media();
-					$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
-				?>
-				<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
-			</fieldset>
-			<fieldset>
-				<br/>
-				<label class="block" for="variations_images_flipped"><?php _e("Flip Images Horizontal", 'pbc');?></label>
-				<?php
-					$variations_images_flipped = get_option('variations_images_flipped');
-					$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
-					if(!empty($phases)){
-						echo '<select multiple="multiple" name="variations_images_flipped[]" size="6" style="width:100%;">';
-						foreach($phases as $phase){
-							$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
-							if(!empty($variations)){
-								foreach($variations as $var){
-									if(!empty($variations_images_flipped) && in_array($var->ID, $variations_images_flipped))
-										$selected = 'selected="selected"';
-									else $selected = '';
-									echo '<option value="'.$var->ID.'" '.$selected.'>'.str_pad($phase->menu_order, 2, '0', STR_PAD_LEFT).' - '.$phase->post_title.' - '.$var->post_title.'</option>';
-								}
-							}
+	public function general_settings_meta_box_callback() {
+		?>
+		<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
+			<div class="content">
+				<fieldset>
+					<label class="block" for="select_budget_page"><?php esc_html_e( 'Budget Configurator Page', 'pbc' ); ?></label>
+					<?php
+					$budget_configurator = get_option( 'pbc_budget_configurator_page' );
+					$pages = get_pages();
+					if ( ! empty( $pages ) ) {
+						echo '<select name="select_budget_page">';
+						echo '<option value="">' . __('Select a Page', 'pbc' ) . '</option>';
+						foreach ( $pages as $page ) {
+							$option = '<option value="' .( $page->ID ) . '"';
+							$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
+							$option .= '>' . $page->post_title . '</option>';
+							echo $option;
 						}
 						echo '</select>';
 					}
-				?>
-			</fieldset>
-			<fieldset>
-				<label class="block" for="admin_email_notification"><?php _e("Email Notification", 'pbc');?></label>
-				<?php
-					$admin_email_notification = get_option( 'pbc_admin_email_notification' );
-				?>
-				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if( $admin_email_notification ) echo $admin_email_notification; ?>" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
-			</fieldset>
-			<fieldset>
-				<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
-				<?php
-				$show_prices = get_option( 'pbc_budget_show_prices' );
-				$pages = get_pages();
-				if ( ! empty( $pages ) ) {
-					echo '<select name="option_show_prices">';
-					echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . __( 'Yes', 'pbc' ) . '</option>';
-					echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . __( 'No', 'pbc' ) . '</option>';
-					echo '</select>';
-				}
-				?>
-			</fieldset>
-		</div>
+					?>
+					&nbsp;&nbsp;<?php _e('or','pbc');?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' );?>" title="<?php _e('Create New Page', 'pbc');?>"><?php _e('Create Page', 'pbc');?></a>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_PDF_image"><?php _e("Set PDF Image", 'pbc');?></label>
+					<?php
+						wp_enqueue_media();
+						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
+					?>
+					<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
+				</fieldset>
+				<fieldset>
+					<br/>
+					<label class="block" for="variations_images_flipped"><?php _e("Flip Images Horizontal", 'pbc');?></label>
+					<?php
+						$variations_images_flipped = get_option('variations_images_flipped');
+						$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
+						if(!empty($phases)){
+							echo '<select multiple="multiple" name="variations_images_flipped[]" size="6" style="width:100%;">';
+							foreach($phases as $phase){
+								$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
+								if(!empty($variations)){
+									foreach($variations as $var){
+										if(!empty($variations_images_flipped) && in_array($var->ID, $variations_images_flipped))
+											$selected = 'selected="selected"';
+										else $selected = '';
+										echo '<option value="'.$var->ID.'" '.$selected.'>'.str_pad($phase->menu_order, 2, '0', STR_PAD_LEFT).' - '.$phase->post_title.' - '.$var->post_title.'</option>';
+									}
+								}
+							}
+							echo '</select>';
+						}
+					?>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="admin_email_notification"><?php _e("Email Notification", 'pbc');?></label>
+					<?php
+						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
+					?>
+					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if( $admin_email_notification ) echo $admin_email_notification; ?>" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
+					<?php
+					$show_prices = get_option( 'pbc_budget_show_prices' );
+					$pages = get_pages();
+					if ( ! empty( $pages ) ) {
+						echo '<select name="option_show_prices">';
+						echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . __( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . __( 'No', 'pbc' ) . '</option>';
+						echo '</select>';
+					}
+					?>
+				</fieldset>
+			</div>
 
-		<div class="save_bar">
-			<input type="hidden" name="form_submit" value="true"/>
-			<input type="submit" value="<?php esc_html_e( 'Save', 'pbc' ); ?>" class="button button-primary submit-button" />
-		</div>
-	</form>
-    <?php
+			<div class="save_bar">
+				<input type="hidden" name="form_submit" value="true"/>
+				<input type="submit" value="<?php esc_html_e( 'Save', 'pbc' ); ?>" class="button button-primary submit-button" />
+			</div>
+		</form>
+		<?php
+	}
+	/**
+	 * General Settings Meta Box Callback
+	 *
+	 * Callback function for add_meta_box import section
+	 */
+	public function license_meta_box_callback() {
+		?>
+		<form action="" method="post" enctype="multipart/form-data" id="pbc_license_form">
+			<div class="content">
+				<fieldset>
+					<label class="block" for="pbc_license_apikey"><?php esc_html_e( 'License API Key', 'pbc' ); ?></label>
+					<?php
+					$license_apikey = get_option( 'pbc_license_apikey' );
+					?>
+					<input style="width:100%;" type="text" name="pbc_license_apikey" value="<?php if( $license_apikey ) { echo $license_apikey; } ?>" placeholder="<?php esc_html_e( 'License API Key', 'pbc' ); ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="pbc_license_product_id"><?php esc_html_e( 'License Product ID', 'pbc' ); ?></label>
+					<?php
+					$license_product_id = get_option( 'pbc_license_product_id' );
+					?>
+					<input style="width:100%;" type="text" name="pbc_license_product_id" value="<?php if( $license_product_id ) { echo $license_product_id; } ?>" placeholder="<?php esc_html_e( 'License Product ID', 'pbc' ); ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="pbc_license_status"><?php esc_html_e( 'Status:', 'pbc' ); ?></label>
+					<p><strong><?php $this->license_status_callback(); ?></strong></p>
+				</fieldset>
+			</div>
+
+			<div class="save_bar">
+				<input type="hidden" name="submit_license" value="true"/>
+				<input type="submit" value="<?php esc_html_e( 'Save license', 'pbc' ); ?>" class="button button-primary submit-button" />
+			</div>
+		</form>
+		<?php
+		echo '<div class="settings">';
+		echo '<h2>' . esc_html__( 'What is the license for?', 'pbc' ) . '</h2>';
+		echo '<p>';
+		echo sprintf(
+			__( 'With the <a href="%s" target="_blank">Product Budget Configurator</a> license, you\'ll have updates and automatic fixes to what\'s new or change in your system, so you\'ll always have automatic translations working.', 'pbc' ),
+			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
+		);
+		echo '</p>';
+		echo '</div><div class="help">';
+		echo '<h2>' . esc_html__( 'How do I get a license?', 'pbc' ) . '</h2>';
+		echo '<p>';
+		echo sprintf(
+			__( 'Visit the <a href="%s" target="_blank">Product Budget Configurator</a> page and purchase the licenses you need, depending on the number of WordPress MultiSites you\'re using.', 'pbc' ),
+			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
+		);
+		echo '</p>';
+		echo '</div>';
 	}
 
     /**
@@ -1614,6 +1719,476 @@ class Admin_PBCPlugin {
 		}
 		echo ';;--;;'.json_encode($return);
 		die(0);
+	}
+	/**
+	 * # LICENSE
+	 * ---------------------------------------------------------------------------------------------------- */
+
+	/**
+	 * Displays an inactive notice when the software is inactive.
+	 */
+	public function inactive_notice() {
+		/**
+		 * @since 2.5.1
+		 *
+		 * Filter wc_am_client_inactive_notice_override
+		 * If set to false inactive_notice() method will be disabled.
+		 */
+		if ( apply_filters( 'wpat_client_inactive_notice_override', true ) ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+			if ( isset( $_GET['page'] ) && 'wpautotranslate' == $_GET['page'] ) {
+				return;
+			}
+			echo '<div class="notice notice-error">';
+			echo '<p>';
+			printf(
+				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'wpautotranslate' ),
+				esc_attr( WPPBC_ITEM_NAME ),
+				'<a href="' . esc_url( admin_url( 'network/admin.php?page=wpautotranslate&tab=license' ) ) . '">',
+				'</a>'
+			);
+			echo '</p></div>';
+		}
+	}
+	/**
+	 * Callback for Setting license API key
+	 *
+	 * @return void
+	 */
+	public function license_status_callback() {
+		if ( $this->get_api_key_status( true ) ) {
+			$license_status_check = esc_html__( 'Activated', 'wpautotranslate' );
+			update_option( 'pbc_license_activated', 'Activated' );
+			update_option( 'pbc_license_deactivate_checkbox', 'off' );
+		} else {
+			$license_status_check = esc_html__( 'Deactivated', 'wpautotranslate' );
+		}
+
+		echo esc_attr( $license_status_check );
+	}
+	/**
+	 * Validates license option
+	 *
+	 * @param array $input Settings input option.
+	 * @return mixed|string
+	 */
+	public function validate_license( $input ) {
+		// Load existing options, validate, and update with changes from input before returning.
+		$api_key           = trim( $input['pbc_license_apikey'] );
+		$activation_status = get_option( 'pbc_license_activated' );
+		$checkbox_status   = get_option( 'pbc_license_deactivate_checkbox' );
+		$current_api_key   = ! empty( get_option( 'pbc_license_apikey' ) ) ? get_option( 'pbc_license_apikey' ) : '';
+
+		/**
+		* @since 2.3
+		*/
+		if ( isset( $input['pbc_license_product_id'] ) ) {
+			$new_product_id = absint( $input['pbc_license_product_id'] );
+
+			if ( ! empty( $new_product_id ) ) {
+				update_option( 'pbc_license_product_id', $new_product_id );
+			}
+		}
+
+		// Deactivates API Key key activation.
+		if ( isset( $input['pbc_license_deactivate_checkbox'] ) && 'on' === $input['pbc_license_deactivate_checkbox'] ) {
+			$args = array(
+				'api_key' => ! empty( $api_key ) ? $api_key : '',
+			);
+			$deactivation_result = $this->license_deactivate( $args );
+
+			if ( ! empty( $deactivation_result ) ) {
+
+				if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
+					update_option( 'pbc_license_activated', 'Deactivated' );
+					update_option( 'pbc_license_apikey', '' );
+					update_option( 'pbc_license_product_id', '' );
+					add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
+
+					return;
+				}
+
+				if ( isset( $deactivation_result['data']['error_code'] ) && ! empty( $this->data ) && ! empty( 'pbc_license_activated' ) ) {
+					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
+					update_option( 'pbc_license_activated', 'Deactivated' );
+				}
+			}
+			return;
+		}
+
+		// Should match the settings_fields() value.
+		if ( 'Deactivated' == $activation_status || '' == $activation_status || '' == $api_key || 'on' == $checkbox_status || $current_api_key != $api_key ) {
+
+			/**
+			* If this is a new key, and an existing key already exists in the database,
+			* try to deactivate the existing key before activating the new key.
+			*/
+			if ( ! empty( $current_api_key ) && $current_api_key != $api_key ) {
+				$this->replace_license_key( $current_api_key );
+			}
+
+			$activation_result = $this->license_activate( $api_key );
+
+			if ( ! empty( $activation_result ) ) {
+				$activate_results = json_decode( $activation_result, true );
+
+				if ( true === $activate_results['success'] && true === $activate_results['activated'] ) {
+					add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
+
+					update_option( 'pbc_license_apikey', $api_key );
+					update_option( 'pbc_license_activated', 'Activated' );
+					update_option( 'pbc_license_deactivate_checkbox', 'off' );
+				}
+
+				if ( false == $activate_results && ! empty( get_option( 'pbc_license_activated' ) ) ) {
+					add_settings_error( 'api_key_check_text', 'api_key_check_error', esc_html__( 'Connection failed to the License Key API server. Try again later. There may be a problem on your server preventing outgoing requests, or the store is blocking your request to activate the plugin/theme.', 'pbc' ), 'error' );
+					update_option( 'pbc_license_activated', 'Deactivated' );
+				}
+
+				if ( isset( $activate_results['data']['error_code'] ) && ! empty( get_option( 'pbc_license_activated' ) ) ) {
+					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$activate_results['data']['error']}" ), 'error' );
+					update_option( 'pbc_license_activated', 'Deactivated' );
+				}
+			} else {
+				add_settings_error( 'not_activated_empty_response_text', 'not_activated_empty_response_error', esc_html__( 'The API Key activation could not be commpleted due to an unknown error possibly on the store server The activation results were empty.', 'pbc' ), 'updated' );
+			}
+		} // End Plugin Activation
+	}
+	/**
+	 * Sends the request to activate to the API Manager.
+	 *
+	 * @param array $api_key API Key to activate.
+	 *
+	 * @return string
+	 */
+	public function license_activate( $api_key ) {
+		if ( empty( $api_key ) ) {
+			add_settings_error( 'not_activated_text', 'not_activated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'wpautotranslate' ), 'updated' );
+
+			return '';
+		}
+
+		$defaults            = $this->get_license_defaults( 'activate', true );
+		$defaults['api_key'] = $api_key;
+		$target_url          = esc_url_raw( $this->create_software_api_url( $defaults ) );
+		$request             = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+
+		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+			// Request failed.
+			return '';
+		}
+
+		return wp_remote_retrieve_body( $request );
+	}
+
+	/**
+	 * Sends the request to deactivate to the API Manager.
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function license_deactivate( $args ) {
+		if ( empty( $args ) ) {
+			add_settings_error( 'not_deactivated_text', 'not_deactivated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'wpautotranslate' ), 'updated' );
+
+			return '';
+		}
+
+		$defaults   = $this->get_license_defaults( 'deactivate' );
+		$args       = wp_parse_args( $defaults, $args );
+		$target_url = esc_url_raw( $this->create_software_api_url( $args ) );
+		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+		$body_json  = wp_remote_retrieve_body( $request );
+		$result_api = json_decode( $body_json, true );
+
+		$error = ! empty( $result_api['error'] ) ? $result_api['error'] : '';
+
+		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 || $error ) {
+			// Request failed.
+			add_settings_error(
+				'not_deactivated_empty_response_text',
+				'not_deactivated_empty_response_error',
+				$error,
+				'error'
+			);
+			return;
+		}
+
+		return $result_api;
+	}
+	/**
+	 * Returns true if the API Key status is Activated.
+	 *
+	 * @since 2.1
+	 *
+	 * @param bool $live Do not set to true if using to activate software. True is for live status checks after activation.
+	 *
+	 * @return bool
+	 */
+	public function get_api_key_status( $live = false ) {
+		/**
+		 * Real-time result.
+		 *
+		 * @since 2.5.1
+		 */
+		if ( $live ) {
+			$license_status = $this->license_key_status();
+
+			return ! empty( $license_status ) && ! empty( $license_status['data'][ 'activated' ] ) && $license_status['data'][ 'activated' ];
+		}
+
+		/**
+		 * If $live === false.
+		 *
+		 * Stored result when first activating software.
+		 */
+		return get_option('pbc_license_activated') == 'Activated';
+	}
+
+	/**
+	 * Returns the API Key status by querying the Status API function from the WooCommerce API Manager on the server.
+	 *
+	 * @return array|mixed|object
+	 */
+	public function license_key_status() {
+		$status = $this->status();
+
+		return ! empty( $status ) ? json_decode( $this->status(), true ) : $status;
+	}
+
+	/**
+	 * Sends the status check request to the API Manager.
+	 *
+	 * @return bool|string
+	 */
+	public function status() {
+		if ( empty( get_option( 'pbc_license_apikey' ) ) ) {
+			return '';
+		}
+
+		$defaults   = $this->get_license_defaults( 'status' );
+		$target_url = esc_url_raw( $this->create_software_api_url( $defaults ) );
+		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+
+		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+			// Request failed.
+			return '';
+		}
+
+		return wp_remote_retrieve_body( $request );
+	}
+
+	/**
+	 * Get license defaults
+	 *
+	 * @param [type] $action
+	 * @return array
+	 */
+	private function get_license_defaults( $action, $software_version = false ) {
+		$api_key    = get_option( 'pbc_license_apikey' );
+		$product_id = get_option( 'pbc_license_product_id' );
+
+		$defaults = array(
+			'wc_am_action' => $action,
+			'api_key'      => $api_key,
+			'product_id'   => $product_id,
+			'instance'     => get_option( 'pbc_license_instance' ),
+			'object'       => str_ireplace( array( 'http://', 'https://' ), '', home_url() ),
+		);
+
+		if ( $software_version ) {
+			$defaults['software_version'] = WPPBC_VERSION;
+		}
+
+		return $defaults;
+
+	}
+
+	/**
+	 * Builds the URL containing the API query string for activation, deactivation, and status requests.
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function create_software_api_url( $args ) {
+		return add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args );
+	}
+
+	/**
+	 * Generate the default data.
+	 */
+	public function license_instance_activation() {
+		$instance_exists = get_option( 'pbc_license_instance' );
+
+		if ( false === $instance_exists ) {
+			update_option( 'pbc_license_instance', wp_generate_password( 12, false ) );
+		}
+	}
+
+	/**
+	 * Deactivate the current API Key before activating the new API Key
+	 *
+	 * @param string $current_api_key
+	 */
+	public function replace_license_key( $current_api_key ) {
+		$args = array(
+			'api_key' => $current_api_key,
+		);
+
+		$this->license_deactivate( $args );
+	}
+
+	/**
+	 * Sends and receives data to and from the server API
+	 *
+	 * @since  2.0
+	 *
+	 * @param array $args
+	 *
+	 * @return bool|string $response
+	 */
+	public function send_query( $args ) {
+		$target_url = esc_url_raw( add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args ) );
+		error_log( 'target_url:'.$target_url);
+		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+
+		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+			return false;
+		}
+
+		$response = wp_remote_retrieve_body( $request );
+
+		return ! empty( $response ) ? $response : false;
+	}
+
+	/**
+	 * Check for updates against the remote server.
+	 *
+	 * @since  2.0
+	 *
+	 * @param object $transient Transient plugins.
+	 *
+	 * @return object
+	 */
+	public function update_check( $transient ) {
+		if ( empty( $transient->checked ) ) {
+			return $transient;
+		}
+
+		$args = array(
+			'wc_am_action' => 'update',
+			'slug'         => 'pbc',
+			'plugin_name'  => 'pbc',
+			'version'      => WPPBC_VERSION,
+			'product_id'   => get_option( 'pbc_license_product_id' ),
+			'api_key'      => get_option( 'pbc_license_apikey' ),
+			'instance'     => get_option( 'pbc_license_instance' ),
+		);
+
+		// Check for a plugin update.
+		$response = json_decode( $this->send_query( $args ), true );
+
+		if ( isset( $response['data']['error_code'] ) ) {
+			add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', "{$response['data']['error']}", 'error' );
+		}
+
+		if ( false !== $response && true === $response['success'] ) {
+			$new_version  = (string) $response['data']['package']['new_version'];
+			$curr_version = (string) WPPBC_VERSION;
+
+			$package = array(
+				'id'             => $response['data']['package']['id'],
+				'slug'           => $response['data']['package']['slug'],
+				'plugin'         => $response['data']['package']['plugin'],
+				'new_version'    => $response['data']['package']['new_version'],
+				'url'            => $response['data']['package']['url'],
+				'tested'         => $response['data']['package']['tested'],
+				'package'        => $response['data']['package']['package'],
+				'upgrade_notice' => $response['data']['package']['upgrade_notice'],
+			);
+
+			if ( isset( $new_version ) && isset( $curr_version ) ) {
+				if ( version_compare( $new_version, $curr_version, '>' ) ) {
+					$transient->response['pbc'] = (object) $package;
+					unset( $transient->no_update['pbc'] );
+				}
+			}
+		}
+
+		return $transient;
+	}
+
+	/**
+	 * API request for informatin.
+	 *
+	 * If `$action` is 'query_plugins' or 'plugin_information', an object MUST be passed.
+	 * If `$action` is 'hot_tags` or 'hot_categories', an array should be passed.
+	 *
+	 * @param false|object|array $result The result object or array. Default false.
+	 * @param string             $action The type of information being requested from the Plugin Install API.
+	 * @param object             $args
+	 *
+	 * @return object
+	 */
+	public function information_request( $result, $action, $args ) {
+		// Check if this plugins API is about this plugin.
+		if ( isset( $args->slug ) ) {
+			if ( 'pbc' !== $args->slug ) {
+				return $result;
+			}
+		} else {
+			return $result;
+		}
+
+		$args = array(
+			'wc_am_action' => 'plugininformation',
+			'plugin_name'  => 'pbc',
+			'version'      => WPPBC_VERSION,
+			'product_id'   => get_option( 'pbc_license_product_id' ),
+			'api_key'      => get_option( 'pbc_license_apikey' ),
+			'instance'     => get_option( 'pbc_license_instance' ),
+			'object'       => str_ireplace( array( 'http://', 'https://' ), '', home_url() ),
+		);
+
+		$response = unserialize( $this->send_query( $args ) );
+
+		if ( isset( $response ) && is_object( $response ) && false !== $response ) {
+			return $response;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Check for external blocking contstant.
+	 */
+	public function check_external_blocking() {
+		// show notice if external requests are blocked through the WP_HTTP_BLOCK_EXTERNAL constant.
+		if ( defined( 'WP_HTTP_BLOCK_EXTERNAL' ) && true === WP_HTTP_BLOCK_EXTERNAL ) {
+			// check if our API endpoint is in the allowed hosts.
+			$host = parse_url( WPPBC_URL_API, PHP_URL_HOST );
+
+			if ( ! defined( 'WP_ACCESSIBLE_HOSTS' ) || stristr( WP_ACCESSIBLE_HOSTS, $host ) === false ) {
+				?>
+				<div class="notice notice-error">
+					<p>
+						<?php
+						printf(
+							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %s updates. Please add %s to %s.', 'wpautotranslate' ),
+							'AutoTranslate',
+							'<strong>' . esc_html( $host ) . '</strong>',
+							'<code>WP_ACCESSIBLE_HOSTS</code>'
+						);
+						?>
+					</p>
+				</div>
+				<?php
+			}
+		}
 	}
 }
 
