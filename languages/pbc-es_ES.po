@@ -76,7 +76,7 @@ msgstr "Enviar"
 #: includes/class-admin-pbcplugin.php:156
 #: includes/class-admin-pbcplugin.php:169
 msgid "Product Budget Configurator"
-msgstr "Configurador Presupuestos Producto"
+msgstr "Product Budget Configurator"
 
 #: includes/class-admin-pbcplugin.php:170
 msgid "Settings"
