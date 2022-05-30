@@ -612,7 +612,7 @@ if ( ! empty( $phases ) ) {
 			</div>
 			<div class="configurator_summary">
 				<?php if(isset($_SESSION) && isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation'])){?>
-						<h1 class="title"><?php _e('Actual Configuration','pbc');?></h1>
+						<h2 class="title"><?php _e('Actual Configuration','pbc');?></h2>
 						<table>
 						<?php
 							if($cStep == 'calculate'){
@@ -663,9 +663,16 @@ if ( ! empty( $phases ) ) {
 							</tr>
 						<?php }?>
 						</table>
-				<?php }?>
+				<?php
+				}
+				?>
 			</div>
-			<?php if($cStep == 'calculate'){?>
+			<?php 
+			
+			// Banner.
+			do_action( 'pbc_banner_after_setup' );
+
+			if($cStep == 'calculate'){?>
 				<div class="configurator_result_share">
 					<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
 					<div class="email_submit_fields">
