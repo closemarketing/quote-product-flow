@@ -1,0 +1,55 @@
+.postcontent-left,
+.postcontent-right {
+   width: 46%;
+   margin-right: 2%;
+   display: inline-block;
+   vertical-align: top;
+}
+
+fieldset {
+   padding: 2px 0;
+   margin-bottom: 5px;
+}
+
+fieldset label.inline {
+   min-width: 140px;
+   display: inline-block;
+}
+
+fieldset label.block {
+   width: 100%;
+   display: block;
+   margin-bottom: 2px;
+}
+
+.save_bar {
+   padding: 0 10px;
+   text-align: right;
+   margin-bottom: 20px;
+}
+
+.content.left-content,
+.content.right-content {
+   width: 45%;
+   display: inline-block;
+   vertical-align: top;
+}
+
+.content.left-content {
+   border-right: 1px solid #EEEEEE;
+   margin-right: 2%;
+}
+
+.phases-lists-table th,
+.phases-lists-table td {
+   text-align: left;
+}
+
+.phases-col {
+   width: 60%;
+}
+
+.order-col,
+.variations-col {
+   width: 20%;
+}

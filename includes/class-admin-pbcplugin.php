@@ -22,6 +22,7 @@ class Admin_PBCPlugin {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'init' ) );
 		add_action( 'admin_footer', array( $this, 'pbc_admin_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
 		// Custom Post types stuff.
 		add_action( 'admin_menu', array( $this, 'pbc_add_admin_menus' ), 1 );
@@ -31,6 +32,9 @@ class Admin_PBCPlugin {
 
 		add_filter( 'disable_months_dropdown', array( $this, 'disable_months_dropdown' ), 10, 2 );
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
+
+		add_action( 'wp_ajax_pbc_enquiry_pdf', array( $this, 'pbc_enquiry_pdf' ) );
+		add_action( 'wp_ajax_nopriv_pbc_enquiry_pdf', array( $this, 'pbc_enquiry_pdf' ) );
 
 		add_filter( 'manage_edit-enquiry_columns', array( $this, 'add_new_budgets_columns' ) );
 		add_action( 'manage_enquiry_posts_custom_column', array( $this, 'manage_budgets_columns' ), 10, 2 );
@@ -85,75 +89,37 @@ class Admin_PBCPlugin {
 		$screen = get_current_screen();
 		if ( ! empty( $screen ) && ( 'pbc_menu' === $screen->parent_base ) ) {
 			wp_enqueue_script( 'post' );
-			$this->plugin_admin_scripts();
+			wp_enqueue_script( 'pbc-media' );
+			wp_enqueue_style( 'pbc-admin' );
 		}
 		return null;
 	}
 
-	public function plugin_admin_scripts() {
-		?>
-		<style>
-			.postcontent-left, .postcontent-right{width: 46%;margin-right: 2%;display: inline-block;vertical-align: top;}
-			fieldset{ padding: 2px 0;margin-bottom:5px;}
-			fieldset label.inline{min-width: 140px;display: inline-block;}
-			fieldset label.block{width: 100%;display: block;margin-bottom: 2px;}
-			.save_bar{padding: 0 10px;text-align: right;margin-bottom: 20px;}
-			.content.left-content, .content.right-content {width: 45%;display: inline-block;vertical-align: top;}
-			.content.left-content { border-right: 1px solid #EEEEEE;margin-right: 2%;}
-			.phases-lists-table th, .phases-lists-table td{text-align: left;}
-			.phases-col{width: 60%;}
-			.order-col, .variations-col{width: 20%;}
-		</style>
+	public function enqueue_admin_scripts() {
+		wp_register_script(
+			'pbc-media',
+			WPPBC_PLUGIN_URL . 'includes/assets/pbc-media.js',
+			array( 'jquery' ),
+			WPPBC_VERSION,
+			true
+		);
+		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
 
-		<script type="text/javascript">
-		jQuery(function($){
-			$(document).on('click', '.select-image', function(event){
-				var current_button = $(this);
-	            event.preventDefault();
+		wp_enqueue_script( 
+			'pbc-enquiry-pdf',
+			WPPBC_PLUGIN_URL . 'includes/assets/pbc-enquiry-pdf.js',
+			array( 'jquery' ),
+			WPPBC_VERSION,
+		);
 
-	            // check for media manager instance
-	            if(wp.media.frames.pbc) {
-	                wp.media.frames.pbc.open();
-	                return;
-	            }
-	            // configuration of the media manager new instance
-	            wp.media.frames.pbc = wp.media({
-	                title: 'Select image',
-	                multiple: false,
-	                library: {
-	                    type: 'image'
-	                },
-	                button: {
-	                    text: 'Use selected image'
-	                }
-	            });
-
-	            // Function used for the image selection and media manager closing
-	            var gk_media_set_image = function() {
-	                var selection = wp.media.frames.pbc.state().get('selection');
-
-	                // no selection
-	                if (!selection) {
-	                    return;
-	                }
-
-	                // iterate through selected elements
-	                selection.each(function(attachment) {
-	                    var url = attachment.attributes.url;
-	                    current_button.prev('[name=pdf_image_selected]').val(url);
-	                });
-	            };
-
-	            // closing event for media manger
-	            wp.media.frames.pbc.on('close', gk_media_set_image);
-	            // image selection event
-	            wp.media.frames.pbc.on('select', gk_media_set_image);
-	            // showing media manager
-	            wp.media.frames.pbc.open();
-			});
-		});
-		</script>
-		<?php
+		wp_localize_script(
+			'pbc-enquiry-pdf',
+			'ajaxAction',
+			array(
+				'url'   => admin_url( 'admin-ajax.php' ),
+				'nonce' => wp_create_nonce( 'pbc_enquiry_pdf_nonce' ),
+			)
+		);
 	}
 
 	/**
@@ -243,6 +209,14 @@ class Admin_PBCPlugin {
 				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
+			if ( isset( $_POST['pdf_image_header'] ) ){
+				update_option( 'pbc_pdf_image_header', $_POST['pdf_image_header'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}
+			if ( isset( $_POST['pdf_image_footer'] ) ){
+				update_option( 'pbc_pdf_image_footer', $_POST['pdf_image_footer'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
 			update_option( 'variations_images_flipped', $variations_images_flipped );
 			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array('');
@@ -250,7 +224,7 @@ class Admin_PBCPlugin {
 		}
 
 		if ( isset( $_POST['submit_license'] ) ) {
-			$license_apikey = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field(  $_POST['pbc_license_apikey'] ) : '';
+			$license_apikey = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field( $_POST['pbc_license_apikey'] ) : '';
 			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field(  $_POST['pbc_license_product_id'] ) : '';
 
 			update_option( 'pbc_license_apikey', $license_apikey );
@@ -366,6 +340,7 @@ class Admin_PBCPlugin {
 	 * Callback function for add_meta_box import section
 	 */
 	public function general_settings_meta_box_callback() {
+		wp_enqueue_media();
 		?>
 		<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
 			<div class="content">
@@ -376,7 +351,7 @@ class Admin_PBCPlugin {
 					$pages = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="select_budget_page">';
-						echo '<option value="">' . __('Select a Page', 'pbc' ) . '</option>';
+						echo '<option value="">' . __( 'Select a Page', 'pbc' ) . '</option>';
 						foreach ( $pages as $page ) {
 							$option = '<option value="' .( $page->ID ) . '"';
 							$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
@@ -389,12 +364,25 @@ class Admin_PBCPlugin {
 					&nbsp;&nbsp;<?php _e('or','pbc');?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' );?>" title="<?php _e('Create New Page', 'pbc');?>"><?php _e('Create Page', 'pbc');?></a>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="select_PDF_image"><?php _e("Set PDF Image", 'pbc');?></label>
+					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
 					<?php
-						wp_enqueue_media();
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
-					<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) echo $pdf_image_selected;?>" /><button class="select-image button"><?php _e('Select image','pbc');?></button>
+					<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {	echo esc_url( $pdf_image_selected ); } ?>" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' );?></button>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
+					<?php
+						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
+					?>
+					<input type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {	echo esc_url( $pdf_image_header ); } ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
+					<?php
+						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
+					?>
+					<input type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {	echo esc_url( $pdf_image_footer ); } ?>" />
 				</fieldset>
 				<fieldset>
 					<br/>
@@ -433,8 +421,8 @@ class Admin_PBCPlugin {
 					$pages = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="option_show_prices">';
-						echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . __( 'Yes', 'pbc' ) . '</option>';
-						echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . __( 'No', 'pbc' ) . '</option>';
+						echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
 						echo '</select>';
 					}
 					?>
@@ -614,9 +602,9 @@ class Admin_PBCPlugin {
 	 * @return array
 	 */
 	public function pbc_metabox_variation( $meta_boxes ) {
+		$phase_options = array();
 		// Phase options
 		if ( is_admin() ) {
-			$phase_options = array();
 			$phasescpt = get_posts(array(
 				'post_type' => 'phases',
 				'posts_per_page' => -1,
@@ -791,12 +779,14 @@ class Admin_PBCPlugin {
 	    );
 	}
 	public function render_enquiry_details( $post ) {
-		$post_id = is_object( $post ) ? $post->ID : $post; ?>
-		<div><label><?php _e('Name:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_name',true);?></label></div>
-		<div><label><?php _e('Phone:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_phone',true);?></label></div>
-		<div><label><?php _e('Email:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_email',true);?></label></div>
-		<div><label><?php _e('City:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_city',true);?></label></div>
-		<div><label><?php _e('State:', 'pbc');?> <?php echo get_post_meta( $post_id, 'pbc_enquiry_state',true);?></label></div>
+		$post_id = is_object( $post ) ? $post->ID : $post;
+		
+		?>
+		<div><label><strong><?php _e('Name:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_name',true);?></label></div>
+		<div><label><strong><?php _e('Phone:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_phone',true);?></label></div>
+		<div><label><strong><?php _e('Email:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_email',true);?></label></div>
+		<div><label><strong><?php _e('City:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_city',true);?></label></div>
+		<div><label><strong><?php _e('State:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_state',true);?></label></div>
 	<?php
 	}
 
@@ -866,7 +856,37 @@ class Admin_PBCPlugin {
 		return $disable_months_dropdown;
 
 	}
+/**
+	 * Ajax function to load info
+	 *
+	 * @return void
+	 */
+	public function pbc_enquiry_pdf(){
+		$post_id = isset( $_POST['post_id'] ) ? esc_attr( $_POST['post_id'] ) : '';
 
+		check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' );
+		if ( true ) {
+			if ( session_id() == '' ) {
+				ob_start();
+				session_start();
+			}
+			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
+			$phase_order = 0;
+			foreach ( $phases as $phase_id ) {
+				$_SESSION['pbc_variation'][ $phase_order ]['phase']['id']   = $phase_id;
+				$_SESSION['pbc_variation'][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
+				//$_SESSION['pbc_variation'][ $phase_order ]['var']['id']     = 0;
+				$_SESSION['pbc_variation'][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
+				$_SESSION['pbc_variation'][ $phase_order ]['var']['price'] = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
+				$phase_order++;
+			}
+			$file_url = $this->generate_engine_pdf( 'url', $post_id );
+
+			wp_send_json_success( $file_url );
+		} else {
+			wp_send_json_error( array( 'error' => 'Error' ) );
+		}
+	}
 	/** Add columns for Phases **/
 	// Add to admin_init function
 	public function add_new_phases_columns($phases_columns) {
@@ -911,6 +931,9 @@ class Admin_PBCPlugin {
 				break;
 			case 'enquiry_date':
 				echo get_the_date( 'd-m-Y H:i', $id );
+				echo '<br/><button class="button generate-pbc-pdf" data-post-id="' . $id . '">';
+				esc_html_e( 'Generate PDF', 'pbc' );
+				echo '</button><span id="pbc-pdf-' . $id . '" class="spinner"></span>';
 				break;
 			default:
 				break;
@@ -1082,40 +1105,6 @@ class Admin_PBCPlugin {
 				}
 				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
 			}
-			if(isset($_GET) && isset($_GET['configurator']) && $_GET['configurator'] == 'pdf')
-            {
-                if (is_file(WPPBC_PLUGIN_DIR.
-                    "/lib/html2pdf/html2pdf.class.php")
-                )
-                {
-                    require_once(WPPBC_PLUGIN_DIR.
-                        '/lib/html2pdf/html2pdf.class.php');
-					if(session_id() == ''){
-						ob_start();
-					    session_start();
-					}
-					$content = $this->configurator_result_generate_pdf();
-					if($content['type'] == 'error'){
-						echo $content['response'];
-					}else{
-					    try {
-					        $width_mm = 710 * 0.2646;   //1px = 0.2646mm
-					        $height_mm = 900 * 0.2646;
-					        $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
-					        $html2pdf->setTestTdInOnePage(false);
-					        $html2pdf->writeHTML($content['response']);
-					        $html2pdf->Output("Budget Configurator ".date('Y-m-d H:i').".pdf");
-					        //$html2pdf->close();
-					    } catch (Html2PdfException $e) {
-					        $formatter = new ExceptionFormatter($e);
-					        echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
-					    }
-					}
-                }else{
-					echo 'Error: PDF Library Not Present';
-				}
-                exit(0);
-            }
 			if ( \locate_template( 'budget-configurator.php' ) )
 				$new_template =  \get_stylesheet_directory().'budget-configurator.php';
 	        else
@@ -1314,40 +1303,7 @@ class Admin_PBCPlugin {
 				$message .= '</table>';
 				$message .= '<br>'.get_option('blogname');
 				$headers = array('Content-Type: text/html; charset=UTF-8');
-				$attachments = array('');
-
-				if ( is_file( WPPBC_PLUGIN_DIR . "/lib/html2pdf/html2pdf.class.php" ) ) {
-               require_once ( WPPBC_PLUGIN_DIR . '/lib/html2pdf/html2pdf.class.php' );
-					if(session_id() == ''){
-						ob_start();
-					    session_start();
-					}
-					$filename   = __( 'budget', 'pbc' ) . '-' . get_bloginfo( 'name' ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
-					$dirname = $this->get_budget_path();
-					$filename_path = $dirname . $filename;
-
-					$content = $this->configurator_result_generate_pdf();
-					if ( $content['type'] == 'error' ) {
-						//error echo $content['response'];
-					} else {
-					    try {
-					        $width_mm = 710 * 0.2646;   //1px = 0.2646mm
-					        $height_mm = 900 * 0.2646;
-					        $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
-					        $html2pdf->setTestTdInOnePage(false);
-					        $html2pdf->writeHTML($content['response']);
-					        $html2pdf->Output( $filename_path, "F");
-					        //$html2pdf->close();
-					    } catch ( Html2PdfException $e ) {
-							//error
-					        //$formatter = new ExceptionFormatter($e);
-					        //echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
-					    }
-					}
-					if ( is_file( $filename_path ) ) {
-						$attachments = array( $filename_path );
-					}
-            }
+				$attachments = array( $this->generate_engine_pdf() );
 
 				//insert_enquiry Post
 				$my_post = array(
@@ -1379,8 +1335,13 @@ class Admin_PBCPlugin {
 			    if(!wp_mail( $emails, $subject, $message, $headers, $attachments)){
 					$result = array('type'=>'error', 'response'=>__('Error in sending mail. Please try again!','pbc'));
 				}else{
-					if(!empty($attachments)) unlink(plugin_dir_path( __FILE__)."$filename");
-					$result = array('type'=>'success', 'response'=>'Mail sent!');
+					if ( ! empty( $attachments ) ) {
+						unlink( $this->get_budget_base_dir() . $filename );
+					}
+					$result = array(
+						'type'     => 'success',
+						'response' => __( 'Mail sent!', 'pbc' ),
+					);
 				}
 				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
 			}
@@ -1389,18 +1350,65 @@ class Admin_PBCPlugin {
 	}
 
 	/**
+	 * Generates PDF from session
+	 *
+	 * @param string $type_return url/path for type to return
+	 * @return file
+	 */
+	private function generate_engine_pdf( $type_return = 'path', $post_id = null ) {
+		if ( is_file( WPPBC_PLUGIN_DIR . "/lib/html2pdf/html2pdf.class.php" ) ) {
+			require_once ( WPPBC_PLUGIN_DIR . '/lib/html2pdf/html2pdf.class.php' );
+			if ( session_id() == '' ) {
+				ob_start();
+				 session_start();
+			}
+			$filename   = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
+			$dirname = $this->get_budget_base_dir( 'path' );
+			$filename_path = $dirname . $filename;
+
+			$content = $this->configurator_result_generate_pdf();
+			if ( $content['type'] == 'error' ) {
+				//error echo $content['response'];
+			} else {
+				 try {
+					  $width_mm = 710 * 0.2646;   //1px = 0.2646mm
+					  $height_mm = 900 * 0.2646;
+					  $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
+					  $html2pdf->setTestTdInOnePage(false);
+					  $html2pdf->writeHTML($content['response']);
+					  $html2pdf->Output( $filename_path, "F");
+					  //$html2pdf->close();
+				 } catch ( Html2PdfException $e ) {
+					//error
+					  //$formatter = new ExceptionFormatter($e);
+					  //echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
+				 }
+			}
+			if ( is_file( $filename_path ) && 'path' === $type_return ) {
+				return $filename_path;
+			} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
+				return $this->get_budget_base_dir( 'url' ) . $filename;
+			}
+		}
+	} 
+
+	/**
 	 * Returns the filename created in folder
 	 *
 	 * @return string Filename and path
 	 */
-	private function get_budget_path() {
+	private function get_budget_base_dir( $type = 'path' ) {
 		$upload_dir = wp_upload_dir();
 		$dir_name   = $upload_dir['basedir'] . '/pbc/';
 		if ( ! file_exists( $dir_name ) ) {
 			wp_mkdir_p( $dir_name );
 		}
 
-		return $dir_name;
+		if ( 'url' === $type ) {
+			return $upload_dir['baseurl'] . '/pbc/';
+		} else {
+			return $dir_name;
+		}
 	}
 
 	public function configurator_result_generate_pdf(){
@@ -1408,7 +1416,7 @@ class Admin_PBCPlugin {
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
 			$output = '';
-		    $output .= "<page backcolor='#fff'>";
+		   $output .= "<page backcolor='#fff'>";
 			$output .= "<style>
 			.header, .product .product-title {margin-left: 20px;}
 			.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
@@ -1426,14 +1434,20 @@ class Admin_PBCPlugin {
 			img.header_image{ width:700px;height:120px; }
 			img.footer_image{ width:700px;height:70px; margin: 50px 0 0 30px;}
 			</style>";
-			// $pdf_image_selected = get_option('pbc_pdf_image_selected');
-			// if($pdf_image_selected)
-			// 	$output .="<img src='".$pdf_image_selected."' width='200'/>";
-			$output .="<table class='header'><tr><td><img src='".WPPBC_PLUGIN_DIR."/assets/pdf-header.png' class='header_image'/></td></tr></table><br/>";
-			$output .= "<table class='product'><tr><td class='product-title'><img width='350' src='".WPPBC_PLUGIN_DIR."/assets/pdf-title.png' class='title_image'/><p>Relaci&oacute;n de caracter&iacute;sticas del modelo seleccionado.</p></td><td class='product-preview'><div class='image-wrap'>";
+			$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
+			if ( $pdf_image_selected ) {
+				$output .="<img src='".$pdf_image_selected."' width='200'/>";
+			}
+			$header_image = get_option( 'pbc_pdf_image_header' );
+			if ( $header_image ) {
+				$output .= '<table class="header"><tr><td><img src="' . esc_url( $header_image ) . '" class="header_image"/></td></tr></table><br/>';
+			}
+			$output .= '<table class="product"><tr><td class="product-title">';
+			$output .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
+			$output .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
 			$flipped = false;
-			$variations_images_flipped = get_option('variations_images_flipped');
-			if(!empty($variations_images_flipped)) {
+			$variations_images_flipped = get_option( 'variations_images_flipped' );
+			if ( ! empty( $variations_images_flipped ) ) {
 				for ($j = 1; $j <= count($_SESSION['pbc_variation']); $j++)
 				{
 					if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
@@ -1443,7 +1457,8 @@ class Admin_PBCPlugin {
 			}
 
 			$outputImage = imagecreatetruecolor(300, 243);
-			$black = imagecolorallocate($outputImage, 0, 0, 0);
+			$black       = imagecolorallocate($outputImage, 0, 0, 0);
+			$dirname     = $this->get_budget_base_dir();
 			// Make the background transparent
 			imagecolortransparent($outputImage, $black);
 			for ($i = 1; $i <= count($_SESSION['pbc_variation']); $i++)
@@ -1494,7 +1509,6 @@ class Admin_PBCPlugin {
 						    break;
 							default:
 								//jpg, jpeg, gif others
-								$dirname = $this->get_budget_path();
 								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), $dirname . 'product-image-for-pdf.png' );
 								list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
 								$img = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
@@ -1509,11 +1523,9 @@ class Admin_PBCPlugin {
 					}
 				}
 			}
-			$filename = 'pdfimage'.round(microtime(true) * 1000).'.png';
-			imagepng($outputImage, WPPBC_PLUGIN_DIR."/product-image-for-pdf.png");
-			imagedestroy($outputImage);
-			$output .= '<img phaseid="'.$i.'" src="'.WPPBC_PLUGIN_DIR.'/product-image-for-pdf.png" alt="product image"/>';
-
+			imagepng( $outputImage, $dirname . '/product-image-for-pdf.png' );
+			imagedestroy( $outputImage );
+			$output .= '<img phaseid="'.$i.'" src="' . $dirname . '/product-image-for-pdf.png" alt="product image"/>';
 			$output .= "</div></td></tr></table><br/><br/>";
 
 			$output .= '<table class="summary">';
@@ -1561,7 +1573,10 @@ class Admin_PBCPlugin {
 			$output .= '</tr>';
 			$output .= '</table><br/>';
 
-			$output .="<table class='footer'><tr><td><img src='".WPPBC_PLUGIN_DIR."/assets/pdf-footer.png' class='footer_image'/></td></tr></table>";
+			$footer_image = get_option( 'pbc_pdf_image_footer' );
+			if ( $footer_image ) {
+				$output .= '<table class="footer"><tr><td><img src="' . esc_url( $footer_image ) . '" class="footer_image"/></td></tr></table><br/>';
+			}
 
 			$output .= '</page>';
 			$result = array('type'=>'success', 'response'=>$output);
