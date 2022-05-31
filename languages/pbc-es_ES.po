@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
-"POT-Creation-Date: 2022-05-31 00:54+0200\n"
+"POT-Creation-Date: 2022-06-01 00:35+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: \n"
@@ -11,58 +11,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0.1\n"
-
-#: budget-configurator.php:439
-msgid "No Variations Available"
-msgstr "No hay variaciones disponibles"
-
-#: budget-configurator.php:584 budget-configurator.php:587
-msgid "Back"
-msgstr "Atrás"
-
-#: budget-configurator.php:595
-msgid "Calculate"
-msgstr "Calcular"
-
-#: budget-configurator.php:598
-msgid "Next"
-msgstr "Siguente"
-
-#: budget-configurator.php:615
-msgid "Actual Configuration"
-msgstr "Configuración Actual"
-
-#: budget-configurator.php:651
-msgid "Total"
-msgstr "Total"
-
-#: budget-configurator.php:661 includes/class-admin-pbcplugin.php:930
-msgid "VAT not included"
-msgstr "IVA no incluido"
-
-#: budget-configurator.php:673
-msgid "separate multiple email by comma"
-msgstr "separar múltiples correos por coma"
-
-#: budget-configurator.php:674
-msgid "Your name"
-msgstr "Nombre"
-
-#: budget-configurator.php:675
-msgid "Phone number"
-msgstr "Teléfono"
-
-#: budget-configurator.php:676
-msgid "Your City"
-msgstr "Ciudad"
-
-#: budget-configurator.php:677
-msgid "State"
-msgstr "Provincia"
-
-#: budget-configurator.php:678
-msgid "Send"
-msgstr "Enviar"
 
 #. Plugin Name of the plugin/theme
 #: includes/class-admin-pbcplugin.php:133
@@ -126,7 +74,7 @@ msgid "General Settings"
 msgstr "Opciones Generales"
 
 #: includes/class-admin-pbcplugin.php:308
-#: includes/class-admin-pbcplugin.php:895
+#: includes/class-admin-pbcplugin.php:904
 msgid "Order"
 msgstr "Orden"
 
@@ -250,10 +198,10 @@ msgstr ""
 "función del número de multisitios de WordPress que utilice."
 
 #: includes/class-admin-pbcplugin.php:497
-#: includes/class-admin-pbcplugin.php:655
-#: includes/class-admin-pbcplugin.php:894
-#: includes/class-admin-pbcplugin.php:948
-#: includes/class-admin-pbcplugin.php:1279
+#: includes/class-admin-pbcplugin.php:664
+#: includes/class-admin-pbcplugin.php:903
+#: includes/class-admin-pbcplugin.php:957
+#: includes/class-admin-pbcplugin.php:1288
 msgid "Phase"
 msgstr "Fase"
 
@@ -296,10 +244,10 @@ msgid "phase"
 msgstr "fase"
 
 #: includes/class-admin-pbcplugin.php:530
-#: includes/class-admin-pbcplugin.php:689
-#: includes/class-admin-pbcplugin.php:709
-#: includes/class-admin-pbcplugin.php:947
-#: includes/class-admin-pbcplugin.php:1279
+#: includes/class-admin-pbcplugin.php:698
+#: includes/class-admin-pbcplugin.php:718
+#: includes/class-admin-pbcplugin.php:956
+#: includes/class-admin-pbcplugin.php:1288
 msgid "Variation"
 msgstr "Variación"
 
@@ -413,198 +361,202 @@ msgstr "Añadir nueva opción"
 msgid "New Price Option"
 msgstr "Nueva Opción de Precio"
 
-#: includes/class-admin-pbcplugin.php:646
+#: includes/class-admin-pbcplugin.php:655
 msgid "Options for variation"
 msgstr "Opciones de variación"
 
-#: includes/class-admin-pbcplugin.php:661
+#: includes/class-admin-pbcplugin.php:670
 msgid "Select a phase"
 msgstr "Selecciona una fase"
 
-#: includes/class-admin-pbcplugin.php:665
+#: includes/class-admin-pbcplugin.php:674
 msgid "Reference"
 msgstr "Referencia"
 
-#: includes/class-admin-pbcplugin.php:674
+#: includes/class-admin-pbcplugin.php:683
 msgid "Icon image"
 msgstr "Imagen de icono"
 
-#: includes/class-admin-pbcplugin.php:681
-#: includes/class-admin-pbcplugin.php:950
-#: includes/class-admin-pbcplugin.php:1681
+#: includes/class-admin-pbcplugin.php:690
+#: includes/class-admin-pbcplugin.php:959
+#: includes/class-admin-pbcplugin.php:1690
 msgid "Depends of"
 msgstr "Depende de"
 
-#: includes/class-admin-pbcplugin.php:695
+#: includes/class-admin-pbcplugin.php:704
 msgid "Not depends of variation"
 msgstr "No depende de la variación"
 
-#: includes/class-admin-pbcplugin.php:701
+#: includes/class-admin-pbcplugin.php:710
 msgid "Product group image"
 msgstr "Imagen del grupo de productos"
 
-#: includes/class-admin-pbcplugin.php:719
+#: includes/class-admin-pbcplugin.php:728
 msgid "Product image"
 msgstr "Imagen del producto"
 
-#: includes/class-admin-pbcplugin.php:727
-#: includes/class-admin-pbcplugin.php:806
-#: includes/class-admin-pbcplugin.php:949
-#: includes/class-admin-pbcplugin.php:1279
-#: includes/class-admin-pbcplugin.php:1680
+#: includes/class-admin-pbcplugin.php:736
+#: includes/class-admin-pbcplugin.php:815
+#: includes/class-admin-pbcplugin.php:958
+#: includes/class-admin-pbcplugin.php:1288
+#: includes/class-admin-pbcplugin.php:1689
 msgid "Price"
 msgstr "Precio"
 
-#: includes/class-admin-pbcplugin.php:735
+#: includes/class-admin-pbcplugin.php:744
 msgid "Option price"
 msgstr "Opción del precio"
 
-#: includes/class-admin-pbcplugin.php:745
+#: includes/class-admin-pbcplugin.php:754
 msgid "Price (VAT not included)"
 msgstr "Precio (IVA no incluido)"
 
-#: includes/class-admin-pbcplugin.php:765
+#: includes/class-admin-pbcplugin.php:774
 msgid "Enquiry Details"
 msgstr "Detalles del Presupuesto"
 
-#: includes/class-admin-pbcplugin.php:774
+#: includes/class-admin-pbcplugin.php:783
 msgid "Budget Configuration"
 msgstr "Configuración del presupuesto"
 
-#: includes/class-admin-pbcplugin.php:785
-#: includes/class-admin-pbcplugin.php:1277
+#: includes/class-admin-pbcplugin.php:794
+#: includes/class-admin-pbcplugin.php:1286
 msgid "Name:"
 msgstr "Nombre:"
 
-#: includes/class-admin-pbcplugin.php:786
-#: includes/class-admin-pbcplugin.php:1277
+#: includes/class-admin-pbcplugin.php:795
+#: includes/class-admin-pbcplugin.php:1286
 msgid "Phone:"
 msgstr "Teléfono:"
 
-#: includes/class-admin-pbcplugin.php:787
-#: includes/class-admin-pbcplugin.php:1277
+#: includes/class-admin-pbcplugin.php:796
+#: includes/class-admin-pbcplugin.php:1286
 msgid "Email:"
 msgstr "Correo:"
 
-#: includes/class-admin-pbcplugin.php:788
-#: includes/class-admin-pbcplugin.php:1277
+#: includes/class-admin-pbcplugin.php:797
+#: includes/class-admin-pbcplugin.php:1286
 msgid "City:"
 msgstr "Ciudad:"
 
-#: includes/class-admin-pbcplugin.php:789
-#: includes/class-admin-pbcplugin.php:1277
+#: includes/class-admin-pbcplugin.php:798
+#: includes/class-admin-pbcplugin.php:1286
 msgid "State:"
 msgstr "Provincia:"
 
-#: includes/class-admin-pbcplugin.php:805
+#: includes/class-admin-pbcplugin.php:814
 msgid "Phase/Variation"
 msgstr "Fase/Variación"
 
-#: includes/class-admin-pbcplugin.php:903
+#: includes/class-admin-pbcplugin.php:912
 msgid "Budget"
 msgstr "Presupuesto"
 
-#: includes/class-admin-pbcplugin.php:904
+#: includes/class-admin-pbcplugin.php:913
 msgid "Details"
 msgstr "Detalles"
 
-#: includes/class-admin-pbcplugin.php:905
+#: includes/class-admin-pbcplugin.php:914
 msgid "Configuration"
 msgstr "Configuración"
 
-#: includes/class-admin-pbcplugin.php:906
-#: includes/class-admin-pbcplugin.php:1674
+#: includes/class-admin-pbcplugin.php:915
+#: includes/class-admin-pbcplugin.php:1683
 msgid "Date"
 msgstr "Fecha"
 
-#: includes/class-admin-pbcplugin.php:935
+#: includes/class-admin-pbcplugin.php:939
+#: includes/template-budget-configurator.php:661
+msgid "VAT not included"
+msgstr "IVA no incluido"
+
+#: includes/class-admin-pbcplugin.php:944
 msgid "Generate PDF"
 msgstr "Generar PDF"
 
-#: includes/class-admin-pbcplugin.php:951
-#: includes/class-admin-pbcplugin.php:1682
+#: includes/class-admin-pbcplugin.php:960
+#: includes/class-admin-pbcplugin.php:1691
 msgid "Icon"
 msgstr "Icono"
 
-#: includes/class-admin-pbcplugin.php:952
+#: includes/class-admin-pbcplugin.php:961
 msgid "Product Images"
 msgstr "Imágenes de producto"
 
-#: includes/class-admin-pbcplugin.php:1056
+#: includes/class-admin-pbcplugin.php:1065
 msgid "All Phases"
 msgstr "Todas las Fases"
 
-#: includes/class-admin-pbcplugin.php:1260
+#: includes/class-admin-pbcplugin.php:1269
 msgid "Email field empty!"
 msgstr "¡El campo de correo está vacío!"
 
-#: includes/class-admin-pbcplugin.php:1262
+#: includes/class-admin-pbcplugin.php:1271
 msgid "Name field is empty!"
 msgstr "¡El campo de nombre está vacío!"
 
-#: includes/class-admin-pbcplugin.php:1264
+#: includes/class-admin-pbcplugin.php:1273
 msgid "Phone field is empty!"
 msgstr "¡El campo de teléfono está vacío!"
 
-#: includes/class-admin-pbcplugin.php:1274
-#: includes/class-admin-pbcplugin.php:1416
+#: includes/class-admin-pbcplugin.php:1283
+#: includes/class-admin-pbcplugin.php:1425
 msgid "Configurator not ready!"
 msgstr "¡Configurador no está funcionando!"
 
-#. Template Name of the plugin/theme
-#: includes/class-admin-pbcplugin.php:1276
+#: includes/class-admin-pbcplugin.php:1285
 msgid "Budget Configurator"
 msgstr "Configurador Presupuestos"
 
-#: includes/class-admin-pbcplugin.php:1277
+#: includes/class-admin-pbcplugin.php:1286
 msgid "Enquiry details:"
 msgstr "Detalles del Presupuesto:"
 
-#: includes/class-admin-pbcplugin.php:1278
+#: includes/class-admin-pbcplugin.php:1287
 msgid "Configuration details:"
 msgstr "Detalles de configuración:"
 
-#: includes/class-admin-pbcplugin.php:1300
+#: includes/class-admin-pbcplugin.php:1309
 msgid "Total:"
 msgstr "Total:"
 
-#: includes/class-admin-pbcplugin.php:1336
+#: includes/class-admin-pbcplugin.php:1345
 msgid "Error in sending mail. Please try again!"
 msgstr "Error enviando el email, por favor ¡intenta más tarde!"
 
-#: includes/class-admin-pbcplugin.php:1343
+#: includes/class-admin-pbcplugin.php:1352
 msgid "Mail sent!"
 msgstr "¡Correo enviado!"
 
-#: includes/class-admin-pbcplugin.php:1365
+#: includes/class-admin-pbcplugin.php:1374
 msgid "budget"
 msgstr "presupuesto"
 
-#: includes/class-admin-pbcplugin.php:1446
+#: includes/class-admin-pbcplugin.php:1455
 msgid "Characteristics selected"
 msgstr "Características seleccionadas"
 
-#: includes/class-admin-pbcplugin.php:1447
+#: includes/class-admin-pbcplugin.php:1456
 msgid "Lists of options selected:"
 msgstr "Listas de opciones seleccionadas:"
 
-#: includes/class-admin-pbcplugin.php:1590
+#: includes/class-admin-pbcplugin.php:1599
 msgid "Create List Price"
 msgstr "Crear Tarifa Precios"
 
-#: includes/class-admin-pbcplugin.php:1673
+#: includes/class-admin-pbcplugin.php:1682
 msgid "List Price for"
 msgstr "Tarifa Precios de"
 
-#: includes/class-admin-pbcplugin.php:1683
+#: includes/class-admin-pbcplugin.php:1692
 msgid "Product"
 msgstr "Producto"
 
-#: includes/class-admin-pbcplugin.php:1773
+#: includes/class-admin-pbcplugin.php:1782
 msgid "List Price"
 msgstr "Tarifa Precios"
 
-#: includes/class-admin-pbcplugin.php:1816
+#: includes/class-admin-pbcplugin.php:1825
 #, php-format
 msgid ""
 "The <strong>%1$s</strong> License has not been activated, so the plugin is "
@@ -613,23 +565,23 @@ msgstr ""
 "El <strong>%1$s</strong> Licencia no ha sido activada, por lo que el plugin "
 "está inactivo %2$sHaga clic aquí%3$s para activarlo."
 
-#: includes/class-admin-pbcplugin.php:1831
+#: includes/class-admin-pbcplugin.php:1840
 msgid "Activated"
 msgstr "Activado"
 
-#: includes/class-admin-pbcplugin.php:1835
+#: includes/class-admin-pbcplugin.php:1844
 msgid "Deactivated"
 msgstr "Desactivado"
 
-#: includes/class-admin-pbcplugin.php:1877
+#: includes/class-admin-pbcplugin.php:1886
 msgid "License AutoTranslate deactivated. "
 msgstr "Licencia AutoTranslate desactivada. "
 
-#: includes/class-admin-pbcplugin.php:1907
+#: includes/class-admin-pbcplugin.php:1916
 msgid "AutoTranslate activated. "
 msgstr "AutoTranslate activado. "
 
-#: includes/class-admin-pbcplugin.php:1915
+#: includes/class-admin-pbcplugin.php:1924
 msgid ""
 "Connection failed to the License Key API server. Try again later. There may "
 "be a problem on your server preventing outgoing requests, or the store is "
@@ -640,7 +592,7 @@ msgstr ""
 "solicitudes salientes, o la tienda está bloqueando su solicitud para activar "
 "el tema/plugin."
 
-#: includes/class-admin-pbcplugin.php:1924
+#: includes/class-admin-pbcplugin.php:1933
 msgid ""
 "The API Key activation could not be commpleted due to an unknown error "
 "possibly on the store server The activation results were empty."
@@ -649,12 +601,12 @@ msgstr ""
 "desconocido posiblemente en el servidor de la tienda Los resultados de la "
 "activación estaban vacíos."
 
-#: includes/class-admin-pbcplugin.php:1937
-#: includes/class-admin-pbcplugin.php:1964
+#: includes/class-admin-pbcplugin.php:1946
+#: includes/class-admin-pbcplugin.php:1973
 msgid "The API Key is missing from the deactivation request."
 msgstr "Falta la clave de la API en la solicitud de desactivación."
 
-#: includes/class-admin-pbcplugin.php:2250
+#: includes/class-admin-pbcplugin.php:2259
 #, php-format
 msgid ""
 "<b>Warning!</b> You're blocking external requests which means you won't be "
@@ -799,6 +751,59 @@ msgstr ""
 #: includes/helper-required-plugins.php:145
 msgid "Please contact the administrator of this site for help."
 msgstr "Para más ayuda, contacta con el administrador de la web."
+
+#: includes/template-budget-configurator.php:439
+msgid "No Variations Available"
+msgstr "No hay variaciones disponibles"
+
+#: includes/template-budget-configurator.php:584
+#: includes/template-budget-configurator.php:587
+msgid "Back"
+msgstr "Atrás"
+
+#: includes/template-budget-configurator.php:595
+msgid "Calculate"
+msgstr "Calcular"
+
+#: includes/template-budget-configurator.php:598
+msgid "Next"
+msgstr "Siguente"
+
+#: includes/template-budget-configurator.php:615
+msgid "Actual Configuration"
+msgstr "Configuración Actual"
+
+#: includes/template-budget-configurator.php:651
+msgid "Total"
+msgstr "Total"
+
+#: includes/template-budget-configurator.php:674
+msgid "Send budget to email"
+msgstr "Enviar presupuesto al correo"
+
+#: includes/template-budget-configurator.php:677
+msgid "separate multiple email by comma"
+msgstr "separar múltiples correos por coma"
+
+#: includes/template-budget-configurator.php:678
+msgid "Your name"
+msgstr "Nombre"
+
+#: includes/template-budget-configurator.php:679
+msgid "Phone number"
+msgstr "Teléfono"
+
+#: includes/template-budget-configurator.php:680
+msgid "Your City"
+msgstr "Ciudad"
+
+#: includes/template-budget-configurator.php:681
+msgid "State"
+msgstr "Provincia"
+
+#: includes/template-budget-configurator.php:682
+msgid "Send"
+msgstr "Enviar"
 
 #. Plugin URI of the plugin/theme
 msgid "https://close.technology/wordpress-plugins/product-budget-configurator/"

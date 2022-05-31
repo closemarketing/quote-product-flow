@@ -23,6 +23,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added option to show prices.
 *  Save budgets in /uploads/pbc/
 *  Updated Metabox Group 1.3.14
+*  Added options for header and footer.
 
 = 1.0 =
 *	First released.
