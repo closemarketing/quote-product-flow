@@ -668,13 +668,10 @@ if ( ! empty( $phases ) ) {
 				?>
 			</div>
 			<?php 
-			
-			// Banner.
-			do_action( 'pbc_banner_after_setup' );
-
 			if($cStep == 'calculate'){?>
 				<div class="configurator_result_share">
 					<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
+					<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
 					<div class="email_submit_fields">
 						<h2><?php esc_html('Send the budget to an email:', 'pbc' ); ?></h2>
 						<input type="text" name="email_field" placeholder="<?php _e('separate multiple email by comma','pbc');?>"/><br/>
@@ -692,7 +689,11 @@ if ( ! empty( $phases ) ) {
 					<?php unset($_SESSION['pbc_output']);}?>
 				</div>
 			<?php }?>
-		<?php if($cStep != 'calculate'){?>
+		<?php
+		if ( $cStep != 'calculate') {
+			// Banner.
+			do_action( 'pbc_banner_after_setup' );
+		?>
 		</div>
 		<?php }//$cStep != 'calculate'?>
 		</form>
