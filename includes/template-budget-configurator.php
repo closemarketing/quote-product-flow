@@ -752,8 +752,13 @@ if ( ! empty( $phases ) ) {
 							}
 							if(obj.option || obj.price){
 								if($('.variation_selected.phase-'+cPhase).length == 0){
-										$('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
-								}else{
+									html_append = '<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">';
+									if ( show_prices !== 'no' ) {
+										html_append += obj.price;
+									}
+									html_append += '</td></tr></table>';
+									$('.configurator_summary').append( html_append );
+								} else {
 										$('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
 									if ( show_prices !== 'no' ) {
 										$('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
