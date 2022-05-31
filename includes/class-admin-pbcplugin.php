@@ -1114,10 +1114,10 @@ class Admin_PBCPlugin {
 				}
 				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
 			}
-			if ( \locate_template( 'budget-configurator.php' ) )
-				$new_template =  \get_stylesheet_directory().'budget-configurator.php';
+			if ( \locate_template( 'template-budget-configurator.php' ) )
+				$new_template =  \get_stylesheet_directory().'template-budget-configurator.php';
 	        else
-				$new_template = WPPBC_PLUGIN_DIR. '/budget-configurator.php';
+				$new_template = WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
 			if ( '' != $new_template ) {
 				return $new_template ;
 			}
@@ -1237,10 +1237,10 @@ class Admin_PBCPlugin {
 			$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
 		}
 		ob_start();
-		if ( \locate_template( 'budget-configurator.php' ) )
-			\locate_template('budget-configurator.php', true);
+		if ( \locate_template( 'template-budget-configurator.php' ) )
+			\locate_template('template-budget-configurator.php', true);
 		else
-			include(WPPBC_PLUGIN_DIR. '/budget-configurator.php');
+			include WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
 		$all_details = ob_get_contents();
 		ob_end_clean();
 		echo $all_details;
@@ -1251,10 +1251,10 @@ class Admin_PBCPlugin {
 		$login = wp_signon( array( 'user_login' => $username, 'user_password' => $password, 'remember' => true ), false );
 		if( $login->ID ) {
 			ob_start();
-			if ( \locate_template( 'budget-configurator.php' ) )
-				\locate_template('budget-configurator.php', true);
+			if ( \locate_template( 'template-budget-configurator.php' ) )
+				\locate_template('template-budget-configurator.php', true);
 			else
-				include(WPPBC_PLUGIN_DIR. '/budget-configurator.php');
+				include WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
 			$all_details = ob_get_contents();
 			ob_end_clean();
 			echo $all_details;
