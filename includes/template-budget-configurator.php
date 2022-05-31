@@ -45,7 +45,7 @@ if ( isset( $_POST['submit'] ) ) {
 					$phase_param['pricevar'] = $pricevar ? $pricevar : '';
 					update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
 				}
-				if ( isset( $pricevar ) ) {
+				if ( isset( $pricevar ) && ! empty( $pricegroup ) ) {
 					foreach ( $pricegroup as $details ) {
 						if ( $details['pbc_meaprice'] == $pricevar ) {
 							$option_name = $pricevar;

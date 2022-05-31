@@ -1290,8 +1290,8 @@ class Admin_PBCPlugin {
 				$logged_in = is_user_logged_in();
 				$enquiry_entries = array();
 				$i=0;
-				foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
-					$total_price += $details['var']['price'];
+				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
+					$total_price += (int) $details['var']['price'];
 					$message .= '<tr>';
 					$message .= '<td>'.$details['phase']['name'].'</td>';
 					$message .= '<td>'.$details['var']['name'].'</td>';
