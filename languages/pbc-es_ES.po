@@ -562,8 +562,8 @@ msgid ""
 "The <strong>%1$s</strong> License has not been activated, so the plugin is "
 "inactive! %2$sClick here%3$s to activate it."
 msgstr ""
-"El <strong>%1$s</strong> Licencia no ha sido activada, por lo que el plugin "
-"está inactivo %2$sHaga clic aquí%3$s para activarlo."
+"La licencia de <strong>%1$s</strong> no ha sido activada, por lo que el "
+"plugin no recibirá actualizaciones %2$sHaz clic aquí%3$s para activarlo."
 
 #: includes/class-admin-pbcplugin.php:1840
 msgid "Activated"
