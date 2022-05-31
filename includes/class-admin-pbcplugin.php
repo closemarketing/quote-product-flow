@@ -1816,15 +1816,15 @@ class Admin_PBCPlugin {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
-			if ( isset( $_GET['page'] ) && 'wpautotranslate' == $_GET['page'] ) {
+			if ( isset( $_GET['page'] ) && 'pbc' == $_GET['page'] ) {
 				return;
 			}
 			echo '<div class="notice notice-error">';
 			echo '<p>';
 			printf(
-				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'wpautotranslate' ),
+				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
 				esc_attr( WPPBC_ITEM_NAME ),
-				'<a href="' . esc_url( admin_url( 'network/admin.php?page=wpautotranslate&tab=license' ) ) . '">',
+				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
 				'</a>'
 			);
 			echo '</p></div>';
@@ -1837,11 +1837,11 @@ class Admin_PBCPlugin {
 	 */
 	public function license_status_callback() {
 		if ( $this->get_api_key_status( true ) ) {
-			$license_status_check = esc_html__( 'Activated', 'wpautotranslate' );
+			$license_status_check = esc_html__( 'Activated', 'pbc' );
 			update_option( 'pbc_license_activated', 'Activated' );
 			update_option( 'pbc_license_deactivate_checkbox', 'off' );
 		} else {
-			$license_status_check = esc_html__( 'Deactivated', 'wpautotranslate' );
+			$license_status_check = esc_html__( 'Deactivated', 'pbc' );
 		}
 
 		echo esc_attr( $license_status_check );
@@ -1943,7 +1943,7 @@ class Admin_PBCPlugin {
 	 */
 	public function license_activate( $api_key ) {
 		if ( empty( $api_key ) ) {
-			add_settings_error( 'not_activated_text', 'not_activated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'wpautotranslate' ), 'updated' );
+			add_settings_error( 'not_activated_text', 'not_activated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'pbc' ), 'updated' );
 
 			return '';
 		}
@@ -1970,7 +1970,7 @@ class Admin_PBCPlugin {
 	 */
 	public function license_deactivate( $args ) {
 		if ( empty( $args ) ) {
-			add_settings_error( 'not_deactivated_text', 'not_deactivated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'wpautotranslate' ), 'updated' );
+			add_settings_error( 'not_deactivated_text', 'not_deactivated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'pbc' ), 'updated' );
 
 			return '';
 		}
@@ -2256,7 +2256,7 @@ class Admin_PBCPlugin {
 					<p>
 						<?php
 						printf(
-							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %s updates. Please add %s to %s.', 'wpautotranslate' ),
+							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %s updates. Please add %s to %s.', 'pbc' ),
 							'AutoTranslate',
 							'<strong>' . esc_html( $host ) . '</strong>',
 							'<code>WP_ACCESSIBLE_HOSTS</code>'
