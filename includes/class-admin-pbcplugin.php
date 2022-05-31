@@ -603,40 +603,49 @@ class Admin_PBCPlugin {
 	 */
 	public function pbc_metabox_variation( $meta_boxes ) {
 		$phase_options = array();
+		$var_options   = array();
 		// Phase options
 		if ( is_admin() ) {
-			$phasescpt = get_posts(array(
-				'post_type' => 'phases',
-				'posts_per_page' => -1,
-				'post_parent'=> 0,
-				'orderby' => 'menu_order',
-				'order' => 'ASC'
-			));
+			$phasescpt = get_posts(
+				array(
+					'post_type'      => 'phases',
+					'posts_per_page' => -1,
+					'post_parent'    => 0,
+					'orderby'        => 'menu_order',
+					'order'          => 'ASC',
+				)
+			);
 			$phasescpt_item = array();
-			foreach ($phasescpt as $phasescpt_item) {
-				$phase_options[$phasescpt_item->ID] = $phasescpt_item->menu_order.' - '.$phasescpt_item->post_title;
+			foreach ( $phasescpt as $phasescpt_item ) {
+				$phase_options[ $phasescpt_item->ID ] = $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
 			}
-			//Variations Options
-			$var_options = array();
+			// Variations Options.
 			$variationscpt = get_posts(array(
-				'post_type' => 'variation',
+				'post_type'      => 'variation',
 				'posts_per_page' => -1,
-				'orderby' => 'name',
-				'order' => 'ASC'
+				'orderby'        => 'name',
+				'order'          => 'ASC'
 			));
-			$variationscpt_item = array();
-			foreach ($variationscpt as $var_item) {
-			$phase_id = get_post_meta($var_item->ID, 'pbc_phase', true);
-			$phase_post = get_post($phase_id);
-			if($phase_post->menu_order<10) $phase_order = '0'.$phase_post->menu_order; else $phase_order = $phase_post->menu_order;
-			$var_value = $phase_order.'|'.$var_item->ID;
-			$var_sku = get_post_meta($var_item->ID, 'pbc_sku', true);
-			if($var_sku)
-				$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
-			else
-				$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
+			foreach ( $variationscpt as $var_item ) {
+				$phase_id   = get_post_meta( $var_item->ID, 'pbc_phase', true );
+				$phase_post = get_post( $phase_id );
+				if ( empty( $phase_post ) ) {
+					continue;
+				}
+				if ( $phase_post->menu_order < 10 ) {
+					$phase_order = '0' . $phase_post->menu_order;
+				} else {
+					$phase_order = $phase_post->menu_order;
+				}
+				$var_value = $phase_order.'|'.$var_item->ID;
+				$var_sku = get_post_meta( $var_item->ID, 'pbc_sku', true );
+				if ( $var_sku ) {
+					$var_options[ $var_value ] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
+				} else {
+					$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
+				}
 			}
-			asort($var_options);
+			asort( $var_options );
 		}
 
     	$prefix = 'pbc_';
