@@ -1429,8 +1429,7 @@ class Admin_PBCPlugin {
 		if(!isset($_SESSION['pbc_variation'])){
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
-			$output = '';
-		   $output .= "<page backcolor='#fff'>";
+			$output  = '<page backcolor="#fff">';
 			$output .= "<style>
 			.header, .product .product-title {margin-left: 20px;}
 			.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
@@ -1461,7 +1460,7 @@ class Admin_PBCPlugin {
 			$output .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
 			$flipped = false;
 			$variations_images_flipped = get_option( 'variations_images_flipped' );
-			if ( ! empty( $variations_images_flipped ) ) {
+			if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
 				for ($j = 1; $j <= count($_SESSION['pbc_variation']); $j++)
 				{
 					if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
@@ -1471,20 +1470,17 @@ class Admin_PBCPlugin {
 			}
 
 			$outputImage = imagecreatetruecolor(300, 243);
-			$black       = imagecolorallocate($outputImage, 0, 0, 0);
+			$black       = imagecolorallocate( $outputImage, 0, 0, 0 );
 			$dirname     = $this->get_budget_base_dir();
 			// Make the background transparent
-			imagecolortransparent($outputImage, $black);
-			for ($i = 1; $i <= count($_SESSION['pbc_variation']); $i++)
-			{
+			imagecolortransparent( $outputImage, $black );
+			for ( $i = 1; $i <= count( $_SESSION['pbc_variation'] ); $i++ ) {
 				$imgprodid = $imgprodurl = '';
-				if(isset($_SESSION['pbc_variation'][$i]))
-				{
+				if ( isset( $_SESSION['pbc_variation'][ $i ] ) ) {
 					$ssVar = $_SESSION['pbc_variation'][$i]['var']['id'];
 					$imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
-					if(!empty($imgprodgroup)){
-						foreach($imgprodgroup as $deps)
-						{
+					if ( ! empty( $imgprodgroup ) ) {
+						foreach ( $imgprodgroup as $deps ) {
 							if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
 							{
 								$prevVar = array();
@@ -1513,14 +1509,16 @@ class Admin_PBCPlugin {
 							}
 						}
 					}
-					if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
-					if(isset($imgprodurl) && $imgprodurl){
-						$extension = pathinfo($imgprodurl[0], PATHINFO_EXTENSION);
-						switch ($extension) {
-						    case 'png':
-						       $img = imagecreatefrompng($imgprodurl[0]);
-							   list($width, $height) = getimagesize($imgprodurl[0]);
-						    break;
+					if ( ! empty( $imgprodid ) ) {
+						$imgprodurl = wp_get_attachment_image_src( $imgprodid, 'full', true );
+					}
+					if ( ! empty( $imgprodurl ) && file_exists( $imgprodurl ) ) {
+						$extension = pathinfo( $imgprodurl[0], PATHINFO_EXTENSION );
+						switch ( $extension ) {
+							case 'png':
+								$img = imagecreatefrompng( $imgprodurl[0] );
+								list($width, $height) = getimagesize($imgprodurl[0]);
+							break;
 							default:
 								//jpg, jpeg, gif others
 								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), $dirname . 'product-image-for-pdf.png' );
@@ -1546,20 +1544,27 @@ class Admin_PBCPlugin {
 			$total_price = '';
 			$logged_in = is_user_logged_in();
 			$i = 0;
-			foreach($_SESSION['pbc_variation'] as $phaseKey => $details){
-				if(($i%2) == 0) $bg = 'background';
-				else $bg = '';
-				$price = (double)($details['var']['price']);
+			foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
+				if ( ( $i % 2 ) == 0 ) {
+					$bg = 'background';
+				} else {
+					$bg = '';
+				}
+				$price = (double)( $details['var']['price'] );
 				$total_price += $price;
 				$output .= '<tr>';
 				$output .= '<td class="title '.$bg.'">'.$details['phase']['name'].' '.$details['var']['name'].'</td>';
 				$output .= '<td class="value right '.$bg.'">';
-				if($logged_in) $output .= number_format($price, 2, ',', ' ').' €'; else $output .= '-';
+				if ( $logged_in ) {
+					$output .= number_format($price, 2, ',', ' ').' €';
+				} else {
+					$output .= '-';
+				}
 				$output .= '</td>';
 				$output .= '</tr>';
 				$i++;
 			}
-			if(!$total_price){
+			if ( ! $total_price ) {
 				$total_price = 0;
 				$tax = 0;
 			}
@@ -1570,12 +1575,12 @@ class Admin_PBCPlugin {
 			$output .= '<table class="summary-total"><tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
 			$output .= '<td class="value right">';
-			if($logged_in) $output .= number_format($tax, 2, ',', '.').' €'; else $output .= '-';
+			if($logged_in) $output .= number_format( $tax, 2, ',', '.').' €'; else $output .= '-';
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
 			$output .= '<td class="value right">';
-			if($logged_in) $output .= number_format($total_price, 2, ',', '.').' €';else $output .= '-';
+			if($logged_in) $output .= number_format( $total_price, 2, ',', '.').' €';else $output .= '-';
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
@@ -1588,7 +1593,7 @@ class Admin_PBCPlugin {
 			$output .= '</table><br/>';
 
 			$footer_image = get_option( 'pbc_pdf_image_footer' );
-			if ( $footer_image ) {
+			if ( ! empty( $footer_image ) && file_exists( $footer_image ) ) {
 				$output .= '<table class="footer"><tr><td><img src="' . esc_url( $footer_image ) . '" class="footer_image"/></td></tr></table><br/>';
 			}
 
