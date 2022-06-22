@@ -490,110 +490,115 @@ class Admin_PBCPlugin {
 		echo '</div>';
 	}
 
-    /**
-     * Post Type Phases
-     */
-    public function pbc_register_cpt() {
-        $nametype = __('Phase','pbc');
-
-        $labels = array(
-         'name' => $nametype.'s',
-         'singular_name' => $nametype,
-         'add_new' => __('Add','pbc').' '.$nametype,
-         'add_new_item' => __('Add New','pbc').' '.$nametype,
-         'edit_item' => __('Edit','pbc').' '.$nametype,
-         'new_item' => __('New','pbc').' '.$nametype,
-         'view_item' => __('View','pbc').' '.$nametype,
-         'search_items' => __('Search for','pbc').' '.$nametype.'s',
-         'not_found' =>  __("We didn't find any",'pbc').' '.$nametype,
-         'not_found_in_trash' => __("We didn't find any",'pbc').' '.$nametype.' '.__("in the trash",'pbc'),
-        );
-        $args = array(
-         'labels' => $labels,
-         'public' => false,
-         'show_in_menu' => false,
-         'publicly_queryable' => false,
-         'show_ui' => true,
-         'query_var' => true,
-         'rewrite' => array( 'slug' => _x('phase','phase','pbc'),'with_front' => 'true' ),
-         'has_archive' => false,
-         'capability_type' => 'page',
-         'hierarchical' => false,
-         'menu_position' => 5,
-         'supports' => array('title','editor','page-attributes'),
-         'menu_icon' => 'dashicons-tagcloud'
-        );
-        register_post_type('phases',$args);
-
-        $labels = array(
-         'name' =>__('Variations','pbc'),
-         'singular_name' => __('Variation','pbc'),
-         'add_new' => __('Add Variation','pbc'),
-         'add_new_item' => __('Add New variation','pbc'),
-         'edit_item' => __('Edit Variation','pbc'),
-         'new_item' => __('New Variation','pbc'),
-         'view_item' => __('View Variation','pbc'),
-         'search_items' => __('Search for variations','pbc').'s',
-         'not_found' =>  __("We didn't find any Variation",'pbc'),
-         'not_found_in_trash' => __("We didn't find any Variation in the trash",'pbc'),
-        );
-        $args = array(
-         'labels' => $labels,
-         'public' => false,
-         'show_in_menu' => false,
-         'publicly_queryable' => false,
-         'show_ui' => true,
-         'query_var' => true,
-         'rewrite' => array( 'slug' => _x('variation','variation','pbc'),'with_front' => 'true' ),
-         'has_archive' => false,
-         'capability_type' => 'post',
-         'hierarchical' => false,
-         'menu_position' => 5,
-         'supports' => array('title'),
-         'menu_icon' => 'dashicons-tagcloud'
-        );
-        register_post_type('variation',$args);
+	/**
+	 * Register post types
+	 *
+	 * @return void
+	 */
+	public function pbc_register_cpt() {
+		$nametype = __('Phase','pbc');
 
 		$labels = array(
-         'name' =>__('Enquiries','pbc'),
-         'singular_name' => __('Enquiry','pbc'),
-         'add_new' => __('Add Enquiry','pbc'),
-         'add_new_item' => __('Add New Enquiry','pbc'),
-         'edit_item' => __('Edit Enquiry','pbc'),
-         'new_item' => __('New Enquiry','pbc'),
-         'view_item' => __('View Enquiry','pbc'),
-         'search_items' => __('Search for Enquiry','pbc').'s',
-         'not_found' =>  __("We didn't find any Enquiry",'pbc'),
-         'not_found_in_trash' => __("We didn't find any Enquiry in the trash",'pbc'),
-        );
-        $args = array(
-         'labels' => $labels,
-         'public' => false,
-         'show_in_menu' => false,
-         'publicly_queryable' => false,
-         'show_ui' => true,
-         'query_var' => true,
-         'rewrite' => array( 'slug' => _x('Enquiry','enquiry','pbc'),'with_front' => 'true' ),
-         'has_archive' => false,
-         'capability_type' => 'post',
-         'hierarchical' => false,
-         'menu_position' => 5,
-         'supports' => array('title'),
-         'menu_icon' => 'dashicons-tagcloud'
-        );
-        register_post_type('enquiry',$args);
-
-		$labels = array(
-		  'name' => __('Price Options','pbc'),
-		  'singular_name' => __('Price Option','pbc'),
-		  'search_items' =>  __('Search Price Option','pbc'),
-		  'all_items' => __('All Price Options','pbc'),
-		  'edit_item' => __('Edit Price Option','pbc'),
-		  'update_item' => __('Update Price Option','pbc'),
-		  'add_new_item' => __('Add New Price Option','pbc'),
-		  'new_item_name' => __('New Price Option','pbc'),
+			'name'               => $nametype.'s',
+			'singular_name'      => $nametype,
+			'add_new'            => __('Add','pbc').' '.$nametype,
+			'add_new_item'       => __('Add New','pbc').' '.$nametype,
+			'edit_item'          => __('Edit','pbc').' '.$nametype,
+			'new_item'           => __('New','pbc').' '.$nametype,
+			'view_item'          => __('View','pbc').' '.$nametype,
+			'search_items'       => __('Search for','pbc').' '.$nametype.'s',
+			'not_found'          => __("We didn't find any",'pbc').' '.$nametype,
+			'not_found_in_trash' => __("We didn't find any",'pbc').' '.$nametype.' '.__("in the trash",'pbc'),
 		);
-    }
+		$args = array(
+			'labels'             => $labels,
+			'public'             => false,
+			'show_in_menu'       => false,
+			'publicly_queryable' => false,
+			'show_ui'            => true,
+			'query_var'          => true,
+			'rewrite'            => array(
+				'slug' => _x( 'phase', 'phase', 'pbc' ),
+				'with_front' => 'true'
+			),
+			'has_archive'        => false,
+			'capability_type'    => 'page',
+			'hierarchical'       => false,
+			'menu_position'      => 5,
+			'supports'           => array('title','editor','page-attributes'),
+			'menu_icon'          => 'dashicons-tagcloud'
+		);
+		register_post_type( 'phases', $args );
+
+		$labels = array(
+			'name'               => __('Variations','pbc'),
+			'singular_name'      => __('Variation','pbc'),
+			'add_new'            => __('Add Variation','pbc'),
+			'add_new_item'       => __('Add New variation','pbc'),
+			'edit_item'          => __('Edit Variation','pbc'),
+			'new_item'           => __('New Variation','pbc'),
+			'view_item'          => __('View Variation','pbc'),
+			'search_items'       => __('Search for variations','pbc').'s',
+			'not_found'          => __("We didn't find any Variation",'pbc'),
+			'not_found_in_trash' => __("We didn't find any Variation in the trash",'pbc'),
+		);
+		$args = array(
+			'labels'             => $labels,
+			'public'             => false,
+			'show_in_menu'       => false,
+			'publicly_queryable' => false,
+			'show_ui'            => true,
+			'query_var'          => true,
+			'rewrite'            => array( 'slug' => _x('variation','variation','pbc'),'with_front' => 'true' ),
+			'has_archive'        => false,
+			'capability_type'    => 'post',
+			'hierarchical'       => false,
+			'menu_position'      => 5,
+			'supports'           => array('title'),
+			'menu_icon'          => 'dashicons-tagcloud'
+		);
+		register_post_type( 'variation', $args );
+
+		$labels = array(
+			'name' =>__('Enquiries','pbc'),
+			'singular_name' => __('Enquiry','pbc'),
+			'add_new' => __('Add Enquiry','pbc'),
+			'add_new_item' => __('Add New Enquiry','pbc'),
+			'edit_item' => __('Edit Enquiry','pbc'),
+			'new_item' => __('New Enquiry','pbc'),
+			'view_item' => __('View Enquiry','pbc'),
+			'search_items' => __('Search for Enquiry','pbc').'s',
+			'not_found' =>  __("We didn't find any Enquiry",'pbc'),
+			'not_found_in_trash' => __("We didn't find any Enquiry in the trash",'pbc'),
+		);
+		$args = array(
+			'labels'             => $labels,
+			'public'             => false,
+			'show_in_menu'       => false,
+			'publicly_queryable' => false,
+			'show_ui'            => true,
+			'query_var'          => true,
+			'rewrite'            => array( 'slug' => _x('Enquiry','enquiry','pbc'),'with_front' => 'true' ),
+			'has_archive'        => false,
+			'capability_type'    => 'post',
+			'hierarchical'       => false,
+			'menu_position'      => 5,
+			'supports'           => array('title'),
+			'menu_icon'          => 'dashicons-tagcloud'
+      );
+      register_post_type( 'enquiry', $args );
+
+		$labels = array(
+			'name'          => __('Price Options','pbc'),
+			'singular_name' => __('Price Option','pbc'),
+			'search_items'  => __('Search Price Option','pbc'),
+			'all_items'     => __('All Price Options','pbc'),
+			'edit_item'     => __('Edit Price Option','pbc'),
+			'update_item'   => __('Update Price Option','pbc'),
+			'add_new_item'  => __('Add New Price Option','pbc'),
+			'new_item_name' => __('New Price Option','pbc'),
+		);
+	}
 
 	/**
 	 * Metabox variations
