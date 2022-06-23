@@ -614,7 +614,7 @@ if ( ! empty( $phases ) ) {
 			</div>
 			<div class="configurator_summary">
 				<?php if(isset($_SESSION) && isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation'])){?>
-				<h2 class="title"><?php _e('Actual Configuration','pbc');?></h2>
+				<h2 class="title"><?php _e( 'Actual Configuration', 'pbc' ); ?></h2>
 				<table>
 					<?php
 					if( $cStep == 'calculate' ){
@@ -650,12 +650,12 @@ if ( ! empty( $phases ) ) {
 						</tr>
 						<?php
 					}
-					if ( $cStep == 'calculate' ) { ?>
+					if ( $cStep == 'calculate' && 'no' !== $show_prices ) { ?>
 						<tr class="variation_selected phase-total_price">
 							<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
 							<td class="price">
 								<?php
-								if ( $varPrice && 'no' !== $show_prices ) {
+								if ( $varPrice ) {
 									echo $varPrice . ' €';
 								}
 								?>
