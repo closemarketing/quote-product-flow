@@ -1279,51 +1279,57 @@ class Admin_PBCPlugin {
 		}else{
 			$emails = explode(',', $email_field);
 			$admin_emails = get_option('pbc_admin_email_notification');
-			if($admin_emails){
-				$admin_emails = explode(',', $admin_emails);
-				$emails = array_merge($emails, $admin_emails);
+			if ( $admin_emails ) {
+				$admin_emails = explode( ',', $admin_emails );
+				$emails       = array_merge( $emails, $admin_emails );
 			}
-			$emails = array_map('trim', $emails);
-			if(!isset($_SESSION['pbc_variation'])){
-				$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc') );
-			}else{
-				$subject = __('Budget Configurator','pbc').' - '.get_option('blogname');
-				$message .= '<div><h2>'.__('Enquiry details:','pbc').'</h2><br/><strong>'.__('Name:','pbc').'</strong>'.$name_field.'<br/><strong>'.__('Email:','pbc').'</strong>'.$email_field.'<br/><strong>'.__('Phone:','pbc').'</strong>'.$phone_field.'<br/><strong>'.__('City:','pbc').'</strong>'.$city_field.'<br/><strong>'.__('State:','pbc').'</strong>'.$state_field.'<br/><br/></div>';
-				$message = '<h4>'.__('Configuration details:','pbc').'</h4>'.'<br>';
-				$message .= '<table><tr><th>'.__('Phase','pbc').'</th><th>'.__('Variation','pbc').'</th><th>'.__('Price','pbc').'</th></tr>';
+			$emails = array_map( 'trim', $emails );
+			if ( !isset( $_SESSION['pbc_variation'] ) ) {
+				$result = array(
+					'type'     => 'error',
+					'response' => __( 'Configurator not ready!', 'pbc' ),
+				);
+			} else {
+				$subject  = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
+				$message .= '<div><h2>' . __( 'Enquiry details:', 'pbc' ).'</h2><br/><strong>'.__( 'Name:', 'pbc' ).'</strong>'.$name_field.'<br/><strong>'.__( 'Email:', 'pbc' ).'</strong>'.$email_field.'<br/><strong>'.__( 'Phone:', 'pbc' ).'</strong>'.$phone_field.'<br/><strong>'.__( 'City:', 'pbc' ).'</strong>'.$city_field.'<br/><strong>'.__( 'State:', 'pbc' ).'</strong>'.$state_field.'<br/><br/></div>';
+				$message = '<h4>'.__( 'Configuration details:', 'pbc' ).'</h4>'.'<br>';
+				$message .= '<table><tr><th>'.__( 'Phase', 'pbc' ).'</th><th>'.__( 'Variation', 'pbc' ).'</th><th>'.__( 'Price', 'pbc' ).'</th></tr>';
 				$total_price = '';
-				$logged_in = is_user_logged_in();
 				$enquiry_entries = array();
 				$i=0;
 				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
-					$total_price += (int) $details['var']['price'];
+					$price        = (double) $details['var']['price'];
+					$total_price += $price;
 					$message .= '<tr>';
 					$message .= '<td>'.$details['phase']['name'].'</td>';
 					$message .= '<td>'.$details['var']['name'].'</td>';
 					$message .= '<td>';
-					if($logged_in) $message .= $details['var']['price'].' €'; else $message .= '-';
+					if ( $price > 0 ) {
+						$message .= number_format( $price, 2, ',', ' ' ) . ' €';
+					}
 					$message .= '</td>';
 					$message .= '</tr>';
 					$enquiry_entries[$i]['phase_var'] = $details['phase']['name'].': '.$details['var']['name'];
 					$enquiry_entries[$i]['price'] = $details['var']['price'];
 					$i++;
 				}
-				if($total_price && $logged_in) $total_price = $total_price.' €';
-				else $total_price = '-';
+				if ( $total_price ) {
+					$total_price = $total_price . ' €';
+				}
 				$message .= '<tr>';
-				$message .= '<td>&nbsp;</td><td>'.__('Total:','pbc').'</td>';
-				$message .= '<td>'.$total_price.'</td>';
+				$message .= '<td>&nbsp;</td><td>' . __( 'Total:', 'pbc' ) . '</td>';
+				$message .= '<td>' . $total_price . '</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
-				$message .= '<br>'.get_option('blogname');
+				$message .= '<br>' . get_option('blogname');
 				$headers = array('Content-Type: text/html; charset=UTF-8');
 				$attachments = array( $this->generate_engine_pdf() );
 
 				//insert_enquiry Post
 				$my_post = array(
-				    'post_title'    => $name_field.'-'.$phone_field,
-				    'post_status'   => 'publish',
-					'post_type'		=> 'enquiry'
+					'post_title'  => $name_field . '-' . $phone_field,
+					'post_status' => 'publish',
+					'post_type'   => 'enquiry',
 				);
 				$post_id = wp_insert_post( $my_post );
 				if ( $post_id ) {
@@ -1346,7 +1352,7 @@ class Admin_PBCPlugin {
 					return 'text/html';
 				}
 				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
-			    if(!wp_mail( $emails, $subject, $message, $headers, $attachments)){
+				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
 					$result = array('type'=>'error', 'response'=>__('Error in sending mail. Please try again!','pbc'));
 				}else{
 					if ( ! empty( $attachments ) ) {
@@ -1374,7 +1380,7 @@ class Admin_PBCPlugin {
 			require_once ( WPPBC_PLUGIN_DIR . '/lib/html2pdf/html2pdf.class.php' );
 			if ( session_id() == '' ) {
 				ob_start();
-				 session_start();
+				session_start();
 			}
 			$filename   = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
 			$dirname = $this->get_budget_base_dir( 'path' );
@@ -1384,19 +1390,19 @@ class Admin_PBCPlugin {
 			if ( $content['type'] == 'error' ) {
 				//error echo $content['response'];
 			} else {
-				 try {
-					  $width_mm = 710 * 0.2646;   //1px = 0.2646mm
-					  $height_mm = 900 * 0.2646;
-					  $html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
-					  $html2pdf->setTestTdInOnePage(false);
-					  $html2pdf->writeHTML($content['response']);
-					  $html2pdf->Output( $filename_path, "F");
-					  //$html2pdf->close();
-				 } catch ( Html2PdfException $e ) {
-					//error
-					  //$formatter = new ExceptionFormatter($e);
-					  //echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
-				 }
+				try {
+					$width_mm = 710 * 0.2646;   //1px = 0.2646mm
+					$height_mm = 900 * 0.2646;
+					$html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
+					$html2pdf->setTestTdInOnePage(false);
+					$html2pdf->writeHTML($content['response']);
+					$html2pdf->Output( $filename_path, "F");
+					//$html2pdf->close();
+				} catch ( Html2PdfException $e ) {
+				//error
+					//$formatter = new ExceptionFormatter($e);
+					//echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
+				}
 			}
 			if ( is_file( $filename_path ) && 'path' === $type_return ) {
 				return $filename_path;
@@ -1542,7 +1548,6 @@ class Admin_PBCPlugin {
 
 			$output .= '<table class="summary">';
 			$total_price = '';
-			$logged_in = is_user_logged_in();
 			$i = 0;
 			foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
 				if ( ( $i % 2 ) == 0 ) {
@@ -1550,15 +1555,13 @@ class Admin_PBCPlugin {
 				} else {
 					$bg = '';
 				}
-				$price = (double)( $details['var']['price'] );
+				$price = (double) $details['var']['price'];
 				$total_price += $price;
 				$output .= '<tr>';
 				$output .= '<td class="title '.$bg.'">'.$details['phase']['name'].' '.$details['var']['name'].'</td>';
 				$output .= '<td class="value right '.$bg.'">';
-				if ( $logged_in ) {
-					$output .= number_format($price, 2, ',', ' ').' €';
-				} else {
-					$output .= '-';
+				if ( $price > 0 ) {
+					$output .= number_format( $price, 2, ',', ' ' ) . ' €';
 				}
 				$output .= '</td>';
 				$output .= '</tr>';
@@ -1568,26 +1571,31 @@ class Admin_PBCPlugin {
 				$total_price = 0;
 				$tax = 0;
 			}
-			$tax = $total_price*0.21;
-			$total_pricevat = $total_price + $total_price*0.21;
+			$tax = $total_price * 0.21;
+			$total_pricevat = $total_price + $total_price * 0.21;
 
 			$output .= '</table>';
 			$output .= '<table class="summary-total"><tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
 			$output .= '<td class="value right">';
-			if($logged_in) $output .= number_format( $tax, 2, ',', '.').' €'; else $output .= '-';
+			if ( $tax > 0 ) {
+				$output .= number_format( $tax, 2, ',', '.') . ' €';
+			}
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
 			$output .= '<td class="value right">';
-			if($logged_in) $output .= number_format( $total_price, 2, ',', '.').' €';else $output .= '-';
+			if ( $total_price > 0 ) {
+				$output .= number_format( $total_price, 2, ',', '.').' €';
+			}
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:#835536;color:#fff;">Total</td>';
-
 			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">';
-			if($logged_in) $output .= number_format($total_pricevat, 2, ',', '.').' €'; else $output .= '-';
+			if ( $total_pricevat > 0 ) {
+				$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
+			}
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '</table><br/>';
