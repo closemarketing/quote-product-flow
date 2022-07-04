@@ -187,14 +187,14 @@ class Admin_PBCPlugin {
 				$submenu['function']
 			);
 		}
-   }
+	}
 
 	/**
 	 * Page settings with metaboxes
 	 *
 	 * @return void
 	 */
-   public function pbc_display_admin_page(){
+	public function pbc_display_admin_page(){
 
 		if ( isset( $_POST['form_submit'] ) ) {
 			if ( isset( $_POST['select_budget_page'] ) ) {
@@ -219,8 +219,15 @@ class Admin_PBCPlugin {
 			}
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
 			update_option( 'variations_images_flipped', $variations_images_flipped );
+
 			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array('');
 			update_option( 'pbc_admin_email_notification', $admin_email_notification );
+
+			// Preview width
+			if ( isset( $_POST['preview_width'] ) ){
+				update_option( 'pbc_preview_width', $_POST['preview_width'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}
 		}
 
 		if ( isset( $_POST['submit_license'] ) ) {
@@ -388,23 +395,23 @@ class Admin_PBCPlugin {
 					<br/>
 					<label class="block" for="variations_images_flipped"><?php _e("Flip Images Horizontal", 'pbc');?></label>
 					<?php
-						$variations_images_flipped = get_option('variations_images_flipped');
-						$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
-						if(!empty($phases)){
-							echo '<select multiple="multiple" name="variations_images_flipped[]" size="6" style="width:100%;">';
-							foreach($phases as $phase){
-								$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
-								if(!empty($variations)){
-									foreach($variations as $var){
-										if(!empty($variations_images_flipped) && in_array($var->ID, $variations_images_flipped))
-											$selected = 'selected="selected"';
-										else $selected = '';
-										echo '<option value="'.$var->ID.'" '.$selected.'>'.str_pad($phase->menu_order, 2, '0', STR_PAD_LEFT).' - '.$phase->post_title.' - '.$var->post_title.'</option>';
-									}
+					$variations_images_flipped = get_option('variations_images_flipped');
+					$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
+					if ( ! empty( $phases ) ) {
+						echo '<select multiple="multiple" name="variations_images_flipped[]" size="6" style="width:100%;">';
+						foreach($phases as $phase){
+							$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
+							if(!empty($variations)){
+								foreach ( $variations as $var ) {
+									if(!empty($variations_images_flipped) && in_array($var->ID, $variations_images_flipped))
+										$selected = 'selected="selected"';
+									else $selected = '';
+									echo '<option value="'.$var->ID.'" '.$selected.'>'.str_pad($phase->menu_order, 2, '0', STR_PAD_LEFT).' - '.$phase->post_title.' - '.$var->post_title.'</option>';
 								}
 							}
-							echo '</select>';
 						}
+						echo '</select>';
+					}
 					?>
 				</fieldset>
 				<fieldset>
@@ -413,6 +420,13 @@ class Admin_PBCPlugin {
 						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
 					?>
 					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if( $admin_email_notification ) echo $admin_email_notification; ?>" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' );?></label>
+					<?php
+						$preview_width = get_option( 'pbc_preview_width' );
+					?>
+					<input style="width:100%;" type="text" name="preview_width" value="<?php if( $preview_width ) echo $preview_width; ?>" placeholder="<?php _e( 'default: 570', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
@@ -487,6 +501,7 @@ class Admin_PBCPlugin {
 			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
 		);
 		echo '</p>';
+		echo '<p style="color:#F0F0F1;">' . esc_html__( 'Instance:', 'pbc' ) . ' ' . get_option( 'pbc_license_instance' ) . '</p>';
 		echo '</div>';
 	}
 
@@ -560,16 +575,16 @@ class Admin_PBCPlugin {
 		register_post_type( 'variation', $args );
 
 		$labels = array(
-			'name' =>__('Enquiries','pbc'),
-			'singular_name' => __('Enquiry','pbc'),
-			'add_new' => __('Add Enquiry','pbc'),
-			'add_new_item' => __('Add New Enquiry','pbc'),
-			'edit_item' => __('Edit Enquiry','pbc'),
-			'new_item' => __('New Enquiry','pbc'),
-			'view_item' => __('View Enquiry','pbc'),
-			'search_items' => __('Search for Enquiry','pbc').'s',
-			'not_found' =>  __("We didn't find any Enquiry",'pbc'),
-			'not_found_in_trash' => __("We didn't find any Enquiry in the trash",'pbc'),
+			'name'               => __( 'Enquiries', 'pbc' ),
+			'singular_name'      => __( 'Enquiry', 'pbc' ),
+			'add_new'            => __( 'Add Enquiry', 'pbc' ),
+			'add_new_item'       => __( 'Add New Enquiry', 'pbc' ),
+			'edit_item'          => __( 'Edit Enquiry', 'pbc' ),
+			'new_item'           => __( 'New Enquiry', 'pbc' ),
+			'view_item'          => __( 'View Enquiry', 'pbc' ),
+			'search_items'       => __( 'Search for Enquiry', 'pbc').'s',
+			'not_found'          => __( 'We didn\'t find any Enquiry', 'pbc' ),
+			'not_found_in_trash' => __( 'We didn\'t find any Enquiry in the trash', 'pbc' ),
 		);
 		$args = array(
 			'labels'             => $labels,
@@ -578,15 +593,15 @@ class Admin_PBCPlugin {
 			'publicly_queryable' => false,
 			'show_ui'            => true,
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => _x('Enquiry','enquiry','pbc'),'with_front' => 'true' ),
+			'rewrite'            => array( 'slug' => _x( 'Enquiry','enquiry','pbc'),'with_front' => 'true' ),
 			'has_archive'        => false,
 			'capability_type'    => 'post',
 			'hierarchical'       => false,
 			'menu_position'      => 5,
 			'supports'           => array('title'),
 			'menu_icon'          => 'dashicons-tagcloud'
-      );
-      register_post_type( 'enquiry', $args );
+		);
+		register_post_type( 'enquiry', $args );
 
 		$labels = array(
 			'name'          => __('Price Options','pbc'),
@@ -653,144 +668,142 @@ class Admin_PBCPlugin {
 			asort( $var_options );
 		}
 
-    	$prefix = 'pbc_';
-    	// 1st meta box
-    	$meta_boxes[] = array(
-    		'id'         => 'standard',
-    		'title'      => __( 'Options for variation', 'pbc' ),
-    		'post_types' => array( 'variation' ),
-    		'context'    => 'normal',
-    		'priority'   => 'high',
-    		'autosave'   => true,
-
-    		'fields'     => array(
-    			// SELECT BOX PHASE
-    			array(
-    				'name'        => __( 'Phase', 'pbc' ),
-    				'id'          => "{$prefix}phase",
-    				'type'        => 'select',
-    				'options'     => $phase_options,
-    				'multiple'    => false,
-    				'std'         => '',
-    				'placeholder' => __( 'Select a phase', 'pbc' ),
-    			),
-    			// TEXT
-    			array(
-    				'name'  => __( 'Reference', 'pbc' ),
-    				'id'    => "{$prefix}sku",
-    				'desc'  => '',
-    				'type'  => 'text',
-    				'std'   => '',
-    				'clone' => false,
-    			),
-    			// IMAGE ADVANCED (WP 3.5+)
-    			array(
-    				'name'             => __( 'Icon image', 'pbc' ),
-    				'id'               => "{$prefix}imgicon",
-    				'type'             => 'image_advanced',
-    				'max_file_uploads' => 1,
-    			),
-
+		$prefix = 'pbc_';
+		// 1st meta box
+		$meta_boxes[] = array(
+			'id'         => 'standard',
+			'title'      => __( 'Options for variation', 'pbc' ),
+			'post_types' => array( 'variation' ),
+			'context'    => 'normal',
+			'priority'   => 'high',
+			'autosave'   => true,
+			'fields'     => array(
+				// SELECT BOX PHASE
 				array(
-    				'name'   => __( 'Depends of', 'pbc' ),
+					'name'        => __( 'Phase', 'pbc' ),
+					'id'          => "{$prefix}phase",
+					'type'        => 'select',
+					'options'     => $phase_options,
+					'multiple'    => false,
+					'std'         => '',
+					'placeholder' => __( 'Select a phase', 'pbc' ),
+				),
+				// TEXT
+				array(
+					'name'  => __( 'Reference', 'pbc' ),
+					'id'    => "{$prefix}sku",
+					'desc'  => '',
+					'type'  => 'text',
+					'std'   => '',
+					'clone' => false,
+				),
+				// IMAGE ADVANCED (WP 3.5+)
+				array(
+					'name'             => __( 'Icon image', 'pbc' ),
+					'id'               => "{$prefix}imgicon",
+					'type'             => 'image_advanced',
+					'max_file_uploads' => 1,
+				),
+				array(
+					'name'   => __( 'Depends of', 'pbc' ),
 					'id'     => "{$prefix}depends",
 					'type'   => 'group',
 					'clone'  => true,
 					'sort_clone' => true,
 					'fields' => array(
-		    			// SELECT BOX VARIATIONS
-		    			array(
-		    				'name'        => __( 'Variation', 'pbc' ),
-		    				'id'          => "{$prefix}depvar",
-		    				'type'        => 'select',
-		    				'options'     => $var_options,
-		    				'multiple'    => false,
-		    				'std'         => '',
-		    				'placeholder' => __( 'Not depends of variation', 'pbc' ),
-		    			),
+						// SELECT BOX VARIATIONS
+						array(
+							'name'        => __( 'Variation', 'pbc' ),
+							'id'          => "{$prefix}depvar",
+							'type'        => 'select',
+							'options'     => $var_options,
+							'multiple'    => false,
+							'std'         => '',
+							'placeholder' => __( 'Not depends of variation', 'pbc' ),
+						),
 					),
 				), //array
 
 				array(
-    			'name'   => __( 'Product group image', 'pbc' ),
+					'name'   => __( 'Product group image', 'pbc' ),
 					'id'     => "{$prefix}imgprodgroup",
 					'type'   => 'group',
 					'clone'  => true,
 					'sort_clone' => true,
 					'fields' => array(
-		    			// SELECT BOX VARIATIONS
-		    			array(
-		    				'name'        => __( 'Variation', 'pbc' ),
-		    				'id'          => "{$prefix}depvarimgprod",
-		    				'type'        => 'select_advanced',
-		    				'options'     => $var_options,
-		    				'multiple'    => true,
-		    				'std'         => '',
-		    				'placeholder' => 'No depende de una variación',
-		    			),
-		    			// IMAGE ADVANCED (WP 3.5+)
-		    			array(
-		    				'name'             => __( 'Product image', 'pbc' ),
-		    				'id'               => "{$prefix}imgprod",
-		    				'type'             => 'image_advanced',
-		    				'max_file_uploads' => 1,
-		    			),
+						// SELECT BOX VARIATIONS
+						array(
+							'name'        => __( 'Variation', 'pbc' ),
+							'id'          => "{$prefix}depvarimgprod",
+							'type'        => 'select_advanced',
+							'options'     => $var_options,
+							'multiple'    => true,
+							'std'         => '',
+							'placeholder' => 'No depende de una variación',
+						),
+						// IMAGE ADVANCED (WP 3.5+)
+						array(
+							'name'             => __( 'Product image', 'pbc' ),
+							'id'               => "{$prefix}imgprod",
+							'type'             => 'image_advanced',
+							'max_file_uploads' => 1,
+						),
 					),
 				), //array
 				array(
-    				'name'   => __( 'Price', 'pbc' ),
+					'name'   => __( 'Price', 'pbc' ),
 					'id'     => "{$prefix}pricegroup",
 					'type'   => 'group',
 					'clone'  => true,
 					'sort_clone' => true,
 					'fields' => array(
-		    			// TEXT
-		    			array(
-		    				'name'  => __( 'Option price', 'pbc' ),
-		    				'id'    => "{$prefix}meaprice",
-		    				'desc'  => '',
-		    				'type'  => 'text',
-		    				'std'   => '',
-		    				'clone' => false,
-		               'columns' => 3,
-		    			),
-		    			// TEXT
-		    			array(
-		    				'name'  => __( 'Price (VAT not included)', 'pbc' ),
-		    				'id'    => "{$prefix}pricem",
-		    				'desc'  => '',
-		    				'type'  => 'text',
-		    				'std'   => '',
-		    				'clone' => false,
-		               'columns' => 1,
-		    			),
+						// TEXT
+						array(
+							'name'  => __( 'Option price', 'pbc' ),
+							'id'    => "{$prefix}meaprice",
+							'desc'  => '',
+							'type'  => 'text',
+							'std'   => '',
+							'clone' => false,
+							'columns' => 3,
+						),
+						// TEXT
+						array(
+							'name'  => __( 'Price (VAT not included)', 'pbc' ),
+							'id'    => "{$prefix}pricem",
+							'desc'  => '',
+							'type'  => 'text',
+							'std'   => '',
+							'clone' => false,
+							'columns' => 1,
+						),
 					),
 				), //array
-    		)
-    	);
+			)
+		);
 
-    	return $meta_boxes;
-    }
+		return $meta_boxes;
+	}
 
 	public function pbc_metabox_enquiry(){
 
 		add_meta_box(
-	        'enquiry-details',
-	        __( 'Enquiry Details','pbc' ),
-	        array($this,'render_enquiry_details'),
-	        'enquiry',
-	        'normal',
-	        'default'
-	    );
+			'enquiry-details',
+			__( 'Enquiry Details','pbc' ),
+			array($this,'render_enquiry_details'),
+			'enquiry',
+			'normal',
+			'default'
+		);
 
 		add_meta_box(
-	        'configuration-details',
-	        __( 'Budget Configuration','pbc' ),
-	        array($this,'render_budget_configuration'),
-	        'enquiry',
-	        'normal',
-	        'default'
-	    );
+			'configuration-details',
+			__( 'Budget Configuration','pbc' ),
+			array($this,'render_budget_configuration'),
+			'enquiry',
+			'normal',
+			'default'
+		);
 	}
 	public function render_enquiry_details( $post ) {
 		$post_id = is_object( $post ) ? $post->ID : $post;
@@ -904,11 +917,11 @@ class Admin_PBCPlugin {
 	/** Add columns for Phases **/
 	// Add to admin_init function
 	public function add_new_phases_columns($phases_columns) {
-	    $new_columns['cb'] = '<input type="checkbox" />';
-	    $new_columns['title'] = __('Phase','pbc');
-	    $new_columns['menu_order'] = __('Order','pbc');
+		$new_columns['cb'] = '<input type="checkbox" />';
+		$new_columns['title'] = __('Phase','pbc');
+		$new_columns['menu_order'] = __('Order','pbc');
 
-	    return $new_columns;
+		return $new_columns;
 	}
 
 
@@ -931,7 +944,7 @@ class Admin_PBCPlugin {
 	 */
 	public function manage_budgets_columns( $column_name, $id ) {
 
-	    switch ( $column_name) {
+		switch ( $column_name) {
 			case 'enquiry_name':
 				echo '<a href="' . get_edit_post_link( $id ) . '" class="row-title">';
 				echo get_post_meta( $id, 'pbc_enquiry_name', true );
@@ -951,21 +964,21 @@ class Admin_PBCPlugin {
 				break;
 			default:
 				break;
-	    } // end switch
+		} // end switch
 	}
 
 	/** Add columns for Variations **/
 	// Add to admin_init function
 	public function add_new_var_columns($phases_columns) {
-	    $new_columns['cb'] = '<input type="checkbox" />';
-	    $new_columns['title'] = __('Variation','pbc');
-	    $new_columns['phase'] = __('Phase','pbc');
-	    $new_columns['price'] = __('Price','pbc');
-	    $new_columns['depends'] = __('Depends of','pbc');
-	    $new_columns['imgicon'] = __('Icon','pbc');
-	    $new_columns['imgprod'] = __('Product Images','pbc');
+		$new_columns['cb'] = '<input type="checkbox" />';
+		$new_columns['title'] = __('Variation','pbc');
+		$new_columns['phase'] = __('Phase','pbc');
+		$new_columns['price'] = __('Price','pbc');
+		$new_columns['depends'] = __('Depends of','pbc');
+		$new_columns['imgicon'] = __('Icon','pbc');
+		$new_columns['imgprod'] = __('Product Images','pbc');
 
-	    return $new_columns;
+		return $new_columns;
 	}
 
 
@@ -974,11 +987,11 @@ class Admin_PBCPlugin {
 		//* Price group
 		$price_group = rwmb_meta( 'pbc_pricegroup' );
 		$price_column = '';
-		foreach($price_group as $price_item) {
+		foreach ( $price_group as $price_item ) {
 			if(isset($price_item['pbc_meaprice'])) {
-        	$price_column .= $price_item['pbc_meaprice'].' - '.$price_item['pbc_pricem'].' €';
+				$price_column .= $price_item['pbc_meaprice'] . ' - ' . $price_item['pbc_pricem'] . ' €';
 			} else { // Price without any option
-			$price_column .= $price_item['pbc_pricem'].' €';
+				$price_column .= $price_item['pbc_pricem'].' €';
 			}
 			$price_column .= '<br/>';
 		}
@@ -1005,22 +1018,21 @@ class Admin_PBCPlugin {
 		//* Image Group Product
 		$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 
-	    switch ($column_name) {
-
-	    case 'phase':
-			$phase_post = get_post($phase_id);
-	        echo $phase_post->menu_order.' - '.$phase_post->post_title;
-	        break;
-	    case 'price':
-	        echo $price_column;
-	        break;
-	    case 'depends':
-			echo $depends_column;
-	        break;
-	    case 'imgicon':
-			if(isset($icon_image) ) echo '<img src="'.$icon_image[0].'" />';
-	        break;
-	    case 'imgprod':
+		switch ($column_name) {
+			case 'phase':
+				$phase_post = get_post($phase_id);
+				echo $phase_post->menu_order.' - '.$phase_post->post_title;
+				break;
+			case 'price':
+				echo $price_column;
+				break;
+			case 'depends':
+				echo $depends_column;
+				break;
+			case 'imgicon':
+				if(isset($icon_image) ) echo '<img src="'.$icon_image[0].'" />';
+				break;
+			case 'imgprod':
 			if(isset($image_group)) {
 				if(count($image_group)>0) echo count($image_group).'<br>';
 				foreach($image_group as $imageg_item) {
@@ -1030,10 +1042,10 @@ class Admin_PBCPlugin {
 					}
 				}
 			}
-	        break;
-	    default:
-	        break;
-	    } // end switch
+				break;
+			default:
+				break;
+		} // end switch
 	}
 
 	/**
@@ -1132,17 +1144,17 @@ class Admin_PBCPlugin {
 
 	public function variation_selected_action_callback(){
 		extract($_REQUEST);
-		if(session_id() == ''){
+		if ( session_id() == '' ) {
 			ob_start();
 			session_start();
 		}
-	    if(session_id() == ''){
-	       echo ';;--;;'.json_encode(array('type'=>'error', 'msg'=>'Error: Unable to initialize Session!'));
-	       die(0);
-	    }
-		if(!empty($pbc_variation) && $current_phase && $pbc_variation[$current_phase]){
-			$sVar = $pbc_variation[$current_phase];
-			if(is_user_logged_in()){
+		if ( session_id() == '' ) {
+			echo ';;--;;'.json_encode(array('type'=>'error', 'msg'=>'Error: Unable to initialize Session!'));
+			die(0);
+		}
+		if ( ! empty( $pbc_variation ) && $current_phase && $pbc_variation[ $current_phase ] ) {
+			$sVar = $pbc_variation[ $current_phase ];
+			if ( is_user_logged_in() ) {
 				$user_id = get_current_user_id();
 				$phase_param['var'] = $sVar;
 				$phase_param['pricevar'] = ($_REQUEST["pbc_pricevar_$sVar"])?($_REQUEST["pbc_pricevar_$sVar"]):'';
