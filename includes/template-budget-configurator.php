@@ -145,7 +145,9 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 			background-position: right .7em top 50%, 0 0;
 			background-size: .65em auto, 100%;
 		}
-
+		.variation_img img {
+			min-width: 120px;
+		}
 		.hidden{display: none !important;}
 		#content{max-width: 1200px;margin: 0 auto 40px;}
 		.configurator_steps_nav{width: 100%;margin: 10px auto;float: left;padding-right: 15px;}
@@ -431,7 +433,7 @@ if ( ! empty( $phases ) ) {
 										$imgicon = get_post_meta( $variation, 'pbc_imgicon', true );
 										if ( $imgicon ) {
 											echo '<div class="variation_img">';
-											echo wp_get_attachment_image( $imgicon, 'pbc_icon', true );
+											echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
 											echo '</div>';
 										}
 										?>
@@ -543,7 +545,7 @@ if ( ! empty( $phases ) ) {
 					$imgprodid = $imgprodurl = '';
 					if ( $sVar ) {
 						$imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
-						if(!empty($imgprodgroup)){
+						if ( ! empty( $imgprodgroup ) ) {
 							foreach($imgprodgroup as $deps)
 							{
 									if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
