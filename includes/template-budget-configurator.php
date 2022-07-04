@@ -382,51 +382,57 @@ if ( ! empty( $phases ) ) {
 				<div class="phase_variations">
 					<?php
 					$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase_id . '&fields=ids&orderby=title&order=asc' );
-						if ( ! empty( $variations ) ) {
-							foreach ( $variations as $key => $variation ) {
-								$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
-								if ( ! empty( $pbc_depends ) ) {
-									$prevVar = array();
-									foreach($pbc_depends as $deps)
-									{
-										$arr = explode('|', $deps['pbc_depvar']);
-										if(!empty($arr[0]) && !empty($arr[1])){
-											$prevVar[(int)$arr[0]][] = $arr[1];
-										}
+					if ( ! empty( $variations ) ) {
+						foreach ( $variations as $key => $variation ) {
+							$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
+							if ( ! empty( $pbc_depends ) ) {
+								$prevVar = array();
+								foreach($pbc_depends as $deps)
+								{
+									$arr = explode('|', $deps['pbc_depvar']);
+									if(!empty($arr[0]) && !empty($arr[1])){
+										$prevVar[(int)$arr[0]][] = $arr[1];
 									}
-									if($cStep != 1 && !empty($_SESSION['pbc_variation']))
+								}
+								if($cStep != 1 && !empty($_SESSION['pbc_variation']))
+								{
+									foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
 									{
-										foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
+										if(isset($prevVar[$sPhaseKey]) && !in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
 										{
-											if(isset($prevVar[$sPhaseKey]) && !in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
-											{
-													unset($variations[$key]);
-													break;
-											}
+												unset($variations[$key]);
+												break;
 										}
 									}
 								}
 							}
-							$variations = array_values( $variations );
-							sort( $variations );
+						}
+						$variations = array_values( $variations );
+						sort( $variations );
 
-							if ( isset( $_SESSION['pbc_variation'] ) && is_array( $_SESSION['pbc_variation'] ) && isset( $_SESSION['pbc_variation'][ $cStep ] ) &&
-								in_array( $_SESSION['pbc_variation'][ $cStep ]['var']['id'], $variations )
-							)
-								$sVar = $_SESSION['pbc_variation'][ $cStep ]['var']['id'];
-							else{
-								if(isset($user_id)){
-										$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cStep, true );
-										if ( !empty( $pbc_phase ) && ! empty( $pbc_phase['var'] ) )
-											$sVar = $pbc_phase['var'];
+						if ( 
+							isset( $_SESSION['pbc_variation'] ) && 
+							is_array( $_SESSION['pbc_variation'] ) && 
+							isset( $_SESSION['pbc_variation'][ $cStep ] ) && 
+							in_array( $_SESSION['pbc_variation'][ $cStep ]['var']['id'], $variations )
+						) {
+							$sVar = $_SESSION['pbc_variation'][ $cStep ]['var']['id'];
+						} else {
+							if ( isset( $user_id ) ) {
+								$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cStep, true );
+								if ( ! empty( $pbc_phase ) && ! empty( $pbc_phase['var'] ) ) {
+									$sVar = $pbc_phase['var'];
 								}
-								if(empty($sVar))
-										$sVar = $variations[current(array_keys($variations))];
 							}
-							if ( ! empty( $variations ) ) {
+							if ( empty( $sVar ) ) {
+								$sVar = $variations[current(array_keys($variations))];
+							}
+						}
+						if ( ! empty( $variations ) ) {
 							?>
 							<ul>
-								<?php foreach ( $variations as $variation ) { ?>
+								<?php
+								foreach ( $variations as $variation ) { ?>
 								<li class="variation_list">
 									<label>
 										<?php
@@ -450,15 +456,19 @@ if ( ! empty( $phases ) ) {
 												}
 											}?>
 											</select></div>
-										<?php
+											<?php
 										}?>
 								</li>
-							<?php }?>
+							<?php } ?>
 							</ul>
-						<?php }
-						}else{?>
-						<div class="error"><?php _e('No Variations Available','pbc');?></div>
-				<?php }?>
+							<?php
+						}
+					} else {
+						?>
+						<div class="error"><?php _e( 'No Variations Available', 'pbc' ); ?></div>
+						<?php
+					}
+					?>
 				</div>
 			</div>
 		<div class="configurator-right">
@@ -546,43 +556,42 @@ if ( ! empty( $phases ) ) {
 					if ( $sVar ) {
 						$imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
 						if ( ! empty( $imgprodgroup ) ) {
-							foreach($imgprodgroup as $deps)
-							{
-									if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
-									{
-										$prevVar = array();
-										foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
-										{
-											$arr = explode('|', $depvarimgprod);
-											if(!empty($arr[0]) && !empty($arr[1])){
-													$prevVar[(int)$arr[0]][] = $arr[1];
-											}
+							foreach ( $imgprodgroup as $deps ) {
+								if ( ! empty( $deps['pbc_depvarimgprod'] ) && isset($deps['pbc_imgprod']) ) {
+									$prevVar = array();
+									foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+										$arr = explode('|', $depvarimgprod);
+										if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
+												$prevVar[(int)$arr[0]][] = $arr[1];
 										}
-										if(!empty($_SESSION['pbc_variation']) && !empty($prevVar))
+									}
+									if ( ! empty( $_SESSION['pbc_variation'] ) && ! empty( $prevVar ) ) {
+										foreach($prevVar as $sPhaseKey => $sVariations)
 										{
-											foreach($prevVar as $sPhaseKey => $sVariations)
-											{
-													if(isset($prevVar[$sPhaseKey]) &&
-													isset($_SESSION['pbc_variation'][$sPhaseKey]) &&
-													in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
-													{
-														$imgprodid = $deps['pbc_imgprod'][0];
-													}else{
-														$imgprodid = '';
-														break;
-													}
-											}
+												if(isset($prevVar[$sPhaseKey]) &&
+												isset($_SESSION['pbc_variation'][$sPhaseKey]) &&
+												in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
+												{
+													$imgprodid = $deps['pbc_imgprod'][0];
+												}else{
+													$imgprodid = '';
+													break;
+												}
 										}
-									}elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
+									}
+								} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ) {
 										$imgprodid = $deps['pbc_imgprod'][0];
 										break;
-									}
-									if($imgprodid)
-										break;
+								}
+								if ( $imgprodid ) {
+									break;
+								}
 							}
 						}
-						if(isset($imgprodid) && $imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}?>
-					<?php }
+						if ( isset( $imgprodid ) && $imgprodid ) {
+							$imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);
+						}
+					}
 					if(isset($imgprodurl) && $imgprodurl){
 						$variations_images_flipped = get_option('variations_images_flipped');
 						if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped))
