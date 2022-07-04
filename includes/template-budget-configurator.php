@@ -8,13 +8,13 @@ if ( session_id() == '' ) {
 	session_start();
 }
 if ( session_id() == '' ) {
-   echo ';;--;;' . json_encode(
+	echo ';;--;;' . json_encode(
 		array(
 			'type'=>'error',
 			'msg'=>'Error: Unable to initialize Session!'
 		)
 	);
-   die( 'Error: Unable to initialize Session!' );
+	die( 'Error: Unable to initialize Session!' );
 }
 $cStep ='';
 $phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
@@ -23,8 +23,8 @@ if ( is_user_logged_in() ) {
 }
 
 if ( isset( $_POST['submit'] ) ) {
-   $submit = sanitize_text_field( $_POST['submit'] );
-   if ( isset( $_POST[ $submit . '_phase' ] ) ) {
+	$submit = sanitize_text_field( $_POST['submit'] );
+	if ( isset( $_POST[ $submit . '_phase' ] ) ) {
 		$cStep = sanitize_text_field( $_POST[ $submit . '_phase' ] );
 	} else {
 		$cStep = 'calculate';
@@ -78,6 +78,7 @@ if ( empty( $cStep ) ) {
 <?php if ( ! defined( 'DOING_AJAX' ) ) get_header(); ?>
 <?php
 if ( ! defined( 'DOING_AJAX' ) ) {
+	$preview_width = ! empty( get_option( 'pbc_preview_width' ) ) ? get_option( 'pbc_preview_width' ) : '570';
 	?>
 	<style>
 		.btn{
@@ -129,6 +130,20 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 		}
 		.prev .btn:hover::after {
 			border-right-color: black;
+		}
+		.phase_variations select {
+			padding: 5px 10px;
+			border-radius: 3px;
+			padding-right: 30px;
+			position: relative;
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			appearance: none;
+			border: none;
+			background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+			background-repeat: no-repeat, repeat;
+			background-position: right .7em top 50%, 0 0;
+			background-size: .65em auto, 100%;
 		}
 
 		.hidden{display: none !important;}
@@ -198,7 +213,9 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 			vertical-align: top;
 		}
 		.configurator-left .phase_title{text-transform: uppercase;font-size: 20px;}
-		.phase_variations{margin-top: 40px;}
+		.phase_variations{
+			margin-top: 40px;
+		}
 		.phase_variations ul{margin: 0; list-style: none;}
 		.phase_variations ul li.variation_list {
 			width: 24%;
@@ -211,14 +228,14 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 		.product_preview {
 			position: relative;
 			text-align: left;
-			max-width: 570px;
+			max-width: <?php echo esc_html( $preview_width ); ?>px;
 			overflow: hidden;
 			display: inline-block;
 			vertical-align: top;
 		}
 		.product_preview.wrap-left{margin-right: 20px;}
 		.product_preview .image-wrap img:first-child{position: relative;}
-		.product_preview .image-wrap img{width: 100%;max-width: 570px;position: absolute;top: 0;left: 0;}
+		.product_preview .image-wrap img{width: 100%;max-width: <?php echo esc_html( $preview_width ); ?>px;position: absolute;top: 0;left: 0;}
 		.configurator_form_action {
 			text-align: right;
 			clear: both;
@@ -892,8 +909,8 @@ if ( ! empty( $phases ) ) {
 <?php
 }?>
 <?php if(!defined('DOING_AJAX')){?>
-        </div>
-    </div>
+		</div>
+	</div>
 </div>
 <?php
 }//defined('DOING_AJAX')

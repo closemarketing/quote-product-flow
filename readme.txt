@@ -24,6 +24,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Save budgets in /uploads/pbc/
 *  Updated Metabox Group 1.3.14
 *  Added options for header and footer.
+*  Added option for width image preview.
 
 = 1.0 =
 *	First released.
