@@ -377,10 +377,6 @@ if ( ! empty( $phases ) ) {
 			$phase_id = $phases[((int)$cStep-1)];?>
 			<div class="configurator-left">
 				<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
-				<div class="phase_content">
-						<?php $post_object = get_post( $phase_id );
-							echo $post_object->post_content;?>
-				</div>
 				<div class="phase_variations">
 					<?php
 					$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase_id . '&fields=ids&orderby=title&order=asc' );
@@ -469,6 +465,14 @@ if ( ! empty( $phases ) ) {
 						?>
 						<div class="error"><?php _e( 'No Variations Available', 'pbc' ); ?></div>
 						<?php
+					}
+					?>
+				</div>
+				<div class="phase_content">
+					<?php
+					$post_object = get_post( $phase_id );
+					if ( ! empty( $post_object->post_content ) ) {
+						echo $post_object->post_content;
 					}
 					?>
 				</div>
