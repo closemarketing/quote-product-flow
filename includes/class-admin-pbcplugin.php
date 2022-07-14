@@ -164,6 +164,14 @@ class Admin_PBCPlugin {
 				'menu_slug'   => 'edit.php?post_type=variation',
 				'function'    => null,
 			),
+			array(
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __( 'Sections in variations', 'pbc' ),
+				'menu_title'  => __( 'Sections', 'pbc' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'edit-tags.php?taxonomy=variation_tag',
+				'function'    => null,
+			),
 			// Post Type :: View All Posts.
 			array(
 				'parent_slug' => 'pbc_menu',
@@ -546,16 +554,16 @@ class Admin_PBCPlugin {
 		register_post_type( 'phases', $args );
 
 		$labels = array(
-			'name'               => __('Variations','pbc'),
-			'singular_name'      => __('Variation','pbc'),
-			'add_new'            => __('Add Variation','pbc'),
-			'add_new_item'       => __('Add New variation','pbc'),
-			'edit_item'          => __('Edit Variation','pbc'),
-			'new_item'           => __('New Variation','pbc'),
-			'view_item'          => __('View Variation','pbc'),
-			'search_items'       => __('Search for variations','pbc').'s',
-			'not_found'          => __("We didn't find any Variation",'pbc'),
-			'not_found_in_trash' => __("We didn't find any Variation in the trash",'pbc'),
+			'name'               => __( 'Variations', 'pbc' ),
+			'singular_name'      => __( 'Variation', 'pbc' ),
+			'add_new'            => __( 'Add Variation', 'pbc' ),
+			'add_new_item'       => __( 'Add New variation', 'pbc' ),
+			'edit_item'          => __( 'Edit Variation', 'pbc' ),
+			'new_item'           => __( 'New Variation', 'pbc' ),
+			'view_item'          => __( 'View Variation', 'pbc' ),
+			'search_items'       => __( 'Search for variations', 'pbc' ),
+			'not_found'          => __("We didn't find any Variation",'pbc' ),
+			'not_found_in_trash' => __("We didn't find any Variation in the trash",'pbc' ),
 		);
 		$args = array(
 			'labels'             => $labels,
@@ -564,7 +572,7 @@ class Admin_PBCPlugin {
 			'publicly_queryable' => false,
 			'show_ui'            => true,
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => _x('variation','variation','pbc'),'with_front' => 'true' ),
+			'rewrite'            => array( 'slug' => _x( 'variation', 'variation','pbc'),'with_front' => 'true' ),
 			'has_archive'        => false,
 			'capability_type'    => 'post',
 			'hierarchical'       => false,
@@ -573,6 +581,38 @@ class Admin_PBCPlugin {
 			'menu_icon'          => 'dashicons-tagcloud'
 		);
 		register_post_type( 'variation', $args );
+
+		/**
+		 * Register Taxonomy Sections
+		 */
+		$labels = array(
+			'name'          => __( 'Sections', 'pbc' ),
+			'singular_name' => __( 'Section', 'pbc' ),
+			'search_items'  => __( 'Search Section', 'pbc' ),
+			'all_items'     => __( 'All Sections', 'pbc' ),
+			'edit_item'     => __( 'Edit Section', 'pbc' ),
+			'update_item'   => __( 'Update Section', 'pbc' ),
+			'add_new_item'  => __( 'Add New Section', 'pbc' ),
+			'new_item_name' => __( 'Add New Section', 'pbc' ),
+		);
+	
+		register_taxonomy(
+			'variation_tag',
+			array(
+				'variation',
+			),
+			array(
+				'hierarchical'       => false,
+				'public'             => false,
+				'publicly_queryable' => true,
+				'labels'             => $labels,
+				'show_ui'            => true,
+				'show_in_menu'       => false,
+				'show_admin_column'  => true,
+				'query_var'          => true,
+				'rewrite'            => false,
+			)
+		);
 
 		$labels = array(
 			'name'               => __( 'Enquiries', 'pbc' ),
@@ -602,17 +642,6 @@ class Admin_PBCPlugin {
 			'menu_icon'          => 'dashicons-tagcloud'
 		);
 		register_post_type( 'enquiry', $args );
-
-		$labels = array(
-			'name'          => __('Price Options','pbc'),
-			'singular_name' => __('Price Option','pbc'),
-			'search_items'  => __('Search Price Option','pbc'),
-			'all_items'     => __('All Price Options','pbc'),
-			'edit_item'     => __('Edit Price Option','pbc'),
-			'update_item'   => __('Update Price Option','pbc'),
-			'add_new_item'  => __('Add New Price Option','pbc'),
-			'new_item_name' => __('New Price Option','pbc'),
-		);
 	}
 
 	/**
@@ -981,7 +1010,7 @@ class Admin_PBCPlugin {
 	public function add_new_var_columns($phases_columns) {
 		$new_columns['cb'] = '<input type="checkbox" />';
 		$new_columns['title'] = __('Variation','pbc');
-		$new_columns['phase'] = __('Phase','pbc');
+		$new_columns['phase'] = __('Phase and section','pbc');
 		$new_columns['price'] = __('Price','pbc');
 		$new_columns['depends'] = __('Depends of','pbc');
 		$new_columns['imgicon'] = __('Icon','pbc');
@@ -1007,30 +1036,39 @@ class Admin_PBCPlugin {
 		//* Depends group
 		$depends_group = rwmb_meta( 'pbc_depends' );
 		$depends_column = '';
-		foreach($depends_group as $depends_item) {
-			$variation_id = substr($depends_item['pbc_depvar'], 3);
-			$variation_post = get_post($variation_id);
-			$phase_id_dp = get_post_meta($variation_id, 'pbc_phase', true);
-			$phase_post_dp = get_post($phase_id_dp);
-			if($phase_post_dp->menu_order<10) $phase_order = '0'.$phase_post_dp->menu_order; else $phase_order = $phase_post_dp->menu_order;
-        	$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$variation_post->post_title;
+		foreach ( $depends_group as $depends_item ) {
+			$variation_id   = substr( $depends_item['pbc_depvar'], 3 );
+			$variation_post = get_post( $variation_id );
+			$phase_id_dp    = get_post_meta( $variation_id, 'pbc_phase', true );
+			$phase_post_dp  = get_post( $phase_id_dp );
+			$phase_order    = '';
+			if ( $phase_post_dp->menu_order < 10 ) {
+				$phase_order = '0';
+			}
+			$phase_order    .= $phase_post_dp->menu_order;
+			$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$variation_post->post_title;
 			$depends_column .= '<br/>';
 		}
-		$phase_id = get_post_meta(get_the_id(),'pbc_phase',true);
+		$phase_id = get_post_meta( $id,'pbc_phase',true );
 
 		//* Image icon
-		$imgicon = get_post_meta(get_the_id(), 'pbc_imgicon', true);
-        if($imgicon){
-            $icon_image = wp_get_attachment_image_src($imgicon, array(120,120), true);
+		$imgicon = get_post_meta( $id, 'pbc_imgicon', true );
+		if ( $imgicon ) {
+			$icon_image = wp_get_attachment_image_src( $imgicon, array( 120, 120 ), true );
 		}
 
 		//* Image Group Product
 		$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 
-		switch ($column_name) {
+		switch ( $column_name ) {
 			case 'phase':
-				$phase_post = get_post($phase_id);
-				echo $phase_post->menu_order.' - '.$phase_post->post_title;
+				$phase_post = get_post( $phase_id );
+				echo $phase_post->menu_order . ' - ' . $phase_post->post_title;
+				//* Shows taxonomy
+				$term_list = wp_get_post_terms( $id, 'variation_tag', array( 'fields' => 'all' ) );
+				foreach ( $term_list as $term_single ) {
+					echo '<p class="taxonomy-variation_tag">' . esc_html( $term_single->name ) . '</p>';
+				}
 				break;
 			case 'price':
 				echo $price_column;
