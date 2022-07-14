@@ -373,7 +373,7 @@ if ( ! empty( $phases ) ) {
 	<div class="phase_detail">
 		<form action="" method="post" name="configurator-form" id="configurator-form">
 		<?php
-		if($cStep !='calculate'){
+		if ( $cStep !='calculate' ) {
 			$phase_id = $phases[((int)$cStep-1)];?>
 			<div class="configurator-left">
 				<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
@@ -447,13 +447,17 @@ if ( ! empty( $phases ) ) {
 										$priceVar = array();
 										$pricegroup = get_post_meta( $variation, 'pbc_pricegroup', true );
 										if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) { ?>
-											<div class="pbc_pricevarwrap"><select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation;?>">
-											<?php foreach($pricegroup as $key => $details){
-												if(!empty($details['pbc_meaprice']) && isset($details['pbc_pricem'])){
-														echo '<option value="'.$details["pbc_meaprice"].'">'.$details["pbc_meaprice"].'</option>';
-												}
-											}?>
-											</select></div>
+											<div class="pbc_pricevarwrap">
+												<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation;?>">
+												<?php foreach($pricegroup as $key => $details){
+													if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
+														echo '<option value="' . $details["pbc_meaprice"] . '">';
+														echo esc_html( $details["pbc_meaprice"] );
+														echo '</option>';
+													}
+												}?>
+												</select>
+											</div>
 											<?php
 										}?>
 								</li>
@@ -468,6 +472,32 @@ if ( ! empty( $phases ) ) {
 					}
 					?>
 				</div>
+				<?php // Variations Description.
+				if ( ! empty( $variations ) ) {
+					$index_var = 1;
+					echo '<div class="phase_descvar">';
+					foreach ( $variations as $variation_id ) {
+						$descvar = get_post_meta( $variation_id, 'pbc_descvar', true );
+						if ( ! empty( $descvar ) ) {
+							echo '<div class="descvar descvar_' . esc_attr( $variation_id );
+							if ( $index_var > 1 ) {
+								echo ' hidden';
+							} else {
+								echo ' actived';
+							}
+							echo '">';
+							$allowed_html = array(
+								'strong' => array(),
+							);
+							echo wp_kses( $descvar, $allowed_html );
+							echo '</div>';
+						}
+						$index_var++;
+					}
+					echo '</div>';
+				}
+				?>
+
 				<div class="phase_content">
 					<?php
 					$post_object = get_post( $phase_id );
@@ -747,6 +777,8 @@ if ( ! empty( $phases ) ) {
 				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
 				var cPhase = $('input[name=pbc_current_phase]').val();
 				var show_prices = '<?php echo $show_prices; ?>';
+				$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
+				$('.phase_descvar .descvar_' + $(this).val() ).addClass('actived').removeClass('hidden');
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
 					type: 'POST',
@@ -761,16 +793,21 @@ if ( ! empty( $phases ) ) {
 										$('.product_preview').find('.product_preview_status').html('').addClass('hidden');
 								}, 1000 );
 							});
-						}else if(obj.type == 'success'){
+						} else
+							if ( obj.type == 'success' ) {
 							$('.product_preview').find('.product_preview_status').addClass('hidden');
 							if(obj.url){
 								if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
 										$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
-								}else{
-										if(obj.flipped)
-											var className = 'flipped';
-										else className = '';
-										$('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
+								} else {
+									if ( obj.flipped ) {
+										var className = 'flipped';
+									} else {
+										className = '';
+									}
+									console.log('obj:');
+									console.log(obj);
+									$('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
 								}
 							}
 							else

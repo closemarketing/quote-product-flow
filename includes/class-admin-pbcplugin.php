@@ -723,7 +723,6 @@ class Admin_PBCPlugin {
 						),
 					),
 				), //array
-
 				array(
 					'name'   => __( 'Product group image', 'pbc' ),
 					'id'     => "{$prefix}imgprodgroup",
@@ -779,6 +778,16 @@ class Admin_PBCPlugin {
 						),
 					),
 				), //array
+				array(
+					'name'    => __( 'Description', 'pbc' ),
+					'id'      => "{$prefix}descvar",
+					'type'    => 'wysiwyg',
+					'raw'     => false,
+					'options' => array(
+						'textarea_rows' => 8,
+						'teeny'         => true,
+					),
+				),
 			)
 		);
 
