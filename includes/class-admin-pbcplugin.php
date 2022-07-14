@@ -1127,7 +1127,7 @@ class Admin_PBCPlugin {
 		if ( !empty($budget_configurator) && \is_page( $budget_configurator )  ) {
 			if(isset($_POST) && isset($_GET['submit']) && $_POST['submit'] == 'email_send'){
 				if(session_id() == ''){
-				    session_start();
+				   session_start();
 				}
 				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
 			}
@@ -1365,10 +1365,14 @@ class Admin_PBCPlugin {
 				}
 				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
 				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
-					$result = array('type'=>'error', 'response'=>__('Error in sending mail. Please try again!','pbc'));
-				}else{
-					if ( ! empty( $attachments ) ) {
-						unlink( $this->get_budget_base_dir() . $filename );
+					$result = array(
+						'type'     => 'error',
+						'response' => __( 'Error in sending mail. Please try again!', 'pbc' )
+					);
+				} else {
+					$file_pdf = $this->get_budget_base_dir() . $filename;
+					if ( ! empty( $attachments ) && file_exists( $file_pdf ) ) {
+						unlink( $file_pdf );
 					}
 					$result = array(
 						'type'     => 'success',

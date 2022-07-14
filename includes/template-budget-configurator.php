@@ -36,10 +36,11 @@ if ( isset( $_POST['submit'] ) ) {
 		}
 		foreach ( $_POST['pbc_variation'] as $key => $pbc_variation ) {
 			if ( ! empty( $phases ) ) {
-				$price      = $option_name = '';
-				$pricegroup = get_post_meta( $pbc_variation, 'pbc_pricegroup', true );
-				$pricevar   = isset( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) ? sanitize_text_field(  $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) : '';
-				error_log( 'pricegroup:' . print_r( $pricegroup, true ) );
+				$price       = ''; 
+				$option_name = '';
+				$pricegroup  = get_post_meta( $pbc_variation, 'pbc_pricegroup', true );
+				$pricevar    = isset( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) ? sanitize_text_field(  $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) : '';
+
 				if ( isset( $user_id ) ) {
 					$phase_param['var'] = $pbc_variation;
 					$phase_param['pricevar'] = $pricevar ? $pricevar : '';
@@ -47,9 +48,10 @@ if ( isset( $_POST['submit'] ) ) {
 				}
 				if ( isset( $pricevar ) && ! empty( $pricegroup ) ) {
 					foreach ( $pricegroup as $details ) {
-						if ( $details['pbc_meaprice'] == $pricevar ) {
+						if ( trim( $details['pbc_meaprice'] ) == $pricevar ) {
 							$option_name = $pricevar;
-							$price = $details['pbc_pricem'];
+							$price       = $details['pbc_pricem'];
+							break;
 						}
 					}
 				} elseif ( isset( $pricegroup[0]['pbc_pricem'] ) ) {
@@ -850,8 +852,12 @@ if ( ! empty( $phases ) ) {
 								}
 								if(obj.option || obj.price){
 									if($('.variation_selected.phase-'+cPhase).length == 0){
-											$('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td><td class="price">'+obj.price+'</td></tr></table>')
-									}else{
+										html_price = '';
+										if ( show_prices !== 'no' ) {
+											html_price = '<td class="price">'+obj.price+'</td>';
+										}
+										$('.configurator_summary').append('<table><tr class="variation_selected phase-'+cPhase+'"><td class="name">'+obj.option+'</td>'+html_price+'</tr></table>');
+									} else {
 										$('.variation_selected.phase-'+cPhase+' td.name').html(obj.option);
 										if ( show_prices !== 'no' ) {
 											$('.variation_selected.phase-'+cPhase+' td.price').html(obj.price);
