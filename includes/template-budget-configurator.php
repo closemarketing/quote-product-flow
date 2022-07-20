@@ -17,7 +17,7 @@ if ( session_id() == '' ) {
 	die( 'Error: Unable to initialize Session!' );
 }
 $cStep ='';
-$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
+$phases = get_posts( 'numberposts=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
 if ( is_user_logged_in() ) {
 	$user_id = get_current_user_id();
 }
@@ -379,7 +379,7 @@ if ( ! empty( $phases ) ) {
 				<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
 				<div class="phase_variations">
 					<?php
-					$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase_id . '&fields=ids&orderby=title&order=asc' );
+					$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase_id . '&fields=ids&orderby=title&order=asc' );
 					if ( ! empty( $variations ) ) {
 						foreach ( $variations as $key => $variation ) {
 							$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
