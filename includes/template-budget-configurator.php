@@ -385,21 +385,17 @@ if ( ! empty( $phases ) ) {
 							$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
 							if ( ! empty( $pbc_depends ) ) {
 								$prevVar = array();
-								foreach($pbc_depends as $deps)
-								{
+								foreach ( $pbc_depends as $deps ) {
 									$arr = explode('|', $deps['pbc_depvar']);
 									if(!empty($arr[0]) && !empty($arr[1])){
 										$prevVar[(int)$arr[0]][] = $arr[1];
 									}
 								}
-								if($cStep != 1 && !empty($_SESSION['pbc_variation']))
-								{
-									foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
-									{
-										if(isset($prevVar[$sPhaseKey]) && !in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
-										{
-												unset($variations[$key]);
-												break;
+								if ( $cStep != 1 && !empty($_SESSION['pbc_variation'] ) ) {
+									foreach ( $_SESSION['pbc_variation'] as $sPhaseKey => $sVariations ) {
+										if ( isset($prevVar[$sPhaseKey]) && ! in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey] ) ) {
+											unset($variations[$key]);
+											break;
 										}
 									}
 								}
@@ -430,38 +426,51 @@ if ( ! empty( $phases ) ) {
 							?>
 							<ul>
 								<?php
-								foreach ( $variations as $variation ) { ?>
-								<li class="variation_list">
-									<label>
-										<?php
-										$imgicon = get_post_meta( $variation, 'pbc_imgicon', true );
-										if ( $imgicon ) {
-											echo '<div class="variation_img">';
-											echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
-											echo '</div>';
-										}
-										?>
-										<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation; ?>" <?php if ( $variation == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo get_the_title($variation);?>
-									</label>
-										<?php
-										$priceVar = array();
-										$pricegroup = get_post_meta( $variation, 'pbc_pricegroup', true );
-										if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) { ?>
-											<div class="pbc_pricevarwrap">
-												<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation;?>">
-												<?php foreach($pricegroup as $key => $details){
-													if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
-														echo '<option value="' . $details["pbc_meaprice"] . '">';
-														echo esc_html( $details["pbc_meaprice"] );
-														echo '</option>';
-													}
-												}?>
-												</select>
-											</div>
+								$actual_variation_tag = '';
+								foreach ( $variations as $variation ) {
+									$term_list = (array) wp_get_post_terms(
+										$variation,
+										'variation_tag',
+										array(
+											'fields' => 'all'
+										)
+									);
+									if ( $term_list[0]->name !== $actual_variation_tag ) {
+										echo '</ul><h2>' . esc_html( $term_list[0]->name ) . '</h2><ul>';
+										$actual_variation_tag = $term_list[0]->name;
+									}
+									?>
+									<li class="variation_list">
+										<label>
 											<?php
-										}?>
-								</li>
-							<?php } ?>
+											$imgicon = get_post_meta( $variation, 'pbc_imgicon', true );
+											if ( $imgicon ) {
+												echo '<div class="variation_img">';
+												echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+												echo '</div>';
+											}
+											?>
+											<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation; ?>" <?php if ( $variation == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo get_the_title($variation);?>
+										</label>
+											<?php
+											$priceVar = array();
+											$pricegroup = get_post_meta( $variation, 'pbc_pricegroup', true );
+											if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) { ?>
+												<div class="pbc_pricevarwrap">
+													<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation;?>">
+													<?php foreach($pricegroup as $key => $details){
+														if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
+															echo '<option value="' . $details["pbc_meaprice"] . '">';
+															echo esc_html( $details["pbc_meaprice"] );
+															echo '</option>';
+														}
+													}?>
+													</select>
+												</div>
+												<?php
+											}?>
+									</li>
+								<?php } ?>
 							</ul>
 							<?php
 						}

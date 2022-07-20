@@ -22,6 +22,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Updated Metabox Group 1.3.14
 *  Added options for header and footer.
 *  Added option for width image preview.
+*  Added sections in variations.
 *  Fix: Error option with space not working.
 
 = 1.0 =
