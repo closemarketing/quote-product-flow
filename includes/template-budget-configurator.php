@@ -76,9 +76,10 @@ if ( isset( $_POST['submit'] ) ) {
 if ( empty( $cStep ) ) {
 	$cStep = 1;
 }
-?>
-<?php if ( ! defined( 'DOING_AJAX' ) ) get_header(); ?>
-<?php
+
+if ( ! defined( 'DOING_AJAX' ) ) {
+	get_header();
+}
 if ( ! defined( 'DOING_AJAX' ) ) {
 	$preview_width = ! empty( get_option( 'pbc_preview_width' ) ) ? get_option( 'pbc_preview_width' ) : '570';
 	?>
@@ -330,7 +331,6 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 		margin-top: 15px;
 		}
 	</style>
-
 	<?php
 	$queried_object = get_queried_object();
 	?>
@@ -342,14 +342,13 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 			<div class="page-content">
 					<p><?php
 						$post_object = get_post( $queried_object->ID );
-						echo $post_object->post_content;
+						echo apply_filters( 'the_content', $post_object->post_content );
 					?></p>
 			</div>
 		<div class="page-configurator">
 	<?php
 } //defined('DOING_AJAX')
-?>
-<?php
+
 if ( ! empty( $phases ) ) {
 	?>
 	<div class="configurator_steps_nav" id="configurator_steps_nav">
@@ -402,7 +401,6 @@ if ( ! empty( $phases ) ) {
 							}
 						}
 						$variations = array_values( $variations );
-						sort( $variations );
 
 						if ( 
 							isset( $_SESSION['pbc_variation'] ) && 
