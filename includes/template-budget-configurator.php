@@ -48,7 +48,7 @@ if ( isset( $_POST['submit'] ) ) {
 				}
 				if ( isset( $pricevar ) && ! empty( $pricegroup ) ) {
 					foreach ( $pricegroup as $details ) {
-						if ( trim( $details['pbc_meaprice'] ) == $pricevar ) {
+						if ( isset( $details['pbc_meaprice'] ) && trim( $details['pbc_meaprice'] ) == $pricevar ) {
 							$option_name = $pricevar;
 							$price       = $details['pbc_pricem'];
 							break;
@@ -433,7 +433,7 @@ if ( ! empty( $phases ) ) {
 											'fields' => 'all'
 										)
 									);
-									if ( $term_list[0]->name !== $actual_variation_tag ) {
+									if ( isset( $term_list[0]->name ) && $term_list[0]->name !== $actual_variation_tag ) {
 										echo '</ul><h2>' . esc_html( $term_list[0]->name ) . '</h2><ul>';
 										$actual_variation_tag = $term_list[0]->name;
 									}
@@ -596,8 +596,8 @@ if ( ! empty( $phases ) ) {
 						}
 					}
 					$imgprodid = $imgprodurl = '';
-					if ( $sVar ) {
-						$imgprodgroup = get_post_meta($sVar, 'pbc_imgprodgroup', true);
+					if ( isset( $sVar ) && $sVar ) {
+						$imgprodgroup = get_post_meta( $sVar, 'pbc_imgprodgroup', true);
 						if ( ! empty( $imgprodgroup ) ) {
 							foreach ( $imgprodgroup as $deps ) {
 								if ( ! empty( $deps['pbc_depvarimgprod'] ) && isset($deps['pbc_imgprod']) ) {
@@ -690,7 +690,7 @@ if ( ! empty( $phases ) ) {
 					<?php
 					if( $cStep == 'calculate' ){
 						$count       = count( $phases );
-						$total_price = '';
+						$total_price = 0;
 					} else {
 						$count = $cStep;
 					}
@@ -698,13 +698,14 @@ if ( ! empty( $phases ) ) {
 						if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
 							continue;
 						}
-						$phaseKey = $i;
-						$varId = $_SESSION['pbc_variation'][$i]['var']['id'];
-						$varName = $_SESSION['pbc_variation'][$i]['var']['name'];
-						$varPrice = $_SESSION['pbc_variation'][$i]['var']['price'];
+						$phaseKey  = $i;
+						$varId     = $_SESSION['pbc_variation'][$i]['var']['id'];
+						$varName   = $_SESSION['pbc_variation'][$i]['var']['name'];
+						$varPrice  = ! empty( $_SESSION['pbc_variation'][$i]['var']['price'] ) ? $_SESSION['pbc_variation'][$i]['var']['price'] : 0;
 						$phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
+						
 						if ( $cStep == 'calculate' ) {
-								$total_price += (int) $varPrice;
+							$total_price += (int) $varPrice;
 						}
 						$logged_in = is_user_logged_in();
 						?>
