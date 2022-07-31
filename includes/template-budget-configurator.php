@@ -854,9 +854,13 @@ if ( ! empty( $phases ) ) {
 					}
 				});
 			});
+			$(document).on('click', 'select[class=pbc_pricevar]', function(){
+				$(this).parent().parent().find('input.pbc_variation').prop("checked", true);
+			});
 			$(document).on('change', 'select[class=pbc_pricevar]', function(){
 				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
 				var cPhase = $('input[name=pbc_current_phase]').val();
+				var select_pricevar = $(this).parent().parent().find('input.pbc_variation');
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
 					type: 'POST',
@@ -873,6 +877,7 @@ if ( ! empty( $phases ) ) {
 								});
 							}else if(obj.type == 'success'){
 								$('.product_preview').find('.product_preview_status').addClass('hidden');
+								select_pricevar.prop("checked", true);
 								if(obj.url){
 									if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
 											$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
