@@ -37,8 +37,14 @@ jQuery(document).ready(function($) {
 				percentage: $("#pbc-percentage-price").val(),
 				nonce: ajaxActionPrice.nonce
 			},
-			beforeSend: function() { $("#pbc-price-updater-button.spinner").addClass("is-active"); },
-			complete: function() { $("#pbc-price-updater-button.spinner").removeClass("is-active"); },
+			beforeSend: function() { 
+				$("#pbc-price-updater-button.spinner").addClass("is-active");
+				$("#bulk-updater-prices").prop('disabled', true);
+			},
+			complete: function() { 
+				$("#pbc-price-updater-button.spinner").removeClass("is-active");
+				$("#bulk-updater-prices").prop('disabled', false);
+			},
 			success: function(result){
 				$(".price-updater-result").html( result.data );
 			},
