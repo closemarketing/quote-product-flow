@@ -402,6 +402,22 @@ if ( ! empty( $phases ) ) {
 						}
 						$variations = array_values( $variations );
 
+						// Order variations per section.
+						$variations_section = array();
+						foreach ( $variations as $variation_id ) {
+							$term_list = (array) wp_get_post_terms(
+								$variation_id,
+								'variation_tag',
+								array(
+									'fields' => 'all'
+								)
+							);
+							$variations_section[ $variation_id ] = isset( $term_list[0]->name ) ? $term_list[0]->name : '';
+						}
+
+						asort( $variations_section );
+
+						// Show public.
 						if ( 
 							isset( $_SESSION['pbc_variation'] ) && 
 							is_array( $_SESSION['pbc_variation'] ) && 
@@ -420,42 +436,36 @@ if ( ! empty( $phases ) ) {
 								$sVar = $variations[current(array_keys($variations))];
 							}
 						}
-						if ( ! empty( $variations ) ) {
+						if ( ! empty( $variations_section ) ) {
 							?>
 							<ul>
 								<?php
 								$actual_variation_tag = '';
-								foreach ( $variations as $variation ) {
-									$term_list = (array) wp_get_post_terms(
-										$variation,
-										'variation_tag',
-										array(
-											'fields' => 'all'
-										)
-									);
-									if ( isset( $term_list[0]->name ) && $term_list[0]->name !== $actual_variation_tag ) {
-										echo '</ul><h2>' . esc_html( $term_list[0]->name ) . '</h2><ul>';
-										$actual_variation_tag = $term_list[0]->name;
+								foreach ( $variations_section as $variation_id => $section_title ) {
+									
+									if ( $actual_variation_tag !== $section_title ) {
+										echo '</ul><h2>' . esc_html( $section_title ) . '</h2><ul>';
+										$actual_variation_tag = $section_title;
 									}
 									?>
 									<li class="variation_list">
 										<label>
 											<?php
-											$imgicon = get_post_meta( $variation, 'pbc_imgicon', true );
+											$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
 											if ( $imgicon ) {
 												echo '<div class="variation_img">';
 												echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
 												echo '</div>';
 											}
 											?>
-											<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation; ?>" <?php if ( $variation == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo get_the_title($variation);?>
+											<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo get_the_title($variation_id);?>
 										</label>
 											<?php
 											$priceVar = array();
-											$pricegroup = get_post_meta( $variation, 'pbc_pricegroup', true );
+											$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
 											if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) { ?>
 												<div class="pbc_pricevarwrap">
-													<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation;?>">
+													<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation_id;?>">
 													<?php foreach($pricegroup as $key => $details){
 														if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
 															echo '<option value="' . $details["pbc_meaprice"] . '">';
