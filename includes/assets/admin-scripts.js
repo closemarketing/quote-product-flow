@@ -26,4 +26,26 @@ jQuery(document).ready(function($) {
 		});
 	});
 
+	$('#bulk-updater-prices').click(function(e) {
+		e.preventDefault();
+
+		$.ajax({
+			type: 'POST',
+			url: ajaxActionPrice.url,
+			data: {
+				action: 'price_updater',
+				percentage: $("#pbc-percentage-price").val(),
+				nonce: ajaxActionPrice.nonce
+			},
+			beforeSend: function() { $("#pbc-price-updater-button.spinner").addClass("is-active"); },
+			complete: function() { $("#pbc-price-updater-button.spinner").removeClass("is-active"); },
+			success: function(result){
+				$(".price-updater-result").html( result.data );
+			},
+			error: function(error) {
+				console.log(error);
+			}
+		});
+	});
+
 });

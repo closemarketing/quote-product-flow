@@ -47,10 +47,15 @@ class Admin_PBCPlugin {
 		add_filter( 'template_include', array( $this, 'pbc_custom_page_template' ), 99 );
 		add_action( 'wp_ajax_variation_selected', array( $this, 'variation_selected_action_callback' ) );
 		add_action( 'wp_ajax_nopriv_variation_selected', array( $this, 'variation_selected_action_callback' ) );
+
 		add_action( 'wp_ajax_configurator_submit', array( $this, 'configurator_submit_action_callback' ) );
 		add_action( 'wp_ajax_nopriv_configurator_submit', array( $this, 'configurator_submit_action_callback' ) );
+
 		add_action( 'wp_ajax_configurator_login', array( $this, 'configurator_login_action_callback' ) );
 		add_action( 'wp_ajax_nopriv_configurator_login', array( $this, 'configurator_login_action_callback' ) );
+
+		add_action( 'wp_ajax_price_updater', array( $this, 'price_updater_action_callback' ) );
+		add_action( 'wp_ajax_nopriv_price_updater', array( $this, 'price_updater_action_callback' ) );
 
 		// On variation-lists admin screen.
 		add_filter( 'views_edit-variation', array( $this, 'pbc_add_print_pdf_button' ) );
@@ -106,18 +111,27 @@ class Admin_PBCPlugin {
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
 
 		wp_enqueue_script( 
-			'pbc-enquiry-pdf',
-			WPPBC_PLUGIN_URL . 'includes/assets/pbc-enquiry-pdf.js',
+			'pbc-admin-scripts',
+			WPPBC_PLUGIN_URL . 'includes/assets/admin-scripts.js',
 			array( 'jquery' ),
 			WPPBC_VERSION,
 		);
 
 		wp_localize_script(
-			'pbc-enquiry-pdf',
+			'pbc-admin-scripts',
 			'ajaxAction',
 			array(
 				'url'   => admin_url( 'admin-ajax.php' ),
 				'nonce' => wp_create_nonce( 'pbc_enquiry_pdf_nonce' ),
+			)
+		);
+
+		wp_localize_script(
+			'pbc-admin-scripts',
+			'ajaxActionPrice',
+			array(
+				'url'   => admin_url( 'admin-ajax.php' ),
+				'nonce' => wp_create_nonce( 'pbc_price_updater_nonce' ),
 			)
 		);
 	}
@@ -290,6 +304,17 @@ class Admin_PBCPlugin {
 					</div>
 					<div class="postcontent-right">
 						<?php
+						// Price Updater
+						add_meta_box(
+							'price_updater_meta_box',
+							__( 'Price Updater', 'pbc' ),
+							array(
+								$this,
+								'price_updater_meta_box_callback',
+							),
+							'pbc_import_right'
+						);
+						// General Settings.
 						add_meta_box(
 							'general_settings_meta_box',
 							__( 'General Settings', 'pbc' ),
@@ -347,6 +372,62 @@ class Admin_PBCPlugin {
 			?>
 		</table>
 		<?php
+	}
+
+	/**
+	 * General Settings Meta Box Callback
+	 *
+	 * Callback function for add_meta_box import section
+	 */
+	public function price_updater_meta_box_callback() {
+		?>
+		<label class="block" for="select_percentage_price"><?php esc_html_e( 'Set the percentage to bulk update prices (you can use negative values)', 'pbc' ); ?></label>
+		<input type="text" id="pbc-percentage-price" name="pbc_percentage_price" value="" /> %
+		<button id="bulk-updater-prices" class="button button-primary submit-button"><?php esc_html_e( 'Update Prices', 'pbc' ); ?></button><span id="pbc-price-updater-button" class="spinner"></span><div class="price-updater-result"></div>
+		<?php
+	}
+		/**
+	 * Ajax function to load info
+	 *
+	 * @return void
+	 */
+	public function price_updater_action_callback() {
+		$percentage = isset( $_POST['percentage'] ) ? (int) esc_attr( $_POST['percentage'] ) / 100 : '';
+
+		check_ajax_referer( 'pbc_price_updater_nonce', 'nonce' );
+		if ( true ) {
+			$html       = '';
+			$count      = 0;
+			$variations = get_posts( 'posts_per_page=-1&post_type=variation&fields=ids' );
+
+			if ( 0 === $percentage ) {
+				$html = __( 'Percentage cannot be 0.', 'pbc' );
+				wp_send_json_success( $html );
+			}
+
+			foreach ( $variations as $variation_id ) {
+				$price_group = get_post_meta( $variation_id, 'pbc_pricegroup', true );
+				if ( ! empty( $price_group ) ) {
+					foreach ( $price_group as $key => $price_simple ) {
+						if ( empty( $price_simple ) ) {
+							continue;
+						}
+						$new_price = $price_simple['pbc_pricem'] + ( $price_simple['pbc_pricem'] * $percentage );
+						$price_group[ $key ]['pbc_pricem'] = str_replace( '.', ',', $new_price );
+					}
+					update_post_meta( $variation_id, 'pbc_pricegroup', $price_group );
+					$count++;
+				}
+			}
+			$html = sprintf(
+				__( 'Changed %s variation prices' , 'pbc' ),
+				$count,
+			);
+
+			wp_send_json_success( $html );
+		} else {
+			wp_send_json_error( __( 'Error', 'pbc' ) );
+		}
 	}
 
 	/**
@@ -921,7 +1002,7 @@ class Admin_PBCPlugin {
 		return $disable_months_dropdown;
 
 	}
-/**
+	/**
 	 * Ajax function to load info
 	 *
 	 * @return void
