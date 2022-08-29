@@ -412,10 +412,16 @@ if ( ! empty( $phases ) ) {
 									'fields' => 'all'
 								)
 							);
-							$variations_section[ $variation_id ] = isset( $term_list[0]->name ) ? $term_list[0]->name : '';
+							$variations_section[] = array(
+								'id'      => $variation_id,
+								'section' => isset( $term_list[0]->name ) ? $term_list[0]->name : '',
+								'title'   => get_the_title( $variation_id ),
+							);
 						}
 
-						asort( $variations_section );
+						// Order by sections.
+						$sections = array_column( $variations_section, 'section' );
+						array_multisort( $sections, SORT_ASC, $variations_section );
 
 						// Show public.
 						if ( 
@@ -441,11 +447,11 @@ if ( ! empty( $phases ) ) {
 							<ul>
 								<?php
 								$actual_variation_tag = '';
-								foreach ( $variations_section as $variation_id => $section_title ) {
-									
-									if ( $actual_variation_tag !== $section_title ) {
-										echo '</ul><h2>' . esc_html( $section_title ) . '</h2><ul>';
-										$actual_variation_tag = $section_title;
+								foreach ( $variations_section as $variation_data ) {
+									$variation_id = (int) $variation_data['id'];
+									if ( $actual_variation_tag !== $variation_data['section'] ) {
+										echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
+										$actual_variation_tag = $variation_data['section'];
 									}
 									?>
 									<li class="variation_list">
@@ -458,7 +464,7 @@ if ( ! empty( $phases ) ) {
 												echo '</div>';
 											}
 											?>
-											<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo get_the_title($variation_id);?>
+											<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo esc_html( $variation_data['title'] ); ?>
 										</label>
 											<?php
 											$priceVar = array();
