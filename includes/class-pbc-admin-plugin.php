@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Class for admin
  */
-class Admin_PBCPlugin {
+class PBC_Admin_Plugin {
 	/**
 	 * Construct and intialize
 	 */
@@ -1797,4 +1797,4 @@ class Admin_PBCPlugin {
 	}
 }
 
-new Admin_PBCPlugin();
+new PBC_Admin_Plugin();

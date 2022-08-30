@@ -42,7 +42,7 @@ function pbc_plugin_init() {
 }
 
 // Include files.
-require_once WPPBC_PLUGIN_PATH . '/includes/class-helper-calculations.php';
+require_once WPPBC_PLUGIN_PATH . '/includes/class-pbc-helper-calculations.php';
 require_once WPPBC_PLUGIN_PATH . '/includes/class-pbc-helper-posttypes.php';
-require_once WPPBC_PLUGIN_PATH . '/includes/class-admin-pbcplugin.php';
+require_once WPPBC_PLUGIN_PATH . '/includes/class-pbc-admin-plugin.php';
 require_once WPPBC_PLUGIN_PATH . '/includes/helper-required-plugins.php';
