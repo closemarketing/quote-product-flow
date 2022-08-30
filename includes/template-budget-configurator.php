@@ -509,10 +509,7 @@ if ( ! empty( $phases ) ) {
 								echo ' actived';
 							}
 							echo '">';
-							$allowed_html = array(
-								'strong' => array(),
-							);
-							echo wp_kses( $descvar, $allowed_html );
+							echo wpautop( $descvar );
 							echo '</div>';
 						}
 						$index_var++;
@@ -707,7 +704,7 @@ if ( ! empty( $phases ) ) {
 								<td class="price">
 									<?php
 									if ( $total_price ) {
-										echo number_format( $varPrice, 2, ',', '.' ) . ' €';
+										echo number_format( $total_price, 2, ',', '.' ) . ' €';
 									}
 									?>
 								</td>
@@ -777,7 +774,7 @@ if ( ! empty( $phases ) ) {
 						if(obj.type == 'error'){
 							$('.product_preview').find('.product_preview_status').html('<div>'+obj.msg+'</div>').show().delay(4000, function(){
 								window.setTimeout( function(){
-										$('.product_preview').find('.product_preview_status').html('').addClass('hidden');
+									$('.product_preview').find('.product_preview_status').html('').addClass('hidden');
 								}, 1000 );
 							});
 						} else
@@ -785,7 +782,7 @@ if ( ! empty( $phases ) ) {
 							$('.product_preview').find('.product_preview_status').addClass('hidden');
 							if(obj.url){
 								if($('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').length != 0){
-										$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
+									$('.product_preview').find('.image-wrap img[phaseid="'+cPhase+'"]').attr('src',obj.url);
 								} else {
 									if ( obj.flipped ) {
 										var className = 'flipped';
