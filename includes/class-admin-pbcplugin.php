@@ -352,6 +352,7 @@ class Admin_PBCPlugin {
 			<?php
 			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
 			if ( ! empty( $phases ) ) {
+				$total_count = 0;
 				foreach ( $phases as $phase ) {
 					?>
 					<tr>
@@ -367,9 +368,14 @@ class Admin_PBCPlugin {
 						</td>
 					</tr>
 					<?php
+					$total_count = $total_count + count( $variations );
 				}
 			}
 			?>
+			<tr>
+				<td colspan="2" ><?php esc_html_e( 'Total: ', 'pbc' ); ?></td>
+				<td><?php echo $total_count; ?></td>
+			</tr>
 		</table>
 		<?php
 	}
@@ -968,7 +974,7 @@ class Admin_PBCPlugin {
 				} ?>
 			</tbody>
 		</table>
-	<?php
+		<?php
 	}
 
 	private function get_total_from_enquiry( $post_id ) {
@@ -976,7 +982,7 @@ class Admin_PBCPlugin {
 		$total_price = 0;
 		foreach ( $metas as $key => $value ) {
 			if ( false !== strpos( $key, 'pbc_price_' ) ) {
-				$price = isset( $value[0] ) ? (int) $value[0] : 0;
+				$price = isset( $value[0] ) ? (double) str_replace( ',', '.', $value[0] ) : 0;
 				$total_price = $total_price + $price;
 			}
 		}
@@ -1017,14 +1023,12 @@ class Admin_PBCPlugin {
 				session_start();
 			}
 			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
-			$phase_order = 0;
-			foreach ( $phases as $phase_id ) {
+
+			foreach ( $phases as $phase_order => $phase_id ) {
 				$_SESSION['pbc_variation'][ $phase_order ]['phase']['id']   = $phase_id;
 				$_SESSION['pbc_variation'][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
-				//$_SESSION['pbc_variation'][ $phase_order ]['var']['id']     = 0;
 				$_SESSION['pbc_variation'][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
-				$_SESSION['pbc_variation'][ $phase_order ]['var']['price'] = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
-				$phase_order++;
+				$_SESSION['pbc_variation'][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
 			}
 			$file_url = $this->generate_engine_pdf( 'url', $post_id );
 
@@ -1035,16 +1039,16 @@ class Admin_PBCPlugin {
 	}
 	/** Add columns for Phases **/
 	// Add to admin_init function
-	public function add_new_phases_columns($phases_columns) {
-		$new_columns['cb'] = '<input type="checkbox" />';
-		$new_columns['title'] = __('Phase','pbc');
-		$new_columns['menu_order'] = __('Order','pbc');
+	public function add_new_phases_columns( $phases_columns ) {
+		$new_columns['cb']         = '<input type="checkbox" />';
+		$new_columns['title']      = __( 'Phase', 'pbc' );
+		$new_columns['menu_order'] = __( 'Order', 'pbc' );
 
 		return $new_columns;
 	}
 
 
-	public function add_new_budgets_columns($phases_columns) {
+	public function add_new_budgets_columns( $phases_columns ) {
 		$new_columns['cb']              = '<input type = "checkbox" />';
 		$new_columns['enquiry_name']    = __( 'Budget', 'pbc' );
 		$new_columns['enquiry_details'] = __( 'Details', 'pbc' );
@@ -1073,7 +1077,7 @@ class Admin_PBCPlugin {
 				$this->render_enquiry_details( $id );
 				break;
 			case 'enquiry_conf':
-				echo $this->get_total_from_enquiry( $id ) . ' € ' . __( 'VAT not included', 'pbc' );
+				echo number_format( $this->get_total_from_enquiry( $id ), 2, ',', '.' ) . ' € ' . __( 'VAT not included', 'pbc' );
 				break;
 			case 'enquiry_date':
 				echo get_the_date( 'd-m-Y H:i', $id );
@@ -1330,16 +1334,10 @@ class Admin_PBCPlugin {
 			if($imgprodid){ $imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);}
 			$pricegroup = get_post_meta($sVar, 'pbc_pricegroup', true);
 			$pricevar = $_REQUEST["pbc_pricevar_$sVar"];
-			if($pricevar){
-				foreach($pricegroup as $details){
-					if($details['pbc_meaprice'] == $pricevar){
-						$option_name = $pricevar;
-						$price = $details['pbc_pricem'];
-					}
-				}
-			}else{
-				if(isset($pricegroup[0]['pbc_pricem']))
-					$price = $pricegroup[0]['pbc_pricem'];
+
+			$price = array_search( $pricevar, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ) );
+			if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
+				$price = $pricegroup[0]['pbc_pricem'];
 			}
 			$option = get_the_title($sVar);
 			if(isset($option_name) && $option_name) $option .= ' ['.$option_name.']';
@@ -1408,17 +1406,22 @@ class Admin_PBCPlugin {
 		}
 		die(0);
 	}
-	public function configurator_result_email_send( $post_requests ){
-		extract($post_requests);
-		if(!$email_field){
+	public function configurator_result_email_send( $post_data ){
+		$email_field = ! empty( $post_data['email_field'] ) ? sanitize_text_field( $post_data['email_field'] ) : '';
+		$name_field  = ! empty( $post_data['name_field'] ) ? sanitize_text_field( $post_data['name_field'] ) : '';
+		$phone_field = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
+		$city_field  = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
+		$state_field = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
+
+		if ( ! $email_field ) {
 			$result = array('type'=>'error', 'response'=>__('Email field empty!','pbc') );
-		}elseif(!$name_field){
+		} elseif ( ! $name_field ) {
 			$result = array('type'=>'error', 'response'=>__('Name field is empty!','pbc') );
-		}elseif(!$phone_field){
+		} elseif ( ! $phone_field ) {
 			$result = array('type'=>'error', 'response'=>__('Phone field is empty!','pbc') );
-		}else{
+		} else {
 			$emails = explode(',', $email_field);
-			$admin_emails = get_option('pbc_admin_email_notification');
+			$admin_emails = get_option( 'pbc_admin_email_notification' );
 			if ( $admin_emails ) {
 				$admin_emails = explode( ',', $admin_emails );
 				$emails       = array_merge( $emails, $admin_emails );
@@ -1431,10 +1434,16 @@ class Admin_PBCPlugin {
 				);
 			} else {
 				$subject  = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
-				$message .= '<div><h2>' . __( 'Enquiry details:', 'pbc' ).'</h2><br/><strong>'.__( 'Name:', 'pbc' ).'</strong>'.$name_field.'<br/><strong>'.__( 'Email:', 'pbc' ).'</strong>'.$email_field.'<br/><strong>'.__( 'Phone:', 'pbc' ).'</strong>'.$phone_field.'<br/><strong>'.__( 'City:', 'pbc' ).'</strong>'.$city_field.'<br/><strong>'.__( 'State:', 'pbc' ).'</strong>'.$state_field.'<br/><br/></div>';
-				$message = '<h4>'.__( 'Configuration details:', 'pbc' ).'</h4>'.'<br>';
-				$message .= '<table><tr><th>'.__( 'Phase', 'pbc' ).'</th><th>'.__( 'Variation', 'pbc' ).'</th><th>'.__( 'Price', 'pbc' ).'</th></tr>';
-				$total_price = '';
+				$message  = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
+				$message .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
+				$message .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
+				$message .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
+				$message .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
+				$message .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
+				$message .= '<br/></div>';
+				$message .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>'.'<br>';
+				$message .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>'.__( 'Variation', 'pbc' ) . '</th><th>'.__( 'Price', 'pbc' ) . '</th></tr>';
+				$total_price     = 0;
 				$enquiry_entries = array();
 				$i=0;
 				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
@@ -1445,17 +1454,15 @@ class Admin_PBCPlugin {
 					$message .= '<td>'.$details['var']['name'].'</td>';
 					$message .= '<td>';
 					if ( $price > 0 ) {
-						$message .= number_format( $price, 2, ',', ' ' ) . ' €';
+						$message .= number_format( $price, 2, ',', '.' ) . ' €';
 					}
 					$message .= '</td>';
 					$message .= '</tr>';
 					$enquiry_entries[$i]['phase_var'] = $details['phase']['name'].': '.$details['var']['name'];
-					$enquiry_entries[$i]['price'] = $details['var']['price'];
+					$enquiry_entries[$i]['price'] = $price;
 					$i++;
 				}
-				if ( $total_price ) {
-					$total_price = $total_price . ' €';
-				}
+				$total_price = ! empty( $total_price ) ? $total_price . ' €' : '';
 				$message .= '<tr>';
 				$message .= '<td>&nbsp;</td><td>' . __( 'Total:', 'pbc' ) . '</td>';
 				$message .= '<td>' . $total_price . '</td>';
@@ -1466,12 +1473,12 @@ class Admin_PBCPlugin {
 				$attachments = array( $this->generate_engine_pdf() );
 
 				//insert_enquiry Post
-				$my_post = array(
+				$enquiry_post = array(
 					'post_title'  => $name_field . '-' . $phone_field,
 					'post_status' => 'publish',
 					'post_type'   => 'enquiry',
 				);
-				$post_id = wp_insert_post( $my_post );
+				$post_id = wp_insert_post( $enquiry_post );
 				if ( $post_id ) {
 					update_post_meta( $post_id, 'pbc_enquiry_name', $name_field );
 					update_post_meta( $post_id, 'pbc_enquiry_phone', $phone_field );
@@ -1479,7 +1486,7 @@ class Admin_PBCPlugin {
 					update_post_meta( $post_id, 'pbc_enquiry_city', $city_field );
 					update_post_meta( $post_id, 'pbc_enquiry_state', $state_field );
 					if ( ! empty( $enquiry_entries ) ) {
-						$i=0;
+						$i = 0;
 						foreach ( $enquiry_entries as $entries ) {
 							update_post_meta( $post_id, 'pbc_phase_var_' . $i, $entries['phase_var'] );
 							update_post_meta( $post_id, 'pbc_price_' . $i, $entries['price'] );
@@ -1498,6 +1505,7 @@ class Admin_PBCPlugin {
 						'response' => __( 'Error in sending mail. Please try again!', 'pbc' )
 					);
 				} else {
+					$filename   = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
 					$file_pdf = $this->get_budget_base_dir() . $filename;
 					if ( ! empty( $attachments ) && file_exists( $file_pdf ) ) {
 						unlink( $file_pdf );
@@ -1599,7 +1607,7 @@ class Admin_PBCPlugin {
 			</style>";
 			$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 			if ( $pdf_image_selected ) {
-				$output .="<img src='".$pdf_image_selected."' width='200'/>";
+				$output .="<img src='" . $pdf_image_selected . "' width='200'/>";
 			}
 			$header_image = get_option( 'pbc_pdf_image_header' );
 			if ( $header_image ) {
@@ -1691,7 +1699,7 @@ class Admin_PBCPlugin {
 			$output .= "</div></td></tr></table><br/><br/>";
 
 			$output .= '<table class="summary">';
-			$total_price = '';
+			$total_price = 0;
 			$i = 0;
 			foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
 				if ( ( $i % 2 ) == 0 ) {
@@ -1699,13 +1707,13 @@ class Admin_PBCPlugin {
 				} else {
 					$bg = '';
 				}
-				$price = (double) $details['var']['price'];
+				$price = (double) str_replace( ',', '.', $details['var']['price'] );
 				$total_price += $price;
 				$output .= '<tr>';
 				$output .= '<td class="title '.$bg.'">'.$details['phase']['name'].' '.$details['var']['name'].'</td>';
 				$output .= '<td class="value right '.$bg.'">';
 				if ( $price > 0 ) {
-					$output .= number_format( $price, 2, ',', ' ' ) . ' €';
+					$output .= number_format( $price, 2, ',', '.' ) . ' €';
 				}
 				$output .= '</td>';
 				$output .= '</tr>';
