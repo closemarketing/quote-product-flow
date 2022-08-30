@@ -23,6 +23,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added options for header and footer.
 *  Added option for width image preview.
 *  Added sections in variations.
+*  Refactored Classes.
 *  Fix: Error option with space not working.
 
 = 1.0 =

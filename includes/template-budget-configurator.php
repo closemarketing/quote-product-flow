@@ -3,6 +3,8 @@
  * Template Name: Budget Configurator
  */
 
+global $pbc_helper_calc;
+
 if ( session_id() == '' ) {
 	ob_start();
 	session_start();
@@ -541,13 +543,13 @@ if ( ! empty( $phases ) ) {
 			<?php
 		}
 		?>
-		<div class="product_preview <?php if($cStep =='calculate'){ echo 'wrap-left';}?>">
+		<div class="product_preview<?php if ( $cStep =='calculate'){ echo ' wrap-left'; } ?>">
 			<div class="image-wrap">
 					<?php
 					if ( isset( $_SESSION['pbc_variation'] ) && ! empty( $_SESSION['pbc_variation'] ) ) {
 						$to = (int) $cStep;
 						if ( $cStep == 'calculate') {
-							$to = count($_SESSION['pbc_variation'])+1;
+							$to = count( $_SESSION['pbc_variation'] ) + 1;
 						}
 						for ( $i = 1; $i < $to; $i++ ) {
 							$imgprodid = $imgprodurl = '';
@@ -556,14 +558,12 @@ if ( ! empty( $phases ) ) {
 								$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
-										if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
-										{
+										if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) ) {
 											$prevVar = array();
-											foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
-											{
-												$arr = explode('|', $depvarimgprod);
-												if(!empty($arr[0]) && !empty($arr[1])){
-													$prevVar[(int)$arr[0]][] = $arr[1];
+											foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+												$imgprod_arr = explode('|', $depvarimgprod);
+												if ( ! empty( $imgprod_arr[0] ) && ! empty( $imgprod_arr[1] ) ) {
+													$prevVar[ (int)$imgprod_arr[0] ][] = $imgprod_arr[1];
 												}
 											}
 											if(!empty($_SESSION['pbc_variation']) && !empty($prevVar))
@@ -609,81 +609,45 @@ if ( ! empty( $phases ) ) {
 							}
 						}
 					}
-					$imgprodid = $imgprodurl = '';
-					if ( isset( $sVar ) && $sVar ) {
-						$imgprodgroup = get_post_meta( $sVar, 'pbc_imgprodgroup', true);
-						if ( ! empty( $imgprodgroup ) ) {
-							foreach ( $imgprodgroup as $deps ) {
-								if ( ! empty( $deps['pbc_depvarimgprod'] ) && isset($deps['pbc_imgprod']) ) {
-									$prevVar = array();
-									foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
-										$arr = explode('|', $depvarimgprod);
-										if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-												$prevVar[(int)$arr[0]][] = $arr[1];
-										}
-									}
-									if ( ! empty( $_SESSION['pbc_variation'] ) && ! empty( $prevVar ) ) {
-										foreach($prevVar as $sPhaseKey => $sVariations)
-										{
-												if(isset($prevVar[$sPhaseKey]) &&
-												isset($_SESSION['pbc_variation'][$sPhaseKey]) &&
-												in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
-												{
-													$imgprodid = $deps['pbc_imgprod'][0];
-												}else{
-													$imgprodid = '';
-													break;
-												}
-										}
-									}
-								} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ) {
-										$imgprodid = $deps['pbc_imgprod'][0];
-										break;
-								}
-								if ( $imgprodid ) {
-									break;
-								}
-							}
-						}
-						if ( isset( $imgprodid ) && $imgprodid ) {
-							$imgprodurl = wp_get_attachment_image_src($imgprodid, 'full', true);
-						}
-					}
-					if(isset($imgprodurl) && $imgprodurl){
+					$imgprodurl = $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
+
+					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option('variations_images_flipped');
-						if(!empty($variations_images_flipped) && in_array($sVar, $variations_images_flipped))
+						$addclass                  = '';
+						if ( ! empty( $variations_images_flipped ) && in_array( $sVar, $variations_images_flipped ) ) {
 							$addclass = 'flipped';
-						if(!isset($addclass)) $addclass = '';
+						}
+						?>
+						<img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl; ?>" class="<?php echo $addclass;?>" alt="product image"/>
+						<?php
+					}
 					?>
-						<img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl[0];?>" class="<?php echo $addclass;?>" alt="product image"/>
-					<?php }?>
 			</div>
 			<div class="status_loader product_preview_status fixed hidden"></div>
 		</div>
 			<div class="configurator_form_action">
 				<?php
-						if($cStep == 1)
-						{
-							$prev_step = '';
-							$prev_button = '';
-						}elseif($cStep == 'calculate'){
-							$prev_step = count($phases);
-							$prev_button = __('Back', 'pbc');
-						}else{
-							$prev_step = $cStep-1;
-							$prev_button = __('Back', 'pbc');
-						}
+				if ( $cStep == 1 ) {
+					$prev_step   = '';
+					$prev_button = '';
+				} elseif ( $cStep == 'calculate' ) {
+					$prev_step   = count( $phases );
+					$prev_button = __( 'Back', 'pbc' );
+				} else {
+					$prev_step   = $cStep - 1;
+					$prev_button = __( 'Back', 'pbc' );
+				}
 
-						if($cStep == 'calculate'){
-							$next_step = 'calculate';
-							$next_button = '';
-						}elseif($cStep == count($phases)){
-							$next_step = 'calculate';
-							$next_button = __('Calculate', 'pbc');
-						}else{
-							$next_step = $cStep+1;
-							$next_button = __('Next', 'pbc');
-						}
+				if ( $cStep == 'calculate' ) {
+					$next_step   = 'calculate';
+					$next_button = '';
+				} elseif ( $cStep == count( $phases ) ) {
+					$next_step   = 'calculate';
+					$next_button = __( 'Calculate', 'pbc' );
+				}else{
+					$next_step   = $cStep + 1;
+					$next_button = __( 'Next', 'pbc' );
+				}
 				?>
 				<input type="hidden" name="pbc_current_phase" value="<?php echo $cStep;?>"/>
 				<?php if($prev_step && $prev_button){?>
@@ -730,7 +694,7 @@ if ( ! empty( $phases ) ) {
 								<td class="price">
 									<?php
 									if ( $varPrice && 'no' !== $show_prices ) {
-										echo $varPrice . ' €';
+										echo number_format( $varPrice, 2, ',', '.' ) . ' €';
 									}
 									?>
 								</td>
@@ -743,7 +707,7 @@ if ( ! empty( $phases ) ) {
 								<td class="price">
 									<?php
 									if ( $total_price ) {
-										echo $total_price . ' €';
+										echo number_format( $varPrice, 2, ',', '.' ) . ' €';
 									}
 									?>
 								</td>
@@ -828,8 +792,6 @@ if ( ! empty( $phases ) ) {
 									} else {
 										className = '';
 									}
-									console.log('obj:');
-									console.log(obj);
 									$('.product_preview').find('.image-wrap').append('<img phaseid="'+cPhase+'" class="'+className+'" src="'+obj.url+'" alt="product image"/>').show();
 								}
 							}
