@@ -39,29 +39,27 @@ if ( isset( $_POST['submit'] ) ) {
 				$price       = ''; 
 				$option_name = '';
 				$pricegroup  = get_post_meta( $pbc_variation, 'pbc_pricegroup', true );
-				$pricevar    = isset( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) ? sanitize_text_field(  $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) : '';
+				$price_var   = isset( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) ? sanitize_text_field(  $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) : '';
+				$meaprice    = isset( $details['pbc_meaprice'] ) ? trim( $details['pbc_meaprice'] ) : '';
 
 				if ( isset( $user_id ) ) {
 					$phase_param['var'] = $pbc_variation;
-					$phase_param['pricevar'] = $pricevar ? $pricevar : '';
+					$phase_param['pricevar'] = $price_var ? $price_var : '';
 					update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
 				}
-				if ( isset( $pricevar ) && ! empty( $pricegroup ) ) {
-					foreach ( $pricegroup as $details ) {
-						if ( isset( $details['pbc_meaprice'] ) && trim( $details['pbc_meaprice'] ) == $pricevar ) {
-							$option_name = $pricevar;
-							$price       = $details['pbc_pricem'];
-							break;
-						}
-					}
-				} elseif ( isset( $pricegroup[0]['pbc_pricem'] ) ) {
+				$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ) );
+				if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
 					$price = $pricegroup[0]['pbc_pricem'];
 				}
 				$phase_id = $phases[ (int) $key - 1 ];
+				$variation_title = get_the_title( $pbc_variation );
+				if ( $price_var ) {
+					$variation_title .= ' [' . $price_var . ']'; 
+				}
 				$_SESSION['pbc_variation'][ $key ]['phase']['id']   = $phase_id;
 				$_SESSION['pbc_variation'][ $key ]['phase']['name'] = get_the_title( $phase_id );
 				$_SESSION['pbc_variation'][ $key ]['var']['id']     = $pbc_variation;
-				$_SESSION['pbc_variation'][ $key ]['var']['name']   = get_the_title( $pbc_variation );
+				$_SESSION['pbc_variation'][ $key ]['var']['name']   = $variation_title;
 				if ( $option_name ) {
 					$_SESSION['pbc_variation'][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 				}
@@ -700,62 +698,63 @@ if ( ! empty( $phases ) ) {
 				</div>
 			</div>
 			<div class="configurator_summary">
-				<?php if(isset($_SESSION) && isset($_SESSION['pbc_variation']) && is_array($_SESSION['pbc_variation'])){?>
-				<h2 class="title"><?php _e( 'Actual Configuration', 'pbc' ); ?></h2>
-				<table>
-					<?php
-					if( $cStep == 'calculate' ){
-						$count       = count( $phases );
-						$total_price = 0;
-					} else {
-						$count = $cStep;
-					}
-					for ( $i = 1; $i <= $count; $i++ ) {
-						if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
-							continue;
-						}
-						$phaseKey  = $i;
-						$varId     = $_SESSION['pbc_variation'][$i]['var']['id'];
-						$varName   = $_SESSION['pbc_variation'][$i]['var']['name'];
-						$varPrice  = ! empty( $_SESSION['pbc_variation'][$i]['var']['price'] ) ? $_SESSION['pbc_variation'][$i]['var']['price'] : 0;
-						$phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
-						
-						if ( $cStep == 'calculate' ) {
-							$total_price += (int) $varPrice;
-						}
-						$logged_in = is_user_logged_in();
-						?>
-						<tr class="variation_selected phase-<?php echo $phaseKey;?>">
-							<td class="name"><?php  echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
-							<td class="price">
-								<?php
-								$show_prices = get_option( 'pbc_budget_show_prices' );
-								if ( $varPrice && 'no' !== $show_prices ) {
-									echo $varPrice . ' €';
-								}
-								?>
-							</td>
-						</tr>
-						<?php
-					}
-					if ( $cStep == 'calculate' && 'no' !== $show_prices ) { ?>
-						<tr class="variation_selected phase-total_price">
-							<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
-							<td class="price">
-								<?php
-								if ( $varPrice ) {
-									echo $varPrice . ' €';
-								}
-								?>
-							</td>
-						</tr>
-						<tr class="variation_selected phase-total_price">
-							<td class="name"><?php _e( 'VAT not included', 'pbc' );?></td>
-							<td class="price"></td>
-						</tr>
-					<?php }?>
-				</table>
 				<?php
+				if ( isset( $_SESSION ) && isset($_SESSION['pbc_variation']) && is_array( $_SESSION['pbc_variation'] ) ) {
+					?>
+					<h2 class="title"><?php _e( 'Actual Configuration', 'pbc' ); ?></h2>
+					<table>
+						<?php
+						$show_prices = get_option( 'pbc_budget_show_prices' );
+						if( $cStep == 'calculate' ){
+							$count       = count( $phases );
+							$total_price = 0;
+						} else {
+							$count = $cStep;
+						}
+						for ( $i = 1; $i <= $count; $i++ ) {
+							if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
+								continue;
+							}
+							$phaseKey  = $i;
+							$varId     = $_SESSION['pbc_variation'][$i]['var']['id'];
+							$varName   = $_SESSION['pbc_variation'][$i]['var']['name'];
+							$varPrice  = ! empty( $_SESSION['pbc_variation'][$i]['var']['price'] ) ? $_SESSION['pbc_variation'][$i]['var']['price'] : 0;
+							$phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
+							
+							if ( $cStep == 'calculate' ) {
+								$total_price += (double) $varPrice;
+							}
+							?>
+							<tr class="variation_selected phase-<?php echo $phaseKey;?>">
+								<td class="name"><?php echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
+								<td class="price">
+									<?php
+									if ( $varPrice && 'no' !== $show_prices ) {
+										echo $varPrice . ' €';
+									}
+									?>
+								</td>
+							</tr>
+							<?php
+						}
+						if ( $cStep == 'calculate' && 'no' !== $show_prices ) { ?>
+							<tr class="variation_selected phase-total_price">
+								<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
+								<td class="price">
+									<?php
+									if ( $total_price ) {
+										echo $total_price . ' €';
+									}
+									?>
+								</td>
+							</tr>
+							<tr class="variation_selected phase-total_price">
+								<td class="name"><?php _e( 'VAT not included', 'pbc' );?></td>
+								<td class="price"></td>
+							</tr>
+						<?php }?>
+					</table>
+					<?php
 				}
 				?>
 			</div>
@@ -877,6 +876,7 @@ if ( ! empty( $phases ) ) {
 				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
 				var cPhase = $('input[name=pbc_current_phase]').val();
 				var select_pricevar = $(this).parent().parent().find('input.pbc_variation');
+				var show_prices = '<?php echo $show_prices; ?>';
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
 					type: 'POST',
@@ -941,8 +941,8 @@ if ( ! empty( $phases ) ) {
 			});
 			$(document).on('click', 'button[name=submit]', function(e){
 				var submit_val = $(this).val();
-			var form_id = 'configurator-form';
-			e.preventDefault();
+				var form_id = 'configurator-form';
+				e.preventDefault();
 				$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
@@ -950,20 +950,20 @@ if ( ! empty( $phases ) ) {
 					data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit',
 					dataType: "html",
 					success: function(response) {
-							$('.page-configurator').html(response);
-							if(
-								'<?php echo $next_step;?>' != 'calculate' &&
-								(submit_val == 'prev' || submit_val == 'next') && $(document).find('input[type=radio].pbc_variation').length == 0
-							)
-							{
-								$(document).find('button[name=submit][value='+submit_val+']').trigger('click');
-							}else{
-								$(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
-								//$('.page-configurator').html(response);
-								if($(document).find('.result_submit_action').length > 0){
-									$(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
-								}
+						$('.page-configurator').html(response);
+						if(
+							'<?php echo $next_step;?>' != 'calculate' &&
+							(submit_val == 'prev' || submit_val == 'next') && $(document).find('input[type=radio].pbc_variation').length == 0
+						)
+						{
+							$(document).find('button[name=submit][value='+submit_val+']').trigger('click');
+						}else{
+							$(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+							//$('.page-configurator').html(response);
+							if($(document).find('.result_submit_action').length > 0){
+								$(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
 							}
+						}
 					}
 				});
 			});
