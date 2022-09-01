@@ -24,6 +24,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added option for width image preview.
 *  Added sections in variations.
 *  Refactored Classes.
+*  Added options to customize Budget.
 *  Fix: Error option with space not working.
 
 = 1.0 =
