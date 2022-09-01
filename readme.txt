@@ -25,6 +25,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added sections in variations.
 *  Refactored Classes.
 *  Added options to customize Budget.
+*  Bulk price updater.
 *  Fix: Error option with space not working.
 
 = 1.0 =
