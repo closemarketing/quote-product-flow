@@ -227,6 +227,14 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_pdf_image_footer', $_POST['pdf_image_footer'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
+			if ( isset( $_POST['pdf_color_odd'] ) ){
+				update_option( 'pbc_pdf_color_odd', $_POST['pdf_color_odd'] );
+				
+			if ( isset( $_POST['pdf_color_total'] ) ){
+				update_option( 'pbc_pdf_color_total', $_POST['pdf_color_total'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}$update = __( 'Successfully Saved!', 'pbc' );
+			}
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
 			update_option( 'variations_images_flipped', $variations_images_flipped );
 
@@ -454,27 +462,6 @@ class PBC_Admin_Plugin {
 					&nbsp;&nbsp;<?php _e('or','pbc');?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' );?>" title="<?php _e('Create New Page', 'pbc');?>"><?php _e('Create Page', 'pbc');?></a>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
-					<?php
-						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
-					?>
-					<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {	echo esc_url( $pdf_image_selected ); } ?>" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' );?></button>
-				</fieldset>
-				<fieldset>
-					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
-					<?php
-						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
-					?>
-					<input type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {	echo esc_url( $pdf_image_header ); } ?>" />
-				</fieldset>
-				<fieldset>
-					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
-					<?php
-						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
-					?>
-					<input type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {	echo esc_url( $pdf_image_footer ); } ?>" />
-				</fieldset>
-				<fieldset>
 					<br/>
 					<label class="block" for="variations_images_flipped"><?php _e("Flip Images Horizontal", 'pbc');?></label>
 					<?php
@@ -523,6 +510,42 @@ class PBC_Admin_Plugin {
 						echo '</select>';
 					}
 					?>
+				</fieldset>
+				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
+				<fieldset>
+					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
+					<?php
+						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
+					?>
+					<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {	echo esc_url( $pdf_image_selected ); } ?>" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' );?></button>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
+					<?php
+						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
+					?>
+					<input type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {	echo esc_url( $pdf_image_header ); } ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
+					<?php
+						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
+					?>
+					<input type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {	echo esc_url( $pdf_image_footer ); } ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label>
+					<?php
+						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
+					?>
+					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) {	echo esc_url( $pdf_color_odd ); } ?>" />
+				</fieldset>
+				<fieldset>
+					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
+					<?php
+						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
+					?>
+					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) {	echo esc_url( $pdf_color_total ); } ?>" />
 				</fieldset>
 			</div>
 
@@ -932,10 +955,18 @@ class PBC_Admin_Plugin {
 		}
 	}
 
-	public function configurator_result_generate_pdf(){
+	public function configurator_result_generate_pdf() {
+		global $pbc_helper_calc;
 		if(!isset($_SESSION['pbc_variation'])){
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
+			$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
+			$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1) ? trim( $pdf_color_odd ) : '#ffebcb';
+
+			$pdf_color_total    = get_option( 'pbc_pdf_color_total' );
+			$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1) ? trim( $pdf_color_total ) : '#835536';
+
+			// Starts PDF.
 			$output  = '<page backcolor="#fff">';
 			$output .= "<style>
 			.header, .product .product-title {margin-left: 20px;}
@@ -944,11 +975,11 @@ class PBC_Admin_Plugin {
 			.product .image-wrap{ position:relative; }
 		    .product .image-wrap img:first-child{ position:relative; }
 		    .product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
-			table.summary, table.summary-total{ width:600px;border-collapse:collapse;border:0; margin-left:50px;}
+			table.summary, table.product, table.summary-total{ width:600px;border-collapse:collapse;border:0; margin-left:50px;}
 			table td.title{ width:500px;padding:5px 0 5px 15px; }
 			table td.value{ width:70px;padding:5px 15px 5px 0; }
 			table td.right{text-align:right;}
-			table.summary td.background, table.summary td.background{ background-color:#ffebcb; }
+			table.summary td.background, table.summary td.background{ background-color:$background_color; }
 			table.summary-total td.empty{width:450px;}
 			table.summary-total td.title{width:50px;}
 			img.header_image{ width:700px;height:120px; }
@@ -963,6 +994,7 @@ class PBC_Admin_Plugin {
 				$output .= '<table class="header"><tr><td><img src="' . esc_url( $header_image ) . '" class="header_image"/></td></tr></table><br/>';
 			}
 			$output .= '<table class="product"><tr><td class="product-title">';
+			$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
 			$output .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
 			$output .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
 			$flipped = false;
@@ -1092,8 +1124,9 @@ class PBC_Admin_Plugin {
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
-			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:#835536;color:#fff;">Total</td>';
-			$output .= '<td class="value right" style="background-color:#835536;color:#fff;">';
+			$color = $pbc_helper_calc->calculate_color_text( $background_total );
+			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
+			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 			if ( $total_pricevat > 0 ) {
 				$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
 			}
@@ -1102,7 +1135,7 @@ class PBC_Admin_Plugin {
 			$output .= '</table><br/>';
 
 			$footer_image = get_option( 'pbc_pdf_image_footer' );
-			if ( ! empty( $footer_image ) && file_exists( $footer_image ) ) {
+			if ( ! empty( $footer_image ) ) {
 				$output .= '<table class="footer"><tr><td><img src="' . esc_url( $footer_image ) . '" class="footer_image"/></td></tr></table><br/>';
 			}
 
