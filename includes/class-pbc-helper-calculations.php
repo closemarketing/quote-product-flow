@@ -88,6 +88,19 @@ class PBC_Helper_Calculations {
 		return $total_price;
 	}
 
+	public function calculate_color_text( $background_hex ) {
+		list($r1, $g1, $b1) = sscanf( $background_hex, "#%02x%02x%02x" );
+
+		// Black:
+		$r2 = 0;
+		$g2 = 0;
+		$b2 = 0;
+
+		$contrast = max( $r1, $r2) - min( $r1, $r2 ) + max( $g1, $g2 ) - min( $g1, $g2 ) + max( $b1, $b2) - min( $b1, $b2 );
+
+		return $contrast > 500 ? '#000000': '#ffffff';
+	}
+
 }
 
 $pbc_helper_calc = new PBC_Helper_Calculations();
