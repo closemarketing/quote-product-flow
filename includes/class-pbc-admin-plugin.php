@@ -815,12 +815,12 @@ class PBC_Admin_Plugin {
 				$message .= '<br/></div>';
 				$message .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>'.'<br>';
 				$message .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>'.__( 'Variation', 'pbc' ) . '</th><th>'.__( 'Price', 'pbc' ) . '</th></tr>';
-				$total_price     = 0;
+				$subtotal_price  = 0;
 				$enquiry_entries = array();
 				$i=0;
 				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
 					$price        = (double) $details['var']['price'];
-					$total_price += $price;
+					$subtotal_price += $price;
 					$message .= '<tr>';
 					$message .= '<td>'.$details['phase']['name'].'</td>';
 					$message .= '<td>'.$details['var']['name'].'</td>';
@@ -834,10 +834,21 @@ class PBC_Admin_Plugin {
 					$enquiry_entries[$i]['price'] = $price;
 					$i++;
 				}
-				$total_price = ! empty( $total_price ) ? $total_price . ' €' : '';
+				$message .= '</table><br/>';
+				// Subtotal.
+				$message .= '<table>';
 				$message .= '<tr>';
-				$message .= '<td>&nbsp;</td><td>' . __( 'Total:', 'pbc' ) . '</td>';
-				$message .= '<td>' . $total_price . '</td>';
+				$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+				$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
+				$message .= '</tr>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
+				$vat      = $subtotal_price * 0.21;
+				$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
+				$message .= '</tr>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+				$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
 				$message .= '</tr>';
 				$message .= '</table>';
 				$message .= '<br>' . get_option('blogname');

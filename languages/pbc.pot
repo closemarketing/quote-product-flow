@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2022-09-19 17:14+0200\n"
+"POT-Creation-Date: 2022-09-19 17:33+0200\n"
 "PO-Revision-Date: 2022-05-10 22:22+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
@@ -277,7 +277,7 @@ msgid "Phone field is empty!"
 msgstr ""
 
 #: includes/class-pbc-admin-plugin.php:805
-#: includes/class-pbc-admin-plugin.php:961
+#: includes/class-pbc-admin-plugin.php:972
 msgid "Configurator not ready!"
 msgstr ""
 
@@ -333,117 +333,125 @@ msgid "Variation"
 msgstr ""
 
 #: includes/class-pbc-admin-plugin.php:817
-#: includes/class-pbc-admin-plugin.php:1241
+#: includes/class-pbc-admin-plugin.php:1252
 #: includes/class-pbc-helper-posttypes.php:307
 #: includes/class-pbc-helper-posttypes.php:407
 #: includes/class-pbc-helper-posttypes.php:487
 msgid "Price"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:839
+#: includes/class-pbc-admin-plugin.php:841
+msgid "Subtotal:"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:845
+msgid "VAT:"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:850
 msgid "Total:"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:877
+#: includes/class-pbc-admin-plugin.php:888
 msgid "Error in sending mail. Please try again!"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:880
-#: includes/class-pbc-admin-plugin.php:909
+#: includes/class-pbc-admin-plugin.php:891
+#: includes/class-pbc-admin-plugin.php:920
 msgid "budget"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:887
+#: includes/class-pbc-admin-plugin.php:898
 msgid "Mail sent!"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:997
+#: includes/class-pbc-admin-plugin.php:1008
 #: includes/class-pbc-helper-posttypes.php:441
 msgid "Budget"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:998
+#: includes/class-pbc-admin-plugin.php:1009
 msgid "Characteristics selected"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:999
+#: includes/class-pbc-admin-plugin.php:1010
 msgid "Lists of options selected:"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1151
+#: includes/class-pbc-admin-plugin.php:1162
 msgid "Create List Price"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1234
+#: includes/class-pbc-admin-plugin.php:1245
 msgid "List Price for"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1235
+#: includes/class-pbc-admin-plugin.php:1246
 #: includes/class-pbc-helper-posttypes.php:444
 msgid "Date"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1242
+#: includes/class-pbc-admin-plugin.php:1253
 #: includes/class-pbc-helper-posttypes.php:262
 #: includes/class-pbc-helper-posttypes.php:488
 msgid "Depends of"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1243
+#: includes/class-pbc-admin-plugin.php:1254
 #: includes/class-pbc-helper-posttypes.php:489
 msgid "Icon"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1244
+#: includes/class-pbc-admin-plugin.php:1255
 msgid "Product"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1342
+#: includes/class-pbc-admin-plugin.php:1353
 msgid "List Price"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1385
+#: includes/class-pbc-admin-plugin.php:1396
 #, php-format
 msgid ""
 "The <strong>%1$s</strong> License has not been activated, so the plugin is "
 "inactive! %2$sClick here%3$s to activate it."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1400
+#: includes/class-pbc-admin-plugin.php:1411
 msgid "Activated"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1404
+#: includes/class-pbc-admin-plugin.php:1415
 msgid "Deactivated"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1446
+#: includes/class-pbc-admin-plugin.php:1457
 msgid "License AutoTranslate deactivated. "
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1476
+#: includes/class-pbc-admin-plugin.php:1487
 msgid "AutoTranslate activated. "
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1484
+#: includes/class-pbc-admin-plugin.php:1495
 msgid ""
 "Connection failed to the License Key API server. Try again later. There may "
 "be a problem on your server preventing outgoing requests, or the store is "
 "blocking your request to activate the plugin/theme."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1493
+#: includes/class-pbc-admin-plugin.php:1504
 msgid ""
 "The API Key activation could not be commpleted due to an unknown error "
 "possibly on the store server The activation results were empty."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1506
-#: includes/class-pbc-admin-plugin.php:1533
+#: includes/class-pbc-admin-plugin.php:1517
+#: includes/class-pbc-admin-plugin.php:1544
 msgid "The API Key is missing from the deactivation request."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1819
+#: includes/class-pbc-admin-plugin.php:1830
 #, php-format
 msgid ""
 "<b>Warning!</b> You're blocking external requests which means you won't be "
