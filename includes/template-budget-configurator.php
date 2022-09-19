@@ -483,6 +483,14 @@ if ( ! empty( $phases ) ) {
 												</div>
 												<?php
 											}?>
+											<?php
+											$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
+											if ( $pbc_descopt ) {
+												?>
+												<p class="pbc_descopt"><?php echo wpautop( $pbc_descopt ); ?></p>
+												<?php
+											}
+											?>
 									</li>
 								<?php } ?>
 							</ul>

@@ -44,19 +44,17 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function pbc_register_cpt() {
-		$nametype = __('Phase','pbc');
-
 		$labels = array(
-			'name'               => $nametype.'s',
-			'singular_name'      => $nametype,
-			'add_new'            => __('Add','pbc').' '.$nametype,
-			'add_new_item'       => __('Add New','pbc').' '.$nametype,
-			'edit_item'          => __('Edit','pbc').' '.$nametype,
-			'new_item'           => __('New','pbc').' '.$nametype,
-			'view_item'          => __('View','pbc').' '.$nametype,
-			'search_items'       => __('Search for','pbc').' '.$nametype.'s',
-			'not_found'          => __("We didn't find any",'pbc').' '.$nametype,
-			'not_found_in_trash' => __("We didn't find any",'pbc').' '.$nametype.' '.__("in the trash",'pbc'),
+			'name'               => __( 'Phases', 'pbc' ),
+			'singular_name'      => __( 'Phase', 'pbc' ),
+			'add_new'            => __( 'Add Phase', 'pbc' ),
+			'add_new_item'       => __( 'Add New Phase', 'pbc' ),
+			'edit_item'          => __( 'Edit Phase', 'pbc' ),
+			'new_item'           => __( 'New Phase ', 'pbc' ),
+			'view_item'          => __( 'View Phase ', 'pbc' ),
+			'search_items'       => __( 'Search for Phases', 'pbc'),
+			'not_found'          => __( "We didn't find any phase", 'pbc' ),
+			'not_found_in_trash' => __( "We didn't find an phase in the trash", 'pbc' ),
 		);
 		$args = array(
 			'labels'             => $labels,
@@ -73,7 +71,7 @@ class PBC_Helper_PostTypes {
 			'capability_type'    => 'page',
 			'hierarchical'       => false,
 			'menu_position'      => 5,
-			'supports'           => array('title','editor','page-attributes'),
+			'supports'           => array( 'title', 'editor', 'page-attributes' ),
 			'menu_icon'          => 'dashicons-tagcloud'
 		);
 		register_post_type( 'phases', $args );
@@ -334,6 +332,18 @@ class PBC_Helper_PostTypes {
 						),
 					),
 				), //array
+				// Desc HTML
+				array(
+					'name'    => __( 'Description after option', 'pbc' ),
+					'id'      => "{$prefix}descopt",
+					'type'    => 'wysiwyg',
+					'raw'     => false,
+					'options' => array(
+						'textarea_rows' => 5,
+						'teeny'         => true,
+					),
+				),
+				// Desc HTML
 				array(
 					'name'    => __( 'Description', 'pbc' ),
 					'id'      => "{$prefix}descvar",
