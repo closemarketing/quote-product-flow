@@ -419,9 +419,14 @@ if ( ! empty( $phases ) ) {
 							);
 						}
 
-						// Order by sections.
-						$sections = array_column( $variations_section, 'section' );
-						array_multisort( $sections, SORT_ASC, $variations_section );
+						// Order by sections and title.
+						foreach ( $variations_section as $key => $val ) {
+								$temp_arr['section'][ $key ] = $val['section'];
+								$temp_arr['title'][ $key ]   = $val['title'];
+						}
+						// sort by section asc and then title asc
+						array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
+						
 
 						// Show public.
 						if ( 
