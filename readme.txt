@@ -17,7 +17,8 @@ WordPress installation and then activate the Plugin from Plugins page.
 == Changelog ==
 = 1.2 =
 *	Adds subtitle option.
-*  Fixed email without VAT info and total.
+*  Fix: email without VAT info and total.
+*  Fix: clean session in first step.
 
 = 1.1 =
 *	Coding standards.
