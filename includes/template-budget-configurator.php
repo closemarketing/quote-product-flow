@@ -24,6 +24,10 @@ if ( is_user_logged_in() ) {
 	$user_id = get_current_user_id();
 }
 
+if ( empty( $_POST ) ) {
+	$_SESSION['pbc_variation'] = array();
+}
+
 if ( isset( $_POST['submit'] ) ) {
 	$submit = sanitize_text_field( $_POST['submit'] );
 	if ( isset( $_POST[ $submit . '_phase' ] ) ) {
@@ -49,9 +53,11 @@ if ( isset( $_POST['submit'] ) ) {
 					$phase_param['pricevar'] = $price_var ? $price_var : '';
 					update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
 				}
-				$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ) );
-				if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
-					$price = $pricegroup[0]['pbc_pricem'];
+				if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
+					$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ) );
+					if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
+						$price = $pricegroup[0]['pbc_pricem'];
+					}
 				}
 				$phase_id = $phases[ (int) $key - 1 ];
 				$variation_title = get_the_title( $pbc_variation );
@@ -350,6 +356,7 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 } //defined('DOING_AJAX')
 
 if ( ! empty( $phases ) ) {
+	error_log( '$_SESSION: ' . print_r( $_SESSION, true ) );
 	?>
 	<div class="configurator_steps_nav" id="configurator_steps_nav">
 		<ul>
@@ -619,7 +626,7 @@ if ( ! empty( $phases ) ) {
 							}
 						}
 					}
-					$imgprodurl = $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
+					$imgprodurl = isset( $sVar ) ? $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar ): '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option('variations_images_flipped');
@@ -704,7 +711,7 @@ if ( ! empty( $phases ) ) {
 								<td class="price">
 									<?php
 									if ( $varPrice && 'no' !== $show_prices ) {
-										echo number_format( $varPrice, 2, ',', '.' ) . ' €';
+										echo $varPrice . ' €';
 									}
 									?>
 								</td>
