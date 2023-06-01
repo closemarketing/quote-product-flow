@@ -689,7 +689,7 @@ class PBC_Admin_Plugin {
 			}
 			$get_configurator = isset( $_GET['configurator'] ) ? esc_attr( $_GET['configurator'] ) : '';
 			if ( 'pdf' === $get_configurator ) {
-				$pdf_url = $this->generate_engine_pdf();
+				$pdf_url = $this->generate_engine_pdf( 'url' );
 				header( "Location: $pdf_url" );
 				exit();
 			}
