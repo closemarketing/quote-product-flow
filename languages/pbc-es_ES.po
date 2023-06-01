@@ -1,16 +1,20 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2022-09-19 17:33+0200\n"
+=======
+"POT-Creation-Date: 2022-09-01 12:53+0200\n"
+>>>>>>> master
 "PO-Revision-Date: \n"
-"Last-Translator: David <david@closemarketing.es>\n"
+"Last-Translator: David Pérez <david@close.marketing>\n"
 "Language-Team: \n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.3.1\n"
 
 #. Plugin Name of the plugin/theme
 #: includes/class-pbc-admin-plugin.php:135
@@ -28,7 +32,10 @@ msgstr "Fases del configurador"
 
 #: includes/class-pbc-admin-plugin.php:156
 #: includes/class-pbc-admin-plugin.php:345
+<<<<<<< HEAD
 #: includes/class-pbc-helper-posttypes.php:48
+=======
+>>>>>>> master
 msgid "Phases"
 msgstr "Fases"
 
@@ -91,7 +98,11 @@ msgid "General Settings"
 msgstr "Opciones Generales"
 
 #: includes/class-pbc-admin-plugin.php:344
+<<<<<<< HEAD
 #: includes/class-pbc-helper-posttypes.php:433
+=======
+#: includes/class-pbc-helper-posttypes.php:423
+>>>>>>> master
 msgid "Order"
 msgstr "Orden"
 
@@ -278,7 +289,7 @@ msgid "Phone field is empty!"
 msgstr "¡El campo de teléfono está vacío!"
 
 #: includes/class-pbc-admin-plugin.php:805
-#: includes/class-pbc-admin-plugin.php:972
+#: includes/class-pbc-admin-plugin.php:961
 msgid "Configurator not ready!"
 msgstr "¡Configurador no está funcionando!"
 
@@ -291,27 +302,27 @@ msgid "Enquiry details:"
 msgstr "Detalles del Presupuesto:"
 
 #: includes/class-pbc-admin-plugin.php:810
-#: includes/class-pbc-helper-posttypes.php:387
+#: includes/class-pbc-helper-posttypes.php:377
 msgid "Name:"
 msgstr "Nombre:"
 
 #: includes/class-pbc-admin-plugin.php:811
-#: includes/class-pbc-helper-posttypes.php:389
+#: includes/class-pbc-helper-posttypes.php:379
 msgid "Email:"
 msgstr "Correo:"
 
 #: includes/class-pbc-admin-plugin.php:812
-#: includes/class-pbc-helper-posttypes.php:388
+#: includes/class-pbc-helper-posttypes.php:378
 msgid "Phone:"
 msgstr "Teléfono:"
 
 #: includes/class-pbc-admin-plugin.php:813
-#: includes/class-pbc-helper-posttypes.php:390
+#: includes/class-pbc-helper-posttypes.php:380
 msgid "City:"
 msgstr "Ciudad:"
 
 #: includes/class-pbc-admin-plugin.php:814
-#: includes/class-pbc-helper-posttypes.php:391
+#: includes/class-pbc-helper-posttypes.php:381
 msgid "State:"
 msgstr "Provincia:"
 
@@ -320,98 +331,90 @@ msgid "Configuration details:"
 msgstr "Detalles de configuración:"
 
 #: includes/class-pbc-admin-plugin.php:817
-#: includes/class-pbc-helper-posttypes.php:49
-#: includes/class-pbc-helper-posttypes.php:237
-#: includes/class-pbc-helper-posttypes.php:432
+#: includes/class-pbc-helper-posttypes.php:47
+#: includes/class-pbc-helper-posttypes.php:239
+#: includes/class-pbc-helper-posttypes.php:422
 msgid "Phase"
 msgstr "Fase"
 
 #: includes/class-pbc-admin-plugin.php:817
-#: includes/class-pbc-helper-posttypes.php:81
-#: includes/class-pbc-helper-posttypes.php:270
-#: includes/class-pbc-helper-posttypes.php:485
+#: includes/class-pbc-helper-posttypes.php:83
+#: includes/class-pbc-helper-posttypes.php:272
+#: includes/class-pbc-helper-posttypes.php:475
 msgid "Variation"
 msgstr "Variación"
 
 #: includes/class-pbc-admin-plugin.php:817
-#: includes/class-pbc-admin-plugin.php:1252
-#: includes/class-pbc-helper-posttypes.php:307
-#: includes/class-pbc-helper-posttypes.php:407
-#: includes/class-pbc-helper-posttypes.php:487
+#: includes/class-pbc-admin-plugin.php:1241
+#: includes/class-pbc-helper-posttypes.php:309
+#: includes/class-pbc-helper-posttypes.php:397
+#: includes/class-pbc-helper-posttypes.php:477
 msgid "Price"
 msgstr "Precio"
 
-#: includes/class-pbc-admin-plugin.php:841
-msgid "Subtotal:"
-msgstr "Subtotal:"
-
-#: includes/class-pbc-admin-plugin.php:845
-msgid "VAT:"
-msgstr "IVA:"
-
-#: includes/class-pbc-admin-plugin.php:850
+#: includes/class-pbc-admin-plugin.php:839
 msgid "Total:"
 msgstr "Total:"
 
-#: includes/class-pbc-admin-plugin.php:888
+#: includes/class-pbc-admin-plugin.php:877
 msgid "Error in sending mail. Please try again!"
 msgstr "Error enviando el email, por favor ¡intenta más tarde!"
 
-#: includes/class-pbc-admin-plugin.php:891
-#: includes/class-pbc-admin-plugin.php:920
+#: includes/class-pbc-admin-plugin.php:880
+#: includes/class-pbc-admin-plugin.php:909
 msgid "budget"
 msgstr "presupuesto"
 
-#: includes/class-pbc-admin-plugin.php:898
+#: includes/class-pbc-admin-plugin.php:887
 msgid "Mail sent!"
 msgstr "¡Correo enviado!"
 
-#: includes/class-pbc-admin-plugin.php:1008
-#: includes/class-pbc-helper-posttypes.php:441
+#: includes/class-pbc-admin-plugin.php:997
+#: includes/class-pbc-helper-posttypes.php:431
 msgid "Budget"
 msgstr "Presupuesto"
 
-#: includes/class-pbc-admin-plugin.php:1009
+#: includes/class-pbc-admin-plugin.php:998
 msgid "Characteristics selected"
 msgstr "Características seleccionadas"
 
-#: includes/class-pbc-admin-plugin.php:1010
+#: includes/class-pbc-admin-plugin.php:999
 msgid "Lists of options selected:"
 msgstr "Listas de opciones seleccionadas:"
 
-#: includes/class-pbc-admin-plugin.php:1162
+#: includes/class-pbc-admin-plugin.php:1151
 msgid "Create List Price"
 msgstr "Crear Tarifa Precios"
 
-#: includes/class-pbc-admin-plugin.php:1245
+#: includes/class-pbc-admin-plugin.php:1234
 msgid "List Price for"
 msgstr "Tarifa Precios de"
 
-#: includes/class-pbc-admin-plugin.php:1246
-#: includes/class-pbc-helper-posttypes.php:444
+#: includes/class-pbc-admin-plugin.php:1235
+#: includes/class-pbc-helper-posttypes.php:434
 msgid "Date"
 msgstr "Fecha"
 
-#: includes/class-pbc-admin-plugin.php:1253
-#: includes/class-pbc-helper-posttypes.php:262
-#: includes/class-pbc-helper-posttypes.php:488
+#: includes/class-pbc-admin-plugin.php:1242
+#: includes/class-pbc-helper-posttypes.php:264
+#: includes/class-pbc-helper-posttypes.php:478
 msgid "Depends of"
 msgstr "Depende de"
 
-#: includes/class-pbc-admin-plugin.php:1254
-#: includes/class-pbc-helper-posttypes.php:489
+#: includes/class-pbc-admin-plugin.php:1243
+#: includes/class-pbc-helper-posttypes.php:479
 msgid "Icon"
 msgstr "Icono"
 
-#: includes/class-pbc-admin-plugin.php:1255
+#: includes/class-pbc-admin-plugin.php:1244
 msgid "Product"
 msgstr "Producto"
 
-#: includes/class-pbc-admin-plugin.php:1353
+#: includes/class-pbc-admin-plugin.php:1342
 msgid "List Price"
 msgstr "Tarifa Precios"
 
-#: includes/class-pbc-admin-plugin.php:1396
+#: includes/class-pbc-admin-plugin.php:1385
 #, php-format
 msgid ""
 "The <strong>%1$s</strong> License has not been activated, so the plugin is "
@@ -420,23 +423,23 @@ msgstr ""
 "La licencia de <strong>%1$s</strong> no ha sido activada, por lo que el "
 "plugin no recibirá actualizaciones %2$sHaz clic aquí%3$s para activarlo."
 
-#: includes/class-pbc-admin-plugin.php:1411
+#: includes/class-pbc-admin-plugin.php:1400
 msgid "Activated"
 msgstr "Activado"
 
-#: includes/class-pbc-admin-plugin.php:1415
+#: includes/class-pbc-admin-plugin.php:1404
 msgid "Deactivated"
 msgstr "Desactivado"
 
-#: includes/class-pbc-admin-plugin.php:1457
+#: includes/class-pbc-admin-plugin.php:1446
 msgid "License AutoTranslate deactivated. "
 msgstr "Licencia AutoTranslate desactivada. "
 
-#: includes/class-pbc-admin-plugin.php:1487
+#: includes/class-pbc-admin-plugin.php:1476
 msgid "AutoTranslate activated. "
 msgstr "AutoTranslate activado. "
 
-#: includes/class-pbc-admin-plugin.php:1495
+#: includes/class-pbc-admin-plugin.php:1484
 msgid ""
 "Connection failed to the License Key API server. Try again later. There may "
 "be a problem on your server preventing outgoing requests, or the store is "
@@ -447,7 +450,7 @@ msgstr ""
 "solicitudes salientes, o la tienda está bloqueando su solicitud para activar "
 "el tema/plugin."
 
-#: includes/class-pbc-admin-plugin.php:1504
+#: includes/class-pbc-admin-plugin.php:1493
 msgid ""
 "The API Key activation could not be commpleted due to an unknown error "
 "possibly on the store server The activation results were empty."
@@ -456,12 +459,12 @@ msgstr ""
 "desconocido posiblemente en el servidor de la tienda Los resultados de la "
 "activación estaban vacíos."
 
-#: includes/class-pbc-admin-plugin.php:1517
-#: includes/class-pbc-admin-plugin.php:1544
+#: includes/class-pbc-admin-plugin.php:1506
+#: includes/class-pbc-admin-plugin.php:1533
 msgid "The API Key is missing from the deactivation request."
 msgstr "Falta la clave de la API en la solicitud de desactivación."
 
-#: includes/class-pbc-admin-plugin.php:1830
+#: includes/class-pbc-admin-plugin.php:1819
 #, php-format
 msgid ""
 "<b>Warning!</b> You're blocking external requests which means you won't be "
@@ -670,7 +673,7 @@ msgstr "Configuración del presupuesto"
 msgid "Phase/Variation"
 msgstr "Fase/Variación"
 
-#: includes/class-pbc-helper-posttypes.php:442
+#: includes/class-pbc-helper-posttypes.php:432
 msgid "Details"
 msgstr "Detalles"
 
@@ -851,7 +854,7 @@ msgstr "Calcular"
 
 #: includes/template-budget-configurator.php:654
 msgid "Next"
-msgstr "Siguente"
+msgstr "Siguiente"
 
 #: includes/template-budget-configurator.php:673
 msgid "Actual Configuration"
@@ -906,21 +909,6 @@ msgstr "Closetechnology"
 #. Author URI of the plugin/theme
 msgid "https://close.technology"
 msgstr "https://close.technology"
-
-#~ msgid "Add"
-#~ msgstr "Añadir"
-
-#~ msgid "Edit"
-#~ msgstr "Editar"
-
-#~ msgid "New"
-#~ msgstr "Nuevo"
-
-#~ msgid "View"
-#~ msgstr "Ver"
-
-#~ msgid "in the trash"
-#~ msgstr "en la papelera"
 
 #~ msgid "Edit Price Option"
 #~ msgstr "Editar Opción de precio"

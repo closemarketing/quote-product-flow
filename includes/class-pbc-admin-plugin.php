@@ -215,6 +215,10 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_budget_show_prices', $_POST['option_show_prices'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
+			if ( isset( $_POST['option_show_final_button_pdf'] ) ) {
+				update_option( 'pbc_budget_show_button_pdf', $_POST['option_show_final_button_pdf'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}
 			if ( isset( $_POST['pdf_image_selected'] ) ){
 				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
@@ -511,6 +515,19 @@ class PBC_Admin_Plugin {
 					}
 					?>
 				</fieldset>
+				<fieldset>
+					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show final button PDF?', 'pbc' ); ?></label>
+					<?php
+					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
+					$pages = get_pages();
+					if ( ! empty( $pages ) ) {
+						echo '<select name="option_show_final_button_pdf">';
+						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_button_pdf, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '</select>';
+					}
+					?>
+				</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
 					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
@@ -531,7 +548,7 @@ class PBC_Admin_Plugin {
 					<?php
 						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
 					?>
-					<input type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {	echo esc_url( $pdf_image_footer ); } ?>" />
+					<input type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) { echo esc_url( $pdf_image_footer ); } ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label>
@@ -614,20 +631,15 @@ class PBC_Admin_Plugin {
 	/*
 	 * Disables dropdown dates
 	 */
-	public function disable_months_dropdown( $false , $post_type ) {
-
+	public function disable_months_dropdown( $false, $post_type ) {
 		$disable_months_dropdown = $false;
+		$disable_post_types      = array( 'variation', 'phases' );
 
-		$disable_post_types = array( 'variation' , 'phases' );
-
-		if( in_array( $post_type , $disable_post_types ) ) {
-
+		if ( in_array( $post_type, $disable_post_types ) ) {
 			$disable_months_dropdown = true;
-
 		}
 
 		return $disable_months_dropdown;
-
 	}
 	/**
 	 * Ajax function to load info
@@ -667,16 +679,22 @@ class PBC_Admin_Plugin {
 	 * @return string
 	 */
 	public function custom_page_template( $template ) {
-		$budget_configurator = get_option('pbc_budget_configurator_page');
+		$budget_configurator = get_option( 'pbc_budget_configurator_page' );
 		if ( ! empty( $budget_configurator ) && \is_page( $budget_configurator )  ) {
-			if ( isset($_POST) && isset( $_GET['submit'])  && $_POST['submit'] == 'email_send' ){
+			if ( isset( $_POST ) && isset( $_GET['submit'])  && $_POST['submit'] == 'email_send' ){
 				if ( session_id() == '' ) {
 					session_start();
 				}
-				$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
+				$_SESSION['pbc_output'] = $this->configurator_result_email_send( $_POST );
+			}
+			$get_configurator = isset( $_GET['configurator'] ) ? esc_attr( $_GET['configurator'] ) : '';
+			if ( 'pdf' === $get_configurator ) {
+				$pdf_url = $this->generate_engine_pdf();
+				header( "Location: $pdf_url" );
+				exit();
 			}
 			if ( \locate_template( 'template-budget-configurator.php' ) ) {
-				$new_template =  \get_stylesheet_directory().'template-budget-configurator.php';
+				$new_template =  \get_stylesheet_directory() . 'template-budget-configurator.php';
 			} else {
 				$new_template = WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
 			}
@@ -744,18 +762,20 @@ class PBC_Admin_Plugin {
 		die(0);
 	}
 	public function configurator_submit_action_callback(){
-		extract($_POST);
-		if(isset($submit) && $submit == 'email_send'){
-			if(session_id() == ''){
-			    session_start();
+		$submit = isset( $_POST['submit'] ) ? esc_attr( $_POST['submit'] ) : '';
+		if ( isset( $submit ) && $submit == 'email_send' ) {
+			if ( empty( session_id() ) ) {
+				session_start();
 			}
-			$_SESSION['pbc_output'] = $this->configurator_result_email_send($_POST);
+			$_SESSION['pbc_output'] = $this->configurator_result_email_send( $_POST );
 		}
+		
 		ob_start();
-		if ( \locate_template( 'template-budget-configurator.php' ) )
-			\locate_template('template-budget-configurator.php', true);
-		else
+		if ( \locate_template( 'template-budget-configurator.php' ) ) {
+			\locate_template('template-budget-configurator.php', true );
+		} else {
 			include WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
+		}
 		$all_details = ob_get_contents();
 		ob_end_clean();
 		echo $all_details;
