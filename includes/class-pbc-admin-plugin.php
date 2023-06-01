@@ -215,6 +215,10 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_budget_show_prices', $_POST['option_show_prices'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
+			if ( isset( $_POST['option_show_final_button_pdf'] ) ) {
+				update_option( 'pbc_budget_show_button_pdf', $_POST['option_show_final_button_pdf'] );
+				$update = __( 'Successfully Saved!', 'pbc' );
+			}
 			if ( isset( $_POST['pdf_image_selected'] ) ){
 				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
@@ -507,6 +511,19 @@ class PBC_Admin_Plugin {
 						echo '<select name="option_show_prices">';
 						echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
 						echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '</select>';
+					}
+					?>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show final button PDF?', 'pbc' ); ?></label>
+					<?php
+					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
+					$pages = get_pages();
+					if ( ! empty( $pages ) ) {
+						echo '<select name="option_show_final_button_pdf">';
+						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_button_pdf, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
 						echo '</select>';
 					}
 					?>
