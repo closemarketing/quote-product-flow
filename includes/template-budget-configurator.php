@@ -114,6 +114,9 @@ if ( ! defined( 'DOING_AJAX' ) ) {
 		.btn:hover {
 			background: black;
 		}
+		.btn.btn-pdf {
+			margin-left: 10px;
+		}
 		.next .btn::after,
 		.prev .btn::after {
 			border-style: solid;
@@ -723,11 +726,6 @@ if ( ! empty( $phases ) ) {
 			<?php 
 			if($cStep == 'calculate'){?>
 				<div class="configurator_result_share">
-					<?php
-					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
-					if ( 'no' !== $show_button_pdf ) { ?>
-						<a href="?phase=calculate&configurator=pdf" class="btn btn-share" title="Generate PDF"><?php _e('PDF','pbc');?></a>
-					<?php } ?>
 					<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
 					<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
 					<div class="email_submit_fields">
@@ -738,6 +736,11 @@ if ( ! empty( $phases ) ) {
 						<input type="text" name="city_field" style="width:150px;" placeholder="<?php _e('Your City','pbc');?>"/>
 						<input type="text" name="state_field" style="width:150px;" placeholder="<?php _e('State','pbc');?>"/><br/>
 						<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e('Send','pbc');?></button>
+						<?php
+						$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
+						if ( 'no' !== $show_button_pdf ) { ?>
+							<a href="?phase=calculate&configurator=pdf" class="btn btn-pdf" title="Generate PDF"><?php _e('PDF','pbc');?></a>
+						<?php } ?>
 					</div>
 					<?php }?>
 					<?php if(isset($_SESSION['pbc_output'])){?>
