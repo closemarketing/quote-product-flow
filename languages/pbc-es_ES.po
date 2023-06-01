@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
 "POT-Creation-Date: 2022-09-01 12:53+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: David <david@closemarketing.es>\n"
+"Last-Translator: David Pérez <david@close.marketing>\n"
 "Language-Team: \n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.3.1\n"
 
 #. Plugin Name of the plugin/theme
 #: includes/class-pbc-admin-plugin.php:135
@@ -839,7 +839,7 @@ msgstr "Calcular"
 
 #: includes/template-budget-configurator.php:646
 msgid "Next"
-msgstr "Siguente"
+msgstr "Siguiente"
 
 #: includes/template-budget-configurator.php:665
 msgid "Actual Configuration"
