@@ -57,7 +57,7 @@ class PBC_Helper_Calculations {
 						$imgprod_id = $deps['pbc_imgprod'][0];
 						break;
 				}
-				if ( $imgprod_id ) {
+				if ( ! empty( $imgprod_id ) ) {
 					break;
 				}
 			}

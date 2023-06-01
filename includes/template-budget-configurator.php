@@ -424,6 +424,7 @@ if ( ! empty( $phases ) ) {
 						array_multisort( $sections, SORT_ASC, $variations_section );
 
 						// Show public.
+						$sVar = '';
 						if ( 
 							isset( $_SESSION['pbc_variation'] ) && 
 							is_array( $_SESSION['pbc_variation'] ) && 
@@ -722,6 +723,11 @@ if ( ! empty( $phases ) ) {
 			<?php 
 			if($cStep == 'calculate'){?>
 				<div class="configurator_result_share">
+					<?php
+					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
+					if ( 'no' !== $show_button_pdf ) { ?>
+						<a href="?phase=calculate&configurator=pdf" class="btn btn-share" title="Generate PDF"><?php _e('PDF','pbc');?></a>
+					<?php } ?>
 					<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
 					<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
 					<div class="email_submit_fields">
