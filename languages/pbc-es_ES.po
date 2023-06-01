@@ -1,15 +1,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2022-09-19 17:33+0200\n"
-=======
-"POT-Creation-Date: 2022-09-01 12:53+0200\n"
->>>>>>> master
+"POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: David Pérez <david@close.marketing>\n"
 "Language-Team: \n"
-"Language: es\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,10 +28,7 @@ msgstr "Fases del configurador"
 
 #: includes/class-pbc-admin-plugin.php:156
 #: includes/class-pbc-admin-plugin.php:345
-<<<<<<< HEAD
 #: includes/class-pbc-helper-posttypes.php:48
-=======
->>>>>>> master
 msgid "Phases"
 msgstr "Fases"
 
@@ -98,11 +91,8 @@ msgid "General Settings"
 msgstr "Opciones Generales"
 
 #: includes/class-pbc-admin-plugin.php:344
-<<<<<<< HEAD
 #: includes/class-pbc-helper-posttypes.php:433
-=======
 #: includes/class-pbc-helper-posttypes.php:423
->>>>>>> master
 msgid "Order"
 msgstr "Orden"
 
@@ -487,11 +477,11 @@ msgstr "Editar fase"
 
 #: includes/class-pbc-helper-posttypes.php:53
 msgid "New Phase "
-msgstr "Nueva fase"
+msgstr "Nueva fase "
 
 #: includes/class-pbc-helper-posttypes.php:54
 msgid "View Phase "
-msgstr "Ver fase"
+msgstr "Ver fase "
 
 #: includes/class-pbc-helper-posttypes.php:55
 msgid "Search for Phases"
