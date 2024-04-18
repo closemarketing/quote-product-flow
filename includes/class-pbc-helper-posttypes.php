@@ -28,6 +28,8 @@ class PBC_Helper_PostTypes {
 		add_filter( 'add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry' ) );
 
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
+		add_action( 'manage_phases_posts_custom_column', array( $this, 'manage_phases_columns' ), 10, 2 );
+
 		add_filter( 'manage_edit-enquiry_columns', array( $this, 'add_new_budgets_columns' ) );
 		add_action( 'manage_enquiry_posts_custom_column', array( $this, 'manage_budgets_columns' ), 10, 2 );
 
@@ -52,7 +54,7 @@ class PBC_Helper_PostTypes {
 			'edit_item'          => __( 'Edit Phase', 'pbc' ),
 			'new_item'           => __( 'New Phase ', 'pbc' ),
 			'view_item'          => __( 'View Phase ', 'pbc' ),
-			'search_items'       => __( 'Search for Phases', 'pbc'),
+			'search_items'       => __( 'Search for Phases', 'pbc' ),
 			'not_found'          => __( "We didn't find any phase", 'pbc' ),
 			'not_found_in_trash' => __( "We didn't find an phase in the trash", 'pbc' ),
 		);
@@ -63,16 +65,12 @@ class PBC_Helper_PostTypes {
 			'publicly_queryable' => false,
 			'show_ui'            => true,
 			'query_var'          => true,
-			'rewrite'            => array(
-				'slug' => _x( 'phase', 'phase', 'pbc' ),
-				'with_front' => 'true'
-			),
+			'rewrite'            => false,
 			'has_archive'        => false,
 			'capability_type'    => 'page',
 			'hierarchical'       => true,
 			'menu_position'      => 5,
 			'supports'           => array( 'title', 'editor', 'page-attributes' ),
-			'menu_icon'          => 'dashicons-tagcloud'
 		);
 		register_post_type( 'phases', $args );
 
@@ -95,13 +93,12 @@ class PBC_Helper_PostTypes {
 			'publicly_queryable' => false,
 			'show_ui'            => true,
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => _x( 'variation', 'variation','pbc'),'with_front' => 'true' ),
+			'rewrite'            => false,
 			'has_archive'        => false,
 			'capability_type'    => 'post',
 			'hierarchical'       => false,
 			'menu_position'      => 5,
-			'supports'           => array('title'),
-			'menu_icon'          => 'dashicons-tagcloud'
+			'supports'           => array( 'title' ),
 		);
 		register_post_type( 'variation', $args );
 
@@ -118,7 +115,7 @@ class PBC_Helper_PostTypes {
 			'add_new_item'  => __( 'Add New Section', 'pbc' ),
 			'new_item_name' => __( 'Add New Section', 'pbc' ),
 		);
-	
+
 		register_taxonomy(
 			'variation_tag',
 			array(
@@ -145,24 +142,23 @@ class PBC_Helper_PostTypes {
 			'edit_item'          => __( 'Edit Enquiry', 'pbc' ),
 			'new_item'           => __( 'New Enquiry', 'pbc' ),
 			'view_item'          => __( 'View Enquiry', 'pbc' ),
-			'search_items'       => __( 'Search for Enquiry', 'pbc').'s',
+			'search_items'       => __( 'Search for Enquiry', 'pbc' ),
 			'not_found'          => __( 'We didn\'t find any Enquiry', 'pbc' ),
 			'not_found_in_trash' => __( 'We didn\'t find any Enquiry in the trash', 'pbc' ),
 		);
-		$args = array(
+		$args   = array(
 			'labels'             => $labels,
 			'public'             => false,
 			'show_in_menu'       => false,
 			'publicly_queryable' => false,
 			'show_ui'            => true,
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => _x( 'Enquiry','enquiry','pbc'),'with_front' => 'true' ),
+			'rewrite'            => false,
 			'has_archive'        => false,
 			'capability_type'    => 'post',
 			'hierarchical'       => false,
 			'menu_position'      => 5,
-			'supports'           => array('title'),
-			'menu_icon'          => 'dashicons-tagcloud'
+			'supports'           => array( 'title' ),
 		);
 		register_post_type( 'enquiry', $args );
 	}
@@ -176,7 +172,7 @@ class PBC_Helper_PostTypes {
 	public function pbc_metabox_variation( $meta_boxes ) {
 		$phase_options = array();
 		$var_options   = array();
-		// Phase options
+		// Phase options.
 		if ( is_admin() ) {
 			$phasescpt = get_posts(
 				array(
@@ -197,7 +193,7 @@ class PBC_Helper_PostTypes {
 					'post_type'      => 'variation',
 					'posts_per_page' => -1,
 					'orderby'        => 'name',
-					'order'          => 'ASC'
+					'order'          => 'ASC',
 				)
 			);
 			foreach ( $variationscpt as $var_item ) {
@@ -211,10 +207,10 @@ class PBC_Helper_PostTypes {
 				} else {
 					$phase_order = $phase_post->menu_order;
 				}
-				$var_value = $phase_order.'|'.$var_item->ID;
-				$var_sku = get_post_meta( $var_item->ID, 'pbc_sku', true );
+				$var_value = $phase_order . '|' . $var_item->ID;
+				$var_sku   = get_post_meta( $var_item->ID, 'pbc_sku', true );
 				if ( $var_sku ) {
-					$var_options[ $var_value ] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title.'('.$var_sku.')';
+					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - '.$var_item->post_title.'('.$var_sku.')';
 				} else {
 					$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
 				}
@@ -232,7 +228,7 @@ class PBC_Helper_PostTypes {
 			'priority'   => 'high',
 			'autosave'   => true,
 			'fields'     => array(
-				// SELECT BOX PHASE
+				// SELECT BOX PHASE.
 				array(
 					'name'        => __( 'Phase', 'pbc' ),
 					'id'          => "{$prefix}phase",
@@ -242,7 +238,7 @@ class PBC_Helper_PostTypes {
 					'std'         => '',
 					'placeholder' => __( 'Select a phase', 'pbc' ),
 				),
-				// TEXT
+				// TEXT.
 				array(
 					'name'  => __( 'Reference', 'pbc' ),
 					'id'    => "{$prefix}sku",
@@ -251,7 +247,7 @@ class PBC_Helper_PostTypes {
 					'std'   => '',
 					'clone' => false,
 				),
-				// IMAGE ADVANCED (WP 3.5+)
+				// IMAGE ADVANCED (WP 3.5+).
 				array(
 					'name'             => __( 'Icon image', 'pbc' ),
 					'id'               => "{$prefix}imgicon",
@@ -259,13 +255,13 @@ class PBC_Helper_PostTypes {
 					'max_file_uploads' => 1,
 				),
 				array(
-					'name'   => __( 'Depends of', 'pbc' ),
-					'id'     => "{$prefix}depends",
-					'type'   => 'group',
-					'clone'  => true,
+					'name'       => __( 'Depends of', 'pbc' ),
+					'id'         => "{$prefix}depends",
+					'type'       => 'group',
+					'clone'      => true,
 					'sort_clone' => true,
-					'fields' => array(
-						// SELECT BOX VARIATIONS
+					'fields'     => array(
+						// SELECT BOX VARIATIONS.
 						array(
 							'name'        => __( 'Variation', 'pbc' ),
 							'id'          => "{$prefix}depvar",
@@ -276,15 +272,15 @@ class PBC_Helper_PostTypes {
 							'placeholder' => __( 'Not depends of variation', 'pbc' ),
 						),
 					),
-				), //array
+				),
 				array(
-					'name'   => __( 'Product group image', 'pbc' ),
-					'id'     => "{$prefix}imgprodgroup",
-					'type'   => 'group',
-					'clone'  => true,
+					'name'       => __( 'Product group image', 'pbc' ),
+					'id'         => "{$prefix}imgprodgroup",
+					'type'       => 'group',
+					'clone'      => true,
 					'sort_clone' => true,
-					'fields' => array(
-						// SELECT BOX VARIATIONS
+					'fields'     => array(
+						// SELECT BOX VARIATIONS.
 						array(
 							'name'        => __( 'Depends of Variation', 'pbc' ),
 							'id'          => "{$prefix}depvarimgprod",
@@ -294,7 +290,7 @@ class PBC_Helper_PostTypes {
 							'std'         => '',
 							'placeholder' => 'No depende de una variación',
 						),
-						// IMAGE ADVANCED (WP 3.5+)
+						// IMAGE ADVANCED (WP 3.5+).
 						array(
 							'name'             => __( 'Product image', 'pbc' ),
 							'id'               => "{$prefix}imgprod",
@@ -398,7 +394,8 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function render_budget_configuration( $post ) {
-		$post_id = is_object( $post ) ? $post->ID : $post; ?>
+		$post_id = is_object( $post ) ? $post->ID : $post;
+		?>
 		<table>
 			<thead>
 				<tr>
@@ -409,24 +406,30 @@ class PBC_Helper_PostTypes {
 			</thead>
 			<tbody>
 				<?php
-				for( $i=0; $i < 50; $i++ ) {
+				for ( $i = 0; $i < 50; $i++ ) {
 					$phase_var = get_post_meta( $post_id, 'pbc_phase_var_' . $i, true );
 					if ( $phase_var ) {
 						?>
 						<tr>
-							<td class="sn"><?php echo $i;?></td>
+							<td class="sn"><?php echo (int) $i; ?></td>
 							<td class="phase-variation"><?php echo $phase_var; ?></td>
 							<td class="price"><?php echo get_post_meta( $post_id, 'pbc_price_' . $i, true ); ?></td>
 						</tr>
 						<?php
 					}
-				} ?>
+				}
+				?>
 			</tbody>
 		</table>
 		<?php
 	}
-	/** Add columns for Phases **/
-	// Add to admin_init function
+
+	/**
+	 * Add columns for Phases
+	 *
+	 * @param array $phases_columns Columns.
+	 * @return array
+	 */
 	public function add_new_phases_columns( $phases_columns ) {
 		$new_columns['cb']         = '<input type="checkbox" />';
 		$new_columns['title']      = __( 'Phase', 'pbc' );
@@ -435,7 +438,31 @@ class PBC_Helper_PostTypes {
 		return $new_columns;
 	}
 
+	/**
+	 * Manages columns for Budget
+	 *
+	 * @param string  $column_name Name of the column.
+	 * @param integer $id Post ID.
+	 * @return void
+	 */
+	public function manage_phases_columns( $column_name, $id ) {
+		$post = get_post( $id );
 
+		switch ( $column_name ) {
+			case 'menu_order':
+				echo isset( $post->menu_order ) ? esc_html( $post->menu_order ) : '';
+				break;
+			default:
+				break;
+		} // end switch
+	}
+
+	/**
+	 * Add columns for Budget
+	 *
+	 * @param array $phases_columns Columns.
+	 * @return array
+	 */
 	public function add_new_budgets_columns( $phases_columns ) {
 		$new_columns['cb']              = '<input type = "checkbox" />';
 		$new_columns['enquiry_name']    = __( 'Budget', 'pbc' );
@@ -480,14 +507,14 @@ class PBC_Helper_PostTypes {
 
 	/** Add columns for Variations **/
 	// Add to admin_init function
-	public function add_new_var_columns($phases_columns) {
-		$new_columns['cb'] = '<input type="checkbox" />';
-		$new_columns['title'] = __('Variation','pbc');
-		$new_columns['phase'] = __('Phase and section','pbc');
-		$new_columns['price'] = __('Price','pbc');
-		$new_columns['depends'] = __('Depends of','pbc');
-		$new_columns['imgicon'] = __('Icon','pbc');
-		$new_columns['imgprod'] = __('Product Images','pbc');
+	public function add_new_var_columns( $phases_columns ) {
+		$new_columns['cb']      = '<input type="checkbox" />';
+		$new_columns['title']   = __( 'Variation', 'pbc' );
+		$new_columns['phase']   = __( 'Phase and section', 'pbc' );
+		$new_columns['price']   = __( 'Price', 'pbc' );
+		$new_columns['depends'] = __( 'Depends of', 'pbc' );
+		$new_columns['imgicon'] = __( 'Icon', 'pbc' );
+		$new_columns['imgprod'] = __( 'Product Images', 'pbc' );
 
 		return $new_columns;
 	}
@@ -506,8 +533,8 @@ class PBC_Helper_PostTypes {
 			}
 			$price_column .= '<br/>';
 		}
-		//* Depends group
-		$depends_group = rwmb_meta( 'pbc_depends' );
+		// Depends group.
+		$depends_group  = rwmb_meta( 'pbc_depends' );
 		$depends_column = '';
 		foreach ( $depends_group as $depends_item ) {
 			$variation_id   = substr( $depends_item['pbc_depvar'], 3 );
@@ -519,25 +546,25 @@ class PBC_Helper_PostTypes {
 				$phase_order = '0';
 			}
 			$phase_order    .= $phase_post_dp->menu_order;
-			$depends_column .= $phase_order.' - '.$phase_post_dp->post_title.' - '.$variation_post->post_title;
-			$depends_column .= '<br/>';
+			$depends_column .= $phase_order . ' - ' . $phase_post_dp->post_title . ' - ';
+			$depends_column .= $variation_post->post_title . '<br/>';
 		}
-		$phase_id = get_post_meta( $id,'pbc_phase',true );
+		$phase_id = get_post_meta( $id, 'pbc_phase', true );
 
-		//* Image icon
+		// Image icon.
 		$imgicon = get_post_meta( $id, 'pbc_imgicon', true );
 		if ( $imgicon ) {
 			$icon_image = wp_get_attachment_image_src( $imgicon, array( 120, 120 ), true );
 		}
 
-		//* Image Group Product
+		// Image Group Product.
 		$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 
 		switch ( $column_name ) {
 			case 'phase':
 				$phase_post = get_post( $phase_id );
-				echo $phase_post->menu_order . ' - ' . $phase_post->post_title;
-				//* Shows taxonomy
+				echo esc_html( $phase_post->menu_order . ' - ' . $phase_post->post_title );
+				// Shows taxonomy.
 				$term_list = wp_get_post_terms( $id, 'variation_tag', array( 'fields' => 'all' ) );
 				foreach ( $term_list as $term_single ) {
 					echo '<p class="taxonomy-variation_tag">' . esc_html( $term_single->name ) . '</p>';
