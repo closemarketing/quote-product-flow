@@ -69,7 +69,7 @@ class PBC_Helper_PostTypes {
 			),
 			'has_archive'        => false,
 			'capability_type'    => 'page',
-			'hierarchical'       => false,
+			'hierarchical'       => true,
 			'menu_position'      => 5,
 			'supports'           => array( 'title', 'editor', 'page-attributes' ),
 			'menu_icon'          => 'dashicons-tagcloud'
