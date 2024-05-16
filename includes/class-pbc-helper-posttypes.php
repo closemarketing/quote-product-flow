@@ -10,6 +10,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\CALC;
+
 /**
  * Helper Post Types.
  *
@@ -481,8 +483,7 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function manage_budgets_columns( $column_name, $id ) {
-		global $pbc_helper_calc;
-		switch ( $column_name) {
+		switch ( $column_name ) {
 			case 'enquiry_name':
 				echo '<a href="' . get_edit_post_link( $id ) . '" class="row-title">';
 				echo get_post_meta( $id, 'pbc_enquiry_name', true );
@@ -492,7 +493,7 @@ class PBC_Helper_PostTypes {
 				$this->render_enquiry_details( $id );
 				break;
 			case 'enquiry_conf':
-				echo number_format( $pbc_helper_calc->get_total_from_enquiry( $id ), 2, ',', '.' ) . ' € ' . __( 'VAT not included', 'pbc' );
+				echo number_format( CALC::get_total_from_enquiry( $id ), 2, ',', '.' ) . ' € ' . __( 'VAT not included', 'pbc' );
 				break;
 			case 'enquiry_date':
 				echo get_the_date( 'd-m-Y H:i', $id );

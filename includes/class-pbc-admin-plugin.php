@@ -10,6 +10,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\CALC;
+
 /**
  * Class for admin
  */
@@ -711,7 +713,6 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function variation_selected_action_callback(){
-		global $pbc_helper_calc;
 		extract($_REQUEST);
 		if ( session_id() == '' ) {
 			ob_start();
@@ -730,7 +731,7 @@ class PBC_Admin_Plugin {
 				update_user_meta($user_id, 'pbc_phase_'.$current_phase,$phase_param);
 			}
 			// Gets image variation with filter dependency.
-			$imgprodurl = $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
+			$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
 
 			$pricegroup = get_post_meta( $sVar, 'pbc_pricegroup', true );
 			$pricevar   = $_REQUEST["pbc_pricevar_$sVar"];
@@ -987,7 +988,6 @@ class PBC_Admin_Plugin {
 	}
 
 	public function configurator_result_generate_pdf() {
-		global $pbc_helper_calc;
 		if(!isset($_SESSION['pbc_variation'])){
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
@@ -1155,7 +1155,7 @@ class PBC_Admin_Plugin {
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
-			$color = $pbc_helper_calc->calculate_color_text( $background_total );
+			$color = CALC::calculate_color_text( $background_total );
 			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
 			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 			if ( $total_pricevat > 0 ) {

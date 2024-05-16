@@ -8,6 +8,8 @@
  * @version    1.0
  */
 
+namespace Close\PBC\Helpers;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -17,20 +19,19 @@ defined( 'ABSPATH' ) || exit;
  *
  * @since 1.1
  */
-class PBC_Helper_Calculations {
-
+class CALC {
 	/**
 	 * Get variation image url with filter dependency
 	 *
-	 * @param array $session_variation
-	 * @param integer $variation_id
+	 * @param array   $session_variation Session variation.
+	 * @param integer $variation_id Variation ID.
 	 * @return string
 	 */
-	public function get_image_variation_url( $session_variation, $variation_id = 0 ) {
+	public static function get_image_variation_url( $session_variation, $variation_id = 0 ) {
 		if ( ! isset( $variation_id ) ) {
 			return '';
 		}
-		$imgprodgroup = get_post_meta( $variation_id, 'pbc_imgprodgroup', true);
+		$imgprodgroup = get_post_meta( $variation_id, 'pbc_imgprodgroup', true );
 		if ( ! empty( $imgprodgroup ) ) {
 			foreach ( $imgprodgroup as $deps ) {
 				if ( ! empty( $deps['pbc_depvarimgprod'] ) ) {
@@ -75,7 +76,7 @@ class PBC_Helper_Calculations {
 	 * @param integer $post_id
 	 * @return float
 	 */
-	public function get_total_from_enquiry( $post_id ) {
+	public static function get_total_from_enquiry( $post_id ) {
 		$metas = get_post_meta( $post_id );
 		$total_price = 0;
 		foreach ( $metas as $key => $value ) {
@@ -88,7 +89,7 @@ class PBC_Helper_Calculations {
 		return $total_price;
 	}
 
-	public function calculate_color_text( $background_hex ) {
+	public static function calculate_color_text( $background_hex ) {
 		list($r1, $g1, $b1) = sscanf( $background_hex, "#%02x%02x%02x" );
 
 		// Black:
@@ -100,7 +101,4 @@ class PBC_Helper_Calculations {
 
 		return $contrast > 500 ? '#000000': '#ffffff';
 	}
-
 }
-
-$pbc_helper_calc = new PBC_Helper_Calculations();

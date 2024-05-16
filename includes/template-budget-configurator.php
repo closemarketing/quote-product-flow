@@ -3,7 +3,7 @@
  * Template Name: Budget Configurator
  */
 
-global $pbc_helper_calc;
+use Close\PBC\Helpers\CALC;
 
 if ( session_id() == '' ) {
 	ob_start();
@@ -630,7 +630,7 @@ if ( ! empty( $phases ) ) {
 							}
 						}
 					}
-					$imgprodurl = isset( $sVar ) ? $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar ): '';
+					$imgprodurl = isset( $sVar ) ? CALC::get_image_variation_url( $_SESSION['pbc_variation'], $sVar ): '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option('variations_images_flipped');
