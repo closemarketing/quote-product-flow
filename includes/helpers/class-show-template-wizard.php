@@ -10,6 +10,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\CALC;
+
 /**
  * Template Wizard.
  *
@@ -21,21 +23,19 @@ class PBC_Template_Wizard {
 	 * Construct of Class
 	 */
 	public static function render() {
-		if ( session_id() == '' ) {
-			ob_start();
-			session_start();
-		}
-		if ( session_id() == '' ) {
-			echo ';;--;;' . json_encode(
-				array(
-					'type'=>'error',
-					'msg'=>'Error: Unable to initialize Session!'
-				)
-			);
-			die( 'Error: Unable to initialize Session!' );
-		}
-		$cStep ='';
-		$phases = get_posts( 'numberposts=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
+		$cstep = '';
+
+		$is_multiple = CALC::is_multiple_products();
+		$args        = array(
+			'numberposts' => -1,
+			'post_type'   => 'phases',
+			'orderby'     => 'menu_order',
+			'order'       => 'ASC',
+			'post_parent' => 0,
+			'fields'      => 'ids',
+		);
+		$phases      = get_posts( $args );
+
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 		}
@@ -47,9 +47,9 @@ class PBC_Template_Wizard {
 		if ( isset( $_POST['submit'] ) ) {
 			$submit = sanitize_text_field( $_POST['submit'] );
 			if ( isset( $_POST[ $submit . '_phase' ] ) ) {
-				$cStep = sanitize_text_field( $_POST[ $submit . '_phase' ] );
+				$cstep = sanitize_text_field( $_POST[ $submit . '_phase' ] );
 			} else {
-				$cStep = 'calculate';
+				$cstep = 'calculate';
 			}
 
 			if ( isset( $_POST['pbc_variation'] ) && $_POST['submit']=='next' ) {
@@ -93,270 +93,15 @@ class PBC_Template_Wizard {
 				ksort( $_SESSION['pbc_variation'], SORT_NUMERIC );
 			}
 		} elseif ( isset( $_GET['phase']) ) {
-			$cStep = (int) sanitize_text_field( $_GET['phase'] );
+			$cstep = (int) $_GET['phase'];
 		}
-		if ( empty( $cStep ) ) {
-			$cStep = 1;
+		if ( empty( $cstep ) ) {
+			$cstep = 1;
 		}
 
 		if ( ! defined( 'DOING_AJAX' ) ) {
-			get_header();
-		}
-		if ( ! defined( 'DOING_AJAX' ) ) {
 			$preview_width = ! empty( get_option( 'pbc_preview_width' ) ) ? get_option( 'pbc_preview_width' ) : '570';
-			?>
-			<style>
-				.btn{
-					background: #c0c0c0;
-					color: #333;
-				}
-				.btn-share{
-					background: #c0c0c0;
-					color: #333;
-				}
-				.btn {
-					position: relative;
-					margin: 0;
-					padding-left: 14px;
-					padding-right: 14px;
-					padding-top: 2.8px;
-					padding-bottom: 2.8px;
-					background: #9a781f;
-					color: white;
-					font-size: 14px;
-					border: none;
-				}
-				.btn::after {
-					content: '';
-					position: absolute;
-					top: 0;
-					width: 0;
-					height: 0;
-				}
-				.btn:hover {
-					background: black;
-				}
-				.btn.btn-pdf {
-					margin-left: 10px;
-				}
-				.next .btn::after,
-				.prev .btn::after {
-					border-style: solid;
-				}
-				.next .btn::after {
-					right: -24px;
-					border-width: 12px;
-					border-color: transparent transparent transparent #9a781f;
-				}
-				.next .btn:hover::after {
-					border-left-color: black;
-				}
-				.prev .btn::after {
-					left: -24px;
-					border-color: transparent #9a781f transparent transparent;
-					border-width: 12px;
-				}
-				.prev .btn:hover::after {
-					border-right-color: black;
-				}
-				.phase_variations select {
-					padding: 5px 10px;
-					border-radius: 3px;
-					padding-right: 30px;
-					position: relative;
-					-moz-appearance: none;
-					-webkit-appearance: none;
-					appearance: none;
-					border: none;
-					background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-					background-repeat: no-repeat, repeat;
-					background-position: right .7em top 50%, 0 0;
-					background-size: .65em auto, 100%;
-				}
-				.variation_img img {
-					min-width: 120px;
-				}
-				.hidden{display: none !important;}
-				#content{max-width: 1200px;margin: 0 auto 40px;}
-				.configurator_steps_nav{width: 100%;margin: 10px auto;float: left;padding-right: 15px;}
-				.configurator_steps_nav ul{margin: 0;padding: 0; list-style: none;}
-				.configurator_steps_nav li.configurator_steps{
-					padding: 0;
-					margin: 0;
-					margin-bottom: 3px;
-					background: #ededed;
-					color: #000;
-					position: relative;
-					float: left;
-					width: 12.5%;
-					height: 33px;
-					line-height: 40px;
-					vertical-align: middle;
-					text-align: center;
-					word-wrap: break-word;
-					padding: 5px 10px;
-					border-right: 2px solid #fff;
-				}
-				.configurator_steps_nav li.configurator_steps .step-name{
-					background: none;
-					border: none;
-					padding: 0;
-					display: inline-block;
-					height: auto;
-					width: 100%;
-					padding-right: 0;
-					height: 30px;
-					line-height: 30px;
-					vertical-align: top;
-					font-size: 14px;
-				}
-				.configurator_steps_nav li.configurator_steps .step-arrow-button {
-					width: 30px;
-					height: 30px;
-					position: absolute;
-					top: 5px;
-					z-index: 1;
-					right: -15px;
-					-webkit-transform: rotate(-45deg);
-					-moz-transform: rotate(-45deg);
-					-ms-transform: rotate(-45deg);
-					transform: rotate(-45deg);
-					border-bottom: 2px solid #FFFFFF;
-					border-right: 2px solid #FFFFFF;
-					background: #EDEDED;
-					display: inline-block;
-				}
-				.configurator_steps_nav li.configurator_steps.active {background: #949697;}
-				.configurator_steps_nav li.configurator_steps.active .step-name{
-					color: #fff;
-					font-weight: bold;
-				}
-				.configurator_steps_nav li.configurator_steps.active .step-arrow-button{background: #949697;}
-				.configurator-left {
-					width: 50%;
-					float: left;
-				}
-				.configurator-right {
-					display: block;
-					width: 49%;
-					float: right;
-					vertical-align: top;
-				}
-				.configurator-left .phase_title{text-transform: uppercase;font-size: 20px;}
-				.phase_variations{
-					margin-top: 40px;
-				}
-				.phase_variations ul{margin: 0; list-style: none;}
-				.phase_variations ul li.variation_list {
-					width: 24%;
-					display: inline-block;
-					font-size: 14px;
-					margin-bottom: 20px;
-					text-align: center;
-					vertical-align: top;
-				}
-				.product_preview {
-					position: relative;
-					text-align: left;
-					max-width: <?php echo esc_html( $preview_width ); ?>px;
-					overflow: hidden;
-					display: inline-block;
-					vertical-align: top;
-				}
-				.product_preview.wrap-left{margin-right: 20px;}
-				.product_preview .image-wrap img:first-child{position: relative;}
-				.product_preview .image-wrap img{width: 100%;max-width: <?php echo esc_html( $preview_width ); ?>px;position: absolute;top: 0;left: 0;}
-				.configurator_form_action {
-					text-align: right;
-					clear: both;
-					margin: 20px 0;
-				}
-				.configurator_summary {
-					clear: both;
-					border: 1px solid #949697;
-					padding: 10px;
-					margin: 0 auto;
-					max-width: 600px;
-					min-width: 600px;
-					display: inline-block;
-				}
-				.configurator_result_share{max-width: 400px;margin: 20px auto;text-align: center;}
-				.email_submit_fields{margin-top: 20px;}
-				.configurator_summary .title {
-					text-transform: uppercase;
-					font-size: 20px;
-					margin-bottom: 10px;
-				}
-				.configurator_summary table{width: 100%;border: 0px;}
-				.configurator_summary table td {
-					font-size: 16px;
-				}
-				.configurator_summary table td.price {
-					text-align: right;
-				}
-				.configurator_summary tr.phase-total_price td {
-					padding-top: 15px;
-				}
-				.configurator_form_action .prev, .configurator_form_action .next{display: inline-block;}
-				.status_loader.fixed{position: fixed;width: 100%;height: 100%;
-					/*background: rgba(0, 0, 0, 0.8);*/
-					vertical-align: middle;text-align: center;top: 0;z-index: 9999;left:0;}
-				.status_loader.product_preview_status.fixed{position: absolute;}
-				.status_loader.fixed > div {
-					position: relative;
-					top: 50%;
-					transform: translateY(-50%);
-					z-index: 9999;
-					color: #fff;
-					border-radius: 100%;
-					display: inline-block;
-					-webkit-animation: bouncedelay 1.4s infinite ease-in-out;
-					animation: bouncedelay 1.4s infinite ease-in-out;
-					-webkit-animation-fill-mode: both;
-					animation-fill-mode: both;
-				}
-				img.flipped{
-					-moz-transform: scaleX(-1);
-					-o-transform: scaleX(-1);
-					-webkit-transform: scaleX(-1);
-					transform: scaleX(-1);
-					filter: FlipH;
-					-ms-filter: "FlipH";
-				}
-				.email_submit_fields input {
-					width: 325px;
-				}
-				.configurator_login{
-					clear: both;
-					width: 49%;
-					float: right;
-					margin: 20px 0;
-				}
-				.configurator_login .form_wrapper{max-width: 400px;border: 1px solid;padding: 10px;}
-				.configurator_login .et_pb_contact_submit{border: 2px solid transparent;background: rgba(0, 0, 0, 0.05);}
-				.configurator_login .et_pb_contact_submit:hover{background: transparent;border: 2px solid #A08621;}
-				@media (max-width:768px) {
-					.configurator_steps_nav{padding-right: 0px;}
-					.configurator_steps_nav li.configurator_steps{overflow: hidden;padding: 5px;}
-					.configurator_steps_nav li.configurator_steps .step-arrow-button{display: none;}
-				}
-				.configurator_login .message,.configurator_login h2 {
-					margin: 30px 20px;
-				}
-				.configurator_login h2 {
-					margin: 20px 20px 0;
-				}
-				.configurator_login {
-				text-align: center;
-				}
-				.configurator_login img {
-					width: 300px;
-				}
-				.page-header {
-				margin-top: 15px;
-				}
-			</style>
-			<?php
+
 			$queried_object = get_queried_object();
 			?>
 			<div id="content" class="clearfix row">
@@ -375,7 +120,6 @@ class PBC_Template_Wizard {
 		} //defined('DOING_AJAX')
 
 		if ( ! empty( $phases ) ) {
-			error_log( '$_SESSION: ' . print_r( $_SESSION, true ) );
 			?>
 			<div class="configurator_steps_nav" id="configurator_steps_nav">
 				<ul>
@@ -383,7 +127,7 @@ class PBC_Template_Wizard {
 				$steps = 1;
 				foreach ( $phases as $phase ) {
 					?>
-					<li class="configurator_steps step-<?php echo esc_attr( $steps );?> <?php if ( $cStep == $steps ) { echo 'active'; } ?>">
+					<li class="configurator_steps step-<?php echo esc_attr( $steps );?> <?php if ( $cstep == $steps ) { echo 'active'; } ?>">
 						<div class="stepContainer">
 								<div class="step-name"><?php echo esc_html( get_the_title( $phase ) ); ?></div>
 								<span class="step-arrow-button"></span>
@@ -398,8 +142,8 @@ class PBC_Template_Wizard {
 			<div class="phase_detail">
 				<form action="" method="post" name="configurator-form" id="configurator-form">
 				<?php
-				if ( $cStep !='calculate' ) {
-					$phase_id = $phases[((int)$cStep-1)];?>
+				if ( $cstep !='calculate' ) {
+					$phase_id = $phases[((int)$cstep-1)];?>
 					<div class="configurator-left">
 						<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
 						<div class="phase_variations">
@@ -416,7 +160,7 @@ class PBC_Template_Wizard {
 												$prevVar[(int)$arr[0]][] = $arr[1];
 											}
 										}
-										if ( $cStep != 1 && !empty($_SESSION['pbc_variation'] ) ) {
+										if ( $cstep != 1 && !empty($_SESSION['pbc_variation'] ) ) {
 											foreach ( $_SESSION['pbc_variation'] as $sPhaseKey => $sVariations ) {
 												if ( isset($prevVar[$sPhaseKey]) && ! in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey] ) ) {
 													unset($variations[$key]);
@@ -459,13 +203,13 @@ class PBC_Template_Wizard {
 								if ( 
 									isset( $_SESSION['pbc_variation'] ) && 
 									is_array( $_SESSION['pbc_variation'] ) && 
-									isset( $_SESSION['pbc_variation'][ $cStep ] ) && 
-									in_array( $_SESSION['pbc_variation'][ $cStep ]['var']['id'], $variations )
+									isset( $_SESSION['pbc_variation'][ $cstep ] ) && 
+									in_array( $_SESSION['pbc_variation'][ $cstep ]['var']['id'], $variations )
 								) {
-									$sVar = $_SESSION['pbc_variation'][ $cStep ]['var']['id'];
+									$sVar = $_SESSION['pbc_variation'][ $cstep ]['var']['id'];
 								} else {
 									if ( isset( $user_id ) ) {
-										$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cStep, true );
+										$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cstep, true );
 										if ( ! empty( $pbc_phase ) && ! empty( $pbc_phase['var'] ) ) {
 											$sVar = $pbc_phase['var'];
 										}
@@ -496,7 +240,7 @@ class PBC_Template_Wizard {
 														echo '</div>';
 													}
 													?>
-													<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo esc_html( $variation_data['title'] ); ?>
+													<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cstep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo esc_html( $variation_data['title'] ); ?>
 												</label>
 													<?php
 													$priceVar = array();
@@ -570,22 +314,22 @@ class PBC_Template_Wizard {
 				<div class="configurator-right">
 				<?php }//cStep!=calculate?>
 
-				<?php if ( $cStep != 'calculate' ) {
+				<?php if ( $cstep != 'calculate' ) {
 					?>
 					<script type="text/javascript">jQuery('.configurator_form_action').insertAfter('.product_preview');</script>
 					<?php
-				} elseif ( $cStep =='calculate' ) {
+				} elseif ( $cstep =='calculate' ) {
 					?>
 					<script type="text/javascript">jQuery('.configurator_form_action').insertBefore('.product_preview');</script>
 					<?php
 				}
 				?>
-				<div class="product_preview<?php if ( $cStep =='calculate'){ echo ' wrap-left'; } ?>">
+				<div class="product_preview<?php if ( $cstep =='calculate'){ echo ' wrap-left'; } ?>">
 					<div class="image-wrap">
 							<?php
 							if ( isset( $_SESSION['pbc_variation'] ) && ! empty( $_SESSION['pbc_variation'] ) ) {
-								$to = (int) $cStep;
-								if ( $cStep == 'calculate') {
+								$to = (int) $cstep;
+								if ( $cstep == 'calculate') {
 									$to = count( $_SESSION['pbc_variation'] ) + 1;
 								}
 								for ( $i = 1; $i < $to; $i++ ) {
@@ -655,7 +399,7 @@ class PBC_Template_Wizard {
 									$addclass = 'flipped';
 								}
 								?>
-								<img phaseid="<?php echo $cStep;?>" src="<?php echo $imgprodurl; ?>" class="<?php echo $addclass;?>" alt="product image"/>
+								<img phaseid="<?php echo $cstep;?>" src="<?php echo $imgprodurl; ?>" class="<?php echo $addclass;?>" alt="product image"/>
 								<?php
 							}
 							?>
@@ -664,29 +408,29 @@ class PBC_Template_Wizard {
 				</div>
 					<div class="configurator_form_action">
 						<?php
-						if ( $cStep == 1 ) {
+						if ( $cstep == 1 ) {
 							$prev_step   = '';
 							$prev_button = '';
-						} elseif ( $cStep == 'calculate' ) {
+						} elseif ( $cstep == 'calculate' ) {
 							$prev_step   = count( $phases );
 							$prev_button = __( 'Back', 'pbc' );
 						} else {
-							$prev_step   = $cStep - 1;
+							$prev_step   = $cstep - 1;
 							$prev_button = __( 'Back', 'pbc' );
 						}
 
-						if ( $cStep == 'calculate' ) {
+						if ( $cstep == 'calculate' ) {
 							$next_step   = 'calculate';
 							$next_button = '';
-						} elseif ( $cStep == count( $phases ) ) {
+						} elseif ( $cstep == count( $phases ) ) {
 							$next_step   = 'calculate';
 							$next_button = __( 'Calculate', 'pbc' );
 						}else{
-							$next_step   = $cStep + 1;
+							$next_step   = $cstep + 1;
 							$next_button = __( 'Next', 'pbc' );
 						}
 						?>
-						<input type="hidden" name="pbc_current_phase" value="<?php echo $cStep;?>"/>
+						<input type="hidden" name="pbc_current_phase" value="<?php echo $cstep;?>"/>
 						<?php if($prev_step && $prev_button){?>
 						<div class="prev <?php if(empty($prev_step)) echo 'hidden';?>">
 							<input type="hidden" name="prev_phase" value="<?php echo $prev_step;?>"/>
@@ -706,11 +450,11 @@ class PBC_Template_Wizard {
 							<table>
 								<?php
 								$show_prices = get_option( 'pbc_budget_show_prices' );
-								if( $cStep == 'calculate' ){
+								if( $cstep == 'calculate' ){
 									$count       = count( $phases );
 									$total_price = 0;
 								} else {
-									$count = $cStep;
+									$count = $cstep;
 								}
 								for ( $i = 1; $i <= $count; $i++ ) {
 									if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
@@ -722,7 +466,7 @@ class PBC_Template_Wizard {
 									$varPrice  = ! empty( $_SESSION['pbc_variation'][$i]['var']['price'] ) ? $_SESSION['pbc_variation'][$i]['var']['price'] : 0;
 									$phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
 									
-									if ( $cStep == 'calculate' ) {
+									if ( $cstep == 'calculate' ) {
 										$total_price += (double) $varPrice;
 									}
 									?>
@@ -738,7 +482,7 @@ class PBC_Template_Wizard {
 									</tr>
 									<?php
 								}
-								if ( $cStep == 'calculate' && 'no' !== $show_prices ) { ?>
+								if ( $cstep == 'calculate' && 'no' !== $show_prices ) { ?>
 									<tr class="variation_selected phase-total_price">
 										<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
 										<td class="price">
@@ -760,7 +504,7 @@ class PBC_Template_Wizard {
 						?>
 					</div>
 					<?php 
-					if($cStep == 'calculate'){?>
+					if($cstep == 'calculate'){?>
 						<div class="configurator_result_share">
 							<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>
 							<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
@@ -787,12 +531,12 @@ class PBC_Template_Wizard {
 						</div>
 					<?php }?>
 				<?php
-				if ( $cStep != 'calculate') {
+				if ( $cstep != 'calculate') {
 					// Banner.
 					do_action( 'pbc_banner_after_setup' );
 				?>
 				</div>
-				<?php }//$cStep != 'calculate'?>
+				<?php }//$cstep != 'calculate'?>
 				</form>
 			</div>
 
@@ -1005,11 +749,6 @@ class PBC_Template_Wizard {
 		</div>
 		<?php
 		}//defined('DOING_AJAX')
-
-		if ( ! defined( 'DOING_AJAX' ) ) {
-			get_footer();
-		}
-
 	}
 
 }

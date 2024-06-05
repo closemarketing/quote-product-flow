@@ -101,4 +101,19 @@ class CALC {
 
 		return $contrast > 500 ? '#000000': '#ffffff';
 	}
+	/**
+	 * Returns if product is multiple
+	 *
+	 * @return boolean
+	 */
+	public static function is_multiple_products() {
+		$args = array(
+			'post_type'   => 'phases',
+			'numberposts' => -1,
+			'post_parent' => 0,
+			'fields'      => 'ids',
+		);
+
+		return count( get_posts( $args ) ) > 1;
+	}
 }
