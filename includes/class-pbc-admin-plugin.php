@@ -352,9 +352,9 @@ class PBC_Admin_Plugin {
 				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' ); ?></th>
 			</tr>
 			<?php
-			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+			$total_count = 0;
+			$phases      = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
 			if ( ! empty( $phases ) ) {
-				$total_count = 0;
 				foreach ( $phases as $phase ) {
 					?>
 					<tr>
@@ -362,7 +362,7 @@ class PBC_Admin_Plugin {
 						<td class="phases-col"><?php echo esc_html( $phase->post_title ); ?></td>
 						<td class="variations-col">
 							<?php
-							$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase->ID . '&fields=ids' );
+							$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase->ID . '&fields=ids' );
 							if ( ! empty( $variations ) ) {
 								echo count( $variations );
 							}
@@ -376,7 +376,7 @@ class PBC_Admin_Plugin {
 			?>
 			<tr>
 				<td colspan="2" ><?php esc_html_e( 'Total: ', 'pbc' ); ?></td>
-				<td><?php echo $total_count; ?></td>
+				<td><?php echo (int) $total_count; ?></td>
 			</tr>
 		</table>
 		<?php

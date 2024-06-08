@@ -1,5 +1,37 @@
 {
-  "require": {
-    "tgmpa/tgm-plugin-activation": "^2.6"
-  }
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://wpackagist.org"
+		},
+		{
+			"type": "composer",
+			"url": "https://packages.metabox.io/2e4180fda99b097f63bec435fd908cc4"
+		}
+	],
+	"require": {
+		"tgmpa/tgm-plugin-activation": "^2.6",
+		"wpackagist-plugin/meta-box": "^5.6.7",
+		"meta-box/meta-box-group": "dev-master",
+		"spipu/html2pdf": "^5.2"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
+	"extra": {
+		"installer-paths": {
+			"vendor/meta-box/{$name}": [
+				"vendor:wpackagist-plugin",
+				"vendor:meta-box"
+			]
+		}
+	},
+	"autoload": {
+		"files": [
+			"vendor/meta-box/mb-settings-page/mb-settings-page.php",
+			"vendor/meta-box/meta-box-group/meta-box-group.php"
+		]
+	}
 }

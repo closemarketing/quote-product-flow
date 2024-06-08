@@ -22,19 +22,23 @@ class PBC_Template_Wizard {
 	/**
 	 * Construct of Class
 	 */
-	public static function render() {
+	public static function render( $parent_phase = 0 ) {
 		$cstep = '';
 
-		$is_multiple = CALC::is_multiple_products();
-		$args        = array(
+		// Makes default parent phase.
+		$default_post_parent = CALC::get_default_parent_phase();
+		$is_multiple_prods   = ! empty( $default_post_parent ) ? true : false;
+		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? $default_post_parent : $parent_phase;
+
+		$args   = array(
 			'numberposts' => -1,
 			'post_type'   => 'phases',
 			'orderby'     => 'menu_order',
 			'order'       => 'ASC',
-			'post_parent' => 0,
+			'post_parent' => $base_parent,
 			'fields'      => 'ids',
 		);
-		$phases      = get_posts( $args );
+		$phases = get_posts( $args );
 
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();

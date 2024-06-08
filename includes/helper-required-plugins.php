@@ -5,7 +5,6 @@
  * This function is hooked into tgmpa_init, which is fired within the
  * TGM_Plugin_Activation class constructor.
  */
- require_once WPPBC_PLUGIN_PATH . '/vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php';
 
 add_action( 'tgmpa_register', 'pbc_required_plugins' );
 function pbc_required_plugins() {
@@ -15,41 +14,11 @@ function pbc_required_plugins() {
 	 */
 	$plugins = array(
 		array(
-			'name'               => 'Meta Box Group', // The plugin name.
-			'slug'               => 'meta-box-group', // The plugin slug (typically the folder name).
-			'source'             => WPPBC_PLUGIN_PATH . '/lib/plugins/meta-box-group.zip',
-			'required'           => true,
-			'version'            => '',
-			'force_activation'   => true,
-			'force_deactivation' => false,
-			'external_url'       => '',
-			'is_callable'        => '',
-		),
-		array(
-			'name'      => 'Meta Box',
-			'slug'      => 'meta-box',
-			'required'  => true,
-			'force_activation'   => true,
-		),
-		array(
 			'name'      => 'Duplicate Post',
 			'slug'      => 'duplicate-post',
 			'required'  => true,
 			'force_activation'   => true,
 		),
-
-		array(
-			'name'               => 'Meta Box Settings', // The plugin name.
-			'slug'               => 'mb-settings-page', // The plugin slug (typically the folder name).
-			'source'             => dirname( __FILE__ ) . '/lib/plugins/mb-settings-page.zip',
-			'required'           => true,
-			'version'            => '',
-			'force_activation'   => true,
-			'force_deactivation' => false,
-			'external_url'       => '',
-			'is_callable'        => '',
-		),
-
 	);
 
 	/*

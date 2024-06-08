@@ -65,11 +65,19 @@ class PBC_Public {
 	 *
 	 * @return void
 	 */
-	public function pbc_configurator() {
+	public function pbc_configurator( $atts = array() ) {
 		if ( is_admin() ) {
 			return;
 		}
-		PBC_Template_Wizard::render();
+		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
+
+		$pbc_atts = shortcode_atts(
+			array(
+				'pid' => 0,
+			),
+			$atts,
+		);
+		PBC_Template_Wizard::render( $pbc_atts['pid'] );
 	}
 }
 

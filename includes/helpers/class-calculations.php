@@ -116,4 +116,16 @@ class CALC {
 
 		return count( get_posts( $args ) ) > 1;
 	}
+
+	public static function get_default_parent_phase() {
+		$args          = array(
+			'post_type'   => 'phases',
+			'numberposts' => 1,
+			'post_parent' => 0,
+			'fields'      => 'ids',
+		);
+		$default_phase = get_posts( $args );
+
+		return ! empty( $default_phase[0] ) ? (int) $default_phase[0] : 0;
+	}
 }

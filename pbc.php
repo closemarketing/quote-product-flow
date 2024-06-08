@@ -41,15 +41,17 @@ function pbc_plugin_init() {
 	load_plugin_textdomain( 'pbc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
 
+require WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
+
 // Helpers.
-require_once WPPBC_PLUGIN_PATH . '/includes/helpers/class-calculations.php';
-require_once WPPBC_PLUGIN_PATH . '/includes/helpers/class-show-template-wizard.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template-wizard.php';
 
 // Include files.
-require_once WPPBC_PLUGIN_PATH . '/includes/class-pbc-admin-plugin.php';
-require_once WPPBC_PLUGIN_PATH . '/includes/class-pbc-helper-posttypes.php';
-require_once WPPBC_PLUGIN_PATH . '/includes/class-pbc-admin-plugin.php';
-require_once WPPBC_PLUGIN_PATH . '/includes/helper-required-plugins.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/helper-required-plugins.php';
 
 // Public.
-require_once WPPBC_PLUGIN_PATH . '/includes/public/class-pbc-public.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/public/class-pbc-public.php';
