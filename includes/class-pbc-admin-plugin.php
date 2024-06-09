@@ -11,6 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 use Close\PBC\Helpers\CALC;
+use Spipu\Html2Pdf\Html2Pdf;
 
 /**
  * Class for admin
@@ -932,8 +933,6 @@ class PBC_Admin_Plugin {
 	 * @return file
 	 */
 	private function generate_engine_pdf( $type_return = 'path', $post_id = null ) {
-		if ( is_file( WPPBC_PLUGIN_DIR . "/lib/html2pdf/html2pdf.class.php" ) ) {
-			require_once ( WPPBC_PLUGIN_DIR . '/lib/html2pdf/html2pdf.class.php' );
 			if ( session_id() == '' ) {
 				ob_start();
 				session_start();
@@ -965,7 +964,6 @@ class PBC_Admin_Plugin {
 			} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
 				return $this->get_budget_base_dir( 'url' ) . $filename;
 			}
-		}
 	} 
 
 	/**

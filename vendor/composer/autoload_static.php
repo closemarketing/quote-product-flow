@@ -8,7 +8,7 @@ class ComposerStaticInitf1e0b97bf3be916a3430d384cb18bc3b
 {
     public static $files = array (
         'a5f882d89ab791a139cd2d37e50cdd80' => __DIR__ . '/..' . '/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php',
-        '8f06d35e329fad24db0fe1eb28e40e20' => __DIR__ . '/..' . '/meta-box/mb-settings-page/mb-settings-page.php',
+        '50e7b3f86bffe096b1d2c3244a6855fd' => __DIR__ . '/..' . '/meta-box/meta-box/meta-box.php',
         'efcccce94091def99574319633dff18c' => __DIR__ . '/..' . '/meta-box/meta-box-group/meta-box-group.php',
     );
 
