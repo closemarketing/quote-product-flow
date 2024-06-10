@@ -52,9 +52,9 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_style(
+		wp_register_style(
 			'pbc-public',
-			WPPBC_PLUGIN_URL . 'assets/css/pbc-configurator.css',
+			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.css',
 			array(),
 			WPPBC_VERSION
 		);
@@ -70,6 +70,7 @@ class PBC_Public {
 			return;
 		}
 		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
+		wp_enqueue_style( 'pbc-public' );
 
 		$pbc_atts = shortcode_atts(
 			array(

@@ -56,4 +56,4 @@ require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/helper-required-plugins.php';
 
 // Public.
-require_once WPPBC_PLUGIN_PATH . 'includes/public/class-pbc-public.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-public.php';

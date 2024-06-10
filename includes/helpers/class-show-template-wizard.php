@@ -19,11 +19,10 @@ use Close\PBC\Helpers\CALC;
  */
 class PBC_Template_Wizard {
 
-	/**
-	 * Construct of Class
-	 */
 	public static function render( $parent_phase = 0 ) {
-		$cstep = '';
+		$cstep   = 1;
+		$post_id = get_the_ID();
+		$user_id = get_current_user_id();
 
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
@@ -39,10 +38,6 @@ class PBC_Template_Wizard {
 			'fields'      => 'ids',
 		);
 		$phases = get_posts( $args );
-
-		if ( is_user_logged_in() ) {
-			$user_id = get_current_user_id();
-		}
 
 		if ( empty( $_POST ) ) {
 			$_SESSION['pbc_variation'] = array();
@@ -68,8 +63,8 @@ class PBC_Template_Wizard {
 						$price_var   = isset( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) ? sanitize_text_field(  $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) : '';
 						$meaprice    = isset( $details['pbc_meaprice'] ) ? trim( $details['pbc_meaprice'] ) : '';
 
-						if ( isset( $user_id ) ) {
-							$phase_param['var'] = $pbc_variation;
+						if ( ! empty( $user_id ) ) {
+							$phase_param['var']      = $pbc_variation;
 							$phase_param['pricevar'] = $price_var ? $price_var : '';
 							update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
 						}
@@ -99,27 +94,11 @@ class PBC_Template_Wizard {
 		} elseif ( isset( $_GET['phase']) ) {
 			$cstep = (int) $_GET['phase'];
 		}
-		if ( empty( $cstep ) ) {
-			$cstep = 1;
-		}
 
 		if ( ! defined( 'DOING_AJAX' ) ) {
 			$preview_width = ! empty( get_option( 'pbc_preview_width' ) ) ? get_option( 'pbc_preview_width' ) : '570';
-
-			$queried_object = get_queried_object();
 			?>
-			<div id="content" class="clearfix row">
-				<div id="main" class="col-sm-12 clearfix" role="main">
-					<div class="page-header">
-						<h1><?php echo esc_html( get_the_title( $queried_object->ID ) ); ?></h1>
-					</div>
-					<div class="page-content">
-							<p><?php
-								$post_object = get_post( $queried_object->ID );
-								echo apply_filters( 'the_content', $post_object->post_content );
-							?></p>
-					</div>
-				<div class="page-configurator">
+			<div class="page-configurator">
 			<?php
 		} //defined('DOING_AJAX')
 
@@ -201,7 +180,6 @@ class PBC_Template_Wizard {
 								// sort by section asc and then title asc
 								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
 								
-
 								// Show public.
 								$sVar = '';
 								if ( 
@@ -748,11 +726,8 @@ class PBC_Template_Wizard {
 		<?php
 		}?>
 		<?php if(!defined('DOING_AJAX')){?>
-				</div>
-			</div>
 		</div>
 		<?php
 		}//defined('DOING_AJAX')
 	}
-
 }
