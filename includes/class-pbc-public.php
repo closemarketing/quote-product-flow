@@ -58,6 +58,25 @@ class PBC_Public {
 			array(),
 			WPPBC_VERSION
 		);
+
+		wp_register_script(
+			'pbc-public',
+			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.js',
+			array( 'jquery' ),
+			WPPBC_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'pbc-public',
+			'AjaxAction',
+			array(
+				'ajax_url'       => admin_url( 'admin-ajax.php' ),
+				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/loading.gif',
+				'show_prices'    => get_option( 'pbc_show_prices' ),
+				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
+			)
+		);
 	}
 
 	/**
@@ -71,6 +90,7 @@ class PBC_Public {
 		}
 		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
 		wp_enqueue_style( 'pbc-public' );
+		wp_enqueue_script( 'pbc-public' );
 
 		$pbc_atts = shortcode_atts(
 			array(
