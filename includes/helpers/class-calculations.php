@@ -117,6 +117,11 @@ class CALC {
 		return count( get_posts( $args ) ) > 1;
 	}
 
+	/**
+	 * Gets default parent phase
+	 *
+	 * @return int
+	 */
 	public static function get_default_parent_phase() {
 		$args          = array(
 			'post_type'   => 'phases',

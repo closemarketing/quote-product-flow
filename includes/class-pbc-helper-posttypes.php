@@ -211,9 +211,9 @@ class PBC_Helper_PostTypes {
 				$var_value = $phase_order . '|' . $var_item->ID;
 				$var_sku   = get_post_meta( $var_item->ID, 'pbc_sku', true );
 				if ( $var_sku ) {
-					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - '.$var_item->post_title.'('.$var_sku.')';
+					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title . '(' . $var_sku . ')';
 				} else {
-					$var_options[$var_value] = $phase_order.' - '.$phase_post->post_title.' - '.$var_item->post_title;
+					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
 				}
 			}
 			asort( $var_options );
@@ -435,6 +435,7 @@ class PBC_Helper_PostTypes {
 		$new_columns['cb']         = '<input type="checkbox" />';
 		$new_columns['title']      = __( 'Phase', 'pbc' );
 		$new_columns['menu_order'] = __( 'Order', 'pbc' );
+		$new_columns['shortcode']  = __( 'Shortcode', 'pbc' );
 
 		return $new_columns;
 	}
@@ -448,10 +449,17 @@ class PBC_Helper_PostTypes {
 	 */
 	public function manage_phases_columns( $column_name, $id ) {
 		$post = get_post( $id );
+		$is_multiple = CALC::is_multiple_products();
 
 		switch ( $column_name ) {
 			case 'menu_order':
 				echo isset( $post->menu_order ) ? esc_html( $post->menu_order ) : '';
+				break;
+			case 'shortcode':
+				$post_parent = $post->post_parent;
+				if ( empty( $post_parent ) && $is_multiple ) {
+					echo '<input type="text" value="[pbc pid=' . (int) $id . ']" readonly style="min-width:130px"/>';
+				}
 				break;
 			default:
 				break;
