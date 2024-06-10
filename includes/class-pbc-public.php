@@ -72,7 +72,7 @@ class PBC_Public {
 			'AjaxAction',
 			array(
 				'ajax_url'       => admin_url( 'admin-ajax.php' ),
-				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/loading.gif',
+				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
 				'show_prices'    => get_option( 'pbc_show_prices' ),
 				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
 			)
