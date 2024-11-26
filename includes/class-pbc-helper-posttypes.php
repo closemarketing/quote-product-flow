@@ -611,38 +611,44 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function admin_posts_filter() {
-		$type = isset( $_GET['post_type'] ) ? $_GET['post_type'] : 'variation';
+		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'variation';
 
-		// Only add filter to post type you want
-		if ( 'variation' == $type ) {
-
-			// Phase Filter
+		// Only add filter to post type you want.
+		if ( 'variation' === $type ) {
+			// Phase Filter.
 			$phase_options = array();
-			$phasescpt = get_posts(array(
-				'post_type' => 'phases',
-				'posts_per_page' => -1,
-				'post_parent'=> 0,
-				'orderby' => 'menu_order',
-				'order' => 'ASC'
-			));
+			$phasescpt     = get_posts(
+				array(
+					'post_type'      => 'phases',
+					'posts_per_page' => -1,
+					'orderby'        => 'menu_order',
+					'order'          => 'ASC',
+				)
+			);
 			$phasescpt_item = array();
-			foreach ($phasescpt as $phasescpt_item) {
-				$phase_options[$phasescpt_item->menu_order.' - '.$phasescpt_item->post_title] = $phasescpt_item->ID;
+			foreach ( $phasescpt as $phasescpt_item ) {
+				$post_parent_id = isset( $phasescpt_item->post_parent ) ? $phasescpt_item->post_parent : 0;
+				if ( $post_parent_id > 0 ) {
+					$phase_parent = get_post( $post_parent_id );
+					$phase_key    = $phase_parent->menu_order . ' - ' . $phase_parent->post_title . ' - ' . $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
+				} else {
+					$phase_key = $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
+				}
+				$phase_options[ $phase_key ] = $phasescpt_item->ID;
 			}
 			?>
 			<select name="pbc_filter_phase">
-			<option value=""><?php _e('All Phases', 'pbc'); ?></option>
+			<option value=""><?php esc_html_e( 'All Phases', 'pbc' ); ?></option>
 			<?php
-				$current_v = isset($_GET['pbc_filter_phase'])? $_GET['pbc_filter_phase']:'';
-				foreach ($phase_options as $label => $value) {
-					printf
-							(
-								'<option value="%s"%s>%s</option>',
-								$value,
-								$value == $current_v? ' selected="selected"':'',
-								$label
-							);
-					}
+			$current_v = isset( $_GET['pbc_filter_phase'] ) ? sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ) : '';
+			foreach ( $phase_options as $label => $value ) {
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_html( $value ),
+					$value == $current_v ? ' selected="selected"' : '',
+					esc_html( $label )
+				);
+			}
 			?>
 			</select>
 			<?php
