@@ -195,6 +195,8 @@ class PBC_Helper_PostTypes {
 				$phase_title                         .= CALC::adds_zero( $phasescpt_item->menu_order ) . ' - ' . $phasescpt_item->post_title;
 				$phase_options[ $phasescpt_item->ID ] = $phase_title;
 			}
+			asort( $phase_options );
+
 			// Variations Options.
 			$variationscpt = get_posts(
 				array(
@@ -210,14 +212,20 @@ class PBC_Helper_PostTypes {
 				if ( empty( $phase_post ) ) {
 					continue;
 				}
+				$phase_title    = '';
+				$post_parent_id = isset( $phase_post->post_parent ) ? $phase_post->post_parent : 0;
+				if ( $post_parent_id > 0 ) {
+					$phase_parent = get_post( $post_parent_id );
+					$phase_title .= $phase_parent->post_title . ' - ';
+				}
+
 				$phase_order = CALC::adds_zero( $phase_post->menu_order );
 				$var_value   = $phase_order . '|' . $var_item->ID;
 				$var_sku     = get_post_meta( $var_item->ID, 'pbc_sku', true );
-				if ( $var_sku ) {
-					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title . '(' . $var_sku . ')';
-				} else {
-					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
-				}
+
+				$phase_title .= $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
+				$phase_title .= ! empty( $var_sku ) ? ' (' . $var_sku . ')' : '';
+				$var_options[ $var_value ] = $phase_title;
 			}
 			asort( $var_options );
 		}
@@ -631,7 +639,7 @@ class PBC_Helper_PostTypes {
 				$post_parent_id = isset( $phasescpt_item->post_parent ) ? $phasescpt_item->post_parent : 0;
 				if ( $post_parent_id > 0 ) {
 					$phase_parent = get_post( $post_parent_id );
-					$phase_key    = $phase_parent->menu_order . ' - ' . $phase_parent->post_title . ' - ' . $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
+					$phase_key    = $phase_parent->post_title . ' - ' . $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
 				} else {
 					$phase_key = $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
 				}
