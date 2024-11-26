@@ -136,7 +136,8 @@ class PBC_Template_Wizard {
 			<form action="" method="post" name="configurator-form" id="configurator-form">
 			<?php
 			if ( $cstep !='calculate' ) {
-				$phase_id = $phases[ ( (int) $cstep - 1 ) ]; ?>
+				$phase_id = isset( $phases[ ( (int) $cstep - 1 ) ] ) ? $phases[ ( (int) $cstep - 1 ) ] : 0;
+				?>
 				<div class="configurator-left">
 					<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
 					<div class="phase_variations">
