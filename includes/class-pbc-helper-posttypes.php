@@ -186,7 +186,14 @@ class PBC_Helper_PostTypes {
 			);
 			$phasescpt_item = array();
 			foreach ( $phasescpt as $phasescpt_item ) {
-				$phase_options[ $phasescpt_item->ID ] = $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
+				$phase_title    = '';
+				$post_parent_id = isset( $phasescpt_item->post_parent ) ? $phasescpt_item->post_parent : 0;
+				if ( $post_parent_id > 0 ) {
+					$phase_parent = get_post( $post_parent_id );
+					$phase_title .= $phase_parent->post_title . ' - ';
+				}
+				$phase_title                         .= CALC::adds_zero( $phasescpt_item->menu_order ) . ' - ' . $phasescpt_item->post_title;
+				$phase_options[ $phasescpt_item->ID ] = $phase_title;
 			}
 			// Variations Options.
 			$variationscpt = get_posts(
