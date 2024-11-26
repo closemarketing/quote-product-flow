@@ -203,13 +203,9 @@ class PBC_Helper_PostTypes {
 				if ( empty( $phase_post ) ) {
 					continue;
 				}
-				if ( $phase_post->menu_order < 10 ) {
-					$phase_order = '0' . $phase_post->menu_order;
-				} else {
-					$phase_order = $phase_post->menu_order;
-				}
-				$var_value = $phase_order . '|' . $var_item->ID;
-				$var_sku   = get_post_meta( $var_item->ID, 'pbc_sku', true );
+				$phase_order = CALC::adds_zero( $phase_post->menu_order );
+				$var_value   = $phase_order . '|' . $var_item->ID;
+				$var_sku     = get_post_meta( $var_item->ID, 'pbc_sku', true );
 				if ( $var_sku ) {
 					$var_options[ $var_value ] = $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title . '(' . $var_sku . ')';
 				} else {
@@ -529,49 +525,18 @@ class PBC_Helper_PostTypes {
 
 
 	public function manage_var_columns( $column_name, $id ) {
-
-		//* Price group
-		$price_group = rwmb_meta( 'pbc_pricegroup' );
-		$price_column = '';
-		foreach ( $price_group as $price_item ) {
-			if(isset($price_item['pbc_meaprice'])) {
-				$price_column .= $price_item['pbc_meaprice'] . ' - ' . $price_item['pbc_pricem'] . ' €';
-			} else { // Price without any option
-				$price_column .= $price_item['pbc_pricem'].' €';
-			}
-			$price_column .= '<br/>';
-		}
-		// Depends group.
-		$depends_group  = rwmb_meta( 'pbc_depends' );
-		$depends_column = '';
-		foreach ( $depends_group as $depends_item ) {
-			$variation_id   = substr( $depends_item['pbc_depvar'], 3 );
-			$variation_post = get_post( $variation_id );
-			$phase_id_dp    = get_post_meta( $variation_id, 'pbc_phase', true );
-			$phase_post_dp  = get_post( $phase_id_dp );
-			$phase_order    = '';
-			if ( $phase_post_dp->menu_order < 10 ) {
-				$phase_order = '0';
-			}
-			$phase_order    .= $phase_post_dp->menu_order;
-			$depends_column .= $phase_order . ' - ' . $phase_post_dp->post_title . ' - ';
-			$depends_column .= $variation_post->post_title . '<br/>';
-		}
 		$phase_id = get_post_meta( $id, 'pbc_phase', true );
-
-		// Image icon.
-		$imgicon = get_post_meta( $id, 'pbc_imgicon', true );
-		if ( $imgicon ) {
-			$icon_image = wp_get_attachment_image_src( $imgicon, array( 120, 120 ), true );
-		}
-
-		// Image Group Product.
-		$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 
 		switch ( $column_name ) {
 			case 'phase':
 				$phase_post = get_post( $phase_id );
-				echo esc_html( $phase_post->menu_order . ' - ' . $phase_post->post_title );
+				// Phase parent.
+				if ( $phase_post->post_parent > 0 ) {
+					$phase_parent = get_post( $phase_post->post_parent );
+					echo esc_html( $phase_parent->post_title ) . ' <br/>';
+				}
+				echo esc_html( CALC::adds_zero( $phase_post->menu_order ) . ' - ' . $phase_post->post_title );
+
 				// Shows taxonomy.
 				$term_list = wp_get_post_terms( $id, 'variation_tag', array( 'fields' => 'all' ) );
 				foreach ( $term_list as $term_single ) {
@@ -579,15 +544,44 @@ class PBC_Helper_PostTypes {
 				}
 				break;
 			case 'price':
-				echo $price_column;
+				// Price group.
+				$price_group  = rwmb_meta( 'pbc_pricegroup' );
+				foreach ( $price_group as $price_item ) {
+					if ( isset( $price_item['pbc_meaprice'] ) ) {
+						echo esc_attr( $price_item['pbc_meaprice'] ) . ' - ' . esc_attr( $price_item['pbc_pricem'] ) . ' €';
+					} else {
+						// Price without any option.
+						echo esc_attr( $price_item['pbc_pricem'] ) . ' €';
+					}
+					echo '<br/>';
+				}
 				break;
 			case 'depends':
-				echo $depends_column;
+				// Depends group.
+				$depends_group  = rwmb_meta( 'pbc_depends' );
+				foreach ( $depends_group as $depends_item ) {
+					$depvar         = explode( '|', $depends_item['pbc_depvar'] );
+					$variation_id   = isset( $depvar[1] ) ? (int) $depvar[1] : 0;
+					$variation_post = get_post( $variation_id );
+					$phase_id_dp    = get_post_meta( $variation_id, 'pbc_phase', true );
+					$phase_post_dp  = get_post( $phase_id_dp );
+					$phase_order    = '';
+					$phase_order   .= CALC::adds_zero( $phase_post_dp->menu_order );
+					echo $phase_order . ' - ' . esc_html( $phase_post_dp->post_title ) . ' - ';
+					echo esc_html( $variation_post->post_title ) . '<br/>';
+				}
 				break;
 			case 'imgicon':
+				// Image icon.
+				$imgicon = get_post_meta( $id, 'pbc_imgicon', true );
+				if ( $imgicon ) {
+					$icon_image = wp_get_attachment_image_src( $imgicon, array( 120, 120 ), true );
+				}
 				if(isset($icon_image) ) echo '<img src="'.$icon_image[0].'" />';
 				break;
 			case 'imgprod':
+				// Image Group Product.
+				$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 				if ( ! empty( $image_group ) ) {
 					if ( count ($image_group ) > 0 ) {
 						echo count($image_group).'<br>';

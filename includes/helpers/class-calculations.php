@@ -133,4 +133,14 @@ class CALC {
 
 		return ! empty( $default_phase[0] ) ? (int) $default_phase[0] : 0;
 	}
+
+	/**
+	 * Adds zero to number
+	 *
+	 * @param int $number Number to add zero.
+	 * @return string
+	 */
+	public static function adds_zero( $number ) {
+		return $number < 10 ? '0' . $number : $number;
+	}
 }
