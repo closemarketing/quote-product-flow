@@ -132,17 +132,20 @@ class PBC_Template_Wizard {
 			?>
 			</ul>
 		</div>
-		<div class="phase_detail">
+		<?php $parent_phase_slug = sanitize_title( get_the_title( $parent_phase ) ); ?>
+		<div class="phase_detail product-<?php echo esc_html( $parent_phase_slug ); ?>">
 			<form action="" method="post" name="configurator-form" id="configurator-form">
 			<?php
-			if ( $cstep !='calculate' ) {
-				$phase_id = isset( $phases[ ( (int) $cstep - 1 ) ] ) ? $phases[ ( (int) $cstep - 1 ) ] : 0;
+			if ( 'calculate' !== $cstep ) {
+				$phase_id    = isset( $phases[ ( (int) $cstep - 1 ) ] ) ? $phases[ ( (int) $cstep - 1 ) ] : 0;
+				$phase_title = get_the_title( $phase_id );
+				$phase_slug  = sanitize_title( get_the_title( $phase_id ) );
 				?>
 				<div class="configurator-left">
-					<div class="phase_title"><?php echo get_the_title( $phase_id ); ?></div>
-					<div class="phase_variations">
+					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
+					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 						<?php
-						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase_id . '&fields=ids&orderby=title&order=asc' );
+						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
 						if ( ! empty( $variations ) ) {
 							foreach ( $variations as $key => $variation ) {
 								$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
@@ -173,7 +176,7 @@ class PBC_Template_Wizard {
 									$variation_id,
 									'variation_tag',
 									array(
-										'fields' => 'all'
+										'fields' => 'all',
 									)
 								);
 								$variations_section[] = array(
@@ -188,15 +191,15 @@ class PBC_Template_Wizard {
 									$temp_arr['section'][ $key ] = $val['section'];
 									$temp_arr['title'][ $key ]   = $val['title'];
 							}
-							// sort by section asc and then title asc
+							// Sort by section asc and then title asc.
 							array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
-							
+
 							// Show public.
 							$sVar = '';
-							if ( 
-								isset( $_SESSION['pbc_variation'] ) && 
-								is_array( $_SESSION['pbc_variation'] ) && 
-								isset( $_SESSION['pbc_variation'][ $cstep ] ) && 
+							if (
+								isset( $_SESSION['pbc_variation'] ) &&
+								is_array( $_SESSION['pbc_variation'] ) &&
+								isset( $_SESSION['pbc_variation'][ $cstep ] ) &&
 								in_array( $_SESSION['pbc_variation'][ $cstep ]['var']['id'], $variations )
 							) {
 								$sVar = $_SESSION['pbc_variation'][ $cstep ]['var']['id'];
@@ -208,7 +211,7 @@ class PBC_Template_Wizard {
 									}
 								}
 								if ( empty( $sVar ) ) {
-									$sVar = $variations[current(array_keys($variations))];
+									$sVar = $variations[ current( array_keys( $variations ) ) ];
 								}
 							}
 							if ( ! empty( $variations_section ) ) {
@@ -233,26 +236,26 @@ class PBC_Template_Wizard {
 													echo '</div>';
 												}
 												?>
-												<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cstep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo esc_html( $variation_data['title'] ); ?>
+												<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo esc_html( $variation_data['title'] ); ?>
 											</label>
 												<?php
-												$priceVar = array();
 												$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
 												if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) { ?>
 													<div class="pbc_pricevarwrap">
 														<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation_id;?>">
-														<?php foreach($pricegroup as $key => $details){
-															if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
-																echo '<option value="' . $details["pbc_meaprice"] . '">';
-																echo esc_html( $details["pbc_meaprice"] );
-																echo '</option>';
+															<?php
+															foreach ( $pricegroup as $key => $details ) {
+																if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
+																	echo '<option value="' . esc_attr( $details['pbc_meaprice'] ) . '">';
+																	echo esc_html( $details['pbc_meaprice'] );
+																	echo '</option>';
+																}
 															}
-														}?>
+															?>
 														</select>
 													</div>
 													<?php
-												}?>
-												<?php
+												}
 												$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
 												if ( $pbc_descopt ) {
 													?>
@@ -272,7 +275,8 @@ class PBC_Template_Wizard {
 						}
 						?>
 					</div>
-					<?php // Variations Description.
+					<?php
+					// Variations Description.
 					if ( ! empty( $variations ) ) {
 						$index_var = 1;
 						echo '<div class="phase_descvar">';
