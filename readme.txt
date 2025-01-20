@@ -18,6 +18,9 @@ WordPress installation and then activate the Plugin from Plugins page.
 = 1.4.0 =
 *  Added: You can add hierarchical in products, so you can have different phases.
 
+= 1.3.1 =
+*  Included Internal libraries.
+
 = 1.3.0 =
 *  Option to Print PDF.
 

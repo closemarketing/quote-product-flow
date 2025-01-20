@@ -14,10 +14,10 @@ function pbc_required_plugins() {
 	 */
 	$plugins = array(
 		array(
-			'name'      => 'Duplicate Post',
-			'slug'      => 'duplicate-post',
-			'required'  => true,
-			'force_activation'   => true,
+			'name'             => 'Duplicate Post',
+			'slug'             => 'duplicate-post',
+			'required'         => true,
+			'force_activation' => true,
 		),
 	);
 
