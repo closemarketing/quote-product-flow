@@ -9,3 +9,4 @@ circle.yml
 composer.json
 composer.lock
 .wordpress-org
+vendor/spipu/html2pdf/examples

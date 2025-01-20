@@ -3,7 +3,7 @@
  * Template Name: Budget Configurator
  */
 
-global $pbc_helper_calc;
+use Close\PBC\Helpers\CALC;
 
 if ( session_id() == '' ) {
 	ob_start();
@@ -630,7 +630,7 @@ if ( ! empty( $phases ) ) {
 							}
 						}
 					}
-					$imgprodurl = isset( $sVar ) ? $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar ): '';
+					$imgprodurl = isset( $sVar ) ? CALC::get_image_variation_url( $_SESSION['pbc_variation'], $sVar ): '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option('variations_images_flipped');
@@ -787,7 +787,7 @@ if ( ! empty( $phases ) ) {
 	<script type="text/javascript">
 	jQuery(function($){
 			$(document).on('click', 'input[type=radio].pbc_variation', function(){
-				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
+				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>includes/assets/img/loading.gif"/></div>').show();
 				var cPhase = $('input[name=pbc_current_phase]').val();
 				var show_prices = '<?php echo $show_prices; ?>';
 				$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
@@ -861,7 +861,7 @@ if ( ! empty( $phases ) ) {
 				$(this).parent().parent().find('input.pbc_variation').prop("checked", true);
 			});
 			$(document).on('change', 'select[class=pbc_pricevar]', function(){
-				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
+				$('.product_preview').find('.product_preview_status').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>includes/assets/img/loading.gif"/></div>').show();
 				var cPhase = $('input[name=pbc_current_phase]').val();
 				var select_pricevar = $(this).parent().parent().find('input.pbc_variation');
 				var show_prices = '<?php echo $show_prices; ?>';
@@ -931,7 +931,7 @@ if ( ! empty( $phases ) ) {
 				var submit_val = $(this).val();
 				var form_id = 'configurator-form';
 				e.preventDefault();
-				$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
+				$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>includes/assets/img/loading.gif"/></div>').show();
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
 					type: 'POST',
@@ -958,7 +958,7 @@ if ( ! empty( $phases ) ) {
 			$(document).on('submit', '#configurator_login_form', function(e){
 			e.preventDefault();
 			var form_id = 'configurator_login_form';
-				$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/></div>').show();
+				$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html('<div><img src="<?php echo WPPBC_PLUGIN_URL;?>includes/assets/img/loading.gif"/></div>').show();
 				$.ajax({
 					url: '<?php echo admin_url('admin-ajax.php');?>',  //server script to process data
 					type: 'POST',

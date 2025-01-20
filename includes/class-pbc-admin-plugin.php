@@ -10,6 +10,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\CALC;
+use Spipu\Html2Pdf\Html2Pdf;
+
 /**
  * Class for admin
  */
@@ -350,9 +353,9 @@ class PBC_Admin_Plugin {
 				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' ); ?></th>
 			</tr>
 			<?php
-			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+			$total_count = 0;
+			$phases      = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
 			if ( ! empty( $phases ) ) {
-				$total_count = 0;
 				foreach ( $phases as $phase ) {
 					?>
 					<tr>
@@ -360,7 +363,7 @@ class PBC_Admin_Plugin {
 						<td class="phases-col"><?php echo esc_html( $phase->post_title ); ?></td>
 						<td class="variations-col">
 							<?php
-							$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' .$phase->ID . '&fields=ids' );
+							$variations = get_posts( 'posts_per_page=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase->ID . '&fields=ids' );
 							if ( ! empty( $variations ) ) {
 								echo count( $variations );
 							}
@@ -374,7 +377,7 @@ class PBC_Admin_Plugin {
 			?>
 			<tr>
 				<td colspan="2" ><?php esc_html_e( 'Total: ', 'pbc' ); ?></td>
-				<td><?php echo $total_count; ?></td>
+				<td><?php echo (int) $total_count; ?></td>
 			</tr>
 		</table>
 		<?php
@@ -711,7 +714,6 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function variation_selected_action_callback(){
-		global $pbc_helper_calc;
 		extract($_REQUEST);
 		if ( session_id() == '' ) {
 			ob_start();
@@ -730,7 +732,7 @@ class PBC_Admin_Plugin {
 				update_user_meta($user_id, 'pbc_phase_'.$current_phase,$phase_param);
 			}
 			// Gets image variation with filter dependency.
-			$imgprodurl = $pbc_helper_calc->get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
+			$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
 
 			$pricegroup = get_post_meta( $sVar, 'pbc_pricegroup', true );
 			$pricevar   = $_REQUEST["pbc_pricevar_$sVar"];
@@ -931,8 +933,6 @@ class PBC_Admin_Plugin {
 	 * @return file
 	 */
 	private function generate_engine_pdf( $type_return = 'path', $post_id = null ) {
-		if ( is_file( WPPBC_PLUGIN_DIR . "/lib/html2pdf/html2pdf.class.php" ) ) {
-			require_once ( WPPBC_PLUGIN_DIR . '/lib/html2pdf/html2pdf.class.php' );
 			if ( session_id() == '' ) {
 				ob_start();
 				session_start();
@@ -964,7 +964,6 @@ class PBC_Admin_Plugin {
 			} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
 				return $this->get_budget_base_dir( 'url' ) . $filename;
 			}
-		}
 	} 
 
 	/**
@@ -987,7 +986,6 @@ class PBC_Admin_Plugin {
 	}
 
 	public function configurator_result_generate_pdf() {
-		global $pbc_helper_calc;
 		if(!isset($_SESSION['pbc_variation'])){
 			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
 		}else{
@@ -1155,7 +1153,7 @@ class PBC_Admin_Plugin {
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
-			$color = $pbc_helper_calc->calculate_color_text( $background_total );
+			$color = CALC::calculate_color_text( $background_total );
 			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
 			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 			if ( $total_pricevat > 0 ) {

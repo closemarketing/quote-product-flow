@@ -5,7 +5,6 @@
  * This function is hooked into tgmpa_init, which is fired within the
  * TGM_Plugin_Activation class constructor.
  */
- require_once WPPBC_PLUGIN_PATH . '/vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php';
 
 add_action( 'tgmpa_register', 'pbc_required_plugins' );
 function pbc_required_plugins() {

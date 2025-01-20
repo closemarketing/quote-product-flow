@@ -1,0 +1,836 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Meta Box\n"
+"POT-Creation-Date: 2024-06-09 16:33+0200\n"
+"PO-Revision-Date: 2024-06-09 16:32+0200\n"
+"Last-Translator: David Pérez <david@close.marketing>\n"
+"Language-Team: David Pérez <david@close.marketing>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"X-Generator: Poedit 3.4.4\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: meta-box.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#: inc/about/about.php:38
+msgid "About"
+msgstr ""
+
+#: inc/about/about.php:40
+msgid "Go Pro"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+#: inc/about/about.php:50 inc/about/about.php:51 src/Integrations/Block.php:12
+#: src/Integrations/Bricks.php:10 src/Integrations/Elementor.php:13
+#: src/Integrations/Oxygen.php:14
+msgid "Meta Box"
+msgstr ""
+
+#: inc/about/about.php:63
+msgid "Welcome to Meta Box"
+msgstr ""
+
+#: inc/about/about.php:64
+msgid "Dashboard"
+msgstr ""
+
+#: inc/about/sections/extensions.php:5
+msgid ""
+"Extend custom fields in WordPress well beyond what others would ever "
+"consider ordinary!"
+msgstr ""
+
+#: inc/about/sections/extensions.php:6
+msgid "Save over 80% with our extensions bundles."
+msgstr ""
+
+#: inc/about/sections/extensions.php:6
+msgid "View Bundles"
+msgstr ""
+
+#: inc/about/sections/extensions.php:14
+msgid ""
+"Create and manage custom post types easily in WordPress with an easy-to-use "
+"interface."
+msgstr ""
+
+#: inc/about/sections/extensions.php:18 inc/about/sections/extensions.php:114
+msgid "Free Download"
+msgstr ""
+
+#: inc/about/sections/extensions.php:26
+msgid ""
+"Drag and drop your custom fields into place without a single line of code."
+msgstr ""
+
+#: inc/about/sections/extensions.php:30 inc/about/sections/extensions.php:42
+#: inc/about/sections/extensions.php:54 inc/about/sections/extensions.php:66
+#: inc/about/sections/extensions.php:78 inc/about/sections/extensions.php:90
+#: inc/about/sections/extensions.php:102
+msgid "Learn More"
+msgstr ""
+
+#: inc/about/sections/extensions.php:38
+msgid ""
+"Create repeatable groups of custom fields for better appearance and "
+"structure."
+msgstr ""
+
+#: inc/about/sections/extensions.php:50
+msgid "Create a powerful settings page for your theme, plugin or website."
+msgstr ""
+
+#: inc/about/sections/extensions.php:62
+msgid ""
+"Control the visibility of meta boxes and fields or even HTML elements with "
+"ease."
+msgstr ""
+
+#: inc/about/sections/extensions.php:74
+msgid ""
+"Create register, login and edit user profile forms in the frontend. Embed "
+"everywhere with shortcodes."
+msgstr ""
+
+#: inc/about/sections/extensions.php:86
+msgid ""
+"Create frontend forms for users to submit custom content. Embed everywhere "
+"with shortcode."
+msgstr ""
+
+#: inc/about/sections/extensions.php:98
+msgid ""
+"Save custom fields data to custom table. Reduce database size and increase "
+"performance."
+msgstr ""
+
+#: inc/about/sections/extensions.php:110
+msgid "Create many-to-many relationships between posts, terms and users."
+msgstr ""
+
+#: inc/about/sections/extensions.php:118
+msgid "View all extensions"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:4
+msgid ""
+"Please follow this video tutorial to get started with Meta Box and "
+"extensions:"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:8
+msgid "Tutorials"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:9
+msgid ""
+"We've made bunches of tutorials that come with videos, let's take a look to "
+"have detailed guides to create custom fields and apply them in real cases."
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:11
+msgid "Beginners"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:11
+msgid "Let’s start with some basic practices with Meta Box."
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:12
+msgid "Case Studies"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:12
+msgid ""
+"See how to use Meta Box in the real case studies with comprehensive "
+"tutorials."
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:13
+msgid "General Guide"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:13
+msgid "See how to use Meta box in common tasks."
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:14
+#: inc/about/sections/getting-started.php:15 inc/about/sections/tabs.php:6
+msgid "Extensions"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:14
+msgid ""
+"Learn about Meta Box extensions, what features they offer and how to use "
+"them."
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:15
+msgid "Page Builders"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:15
+msgid ""
+"Tutorials on combining Meta Box and other builders or tools for real case "
+"studies."
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:16
+msgid "MB Views"
+msgstr ""
+
+#: inc/about/sections/getting-started-pro.php:16
+msgid ""
+"Build front-end templates for WordPress without touching theme files. "
+"Support Twig and all field types."
+msgstr ""
+
+#: inc/about/sections/getting-started.php:6
+msgid "Getting Started With Online Generator"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:7
+msgid ""
+"Online Generator is a free tool to help you create and set up custom fields "
+"using a simple, friendly user interface. With it, you can add fields, set "
+"options and generate needed code that's ready to copy and paste."
+msgstr ""
+
+#: inc/about/sections/getting-started.php:9
+msgid "online generator"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:11
+msgid "Go to Online Generator"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:16
+msgid ""
+"Wanna see more features that transform your WordPress website into a "
+"powerful CMS? Check out some extensions below:"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:18
+msgid "Meta Box Builder"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:18
+msgid "Build meta boxes and fields with UI."
+msgstr ""
+
+#: inc/about/sections/getting-started.php:19
+msgid "Meta Box Group"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:19
+msgid "Organize fields into repeatable groups."
+msgstr ""
+
+#: inc/about/sections/getting-started.php:20
+msgid "Meta Box Conditional Logic"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:20
+msgid "Control the visibility of fields."
+msgstr ""
+
+#: inc/about/sections/getting-started.php:21
+msgid "MB Settings Page"
+msgstr ""
+
+#: inc/about/sections/getting-started.php:21
+msgid "Create settings pages/Customizer options."
+msgstr ""
+
+#: inc/about/sections/getting-started.php:27
+msgid "More Extensions"
+msgstr ""
+
+#: inc/about/sections/products.php:5
+msgid "Our WordPress Products"
+msgstr ""
+
+#: inc/about/sections/products.php:8
+msgid "Like this plugin? Check out our other WordPress products:"
+msgstr ""
+
+#: inc/about/sections/products.php:9
+msgid "Automated & fast SEO plugin for WordPress"
+msgstr ""
+
+#: inc/about/sections/products.php:10
+msgid "The best schema plugin for WordPress"
+msgstr ""
+
+#: inc/about/sections/products.php:11
+msgid "Simple, elegant and clean WordPress themes"
+msgstr ""
+
+#: inc/about/sections/review.php:5
+msgid "Write a review for Meta Box"
+msgstr ""
+
+#: inc/about/sections/review.php:8
+msgid ""
+"If you like Meta Box, please write a review on WordPress.org to help us "
+"spread the word. We really appreciate that!"
+msgstr ""
+
+#: inc/about/sections/review.php:9
+msgid "Write a review"
+msgstr ""
+
+#: inc/about/sections/support.php:12
+#, php-format
+msgid ""
+"Still need help with Meta Box? We offer excellent support for you. But don't "
+"forget to check our <a href=\"%s\">documentation</a> first."
+msgstr ""
+
+#: inc/about/sections/support.php:17
+msgid "Free Support"
+msgstr ""
+
+#: inc/about/sections/support.php:18
+msgid ""
+"If you have any question about how to use the plugin, please open a new "
+"topic on WordPress.org support forum or open a new issue on Github "
+"(preferable). We will try to answer as soon as we can."
+msgstr ""
+
+#: inc/about/sections/support.php:19
+msgid "Go to Github"
+msgstr ""
+
+#: inc/about/sections/support.php:20
+msgid "Go to WordPress.org"
+msgstr ""
+
+#: inc/about/sections/support.php:24
+msgid "Premium Support"
+msgstr ""
+
+#: inc/about/sections/support.php:25
+msgid ""
+"For users that have bought premium extensions, the support is provided in "
+"the Meta Box Support forum. Any question will be answered with technical "
+"details within 24 hours."
+msgstr ""
+
+#: inc/about/sections/support.php:26
+msgid "Go to support forum"
+msgstr ""
+
+#: inc/about/sections/tabs.php:4
+msgid "Getting Started"
+msgstr ""
+
+#: inc/about/sections/tabs.php:7 inc/about/sections/welcome.php:15
+msgid "Support"
+msgstr ""
+
+#: inc/about/sections/upgrade.php:4
+msgid "Upgrade to Meta Box PRO"
+msgstr ""
+
+#: inc/about/sections/upgrade.php:5
+msgid "Please upgrade to the PRO plan to unlock more awesome features."
+msgstr ""
+
+#: inc/about/sections/upgrade.php:7
+msgid ""
+"Create custom fields with drag-n-drop interface - no coding knowledge "
+"required!"
+msgstr ""
+
+#: inc/about/sections/upgrade.php:8
+msgid "Add custom fields to taxonomies or user profile."
+msgstr ""
+
+#: inc/about/sections/upgrade.php:9
+msgid "Create custom settings pages."
+msgstr ""
+
+#: inc/about/sections/upgrade.php:10
+msgid "Create frontend submission forms."
+msgstr ""
+
+#: inc/about/sections/upgrade.php:11
+msgid "Save custom fields in custom tables."
+msgstr ""
+
+#: inc/about/sections/upgrade.php:12
+msgid "And much more!"
+msgstr ""
+
+#: inc/about/sections/upgrade.php:14
+msgid "Get Meta Box PRO now"
+msgstr ""
+
+#: inc/about/sections/welcome.php:8
+#, php-format
+msgid "Welcome to %s"
+msgstr ""
+
+#: inc/about/sections/welcome.php:11
+msgid ""
+"Meta Box is a free Gutenberg and GDPR-compatible WordPress custom fields "
+"plugin and framework that makes quick work of customizing a website with—you "
+"guessed it—meta boxes and custom fields in WordPress. Follow the instruction "
+"below to get started!"
+msgstr ""
+
+#: inc/about/sections/welcome.php:14
+msgid "Documentation"
+msgstr ""
+
+#: inc/about/sections/welcome.php:16
+msgid "Facebook Group"
+msgstr ""
+
+#: inc/about/sections/welcome.php:17
+msgid "Youtube Channel"
+msgstr ""
+
+#: inc/core.php:20
+msgid "Docs"
+msgstr ""
+
+#: inc/field.php:309
+msgid "+ Add more"
+msgstr ""
+
+#: inc/fields/autocomplete.php:14 inc/fields/autocomplete.php:79
+#: inc/fields/autocomplete.php:91
+msgid "Delete"
+msgstr ""
+
+#: inc/fields/background.php:61
+msgid "Background Image"
+msgstr ""
+
+#: inc/fields/background.php:73
+msgid "-- Repeat --"
+msgstr ""
+
+#: inc/fields/background.php:75
+msgid "No Repeat"
+msgstr ""
+
+#: inc/fields/background.php:76
+msgid "Repeat All"
+msgstr ""
+
+#: inc/fields/background.php:77
+msgid "Repeat Horizontally"
+msgstr ""
+
+#: inc/fields/background.php:78
+msgid "Repeat Vertically"
+msgstr ""
+
+#: inc/fields/background.php:79 inc/fields/background.php:113
+#: inc/fields/background.php:125
+msgid "Inherit"
+msgstr ""
+
+#: inc/fields/background.php:89
+msgid "-- Position --"
+msgstr ""
+
+#: inc/fields/background.php:91
+msgid "Top Left"
+msgstr ""
+
+#: inc/fields/background.php:92
+msgid "Top Center"
+msgstr ""
+
+#: inc/fields/background.php:93
+msgid "Top Right"
+msgstr ""
+
+#: inc/fields/background.php:94
+msgid "Center Left"
+msgstr ""
+
+#: inc/fields/background.php:95
+msgid "Center Center"
+msgstr ""
+
+#: inc/fields/background.php:96
+msgid "Center Right"
+msgstr ""
+
+#: inc/fields/background.php:97
+msgid "Bottom Left"
+msgstr ""
+
+#: inc/fields/background.php:98
+msgid "Bottom Center"
+msgstr ""
+
+#: inc/fields/background.php:99
+msgid "Bottom Right"
+msgstr ""
+
+#: inc/fields/background.php:109
+msgid "-- Attachment --"
+msgstr ""
+
+#: inc/fields/background.php:111
+msgid "Fixed"
+msgstr ""
+
+#: inc/fields/background.php:112
+msgid "Scroll"
+msgstr ""
+
+#: inc/fields/background.php:123
+msgid "-- Size --"
+msgstr ""
+
+#: inc/fields/background.php:126
+msgid "Cover"
+msgstr ""
+
+#: inc/fields/background.php:127
+msgid "Contain"
+msgstr ""
+
+#: inc/fields/button.php:28
+msgid "Click me"
+msgstr ""
+
+#: inc/fields/checkbox.php:43
+msgid "Yes"
+msgstr ""
+
+#: inc/fields/checkbox.php:43
+msgid "No"
+msgstr ""
+
+#: inc/fields/file-input.php:17
+msgid "Select File"
+msgstr ""
+
+#: inc/fields/file-input.php:46 inc/fields/select.php:80
+msgid "Select"
+msgstr ""
+
+#: inc/fields/file-input.php:48
+msgid "Remove"
+msgstr ""
+
+#: inc/fields/file.php:15
+#, php-format
+msgid "You may only upload maximum %d file"
+msgstr ""
+
+#: inc/fields/file.php:17
+#, php-format
+msgid "You may only upload maximum %d files"
+msgstr ""
+
+#: inc/fields/file.php:48
+msgid "Error: Invalid file"
+msgstr ""
+
+#: inc/fields/file.php:61
+msgid "Error: Cannot delete file"
+msgstr ""
+
+#: inc/fields/file.php:86
+msgctxt "file upload"
+msgid "+ Add new file"
+msgstr ""
+
+#: inc/fields/file.php:166
+msgctxt "file upload"
+msgid "Delete"
+msgstr ""
+
+#: inc/fields/file.php:167
+msgctxt "file upload"
+msgid "Edit"
+msgstr ""
+
+#: inc/fields/icon.php:221
+msgid "Select an icon"
+msgstr ""
+
+#: inc/fields/input-list.php:83
+msgid "Toggle All"
+msgstr ""
+
+#: inc/fields/key-value.php:94
+msgid "Key"
+msgstr ""
+
+#: inc/fields/key-value.php:95
+msgid "Value"
+msgstr ""
+
+#: inc/fields/map.php:29 inc/fields/osm.php:16
+msgid "No results found"
+msgstr ""
+
+#: inc/fields/media.php:20
+msgctxt "media"
+msgid "+ Add Media"
+msgstr ""
+
+#: inc/fields/media.php:21
+msgctxt "media"
+msgid " file"
+msgstr ""
+
+#: inc/fields/media.php:22
+msgctxt "media"
+msgid " files"
+msgstr ""
+
+#: inc/fields/media.php:23
+msgctxt "media"
+msgid "Remove"
+msgstr ""
+
+#: inc/fields/media.php:24
+msgctxt "media"
+msgid "Edit"
+msgstr ""
+
+#: inc/fields/media.php:25
+msgctxt "media"
+msgid "View"
+msgstr ""
+
+#: inc/fields/media.php:26
+msgctxt "media"
+msgid "No Title"
+msgstr ""
+
+#: inc/fields/media.php:29
+msgctxt "media"
+msgid "Select Files"
+msgstr ""
+
+#: inc/fields/media.php:30
+msgctxt "media"
+msgid "or"
+msgstr ""
+
+#: inc/fields/media.php:31
+msgctxt "media"
+msgid "Drop files here to upload"
+msgstr ""
+
+#: inc/fields/oembed.php:18
+msgid "Embed HTML not available."
+msgstr ""
+
+#: inc/fields/post.php:69
+msgid "Select a post"
+msgstr ""
+
+#: inc/fields/post.php:75 inc/fields/taxonomy.php:88
+#, php-format
+msgid "Select a %s"
+msgstr ""
+
+#: inc/fields/post.php:136 inc/fields/taxonomy.php:134 inc/fields/user.php:135
+msgid "(No title)"
+msgstr ""
+
+#: inc/fields/select-advanced.php:44
+msgid "Select an item"
+msgstr ""
+
+#: inc/fields/select.php:80
+msgid "All"
+msgstr ""
+
+#: inc/fields/select.php:80
+msgid "None"
+msgstr ""
+
+#: inc/fields/sidebar.php:10
+msgid "Select a sidebar"
+msgstr ""
+
+#: inc/fields/switch.php:84
+msgid "On"
+msgstr ""
+
+#: inc/fields/switch.php:85
+msgid "Off"
+msgstr ""
+
+#: inc/fields/taxonomy.php:84
+msgid "Select a term"
+msgstr ""
+
+#: inc/fields/user.php:75
+msgid "Select a user"
+msgstr ""
+
+#: inc/fields/user.php:189
+msgid "Add New User"
+msgstr ""
+
+#: inc/meta-box.php:281
+msgid "Meta Box Title"
+msgstr ""
+
+#: inc/validation.php:66
+msgid "Please correct the errors highlighted below and try again."
+msgstr ""
+
+#: src/Updater/Checker.php:104
+msgid ""
+"UPDATE UNAVAILABLE! Please enter a valid license key to enable automatic "
+"updates."
+msgstr ""
+
+#: src/Updater/Notification.php:59
+#, php-format
+msgid ""
+"You have not set your Meta Box license key yet, which means you are missing "
+"out on automatic updates and support! Please <a href=\"%1$s\">enter your "
+"license key</a> or <a href=\"%2$s\" target=\"_blank\">get a new one here</a>."
+msgstr ""
+
+#: src/Updater/Notification.php:61 src/Updater/Notification.php:63
+#, php-format
+msgid ""
+"Your license key for Meta Box is <b>invalid</b>. Please <a "
+"href=\"%1$s\">update your license key</a> or <a href=\"%2$s\" "
+"target=\"_blank\">get a new one</a> to enable automatic updates."
+msgstr ""
+
+#: src/Updater/Notification.php:65
+#, php-format
+msgid ""
+"Your license key for Meta Box is <b>expired</b>. Please <a href=\"%3$s\" "
+"target=\"_blank\">renew your license</a> to get automatic updates and "
+"premium support."
+msgstr ""
+
+#: src/Updater/Notification.php:89
+#, php-format
+msgid ""
+"Please <a href=\"%1$s\">enter your license key</a> or <a href=\"%2$s\" "
+"target=\"_blank\">get a new one here</a>."
+msgstr ""
+
+#: src/Updater/Notification.php:91 src/Updater/Notification.php:93
+#, php-format
+msgid ""
+"Your license key is <b>invalid</b>. Please <a href=\"%1$s\">update your "
+"license key</a> or <a href=\"%2$s\" target=\"_blank\">get a new one here</a>."
+msgstr ""
+
+#: src/Updater/Notification.php:95
+#, php-format
+msgid ""
+"Your license key is <b>expired</b>. Please <a href=\"%3$s\" "
+"target=\"_blank\">renew your license</a>."
+msgstr ""
+
+#: src/Updater/Notification.php:111
+msgid "Activate License"
+msgstr ""
+
+#: src/Updater/Notification.php:111
+msgid "Update License"
+msgstr ""
+
+#: src/Updater/Settings.php:39 src/Updater/Settings.php:54
+msgid "Meta Box License"
+msgstr ""
+
+#: src/Updater/Settings.php:39
+msgid "License"
+msgstr ""
+
+#: src/Updater/Settings.php:55
+msgid ""
+"Please enter your license key to enable automatic updates for Meta Box "
+"extensions."
+msgstr ""
+
+#: src/Updater/Settings.php:60
+#, php-format
+msgid ""
+"To get the license key, visit the <a href=\"%1$s\" target=\"_blank\">My "
+"Account</a> page on metabox.io website. If you have not purchased any "
+"extension yet, please <a href=\"%2$s\" target=\"_blank\">get a new license "
+"here</a>."
+msgstr ""
+
+#: src/Updater/Settings.php:72
+msgid "License Key"
+msgstr ""
+
+#: src/Updater/Settings.php:76 src/Updater/Settings.php:77
+msgid "Your license key is <b style=\"color: #d63638\">invalid</b>."
+msgstr ""
+
+#: src/Updater/Settings.php:78
+msgid "Your license key is <b style=\"color: #d63638\">expired</b>."
+msgstr ""
+
+#: src/Updater/Settings.php:79
+msgid "Your license key is <b style=\"color: #00a32a\">active</b>."
+msgstr ""
+
+#: src/Updater/Settings.php:92
+msgid "Save Changes"
+msgstr ""
+
+#: src/Updater/Settings.php:123
+msgid ""
+"Something wrong with the connection to metabox.io. Please try again later."
+msgstr ""
+
+#: src/Updater/Settings.php:125
+msgid "Your license is activated."
+msgstr ""
+
+#: src/Updater/Settings.php:128
+#, php-format
+msgid ""
+"License expired. Please renew on the <a href=\"%s\" target=\"_blank\">My "
+"Account</a> page on metabox.io website."
+msgstr ""
+
+#: src/Updater/Settings.php:134
+#, php-format
+msgid ""
+"Invalid license. Please <a href=\"%1$s\" target=\"_blank\">check again</a> "
+"or <a href=\"%2$s\" target=\"_blank\">get a new license here</a>."
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+#. Author URI of the plugin/theme
+msgid "https://metabox.io"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Create custom meta boxes and custom fields in WordPress."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "MetaBox.io"
+msgstr ""
