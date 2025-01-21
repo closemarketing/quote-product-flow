@@ -510,22 +510,22 @@ class PBC_Helper_PostTypes {
 	/**
 	 * Manages columns for Budget
 	 *
-	 * @param string  $column_name
-	 * @param integer $id
+	 * @param string  $column_name Name of the column.
+	 * @param integer $id Post ID.
 	 * @return void
 	 */
 	public function manage_budgets_columns( $column_name, $id ) {
 		switch ( $column_name ) {
 			case 'enquiry_name':
-				echo '<a href="' . get_edit_post_link( $id ) . '" class="row-title">';
-				echo get_post_meta( $id, 'pbc_enquiry_name', true );
+				echo '<a href="' . esc_url( get_edit_post_link( $id ) ) . '" class="row-title">';
+				echo esc_html( get_post_meta( $id, 'pbc_enquiry_name', true ) );
 				echo '</a>';
 				break;
 			case 'enquiry_details':
 				$this->render_enquiry_details( $id );
 				break;
 			case 'enquiry_conf':
-				echo number_format( CALC::get_total_from_enquiry( $id ), 2, ',', '.' ) . ' € ' . __( 'VAT not included', 'pbc' );
+				echo number_format( CALC::get_total_from_enquiry( $id ), 2, ',', '.' ) . ' € ' . esc_html__( 'VAT not included', 'pbc' );
 				break;
 			case 'enquiry_date':
 				echo get_the_date( 'd-m-Y H:i', $id );
