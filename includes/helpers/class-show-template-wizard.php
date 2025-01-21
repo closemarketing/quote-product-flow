@@ -196,7 +196,9 @@ class PBC_Template_Wizard {
 									$temp_arr['title'][ $key ]   = $val['title'];
 							}
 							// Sort by section asc and then title asc.
-							array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
+							if ( ! empty( $temp_arr['section'] ) && ! empty( $temp_arr['title'] ) ) {
+								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
+							}
 
 							// Show public.
 							$s_var = '';
