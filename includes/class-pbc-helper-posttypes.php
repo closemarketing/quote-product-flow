@@ -174,28 +174,10 @@ class PBC_Helper_PostTypes {
 	public function pbc_metabox_variation( $meta_boxes ) {
 		$phase_options = array();
 		$var_options   = array();
-		// Phase options.
+
 		if ( is_admin() ) {
-			$phasescpt = get_posts(
-				array(
-					'post_type'      => 'phases',
-					'posts_per_page' => -1,
-					'orderby'        => 'menu_order',
-					'order'          => 'ASC',
-				)
-			);
-			$phasescpt_item = array();
-			foreach ( $phasescpt as $phasescpt_item ) {
-				$phase_title    = '';
-				$post_parent_id = isset( $phasescpt_item->post_parent ) ? $phasescpt_item->post_parent : 0;
-				if ( $post_parent_id > 0 ) {
-					$phase_parent = get_post( $post_parent_id );
-					$phase_title .= $phase_parent->post_title . ' - ';
-				}
-				$phase_title                         .= CALC::adds_zero( $phasescpt_item->menu_order ) . ' - ' . $phasescpt_item->post_title;
-				$phase_options[ $phasescpt_item->ID ] = $phase_title;
-			}
-			asort( $phase_options );
+			// Phase options.
+			$phase_options = CALC::get_phases_options();
 
 			// Variations Options.
 			$variationscpt = get_posts(
@@ -640,33 +622,13 @@ class PBC_Helper_PostTypes {
 
 		// Only add filter to post type you want.
 		if ( 'variation' === $type ) {
-			// Phase Filter.
-			$phase_options = array();
-			$phasescpt     = get_posts(
-				array(
-					'post_type'      => 'phases',
-					'posts_per_page' => -1,
-					'orderby'        => 'menu_order',
-					'order'          => 'ASC',
-				)
-			);
-			$phasescpt_item = array();
-			foreach ( $phasescpt as $phasescpt_item ) {
-				$post_parent_id = isset( $phasescpt_item->post_parent ) ? $phasescpt_item->post_parent : 0;
-				if ( $post_parent_id > 0 ) {
-					$phase_parent = get_post( $post_parent_id );
-					$phase_key    = $phase_parent->post_title . ' - ' . $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
-				} else {
-					$phase_key = $phasescpt_item->menu_order . ' - ' . $phasescpt_item->post_title;
-				}
-				$phase_options[ $phase_key ] = $phasescpt_item->ID;
-			}
+			$phase_options = CALC::get_phases_options();
 			?>
 			<select name="pbc_filter_phase">
 			<option value=""><?php esc_html_e( 'All Phases', 'pbc' ); ?></option>
 			<?php
 			$current_v = isset( $_GET['pbc_filter_phase'] ) ? sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ) : '';
-			foreach ( $phase_options as $label => $value ) {
+			foreach ( $phase_options as $value => $label ) {
 				printf(
 					'<option value="%s"%s>%s</option>',
 					esc_html( $value ),

@@ -89,17 +89,23 @@ class CALC {
 		return $total_price;
 	}
 
+	/**
+	 * Calculates the color of the text based on the background color.
+	 *
+	 * @param string $background_hex Background color in hex.
+	 * @return float
+	 */
 	public static function calculate_color_text( $background_hex ) {
 		list($r1, $g1, $b1) = sscanf( $background_hex, "#%02x%02x%02x" );
 
-		// Black:
+		// Black.
 		$r2 = 0;
 		$g2 = 0;
 		$b2 = 0;
 
 		$contrast = max( $r1, $r2) - min( $r1, $r2 ) + max( $g1, $g2 ) - min( $g1, $g2 ) + max( $b1, $b2) - min( $b1, $b2 );
 
-		return $contrast > 500 ? '#000000': '#ffffff';
+		return $contrast > 500 ? '#000000' : '#ffffff';
 	}
 	/**
 	 * Returns if product is multiple
@@ -142,5 +148,46 @@ class CALC {
 	 */
 	public static function adds_zero( $number ) {
 		return $number < 10 ? '0' . $number : $number;
+	}
+
+	/**
+	 * Gets the phases options
+	 *
+	 * @return array
+	 */
+	public static function get_phases_options() {
+		// Phase Filter.
+		$phase_options = array();
+		$phasescpt     = get_posts(
+			array(
+				'post_type'      => 'phases',
+				'posts_per_page' => -1,
+				'orderby'        => 'menu_order',
+				'order'          => 'ASC',
+				'post_parent'    => 0,
+			)
+		);
+		foreach ( $phasescpt as $item ) {
+			$children     = get_posts(
+				array(
+					'post_type'      => 'phases',
+					'post_parent'    => $item->ID,
+					'posts_per_page' => -1,
+					'orderby'        => 'menu_order',
+					'order'          => 'ASC',
+				)
+			);
+			$has_children = ! empty( $children );
+			if ( $has_children ) {
+				foreach ( $children as $child ) {
+					$label = $item->post_title . ' - ' . self::adds_zero( $child->menu_order ) . ' - ';
+
+					$phase_options[ $child->ID ] = $label . $child->post_title;
+				}
+			} else {
+				$phase_options[ $item->ID ] = self::adds_zero( $item->menu_order ) . ' - ' . $item->post_title;
+			}
+		}
+		return $phase_options;
 	}
 }
