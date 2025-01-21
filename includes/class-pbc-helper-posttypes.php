@@ -60,7 +60,7 @@ class PBC_Helper_PostTypes {
 			'not_found'          => __( "We didn't find any phase", 'pbc' ),
 			'not_found_in_trash' => __( "We didn't find an phase in the trash", 'pbc' ),
 		);
-		$args = array(
+		$args   = array(
 			'labels'             => $labels,
 			'public'             => false,
 			'show_in_menu'       => false,
@@ -85,10 +85,10 @@ class PBC_Helper_PostTypes {
 			'new_item'           => __( 'New Variation', 'pbc' ),
 			'view_item'          => __( 'View Variation', 'pbc' ),
 			'search_items'       => __( 'Search for variations', 'pbc' ),
-			'not_found'          => __("We didn't find any Variation",'pbc' ),
-			'not_found_in_trash' => __("We didn't find any Variation in the trash",'pbc' ),
+			'not_found'          => __( "We didn't find any Variation", 'pbc' ),
+			'not_found_in_trash' => __( "We didn't find any Variation in the trash", 'pbc' ),
 		);
-		$args = array(
+		$args   = array(
 			'labels'             => $labels,
 			'public'             => false,
 			'show_in_menu'       => false,
@@ -205,8 +205,8 @@ class PBC_Helper_PostTypes {
 				$var_value   = $phase_order . '|' . $var_item->ID;
 				$var_sku     = get_post_meta( $var_item->ID, 'pbc_sku', true );
 
-				$phase_title .= $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
-				$phase_title .= ! empty( $var_sku ) ? ' (' . $var_sku . ')' : '';
+				$phase_title              .= $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
+				$phase_title              .= ! empty( $var_sku ) ? ' (' . $var_sku . ')' : '';
 				$var_options[ $var_value ] = $phase_title;
 			}
 			asort( $var_options );
@@ -219,7 +219,7 @@ class PBC_Helper_PostTypes {
 		}
 
 		$prefix = 'pbc_';
-		// 1st meta box
+		// 1st meta box.
 		$meta_boxes[] = array(
 			'id'         => 'standard',
 			'title'      => __( 'Options for variation', 'pbc' ),
@@ -298,32 +298,32 @@ class PBC_Helper_PostTypes {
 							'max_file_uploads' => 1,
 						),
 					),
-				), //array
+				), // array.
 				array(
-					'name'   => __( 'Price', 'pbc' ),
-					'id'     => "{$prefix}pricegroup",
-					'type'   => 'group',
-					'clone'  => true,
+					'name'       => __( 'Price', 'pbc' ),
+					'id'         => "{$prefix}pricegroup",
+					'type'       => 'group',
+					'clone'      => true,
 					'sort_clone' => true,
-					'fields' => array(
-						// TEXT
+					'fields'     => array(
+						// TEXT.
 						array(
-							'name'  => __( 'Option price', 'pbc' ),
-							'id'    => "{$prefix}meaprice",
-							'desc'  => '',
-							'type'  => 'text',
-							'std'   => '',
-							'clone' => false,
+							'name'    => __( 'Option price', 'pbc' ),
+							'id'      => "{$prefix}meaprice",
+							'desc'    => '',
+							'type'    => 'text',
+							'std'     => '',
+							'clone'   => false,
 							'columns' => 3,
 						),
-						// TEXT
+						// TEXT.
 						array(
-							'name'  => __( 'Price (VAT not included)', 'pbc' ),
-							'id'    => "{$prefix}pricem",
-							'desc'  => '',
-							'type'  => 'text',
-							'std'   => '',
-							'clone' => false,
+							'name'    => __( 'Price (VAT not included)', 'pbc' ),
+							'id'      => "{$prefix}pricem",
+							'desc'    => '',
+							'type'    => 'text',
+							'std'     => '',
+							'clone'   => false,
 							'columns' => 1,
 						),
 						// SELECT BOX VARIATIONS.
@@ -337,8 +337,8 @@ class PBC_Helper_PostTypes {
 							'placeholder' => __( 'All users', 'pbc' ),
 						),
 					),
-				), //array.
-				// Desc HTML
+				), // array.
+				// Desc HTML.
 				array(
 					'name'    => __( 'Description after option', 'pbc' ),
 					'id'      => "{$prefix}descopt",
@@ -349,7 +349,7 @@ class PBC_Helper_PostTypes {
 						'teeny'         => true,
 					),
 				),
-				// Desc HTML
+				// Desc HTML.
 				array(
 					'name'    => __( 'Description', 'pbc' ),
 					'id'      => "{$prefix}descvar",
@@ -360,18 +360,23 @@ class PBC_Helper_PostTypes {
 						'teeny'         => true,
 					),
 				),
-			)
+			),
 		);
 
 		return $meta_boxes;
 	}
 
-	public function pbc_metabox_enquiry(){
+	/**
+	 * Metabox enquiry
+	 *
+	 * @return void
+	 */
+	public function pbc_metabox_enquiry() {
 
 		add_meta_box(
 			'enquiry-details',
-			__( 'Enquiry Details','pbc' ),
-			array($this,'render_enquiry_details'),
+			__( 'Enquiry Details', 'pbc' ),
+			array( $this, 'render_enquiry_details' ),
 			'enquiry',
 			'normal',
 			'default'
@@ -379,28 +384,39 @@ class PBC_Helper_PostTypes {
 
 		add_meta_box(
 			'configuration-details',
-			__( 'Budget Configuration','pbc' ),
-			array($this,'render_budget_configuration'),
+			__( 'Budget Configuration', 'pbc' ),
+			array( $this, 'render_budget_configuration' ),
 			'enquiry',
 			'normal',
 			'default'
 		);
 	}
+
+	/**
+	 * Render enquiry details
+	 *
+	 * @param object $post Post object.
+	 * @return void
+	 */
 	public function render_enquiry_details( $post ) {
-		$post_id = is_object( $post ) ? $post->ID : $post;
-		
+		$post_id       = is_object( $post ) ? $post->ID : $post;
+		$enquiry_name  = get_post_meta( $post_id, 'pbc_enquiry_name', true );
+		$enquiry_phone = get_post_meta( $post_id, 'pbc_enquiry_phone', true );
+		$enquiry_email = get_post_meta( $post_id, 'pbc_enquiry_email', true );
+		$enquiry_city  = get_post_meta( $post_id, 'pbc_enquiry_city', true );
+		$enquiry_state = get_post_meta( $post_id, 'pbc_enquiry_state', true );
 		?>
-		<div><label><strong><?php esc_html_e('Name:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_name',true);?></label></div>
-		<div><label><strong><?php esc_html_e('Phone:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_phone',true);?></label></div>
-		<div><label><strong><?php esc_html_e('Email:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_email',true);?></label></div>
-		<div><label><strong><?php esc_html_e('City:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_city',true);?></label></div>
-		<div><label><strong><?php esc_html_e('State:', 'pbc');?></strong> <?php echo get_post_meta( $post_id, 'pbc_enquiry_state',true);?></label></div>
+		<div><label><strong><?php esc_html_e( 'Name:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_name ); ?></label></div>
+		<div><label><strong><?php esc_html_e( 'Phone:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_phone ); ?></label></div>
+		<div><label><strong><?php esc_html_e( 'Email:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_email ); ?></label></div>
+		<div><label><strong><?php esc_html_e( 'City:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_city ); ?></label></div>
+		<div><label><strong><?php esc_html_e( 'State:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_state ); ?></label></div>
 		<?php
 	}
 	/**
 	 * Renders the budget Configuration
 	 *
-	 * @param [type] $post
+	 * @param object $post Post object.
 	 * @return void
 	 */
 	public function render_budget_configuration( $post ) {
@@ -410,8 +426,8 @@ class PBC_Helper_PostTypes {
 			<thead>
 				<tr>
 					<th style="width:20%" class="sn">#</th>
-					<th style="width:50%" class="phase-variation"><?php _e('Phase/Variation','pbc');?></th>
-					<th style="width:30%" class="price"><?php _e('Price','pbc');?></th>
+					<th style="width:50%" class="phase-variation"><?php esc_html_e( 'Phase/Variation', 'pbc' ); ?></th>
+					<th style="width:30%" class="price"><?php esc_html_e( 'Price', 'pbc' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -422,8 +438,8 @@ class PBC_Helper_PostTypes {
 						?>
 						<tr>
 							<td class="sn"><?php echo (int) $i; ?></td>
-							<td class="phase-variation"><?php echo $phase_var; ?></td>
-							<td class="price"><?php echo get_post_meta( $post_id, 'pbc_price_' . $i, true ); ?></td>
+							<td class="phase-variation"><?php echo esc_html( $phase_var ); ?></td>
+							<td class="price"><?php echo esc_html( get_post_meta( $post_id, 'pbc_price_' . $i, true ) ); ?></td>
 						</tr>
 						<?php
 					}
@@ -457,7 +473,7 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function manage_phases_columns( $column_name, $id ) {
-		$post = get_post( $id );
+		$post        = get_post( $id );
 		$is_multiple = CALC::is_multiple_products();
 
 		switch ( $column_name ) {
@@ -494,7 +510,7 @@ class PBC_Helper_PostTypes {
 	/**
 	 * Manages columns for Budget
 	 *
-	 * @param string $column_name
+	 * @param string  $column_name
 	 * @param integer $id
 	 * @return void
 	 */
@@ -558,7 +574,7 @@ class PBC_Helper_PostTypes {
 				break;
 			case 'price':
 				// Price group.
-				$price_group  = rwmb_meta( 'pbc_pricegroup' );
+				$price_group = rwmb_meta( 'pbc_pricegroup' );
 				foreach ( $price_group as $price_item ) {
 					if ( isset( $price_item['pbc_meaprice'] ) ) {
 						echo esc_attr( $price_item['pbc_meaprice'] ) . ' - ' . esc_attr( $price_item['pbc_pricem'] ) . ' €';
@@ -571,7 +587,7 @@ class PBC_Helper_PostTypes {
 				break;
 			case 'depends':
 				// Depends group.
-				$depends_group  = rwmb_meta( 'pbc_depends' );
+				$depends_group = rwmb_meta( 'pbc_depends' );
 				foreach ( $depends_group as $depends_item ) {
 					$depvar         = explode( '|', $depends_item['pbc_depvar'] );
 					$variation_id   = isset( $depvar[1] ) ? (int) $depvar[1] : 0;
@@ -590,19 +606,21 @@ class PBC_Helper_PostTypes {
 				if ( $imgicon ) {
 					$icon_image = wp_get_attachment_image_src( $imgicon, array( 120, 120 ), true );
 				}
-				if(isset($icon_image) ) echo '<img src="'.$icon_image[0].'" />';
+				if ( isset( $icon_image ) ) {
+					echo '<img src="' . $icon_image[0] . '" />';
+				}
 				break;
 			case 'imgprod':
 				// Image Group Product.
 				$image_group = rwmb_meta( 'pbc_imgprodgroup' );
 				if ( ! empty( $image_group ) ) {
-					if ( count ($image_group ) > 0 ) {
-						echo count($image_group).'<br>';
+					if ( count( $image_group ) > 0 ) {
+						echo count( $image_group ) . '<br>';
 					}
 					foreach ( $image_group as $imageg_item ) {
 						if ( isset( $imageg_item['pbc_imgprod'][0] ) ) {
-							$icon_imageprod = wp_get_attachment_image_src($imageg_item['pbc_imgprod'][0], array(57,46), true);
-							echo '<img src="'.$icon_imageprod[0].'" width="57" height="46"/>';
+							$icon_imageprod = wp_get_attachment_image_src( $imageg_item['pbc_imgprod'][0], array( 57, 46 ), true );
+							echo '<img src="' . $icon_imageprod[0] . '" width="57" height="46"/>';
 						}
 					}
 				}
@@ -651,11 +669,11 @@ class PBC_Helper_PostTypes {
 	 * @param (wp_query object) $query
 	 * @return void
 	 */
-	public function pbc_posts_filter( $query ){
+	public function pbc_posts_filter( $query ) {
 		global $pagenow;
 		$type = isset( $_GET['post_type'] ) ? $_GET['post_type'] : 'post';
 
-		if ( 'variation' == $type && is_admin() && $pagenow=='edit.php' ) {
+		if ( 'variation' == $type && is_admin() && $pagenow == 'edit.php' ) {
 			if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] != '' ) {
 				$query->query_vars['meta_key']   = 'pbc_phase';
 				$query->query_vars['meta_value'] = $_GET['pbc_filter_phase'];
