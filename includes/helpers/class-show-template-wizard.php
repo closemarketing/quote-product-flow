@@ -63,7 +63,6 @@ class PBC_Template_Wizard {
 					if ( ! empty( $phases ) ) {
 						$price       = '';
 						$option_name = '';
-						$pricegroup  = get_post_meta( $pbc_variation, 'pbc_pricegroup', true );
 						$price_var   = isset( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) ? sanitize_text_field( $_POST[ 'pbc_pricevar_' . $pbc_variation ] ) : '';
 						$meaprice    = isset( $details['pbc_meaprice'] ) ? trim( $details['pbc_meaprice'] ) : '';
 
@@ -72,13 +71,8 @@ class PBC_Template_Wizard {
 							$phase_param['pricevar'] = $price_var ? $price_var : '';
 							update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
 						}
-						if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
-							$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ) );
-							if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
-								$price = $pricegroup[0]['pbc_pricem'];
-								// TODO: get price frome role.
-							}
-						}
+						$price = CALC::get_price_variation( $pbc_variation, $price_var );
+
 						$phase_id        = $phases[ (int) $key - 1 ];
 						$variation_title = get_the_title( $pbc_variation );
 						if ( $price_var ) {
@@ -469,11 +463,11 @@ class PBC_Template_Wizard {
 				<?php
 				if ( isset( $_SESSION ) && isset( $_SESSION['pbc_variation'] ) && is_array( $_SESSION['pbc_variation'] ) ) {
 					?>
-					<h2 class="title"><?php _e( 'Actual Configuration', 'pbc' ); ?></h2>
+					<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 					<table>
 						<?php
 						$show_prices = get_option( 'pbc_budget_show_prices' );
-						if ( $cstep == 'calculate' ) {
+						if ( 'calculate' === $cstep ) {
 							$count       = count( $phases );
 							$total_price = 0;
 						} else {
@@ -483,29 +477,28 @@ class PBC_Template_Wizard {
 							if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
 								continue;
 							}
-							$phaseKey  = $i;
-							$varId     = $_SESSION['pbc_variation'][ $i ]['var']['id'];
-							$varName   = $_SESSION['pbc_variation'][ $i ]['var']['name'];
-							$varPrice  = ! empty( $_SESSION['pbc_variation'][ $i ]['var']['price'] ) ? $_SESSION['pbc_variation'][ $i ]['var']['price'] : 0;
-							$phaseName = $_SESSION['pbc_variation'][ $i ]['phase']['name'];
+							$phase_key  = $i;
+							$var_name   = isset( $_SESSION['pbc_variation'][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION['pbc_variation'][ $i ]['var']['name'] ) : '';
+							$var_price  = ! empty( $_SESSION['pbc_variation'][ $i ]['var']['price'] ) ? (float) $_SESSION['pbc_variation'][ $i ]['var']['price'] : 0;
+							$phase_name = isset( $_SESSION['pbc_variation'][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION['pbc_variation'][ $i ]['phase']['name'] ) : '';
 
-							if ( $cstep == 'calculate' ) {
-								$total_price += (float) $varPrice;
+							if ( 'calculate' === $cstep ) {
+								$total_price += (float) $var_price;
 							}
 							?>
-							<tr class="variation_selected phase-<?php echo $phaseKey; ?>">
-								<td class="name"><?php echo $phaseKey . '. ' . $phaseName . ': ' . $varName; ?></td>
+							<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
+								<td class="name"><?php echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name ); ?></td>
 								<td class="price">
 									<?php
-									if ( $varPrice && 'no' !== $show_prices ) {
-										echo $varPrice . ' €';
+									if ( $var_price && 'no' !== $show_prices ) {
+										echo esc_html( $var_price ) . ' €';
 									}
 									?>
 								</td>
 							</tr>
 							<?php
 						}
-						if ( $cstep == 'calculate' && 'no' !== $show_prices ) {
+						if ( 'calculate' === $cstep && 'no' !== $show_prices ) {
 							?>
 							<tr class="variation_selected phase-total_price">
 								<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>

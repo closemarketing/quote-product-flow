@@ -212,12 +212,6 @@ class PBC_Helper_PostTypes {
 			asort( $var_options );
 		}
 
-		$roles      = wp_roles()->roles;
-		$user_roles = array();
-		foreach ( $roles as $slug => $role ) {
-			$user_roles[ $slug ] = $role['name'];
-		}
-
 		$prefix = 'pbc_';
 		// 1st meta box.
 		$meta_boxes[] = array(
@@ -325,16 +319,6 @@ class PBC_Helper_PostTypes {
 							'std'     => '',
 							'clone'   => false,
 							'columns' => 1,
-						),
-						// SELECT BOX VARIATIONS.
-						array(
-							'name'        => __( 'Price for user', 'pbc' ),
-							'id'          => "{$prefix}priceuser",
-							'type'        => 'select',
-							'options'     => $user_roles,
-							'multiple'    => false,
-							'std'         => '',
-							'placeholder' => __( 'All users', 'pbc' ),
 						),
 					),
 				), // array.

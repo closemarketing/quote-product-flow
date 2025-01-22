@@ -101,7 +101,7 @@ class PBC_Admin_Plugin {
 		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
 
-		wp_enqueue_script( 
+		wp_enqueue_script(
 			'pbc-admin-scripts',
 			WPPBC_PLUGIN_URL . 'includes/assets/admin-scripts.js',
 			array( 'jquery' ),
@@ -207,8 +207,7 @@ class PBC_Admin_Plugin {
 	 *
 	 * @return void
 	 */
-	public function pbc_display_admin_page(){
-
+	public function pbc_display_admin_page() {
 		if ( isset( $_POST['form_submit'] ) ) {
 			if ( isset( $_POST['select_budget_page'] ) ) {
 				update_option( 'pbc_budget_configurator_page', $_POST['select_budget_page'] );
@@ -222,42 +221,50 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_budget_show_button_pdf', $_POST['option_show_final_button_pdf'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
-			if ( isset( $_POST['pdf_image_selected'] ) ){
+			if ( isset( $_POST['pdf_image_selected'] ) ) {
 				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
-			if ( isset( $_POST['pdf_image_header'] ) ){
+			if ( isset( $_POST['pdf_image_header'] ) ) {
 				update_option( 'pbc_pdf_image_header', $_POST['pdf_image_header'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
-			if ( isset( $_POST['pdf_image_footer'] ) ){
+			if ( isset( $_POST['pdf_image_footer'] ) ) {
 				update_option( 'pbc_pdf_image_footer', $_POST['pdf_image_footer'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
 			}
-			if ( isset( $_POST['pdf_color_odd'] ) ){
+			if ( isset( $_POST['pdf_color_odd'] ) ) {
 				update_option( 'pbc_pdf_color_odd', $_POST['pdf_color_odd'] );
-				
-			if ( isset( $_POST['pdf_color_total'] ) ){
-				update_option( 'pbc_pdf_color_total', $_POST['pdf_color_total'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}$update = __( 'Successfully Saved!', 'pbc' );
+
+				if ( isset( $_POST['pdf_color_total'] ) ) {
+					update_option( 'pbc_pdf_color_total', $_POST['pdf_color_total'] );
+					$update = __( 'Successfully Saved!', 'pbc' );
+				}$update = __( 'Successfully Saved!', 'pbc' );
 			}
-			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array('');
+			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array( '' );
 			update_option( 'variations_images_flipped', $variations_images_flipped );
 
-			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array('');
+			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array( '' );
 			update_option( 'pbc_admin_email_notification', $admin_email_notification );
 
-			// Preview width
-			if ( isset( $_POST['preview_width'] ) ){
-				update_option( 'pbc_preview_width', $_POST['preview_width'] );
+			// Preview width.
+			if ( isset( $_POST['preview_width'] ) ) {
+				update_option( 'pbc_preview_width', sanitize_text_field( $_POST['preview_width'] ) );
 				$update = __( 'Successfully Saved!', 'pbc' );
+			}
+
+			// Roles discount.
+			$roles = wp_roles()->roles;
+			foreach ( $roles as $slug => $role ) {
+				if ( ! empty( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
+					update_option( 'pbc_discount_user_' . $slug, (int) $_POST[ 'pbc_discount_user_' . $slug ] );
+				}
 			}
 		}
 
 		if ( isset( $_POST['submit_license'] ) ) {
-			$license_apikey = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field( $_POST['pbc_license_apikey'] ) : '';
-			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field(  $_POST['pbc_license_product_id'] ) : '';
+			$license_apikey     = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field( $_POST['pbc_license_apikey'] ) : '';
+			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field( $_POST['pbc_license_product_id'] ) : '';
 
 			update_option( 'pbc_license_apikey', $license_apikey );
 			update_option( 'pbc_license_product_id', $license_product_id );
@@ -265,14 +272,14 @@ class PBC_Admin_Plugin {
 		}
 		?>
 		<div class='wrap'>
-			<h2><?php echo $GLOBALS['title'] ?> - <?php esc_html_e( 'Global Settings', 'pbc' ); ?></h2>
+			<h2><?php echo esc_html( $GLOBALS['title'] ); ?> - <?php esc_html_e( 'Global Settings', 'pbc' ); ?></h2>
 
-			<?php if(isset($update)){?>
-				<div id="message" class="updated fade"><?php echo $update;?></div>
-			<?php }?>
-			<?php if(isset($error)){?>
-				<div id="message" class="error"><?php echo $error;?></div>
-			<?php }?>
+			<?php if ( isset( $update ) ) { ?>
+				<div id="message" class="updated fade"><?php echo esc_html( $update ); ?></div>
+			<?php } ?>
+			<?php if ( isset( $error ) ) { ?>
+				<div id="message" class="error"><?php echo esc_html( $error ); ?></div>
+			<?php } ?>
 
 			<div id="poststuff">
 				<div id="post-body">
@@ -307,14 +314,11 @@ class PBC_Admin_Plugin {
 					</div>
 					<div class="postcontent-right">
 						<?php
-						// Price Updater
+						// Price Updater.
 						add_meta_box(
 							'price_updater_meta_box',
 							__( 'Price Updater', 'pbc' ),
-							array(
-								$this,
-								'price_updater_meta_box_callback',
-							),
+							array( $this, 'price_updater_meta_box_callback', ),
 							'pbc_import_right'
 						);
 						// General Settings.
@@ -395,7 +399,8 @@ class PBC_Admin_Plugin {
 		<button id="bulk-updater-prices" class="button button-primary submit-button"><?php esc_html_e( 'Update Prices', 'pbc' ); ?></button><span id="pbc-price-updater-button" class="spinner"></span><div class="price-updater-result"></div>
 		<?php
 	}
-		/**
+
+	/**
 	 * Ajax function to load info
 	 *
 	 * @return void
@@ -421,15 +426,15 @@ class PBC_Admin_Plugin {
 						if ( empty( $price_simple ) ) {
 							continue;
 						}
-						$new_price = $price_simple['pbc_pricem'] + ( $price_simple['pbc_pricem'] * $percentage );
+						$new_price                         = $price_simple['pbc_pricem'] + ( $price_simple['pbc_pricem'] * $percentage );
 						$price_group[ $key ]['pbc_pricem'] = str_replace( '.', ',', $new_price );
 					}
 					update_post_meta( $variation_id, 'pbc_pricegroup', $price_group );
-					$count++;
+					++$count;
 				}
 			}
 			$html = sprintf(
-				__( 'Changed %s variation prices' , 'pbc' ),
+				__( 'Changed %s variation prices', 'pbc' ),
 				$count,
 			);
 
@@ -453,37 +458,55 @@ class PBC_Admin_Plugin {
 					<label class="block" for="select_budget_page"><?php esc_html_e( 'Budget Configurator Page', 'pbc' ); ?></label>
 					<?php
 					$budget_configurator = get_option( 'pbc_budget_configurator_page' );
-					$pages = get_pages();
+					$pages               = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="select_budget_page">';
 						echo '<option value="">' . __( 'Select a Page', 'pbc' ) . '</option>';
 						foreach ( $pages as $page ) {
-							$option = '<option value="' .( $page->ID ) . '"';
-							$option .= ($page->ID == $budget_configurator) ? " selected='selected'" : "";
+							$option  = '<option value="' . ( $page->ID ) . '"';
+							$option .= ( $page->ID == $budget_configurator ) ? " selected='selected'" : '';
 							$option .= '>' . $page->post_title . '</option>';
 							echo $option;
 						}
 						echo '</select>';
 					}
 					?>
-					&nbsp;&nbsp;<?php _e('or','pbc');?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' );?>" title="<?php _e('Create New Page', 'pbc');?>"><?php _e('Create Page', 'pbc');?></a>
+					&nbsp;&nbsp;<?php _e( 'or', 'pbc' ); ?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' ); ?>" title="<?php _e( 'Create New Page', 'pbc' ); ?>"><?php _e( 'Create Page', 'pbc' ); ?></a>
 				</fieldset>
 				<fieldset>
 					<br/>
-					<label class="block" for="variations_images_flipped"><?php _e("Flip Images Horizontal", 'pbc');?></label>
+					<label class="block" for="variations_images_flipped"><?php _e( 'Flip Images Horizontal', 'pbc' ); ?></label>
 					<?php
-					$variations_images_flipped = get_option('variations_images_flipped');
-					$phases =  get_posts(array('post_type'=>'phases','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC'));
+					$variations_images_flipped = get_option( 'variations_images_flipped' );
+					$phases                    = get_posts(
+						array(
+							'post_type'      => 'phases',
+							'posts_per_page' => -1,
+							'orderby'        => 'menu_order',
+							'order'          => 'ASC',
+						)
+					);
 					if ( ! empty( $phases ) ) {
 						echo '<select multiple="multiple" name="variations_images_flipped[]" size="6" style="width:100%;">';
-						foreach($phases as $phase){
-							$variations = get_posts(array('post_type'=>'variation','posts_per_page'=>-1,'meta_key'=>'pbc_phase', 'meta_value'=>$phase->ID,'orderby'=>'title','order'=>'ASC'));
-							if(!empty($variations)){
+						foreach ( $phases as $phase ) {
+							$variations = get_posts(
+								array(
+									'post_type'      => 'variation',
+									'posts_per_page' => -1,
+									'meta_key'       => 'pbc_phase',
+									'meta_value'     => $phase->ID,
+									'orderby'        => 'title',
+									'order'          => 'ASC',
+								)
+							);
+							if ( ! empty( $variations ) ) {
 								foreach ( $variations as $var ) {
-									if(!empty($variations_images_flipped) && in_array($var->ID, $variations_images_flipped))
+									if ( ! empty( $variations_images_flipped ) && in_array( $var->ID, $variations_images_flipped ) ) {
 										$selected = 'selected="selected"';
-									else $selected = '';
-									echo '<option value="'.$var->ID.'" '.$selected.'>'.str_pad($phase->menu_order, 2, '0', STR_PAD_LEFT).' - '.$phase->post_title.' - '.$var->post_title.'</option>';
+									} else {
+										$selected = '';
+									}
+									echo '<option value="' . $var->ID . '" ' . $selected . '>' . str_pad( $phase->menu_order, 2, '0', STR_PAD_LEFT ) . ' - ' . $phase->post_title . ' - ' . $var->post_title . '</option>';
 								}
 							}
 						}
@@ -492,24 +515,34 @@ class PBC_Admin_Plugin {
 					?>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="admin_email_notification"><?php _e("Email Notification", 'pbc');?></label>
+					<label class="block" for="admin_email_notification"><?php _e( 'Email Notification', 'pbc' ); ?></label>
 					<?php
 						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
 					?>
-					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if( $admin_email_notification ) echo $admin_email_notification; ?>" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+					<input style="width:100%;" type="text" name="admin_email_notification" value="
+					<?php
+					if ( $admin_email_notification ) {
+						echo $admin_email_notification;}
+					?>
+					" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
-					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' );?></label>
+					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' ); ?></label>
 					<?php
 						$preview_width = get_option( 'pbc_preview_width' );
 					?>
-					<input style="width:100%;" type="text" name="preview_width" value="<?php if( $preview_width ) echo $preview_width; ?>" placeholder="<?php _e( 'default: 570', 'pbc' ); ?>" />
+					<input style="width:100%;" type="text" name="preview_width" value="
+					<?php
+					if ( $preview_width ) {
+						echo $preview_width;}
+					?>
+					" placeholder="<?php _e( 'default: 570', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
 					<?php
 					$show_prices = get_option( 'pbc_budget_show_prices' );
-					$pages = get_pages();
+					$pages       = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="option_show_prices">';
 						echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
@@ -522,7 +555,7 @@ class PBC_Admin_Plugin {
 					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show final button PDF?', 'pbc' ); ?></label>
 					<?php
 					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
-					$pages = get_pages();
+					$pages           = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="option_show_final_button_pdf">';
 						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
@@ -537,35 +570,80 @@ class PBC_Admin_Plugin {
 					<?php
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
-					<input type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {	echo esc_url( $pdf_image_selected ); } ?>" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' );?></button>
+					<input type="text" name="pdf_image_selected" value="
+					<?php
+					if ( $pdf_image_selected ) {
+						echo esc_url( $pdf_image_selected ); }
+					?>
+					" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
 					?>
-					<input type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {	echo esc_url( $pdf_image_header ); } ?>" />
+					<input type="text" name="pdf_image_header" value="
+					<?php
+					if ( $pdf_image_header ) {
+						echo esc_url( $pdf_image_header ); }
+					?>
+					" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
 					?>
-					<input type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) { echo esc_url( $pdf_image_footer ); } ?>" />
+					<input type="text" name="pdf_image_footer" value="
+					<?php
+					if ( $pdf_image_footer ) {
+						echo esc_url( $pdf_image_footer ); }
+					?>
+					" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
 					?>
-					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) {	echo esc_url( $pdf_color_odd ); } ?>" />
+					<input type="text" name="pdf_color_odd" value="
+					<?php
+					if ( $pdf_color_odd ) {
+						echo esc_url( $pdf_color_odd ); }
+					?>
+					" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 					?>
-					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) {	echo esc_url( $pdf_color_total ); } ?>" />
+					<input type="text" name="pdf_color_total" value="
+					<?php
+					if ( $pdf_color_total ) {
+						echo esc_url( $pdf_color_total ); }
+					?>
+					" />
+				</fieldset>
+
+				<h2><?php esc_html_e( 'Roles Discount', 'pbc' ); ?></h2>
+				<fieldset>
+					<?php
+					$roles      = wp_roles()->roles;
+					$user_roles = array();
+					?>
+					<p><?php esc_html_e( '', 'pbc' ); ?></p>
+					<table>
+						<?php
+						foreach ( $roles as $slug => $role ) {
+							$value = get_option( 'pbc_discount_user_' . $slug );
+							echo '<tr>';
+							echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
+							echo '</label></td>';
+							echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $value . '" /> % </td></tr>';
+						}
+						?>
+					</table>
 				</fieldset>
 			</div>
 
@@ -590,14 +668,24 @@ class PBC_Admin_Plugin {
 					<?php
 					$license_apikey = get_option( 'pbc_license_apikey' );
 					?>
-					<input style="width:100%;" type="text" name="pbc_license_apikey" value="<?php if( $license_apikey ) { echo $license_apikey; } ?>" placeholder="<?php esc_html_e( 'License API Key', 'pbc' ); ?>" />
+					<input style="width:100%;" type="text" name="pbc_license_apikey" value="
+					<?php
+					if ( $license_apikey ) {
+						echo $license_apikey; }
+					?>
+					" placeholder="<?php esc_html_e( 'License API Key', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="pbc_license_product_id"><?php esc_html_e( 'License Product ID', 'pbc' ); ?></label>
 					<?php
 					$license_product_id = get_option( 'pbc_license_product_id' );
 					?>
-					<input style="width:100%;" type="text" name="pbc_license_product_id" value="<?php if( $license_product_id ) { echo $license_product_id; } ?>" placeholder="<?php esc_html_e( 'License Product ID', 'pbc' ); ?>" />
+					<input style="width:100%;" type="text" name="pbc_license_product_id" value="
+					<?php
+					if ( $license_product_id ) {
+						echo $license_product_id; }
+					?>
+					" placeholder="<?php esc_html_e( 'License Product ID', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="pbc_license_status"><?php esc_html_e( 'Status:', 'pbc' ); ?></label>
@@ -614,7 +702,7 @@ class PBC_Admin_Plugin {
 		echo '<div class="settings">';
 		echo '<h2>' . esc_html__( 'What is the license for?', 'pbc' ) . '</h2>';
 		echo '<p>';
-		echo sprintf(
+		printf(
 			__( 'With the <a href="%s" target="_blank">Product Budget Configurator</a> license, you\'ll have updates and automatic fixes to what\'s new or change in your system, so you\'ll always have automatic translations working.', 'pbc' ),
 			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
 		);
@@ -622,7 +710,7 @@ class PBC_Admin_Plugin {
 		echo '</div><div class="help">';
 		echo '<h2>' . esc_html__( 'How do I get a license?', 'pbc' ) . '</h2>';
 		echo '<p>';
-		echo sprintf(
+		printf(
 			__( 'Visit the <a href="%s" target="_blank">Product Budget Configurator</a> page and purchase the licenses you need, depending on the number of WordPress MultiSites you\'re using.', 'pbc' ),
 			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
 		);
@@ -649,7 +737,7 @@ class PBC_Admin_Plugin {
 	 *
 	 * @return void
 	 */
-	public function pbc_enquiry_pdf(){
+	public function pbc_enquiry_pdf() {
 		$post_id = isset( $_POST['post_id'] ) ? esc_attr( $_POST['post_id'] ) : '';
 
 		check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' );
@@ -683,8 +771,8 @@ class PBC_Admin_Plugin {
 	 */
 	public function custom_page_template( $template ) {
 		$budget_configurator = get_option( 'pbc_budget_configurator_page' );
-		if ( ! empty( $budget_configurator ) && \is_page( $budget_configurator )  ) {
-			if ( isset( $_POST ) && isset( $_GET['submit'])  && $_POST['submit'] == 'email_send' ){
+		if ( ! empty( $budget_configurator ) && \is_page( $budget_configurator ) ) {
+			if ( isset( $_POST ) && isset( $_GET['submit'] ) && $_POST['submit'] == 'email_send' ) {
 				if ( session_id() == '' ) {
 					session_start();
 				}
@@ -697,12 +785,12 @@ class PBC_Admin_Plugin {
 				exit();
 			}
 			if ( \locate_template( 'template-budget-configurator.php' ) ) {
-				$new_template =  \get_stylesheet_directory() . 'template-budget-configurator.php';
+				$new_template = \get_stylesheet_directory() . 'template-budget-configurator.php';
 			} else {
-				$new_template = WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
+				$new_template = WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
 			}
 			if ( '' != $new_template ) {
-				return $new_template ;
+				return $new_template;
 			}
 		}
 		return $template;
@@ -713,57 +801,74 @@ class PBC_Admin_Plugin {
 	 *
 	 * @return void
 	 */
-	public function variation_selected_action_callback(){
-		extract($_REQUEST);
+	public function variation_selected_action_callback() {
+		extract( $_REQUEST );
 		if ( session_id() == '' ) {
 			ob_start();
 			session_start();
 		}
 		if ( session_id() == '' ) {
-			echo ';;--;;'.json_encode(array('type'=>'error', 'msg'=>'Error: Unable to initialize Session!'));
-			die(0);
+			echo ';;--;;' . json_encode(
+				array(
+					'type' => 'error',
+					'msg'  => 'Error: Unable to initialize Session!',
+				)
+			);
+			die( 0 );
 		}
 		if ( ! empty( $pbc_variation ) && $current_phase && $pbc_variation[ $current_phase ] ) {
-			$sVar = $pbc_variation[ $current_phase ];
+			$svar = $pbc_variation[ $current_phase ];
 			if ( is_user_logged_in() ) {
-				$user_id = get_current_user_id();
-				$phase_param['var'] = $sVar;
-				$phase_param['pricevar'] = ($_REQUEST["pbc_pricevar_$sVar"])?($_REQUEST["pbc_pricevar_$sVar"]):'';
-				update_user_meta($user_id, 'pbc_phase_'.$current_phase,$phase_param);
+				$user_id                 = get_current_user_id();
+				$phase_param['var']      = $svar;
+				$phase_param['pricevar'] = ( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? ( $_REQUEST[ "pbc_pricevar_$svar" ] ) : '';
+				update_user_meta( $user_id, 'pbc_phase_' . $current_phase, $phase_param );
 			}
 			// Gets image variation with filter dependency.
-			$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $sVar );
+			$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $svar );
 
-			$pricegroup = get_post_meta( $sVar, 'pbc_pricegroup', true );
-			$pricevar   = $_REQUEST["pbc_pricevar_$sVar"];
+			$pricevar = $_REQUEST[ "pbc_pricevar_$svar" ];
+			$price    = CALC::get_price_variation( $svar, $pricevar );
 
-			$price = array_search( $pricevar, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ) );
-			if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
-				$price = $pricegroup[0]['pbc_pricem'];
+			$option = get_the_title( $svar );
+			if ( isset( $option_name ) && $option_name ) {
+				$option .= ' [' . $option_name . ']';
 			}
-			$option = get_the_title($sVar);
-			if(isset($option_name) && $option_name) $option .= ' ['.$option_name.']';
 
-			$variations_images_flipped = get_option('variations_images_flipped');
-			if(!empty($variations_images_flipped)) {
-				for ($j = 1; $j < (int)$current_phase; $j++)
-				{
-					if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
+			$variations_images_flipped = get_option( 'variations_images_flipped' );
+			if ( ! empty( $variations_images_flipped ) ) {
+				for ( $j = 1; $j < (int) $current_phase; $j++ ) {
+					if ( isset( $_SESSION['pbc_variation'][ $j ] ) && in_array( $_SESSION['pbc_variation'][ $j ]['var']['id'], $variations_images_flipped ) ) {
 						$flipped = true;
 					}
 				}
-				if(in_array($sVar, $variations_images_flipped))
+				if ( in_array( $svar, $variations_images_flipped ) ) {
 					$flipped = true;
+				}
 			}
 		}
 
 		$price   = empty( $price ) ? '-' : number_format( $price, 2, ',', '.' ) . ' €';
 		$option  = ! isset( $option ) ? '-' : $option;
 		$flipped = ! isset( $flipped ) ? false : $flipped;
-		echo ';;--;;'.json_encode(array('type'=>'success', 'url'=>$imgprodurl, 'option'=>$option, 'flipped'=>$flipped, 'price'=>$price));
-		die(0);
+		echo ';;--;;' . json_encode(
+			array(
+				'type'    => 'success',
+				'url'     => $imgprodurl,
+				'option'  => $option,
+				'flipped' => $flipped,
+				'price'   => $price,
+			)
+		);
+		die( 0 );
 	}
-	public function configurator_submit_action_callback(){
+
+	/**
+	 * AJAX Callback for variation selected
+	 *
+	 * @return void
+	 */
+	public function configurator_submit_action_callback() {
 		$submit = isset( $_POST['submit'] ) ? esc_attr( $_POST['submit'] ) : '';
 		if ( isset( $submit ) && $submit == 'email_send' ) {
 			if ( empty( session_id() ) ) {
@@ -771,36 +876,44 @@ class PBC_Admin_Plugin {
 			}
 			$_SESSION['pbc_output'] = $this->configurator_result_email_send( $_POST );
 		}
-		
+
 		ob_start();
 		if ( \locate_template( 'template-budget-configurator.php' ) ) {
-			\locate_template('template-budget-configurator.php', true );
+			\locate_template( 'template-budget-configurator.php', true );
 		} else {
-			include WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
+			include WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
 		}
 		$all_details = ob_get_contents();
 		ob_end_clean();
 		echo $all_details;
-		die(0);
+		die( 0 );
 	}
-	public function configurator_login_action_callback(){
-		extract($_POST);
-		$login = wp_signon( array( 'user_login' => $username, 'user_password' => $password, 'remember' => true ), false );
-		if( $login->ID ) {
+	public function configurator_login_action_callback() {
+		extract( $_POST );
+		$login = wp_signon(
+			array(
+				'user_login'    => $username,
+				'user_password' => $password,
+				'remember'      => true,
+			),
+			false
+		);
+		if ( $login->ID ) {
 			ob_start();
-			if ( \locate_template( 'template-budget-configurator.php' ) )
-				\locate_template('template-budget-configurator.php', true);
-			else
-				include WPPBC_PLUGIN_DIR. '/includes/template-budget-configurator.php';
+			if ( \locate_template( 'template-budget-configurator.php' ) ) {
+				\locate_template( 'template-budget-configurator.php', true );
+			} else {
+				include WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
+			}
 			$all_details = ob_get_contents();
 			ob_end_clean();
 			echo $all_details;
-		}elseif ( is_wp_error( $login ) ){
-			echo ';;-;;error;;-;;'.$login->get_error_message();
+		} elseif ( is_wp_error( $login ) ) {
+			echo ';;-;;error;;-;;' . $login->get_error_message();
 		}
-		die(0);
+		die( 0 );
 	}
-	public function configurator_result_email_send( $post_data ){
+	public function configurator_result_email_send( $post_data ) {
 		$email_field = ! empty( $post_data['email_field'] ) ? sanitize_text_field( $post_data['email_field'] ) : '';
 		$name_field  = ! empty( $post_data['name_field'] ) ? sanitize_text_field( $post_data['name_field'] ) : '';
 		$phone_field = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
@@ -808,82 +921,91 @@ class PBC_Admin_Plugin {
 		$state_field = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
 
 		if ( ! $email_field ) {
-			$result = array('type'=>'error', 'response'=>__('Email field empty!','pbc') );
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Email field empty!', 'pbc' ),
+			);
 		} elseif ( ! $name_field ) {
-			$result = array('type'=>'error', 'response'=>__('Name field is empty!','pbc') );
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Name field is empty!', 'pbc' ),
+			);
 		} elseif ( ! $phone_field ) {
-			$result = array('type'=>'error', 'response'=>__('Phone field is empty!','pbc') );
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Phone field is empty!', 'pbc' ),
+			);
 		} else {
-			$emails = explode(',', $email_field);
+			$emails       = explode( ',', $email_field );
 			$admin_emails = get_option( 'pbc_admin_email_notification' );
 			if ( $admin_emails ) {
 				$admin_emails = explode( ',', $admin_emails );
 				$emails       = array_merge( $emails, $admin_emails );
 			}
 			$emails = array_map( 'trim', $emails );
-			if ( !isset( $_SESSION['pbc_variation'] ) ) {
+			if ( ! isset( $_SESSION['pbc_variation'] ) ) {
 				$result = array(
 					'type'     => 'error',
 					'response' => __( 'Configurator not ready!', 'pbc' ),
 				);
 			} else {
-				$subject  = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
-				$message  = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
-				$message .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
-				$message .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
-				$message .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
-				$message .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
-				$message .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
-				$message .= '<br/></div>';
-				$message .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>'.'<br>';
-				$message .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>'.__( 'Variation', 'pbc' ) . '</th><th>'.__( 'Price', 'pbc' ) . '</th></tr>';
+				$subject         = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
+				$message         = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
+				$message        .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
+				$message        .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
+				$message        .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
+				$message        .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
+				$message        .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
+				$message        .= '<br/></div>';
+				$message        .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
+				$message        .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
 				$subtotal_price  = 0;
 				$enquiry_entries = array();
-				$i=0;
+				$i               = 0;
 				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
-					$price        = (double) $details['var']['price'];
+					$price           = (float) $details['var']['price'];
 					$subtotal_price += $price;
-					$message .= '<tr>';
-					$message .= '<td>'.$details['phase']['name'].'</td>';
-					$message .= '<td>'.$details['var']['name'].'</td>';
-					$message .= '<td>';
+					$message        .= '<tr>';
+					$message        .= '<td>' . $details['phase']['name'] . '</td>';
+					$message        .= '<td>' . $details['var']['name'] . '</td>';
+					$message        .= '<td>';
 					if ( $price > 0 ) {
 						$message .= number_format( $price, 2, ',', '.' ) . ' €';
 					}
-					$message .= '</td>';
-					$message .= '</tr>';
-					$enquiry_entries[$i]['phase_var'] = $details['phase']['name'].': '.$details['var']['name'];
-					$enquiry_entries[$i]['price'] = $price;
-					$i++;
+					$message                           .= '</td>';
+					$message                           .= '</tr>';
+					$enquiry_entries[ $i ]['phase_var'] = $details['phase']['name'] . ': ' . $details['var']['name'];
+					$enquiry_entries[ $i ]['price']     = $price;
+					++$i;
 				}
 				$message .= '</table><br/>';
 				// Subtotal.
-				$message .= '<table>';
-				$message .= '<tr>';
-				$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
-				$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
-				$message .= '</tr>';
-				$message .= '<tr>';
-				$message .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
-				$vat      = $subtotal_price * 0.21;
-				$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
-				$message .= '</tr>';
-				$message .= '<tr>';
-				$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
-				$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
-				$message .= '</tr>';
-				$message .= '</table>';
-				$message .= '<br>' . get_option('blogname');
-				$headers = array('Content-Type: text/html; charset=UTF-8');
+				$message    .= '<table>';
+				$message    .= '<tr>';
+				$message    .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+				$message    .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
+				$message    .= '</tr>';
+				$message    .= '<tr>';
+				$message    .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
+				$vat         = $subtotal_price * 0.21;
+				$message    .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
+				$message    .= '</tr>';
+				$message    .= '<tr>';
+				$message    .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+				$message    .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
+				$message    .= '</tr>';
+				$message    .= '</table>';
+				$message    .= '<br>' . get_option( 'blogname' );
+				$headers     = array( 'Content-Type: text/html; charset=UTF-8' );
 				$attachments = array( $this->generate_engine_pdf() );
 
-				//insert_enquiry Post
+				// insert_enquiry Post
 				$enquiry_post = array(
 					'post_title'  => $name_field . '-' . $phone_field,
 					'post_status' => 'publish',
 					'post_type'   => 'enquiry',
 				);
-				$post_id = wp_insert_post( $enquiry_post );
+				$post_id      = wp_insert_post( $enquiry_post );
 				if ( $post_id ) {
 					update_post_meta( $post_id, 'pbc_enquiry_name', $name_field );
 					update_post_meta( $post_id, 'pbc_enquiry_phone', $phone_field );
@@ -895,7 +1017,7 @@ class PBC_Admin_Plugin {
 						foreach ( $enquiry_entries as $entries ) {
 							update_post_meta( $post_id, 'pbc_phase_var_' . $i, $entries['phase_var'] );
 							update_post_meta( $post_id, 'pbc_price_' . $i, $entries['price'] );
-							$i++;
+							++$i;
 						}
 					}
 				}
@@ -907,10 +1029,10 @@ class PBC_Admin_Plugin {
 				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
 					$result = array(
 						'type'     => 'error',
-						'response' => __( 'Error in sending mail. Please try again!', 'pbc' )
+						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
 					);
 				} else {
-					$filename   = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
+					$filename = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
 					$file_pdf = $this->get_budget_base_dir() . $filename;
 					if ( ! empty( $attachments ) && file_exists( $file_pdf ) ) {
 						unlink( $file_pdf );
@@ -933,38 +1055,38 @@ class PBC_Admin_Plugin {
 	 * @return file
 	 */
 	private function generate_engine_pdf( $type_return = 'path', $post_id = null ) {
-			if ( session_id() == '' ) {
-				ob_start();
-				session_start();
-			}
-			$filename   = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
-			$dirname = $this->get_budget_base_dir( 'path' );
+		if ( session_id() == '' ) {
+			ob_start();
+			session_start();
+		}
+			$filename      = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
+			$dirname       = $this->get_budget_base_dir( 'path' );
 			$filename_path = $dirname . $filename;
 
 			$content = $this->configurator_result_generate_pdf();
-			if ( $content['type'] == 'error' ) {
-				//error echo $content['response'];
-			} else {
-				try {
-					$width_mm = 710 * 0.2646;   //1px = 0.2646mm
-					$height_mm = 900 * 0.2646;
-					$html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
-					$html2pdf->setTestTdInOnePage(false);
-					$html2pdf->writeHTML($content['response']);
-					$html2pdf->Output( $filename_path, "F");
-					//$html2pdf->close();
-				} catch ( Html2PdfException $e ) {
-				//error
-					//$formatter = new ExceptionFormatter($e);
-					//echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
-				}
+		if ( $content['type'] == 'error' ) {
+			// error echo $content['response'];
+		} else {
+			try {
+				$width_mm  = 710 * 0.2646;   // 1px = 0.2646mm
+				$height_mm = 900 * 0.2646;
+				$html2pdf  = new \HTML2PDF( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
+				$html2pdf->setTestTdInOnePage( false );
+				$html2pdf->writeHTML( $content['response'] );
+				$html2pdf->Output( $filename_path, 'F' );
+				// $html2pdf->close();
+			} catch ( Html2PdfException $e ) {
+				// error
+				// $formatter = new ExceptionFormatter($e);
+				// echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
 			}
-			if ( is_file( $filename_path ) && 'path' === $type_return ) {
-				return $filename_path;
-			} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
-				return $this->get_budget_base_dir( 'url' ) . $filename;
-			}
-	} 
+		}
+		if ( is_file( $filename_path ) && 'path' === $type_return ) {
+			return $filename_path;
+		} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
+			return $this->get_budget_base_dir( 'url' ) . $filename;
+		}
+	}
 
 	/**
 	 * Returns the filename created in folder
@@ -986,18 +1108,21 @@ class PBC_Admin_Plugin {
 	}
 
 	public function configurator_result_generate_pdf() {
-		if(!isset($_SESSION['pbc_variation'])){
-			$result = array('type'=>'error', 'response'=>__('Configurator not ready!','pbc'));
-		}else{
+		if ( ! isset( $_SESSION['pbc_variation'] ) ) {
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Configurator not ready!', 'pbc' ),
+			);
+		} else {
 			$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
-			$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1) ? trim( $pdf_color_odd ) : '#ffebcb';
+			$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1 ) ? trim( $pdf_color_odd ) : '#ffebcb';
 
-			$pdf_color_total    = get_option( 'pbc_pdf_color_total' );
-			$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1) ? trim( $pdf_color_total ) : '#835536';
+			$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
+			$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
 
 			// Starts PDF.
-			$output  = '<page backcolor="#fff">';
-			$output .= "<style>
+			$output             = '<page backcolor="#fff">';
+			$output            .= "<style>
 			.header, .product .product-title {margin-left: 20px;}
 			.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
 			.product .product-preview{ width:300px; }
@@ -1016,28 +1141,27 @@ class PBC_Admin_Plugin {
 			</style>";
 			$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 			if ( $pdf_image_selected ) {
-				$output .="<img src='" . $pdf_image_selected . "' width='200'/>";
+				$output .= "<img src='" . $pdf_image_selected . "' width='200'/>";
 			}
 			$header_image = get_option( 'pbc_pdf_image_header' );
 			if ( $header_image ) {
 				$output .= '<table class="header"><tr><td><img src="' . esc_url( $header_image ) . '" class="header_image"/></td></tr></table><br/>';
 			}
-			$output .= '<table class="product"><tr><td class="product-title">';
-			$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
-			$output .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
-			$output .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
-			$flipped = false;
+			$output                   .= '<table class="product"><tr><td class="product-title">';
+			$output                   .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
+			$output                   .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
+			$output                   .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
+			$flipped                   = false;
 			$variations_images_flipped = get_option( 'variations_images_flipped' );
 			if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
-				for ($j = 1; $j <= count($_SESSION['pbc_variation']); $j++)
-				{
-					if(isset($_SESSION['pbc_variation'][$j]) && in_array($_SESSION['pbc_variation'][$j]['var']['id'], $variations_images_flipped)){
+				for ( $j = 1; $j <= count( $_SESSION['pbc_variation'] ); $j++ ) {
+					if ( isset( $_SESSION['pbc_variation'][ $j ] ) && in_array( $_SESSION['pbc_variation'][ $j ]['var']['id'], $variations_images_flipped ) ) {
 						$flipped = true;
 					}
 				}
 			}
 
-			$outputImage = imagecreatetruecolor(300, 243);
+			$outputImage = imagecreatetruecolor( 300, 243 );
 			$black       = imagecolorallocate( $outputImage, 0, 0, 0 );
 			$dirname     = $this->get_budget_base_dir();
 			// Make the background transparent
@@ -1045,33 +1169,28 @@ class PBC_Admin_Plugin {
 			for ( $i = 1; $i <= count( $_SESSION['pbc_variation'] ); $i++ ) {
 				$imgprodid = $imgprodurl = '';
 				if ( isset( $_SESSION['pbc_variation'][ $i ] ) ) {
-					$ssVar = $_SESSION['pbc_variation'][$i]['var']['id'];
-					$imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
+					$ssVar        = $_SESSION['pbc_variation'][ $i ]['var']['id'];
+					$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
 					if ( ! empty( $imgprodgroup ) ) {
 						foreach ( $imgprodgroup as $deps ) {
-							if(isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod']) )
-							{
+							if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
 								$prevVar = array();
-								foreach($deps['pbc_depvarimgprod'] as $depvarimgprod)
-								{
-									$arr = explode('|', $depvarimgprod);
-									if(!empty($arr[0]) && !empty($arr[1])){
-										$prevVar[(int)$arr[0]][] = $arr[1];
+								foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+									$arr = explode( '|', $depvarimgprod );
+									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
+										$prevVar[ (int) $arr[0] ][] = $arr[1];
 									}
 								}
-								if(!empty($_SESSION['pbc_variation']))
-								{
-									foreach($_SESSION['pbc_variation'] as $sPhaseKey => $sVariations)
-									{
-										if(isset($prevVar[$sPhaseKey]) &&
-										isset($_SESSION['pbc_variation'][$sPhaseKey]) && in_array($_SESSION['pbc_variation'][$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey]))
-										{
+								if ( ! empty( $_SESSION['pbc_variation'] ) ) {
+									foreach ( $_SESSION['pbc_variation'] as $sPhaseKey => $svariations ) {
+										if ( isset( $prevVar[ $sPhaseKey ] ) &&
+										isset( $_SESSION['pbc_variation'][ $sPhaseKey ] ) && in_array( $_SESSION['pbc_variation'][ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
 											$imgprodid = $deps['pbc_imgprod'][0];
 											break;
 										}
 									}
 								}
-							}elseif((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ){
+							} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
 								$imgprodid = $deps['pbc_imgprod'][0];
 								break;
 							}
@@ -1084,56 +1203,56 @@ class PBC_Admin_Plugin {
 						$extension = pathinfo( $imgprodurl[0], PATHINFO_EXTENSION );
 						switch ( $extension ) {
 							case 'png':
-								$img = imagecreatefrompng( $imgprodurl[0] );
-								list($width, $height) = getimagesize($imgprodurl[0]);
-							break;
+								$img                  = imagecreatefrompng( $imgprodurl[0] );
+								list($width, $height) = getimagesize( $imgprodurl[0] );
+								break;
 							default:
-								//jpg, jpeg, gif others
-								$image = imagepng(imagecreatefromstring(file_get_contents($imgprodurl[0])), $dirname . 'product-image-for-pdf.png' );
+								// jpg, jpeg, gif others
+								$image                = imagepng( imagecreatefromstring( file_get_contents( $imgprodurl[0] ) ), $dirname . 'product-image-for-pdf.png' );
 								list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
-								$img = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
+								$img                  = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
 						}
 
 						// Flip it vertically
 						if ( $flipped ) {
-							imageflip($img, IMG_FLIP_HORIZONTAL);
+							imageflip( $img, IMG_FLIP_HORIZONTAL );
 						}
-						imagecopyresized($outputImage,$img,0,0,0,0,300,243,$width,$height);
-						//$output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
+						imagecopyresized( $outputImage, $img, 0, 0, 0, 0, 300, 243, $width, $height );
+						// $output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
 					}
 				}
 			}
 			imagepng( $outputImage, $dirname . '/product-image-for-pdf.png' );
 			imagedestroy( $outputImage );
-			$output .= '<img phaseid="'.$i.'" src="' . $dirname . '/product-image-for-pdf.png" alt="product image"/>';
-			$output .= "</div></td></tr></table><br/><br/>";
+			$output .= '<img phaseid="' . $i . '" src="' . $dirname . '/product-image-for-pdf.png" alt="product image"/>';
+			$output .= '</div></td></tr></table><br/><br/>';
 
-			$output .= '<table class="summary">';
+			$output     .= '<table class="summary">';
 			$total_price = 0;
-			$i = 0;
+			$i           = 0;
 			foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
 				if ( ( $i % 2 ) == 0 ) {
 					$bg = 'background';
 				} else {
 					$bg = '';
 				}
-				$price = (double) str_replace( ',', '.', $details['var']['price'] );
+				$price        = (float) str_replace( ',', '.', $details['var']['price'] );
 				$total_price += $price;
-				$output .= '<tr>';
-				$output .= '<td class="title '.$bg.'">'.$details['phase']['name'].' '.$details['var']['name'].'</td>';
-				$output .= '<td class="value right '.$bg.'">';
+				$output      .= '<tr>';
+				$output      .= '<td class="title ' . $bg . '">' . $details['phase']['name'] . ' ' . $details['var']['name'] . '</td>';
+				$output      .= '<td class="value right ' . $bg . '">';
 				if ( $price > 0 ) {
 					$output .= number_format( $price, 2, ',', '.' ) . ' €';
 				}
 				$output .= '</td>';
 				$output .= '</tr>';
-				$i++;
+				++$i;
 			}
 			if ( ! $total_price ) {
 				$total_price = 0;
-				$tax = 0;
+				$tax         = 0;
 			}
-			$tax = $total_price * 0.21;
+			$tax            = $total_price * 0.21;
 			$total_pricevat = $total_price + $total_price * 0.21;
 
 			$output .= '</table>';
@@ -1141,19 +1260,19 @@ class PBC_Admin_Plugin {
 			$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
 			$output .= '<td class="value right">';
 			if ( $tax > 0 ) {
-				$output .= number_format( $tax, 2, ',', '.') . ' €';
+				$output .= number_format( $tax, 2, ',', '.' ) . ' €';
 			}
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
 			$output .= '<td class="value right">';
 			if ( $total_price > 0 ) {
-				$output .= number_format( $total_price, 2, ',', '.').' €';
+				$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
 			}
 			$output .= '</td>';
 			$output .= '</tr>';
 			$output .= '<tr>';
-			$color = CALC::calculate_color_text( $background_total );
+			$color   = CALC::calculate_color_text( $background_total );
 			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
 			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 			if ( $total_pricevat > 0 ) {
@@ -1169,23 +1288,25 @@ class PBC_Admin_Plugin {
 			}
 
 			$output .= '</page>';
-			$result = array('type'=>'success', 'response'=>$output);
+			$result  = array(
+				'type'     => 'success',
+				'response' => $output,
+			);
 		}
 		return $result;
 	}
 
-	//add print-pdf button
-	public function pbc_add_print_pdf_button( $views )
-	{
-		$views['pdf-button'] = '<button id="print-pdf" type="button" class="button" title="Print PDF" style="margin:0 5px"><span class="dashicons dashicons-media-spreadsheet"></span> '.__('Create List Price', 'pbc').'</button><span id="print-message"></span>';
+	// add print-pdf button
+	public function pbc_add_print_pdf_button( $views ) {
+		$views['pdf-button'] = '<button id="print-pdf" type="button" class="button" title="Print PDF" style="margin:0 5px"><span class="dashicons dashicons-media-spreadsheet"></span> ' . __( 'Create List Price', 'pbc' ) . '</button><span id="print-message"></span>';
 		return $views;
 	}
-	public function pbc_move_print_pdf_button( )
-	{
+	public function pbc_move_print_pdf_button() {
 		global $current_screen;
 		// only variation post type, exit earlier
-		if( 'variation' != $current_screen->post_type )
+		if ( 'variation' != $current_screen->post_type ) {
 			return;
+		}
 		?>
 		<script type="text/javascript">
 			var ids = new Array();
@@ -1200,10 +1321,10 @@ class PBC_Admin_Plugin {
 				// 	$('#print-message').html('Please select a post!').show().delay(3000).fadeOut(500);
 				// 	return false;
 				// }
-				$('#print-message').html('<img src="<?php echo WPPBC_PLUGIN_URL;?>/assets/loading.gif"/>');
+				$('#print-message').html('<img src="<?php echo WPPBC_PLUGIN_URL; ?>/assets/loading.gif"/>');
 				$.ajax({
 					type: "POST",
-					url: '<?php echo admin_url('admin-ajax.php');?>',
+					url: '<?php echo admin_url( 'admin-ajax.php' ); ?>',
 					data: 'action=print_pdf&ids='+ids,
 					dataType: "html",
 					success: function(result) {
@@ -1226,9 +1347,10 @@ class PBC_Admin_Plugin {
 		</script>
 		<?php
 	}
-	public function print_pdf_action_callback(){
-		extract($_REQUEST);
-		/*if(empty($ids)){
+	public function print_pdf_action_callback() {
+		extract( $_REQUEST );
+		/*
+		if(empty($ids)){
 			$ids = get_posts('posts_per_page=-1&post_type=variation&fields=ids');
 		}else{
 			$ids = explode(',',$ids);
@@ -1256,53 +1378,71 @@ class PBC_Admin_Plugin {
 			}
 		</style>
 		<?php
-		$pdf_image_selected = get_option('pbc_pdf_image_selected');
-		if($pdf_image_selected){?>
-			<img src="<?php echo $pdf_image_selected;?>" width='200'/>
-		<?php }?>
-		<h1><?php _e('List Price for','pbc'); echo ' '.get_bloginfo( 'name');?></h1>
-		<p><strong><?php _e('Date','pbc'); echo ': '.date('d-m-Y');?></strong></p>
-		<?php $phases = get_posts('posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC');
-		foreach ($phases as $phase) { ?>
+		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
+		if ( $pdf_image_selected ) {
+			?>
+			<img src="<?php echo $pdf_image_selected; ?>" width='200'/>
+		<?php } ?>
+		<h1>
+		<?php
+		_e( 'List Price for', 'pbc' );
+		echo ' ' . get_bloginfo( 'name' );
+		?>
+		</h1>
+		<p><strong>
+		<?php
+		_e( 'Date', 'pbc' );
+		echo ': ' . date( 'd-m-Y' );
+		?>
+		</strong></p>
+		<?php
+		$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+		foreach ( $phases as $phase ) {
+			?>
 			<table>
 			<tr class="table_header">
-				<td style="width: 30%; text-align: left"><?php echo $phase->menu_order.' . '.$phase->post_title;?></td>
-				<td style="width: 10%; text-align: left"><?php _e('Price','pbc');?></td>
-				<td style="width: 30%; text-align: left"><?php _e('Depends of','pbc');?></td>
-				<td style="width: 10%; text-align: left"><?php _e('Icon','pbc');?></td>
-				<td style="width: 10%; text-align: left"><?php _e('Product','pbc');?></td>
+				<td style="width: 30%; text-align: left"><?php echo $phase->menu_order . ' . ' . $phase->post_title; ?></td>
+				<td style="width: 10%; text-align: left"><?php _e( 'Price', 'pbc' ); ?></td>
+				<td style="width: 30%; text-align: left"><?php _e( 'Depends of', 'pbc' ); ?></td>
+				<td style="width: 10%; text-align: left"><?php _e( 'Icon', 'pbc' ); ?></td>
+				<td style="width: 10%; text-align: left"><?php _e( 'Product', 'pbc' ); ?></td>
 			</tr>
 			<?php
 			$args = array(
-			  'numberposts' => -1,
-			  'post_type' => 'variation',
-			  'meta_query' => array (
-				array (
-				  'key' => 'pbc_phase',
-				  'value' => $phase->ID,
-				)
-			  ) );
+				'numberposts' => -1,
+				'post_type'   => 'variation',
+				'meta_query'  => array(
+					array(
+						'key'   => 'pbc_phase',
+						'value' => $phase->ID,
+					),
+				),
+			);
 
-			$variation_in_phase = new WP_Query( $args ); ?>
+			$variation_in_phase = new WP_Query( $args );
+			?>
 			<?php if ( $variation_in_phase->have_posts() ) : ?>
 
 
 			<!-- the loop -->
-			<?php while ( $variation_in_phase->have_posts() ) : $variation_in_phase->the_post(); ?>
+				<?php
+				while ( $variation_in_phase->have_posts() ) :
+					$variation_in_phase->the_post();
+					?>
 				<tr>
-					<td style="width: 30%; text-align: left"><?php //* Title ?>
+					<td style="width: 30%; text-align: left"><?php // * Title ?>
 						<strong><?php the_title(); ?></strong>
 					</td>
 					<td style="width: 10%; text-align: left">
 						<?php
 						// Price group.
-						$price_group = rwmb_meta( 'pbc_pricegroup' );
+						$price_group  = rwmb_meta( 'pbc_pricegroup' );
 						$price_column = '';
 						foreach ( $price_group as $price_item ) {
 							if ( isset( $price_item['pbc_meaprice'] ) ) {
-								$price_column .= $price_item['pbc_meaprice'].' - '.$price_item['pbc_pricem'].' €';
+								$price_column .= $price_item['pbc_meaprice'] . ' - ' . $price_item['pbc_pricem'] . ' €';
 							} else { // Price without any option
-								$price_column .= $price_item['pbc_pricem'].' €';
+								$price_column .= $price_item['pbc_pricem'] . ' €';
 							}
 							$price_column .= '<br/>';
 						}
@@ -1310,17 +1450,18 @@ class PBC_Admin_Plugin {
 						?>
 					</td>
 					<td style="width: 30%; text-align: left; font-size: 9pt;">
-						<?php // Depends of.
-						$depends_group = rwmb_meta( 'pbc_depends' );
+						<?php
+						// Depends of.
+						$depends_group  = rwmb_meta( 'pbc_depends' );
 						$depends_column = '';
 						foreach ( $depends_group as $depends_item ) {
 							$variation_id   = substr( $depends_item['pbc_depvar'], 3 );
-							$variation_post = get_post( $variation_id);
+							$variation_post = get_post( $variation_id );
 							$phase_id_dp    = get_post_meta( $variation_id, 'pbc_phase', true );
 							$phase_post_dp  = get_post( $phase_id_dp );
 
-							if ( $phase_post_dp->menu_order<10 ) {
-								$phase_order = '0'.$phase_post_dp->menu_order;
+							if ( $phase_post_dp->menu_order < 10 ) {
+								$phase_order = '0' . $phase_post_dp->menu_order;
 							} else {
 								$phase_order = $phase_post_dp->menu_order;
 							}
@@ -1330,62 +1471,78 @@ class PBC_Admin_Plugin {
 						echo $depends_column;
 						?>
 					</td>
-					<td style="width: 10%; text-align: left"><?php //* Image Icon
+					<td style="width: 10%; text-align: left">
+					<?php
+					// * Image Icon
 						$imgicon = get_post_meta( get_the_id(), 'pbc_imgicon', true );
-						if ( $imgicon ) {
-							$icon_image = wp_get_attachment_image_src($imgicon, array(105,75), true);
-							echo '<img class="imagepdf" src="'.$icon_image[0].'" />';
-						}
-						?>
+					if ( $imgicon ) {
+						$icon_image = wp_get_attachment_image_src( $imgicon, array( 105, 75 ), true );
+						echo '<img class="imagepdf" src="' . $icon_image[0] . '" />';
+					}
+					?>
 					</td>
-					<td style="width: 10%; text-align: left"><?php //* Image Product
-						$imgprod = get_post_meta(get_the_id(), 'pbc_imgprod', true);
-						if($imgprod){
-							$icon_image = wp_get_attachment_image_src($imgprod, array(105,75), true);
-							echo '<img class="imagepdf" src="'.$icon_image[0].'" />';
-						}
-						?>
+					<td style="width: 10%; text-align: left">
+					<?php
+					// * Image Product
+						$imgprod = get_post_meta( get_the_id(), 'pbc_imgprod', true );
+					if ( $imgprod ) {
+						$icon_image = wp_get_attachment_image_src( $imgprod, array( 105, 75 ), true );
+						echo '<img class="imagepdf" src="' . $icon_image[0] . '" />';
+					}
+					?>
 					</td>
 				</tr>
 			<?php endwhile; ?>
-			<?php wp_reset_postdata(); ?>
+				<?php wp_reset_postdata(); ?>
 
 			<?php endif; ?>
 			</table>
-		<?php }
+			<?php
+		}
 		$content = ob_get_contents();
 		ob_end_clean();
 
-		if (is_file(WPPBC_PLUGIN_DIR.
-			"/lib/html2pdf/html2pdf.class.php")
+		if ( is_file(
+			WPPBC_PLUGIN_DIR .
+			'/lib/html2pdf/html2pdf.class.php'
 		)
-		{
-			require_once(WPPBC_PLUGIN_DIR.
-				'/lib/html2pdf/html2pdf.class.php');
+		) {
+			require_once WPPBC_PLUGIN_DIR .
+			'/lib/html2pdf/html2pdf.class.php';
 			try {
-				$files = glob(WPPBC_PLUGIN_DIR."/pdf/*"); // get all file names
-				foreach($files as $file){ // iterate files
-				  if(is_file($file))
-				    unlink($file); // delete file
+				$files = glob( WPPBC_PLUGIN_DIR . '/pdf/*' ); // get all file names
+				foreach ( $files as $file ) { // iterate files
+					if ( is_file( $file ) ) {
+						unlink( $file ); // delete file
+					}
 				}
-				$filename = __('List Price','pbc').' '.get_bloginfo('name').' '.date('Y-m-d H:i');
-				$width_mm = 710 * 0.2646;   //1px = 0.2646mm
+				$filename  = __( 'List Price', 'pbc' ) . ' ' . get_bloginfo( 'name' ) . ' ' . date( 'Y-m-d H:i' );
+				$width_mm  = 710 * 0.2646;   // 1px = 0.2646mm
 				$height_mm = 900 * 0.2646;
-				$html2pdf = new \HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(2.5, 2.5, 2.5, 2.5));
-				$html2pdf->setTestTdInOnePage(false);
-				$html2pdf->writeHTML($content);
-				$html2pdf->Output(WPPBC_PLUGIN_DIR."/pdf/$filename.pdf", 'F');
-				//$html2pdf->close();
-				$return = array('type'=>'success', 'msg'=>WPPBC_PLUGIN_URL."pdf/$filename.pdf");
-			} catch (Html2PdfException $e) {
-				$formatter = new ExceptionFormatter($e);
-				$return = array('type'=>'error', 'msg'=>"Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage());
+				$html2pdf  = new \HTML2PDF( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
+				$html2pdf->setTestTdInOnePage( false );
+				$html2pdf->writeHTML( $content );
+				$html2pdf->Output( WPPBC_PLUGIN_DIR . "/pdf/$filename.pdf", 'F' );
+				// $html2pdf->close();
+				$return = array(
+					'type' => 'success',
+					'msg'  => WPPBC_PLUGIN_URL . "pdf/$filename.pdf",
+				);
+			} catch ( Html2PdfException $e ) {
+				$formatter = new ExceptionFormatter( $e );
+				$return    = array(
+					'type' => 'error',
+					'msg'  => "Unexpected Error!<br>Can't load PDF this time!<br>" . $formatter->getHtmlMessage(),
+				);
 			}
-		}else{
-			$return = array('type'=>'error', 'msg'=>'Error: PDF Library Not Present');
+		} else {
+			$return = array(
+				'type' => 'error',
+				'msg'  => 'Error: PDF Library Not Present',
+			);
 		}
-		echo ';;--;;'.json_encode($return);
-		die(0);
+		echo ';;--;;' . json_encode( $return );
+		die( 0 );
 	}
 	/**
 	 * # LICENSE
@@ -1461,7 +1618,7 @@ class PBC_Admin_Plugin {
 
 		// Deactivates API Key key activation.
 		if ( isset( $input['pbc_license_deactivate_checkbox'] ) && 'on' === $input['pbc_license_deactivate_checkbox'] ) {
-			$args = array(
+			$args                = array(
 				'api_key' => ! empty( $api_key ) ? $api_key : '',
 			);
 			$deactivation_result = $this->license_deactivate( $args );
@@ -1604,7 +1761,7 @@ class PBC_Admin_Plugin {
 		if ( $live ) {
 			$license_status = $this->license_key_status();
 
-			return ! empty( $license_status ) && ! empty( $license_status['data'][ 'activated' ] ) && $license_status['data'][ 'activated' ];
+			return ! empty( $license_status ) && ! empty( $license_status['data']['activated'] ) && $license_status['data']['activated'];
 		}
 
 		/**
@@ -1612,7 +1769,7 @@ class PBC_Admin_Plugin {
 		 *
 		 * Stored result when first activating software.
 		 */
-		return get_option('pbc_license_activated') == 'Activated';
+		return get_option( 'pbc_license_activated' ) == 'Activated';
 	}
 
 	/**
@@ -1671,7 +1828,6 @@ class PBC_Admin_Plugin {
 		}
 
 		return $defaults;
-
 	}
 
 	/**
@@ -1720,8 +1876,8 @@ class PBC_Admin_Plugin {
 	 */
 	public function send_query( $args ) {
 		$target_url = esc_url_raw( add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args ) );
-		error_log( 'target_url:'.$target_url);
-		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+		error_log( 'target_url:' . $target_url );
+		$request = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
 
 		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
 			return false;
@@ -1845,7 +2001,7 @@ class PBC_Admin_Plugin {
 					<p>
 						<?php
 						printf(
-							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %s updates. Please add %s to %s.', 'pbc' ),
+							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
 							'AutoTranslate',
 							'<strong>' . esc_html( $host ) . '</strong>',
 							'<code>WP_ACCESSIBLE_HOSTS</code>'

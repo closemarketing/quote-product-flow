@@ -190,4 +190,32 @@ class CALC {
 		}
 		return $phase_options;
 	}
+
+	/**
+	 * Gets the price variation with roles
+	 *
+	 * @param int    $variation_id Variation ID.
+	 * @param string $price_var Price variation.
+	 * @return array
+	 */
+	public static function get_price_variation( $variation_id, $price_var ) {
+		$user  = wp_get_current_user();
+		$price = null;
+
+		$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
+		if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
+			$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ), true );
+			if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
+				$price = $pricegroup[0]['pbc_pricem'];
+				if ( ! empty( $user->roles ) ) {
+					$role_slug     = $user->roles[0];
+					$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
+					if ( ! empty( $role_discount ) ) {
+						$price = $price - ( $price * $role_discount / 100 );
+					}
+				}
+			}
+		}
+		return $price;
+	}
 }
