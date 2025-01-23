@@ -513,17 +513,21 @@ class PBC_Helper_PostTypes {
 				break;
 			case 'enquiry_date':
 				echo get_the_date( 'd-m-Y H:i', $id );
-				echo '<br/><button class="button generate-pbc-pdf" data-post-id="' . $id . '">';
+				echo '<br/><button class="button generate-pbc-pdf" data-post-id="' . (int) $id . '">';
 				esc_html_e( 'Generate PDF', 'pbc' );
-				echo '</button><span id="pbc-pdf-' . $id . '" class="spinner"></span>';
+				echo '</button><span id="pbc-pdf-' . (int) $id . '" class="spinner"></span>';
 				break;
 			default:
 				break;
 		} // end switch
 	}
 
-	/** Add columns for Variations **/
-	// Add to admin_init function
+	/**
+	 * Add columns for Variations
+	 *
+	 * @param array $phases_columns Columns.
+	 * @return array
+	 */
 	public function add_new_var_columns( $phases_columns ) {
 		$new_columns['cb']      = '<input type="checkbox" />';
 		$new_columns['title']   = __( 'Variation', 'pbc' );
@@ -536,7 +540,13 @@ class PBC_Helper_PostTypes {
 		return $new_columns;
 	}
 
-
+	/**
+	 * Manages columns for Variations
+	 *
+	 * @param string  $column_name Name of the column.
+	 * @param integer $id Post ID.
+	 * @return void
+	 */
 	public function manage_var_columns( $column_name, $id ) {
 		$phase_id = get_post_meta( $id, 'pbc_phase', true );
 
@@ -580,7 +590,7 @@ class PBC_Helper_PostTypes {
 					$phase_post_dp  = get_post( $phase_id_dp );
 					$phase_order    = '';
 					$phase_order   .= CALC::adds_zero( $phase_post_dp->menu_order );
-					echo $phase_order . ' - ' . esc_html( $phase_post_dp->post_title ) . ' - ';
+					echo esc_html( $phase_order ) . ' - ' . esc_html( $phase_post_dp->post_title ) . ' - ';
 					echo esc_html( $variation_post->post_title ) . '<br/>';
 				}
 				break;
@@ -591,7 +601,7 @@ class PBC_Helper_PostTypes {
 					$icon_image = wp_get_attachment_image_src( $imgicon, array( 120, 120 ), true );
 				}
 				if ( isset( $icon_image ) ) {
-					echo '<img src="' . $icon_image[0] . '" />';
+					echo '<img src="' . esc_url( $icon_image[0] ) . '" />';
 				}
 				break;
 			case 'imgprod':
@@ -604,7 +614,7 @@ class PBC_Helper_PostTypes {
 					foreach ( $image_group as $imageg_item ) {
 						if ( isset( $imageg_item['pbc_imgprod'][0] ) ) {
 							$icon_imageprod = wp_get_attachment_image_src( $imageg_item['pbc_imgprod'][0], array( 57, 46 ), true );
-							echo '<img src="' . $icon_imageprod[0] . '" width="57" height="46"/>';
+							echo '<img src="' . esc_url( $icon_imageprod[0] ) . '" width="57" height="46"/>';
 						}
 					}
 				}
@@ -645,22 +655,22 @@ class PBC_Helper_PostTypes {
 	}
 
 	/**
-	 * if submitted filter by post meta
+	 * If submitted filter by post meta
 	 *
-	 * make sure to change META_KEY to the actual meta key
+	 * Make sure to change META_KEY to the actual meta key
 	 * and variation to the name of your custom post type
 	 *
-	 * @param (wp_query object) $query
+	 * @param (wp_query object) $query Query.
 	 * @return void
 	 */
 	public function pbc_posts_filter( $query ) {
 		global $pagenow;
-		$type = isset( $_GET['post_type'] ) ? $_GET['post_type'] : 'post';
+		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
 
-		if ( 'variation' == $type && is_admin() && $pagenow == 'edit.php' ) {
-			if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] != '' ) {
+		if ( 'variation' == $type && is_admin() && 'edit.php' === $pagenow ) {
+			if ( isset( $_GET['pbc_filter_phase'] ) && '' !== $_GET['pbc_filter_phase'] ) {
 				$query->query_vars['meta_key']   = 'pbc_phase';
-				$query->query_vars['meta_value'] = $_GET['pbc_filter_phase'];
+				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) );
 			}
 		}
 	}
