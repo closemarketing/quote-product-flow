@@ -241,6 +241,19 @@ class PBC_Helper_PostTypes {
 					'std'   => '',
 					'clone' => false,
 				),
+				// SELECT BOX PHASE.
+				array(
+					'name'        => __( 'Field type', 'pbc' ),
+					'id'          => "{$prefix}field_type",
+					'type'        => 'select',
+					'options'     => array(
+						''    => __( 'Default by price', 'pbc' ),
+						'qty' => __( 'Quantity', 'pbc' ),
+					),
+					'multiple'    => false,
+					'std'         => '',
+					'placeholder' => __( 'Select a phase', 'pbc' ),
+				),
 				// IMAGE ADVANCED (WP 3.5+).
 				array(
 					'name'             => __( 'Icon image', 'pbc' ),
