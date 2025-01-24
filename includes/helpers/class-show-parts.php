@@ -58,6 +58,7 @@ class SHOW {
 							<?php
 							echo esc_html( $variation_data['title'] );
 						} elseif ( 'qty' === $field_type ) {
+							$s_var = $s_var === $variation_id ? 1 : $s_var;
 							?>
 							<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
 							<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
