@@ -54,7 +54,7 @@ class SHOW {
 						$field_type = get_post_meta( $variation_id, 'pbc_field_type', true );
 						if ( empty( $field_type ) ) {
 							?>
-							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php selected( $variation_id, $s_var, true ); ?> />
+							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
 							<?php
 							echo esc_html( $variation_data['title'] );
 						} elseif ( 'qty' === $field_type ) {
