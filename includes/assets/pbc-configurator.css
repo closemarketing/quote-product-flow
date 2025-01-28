@@ -15,7 +15,7 @@
   padding-right: 14px;
   padding-top: 2.8px;
   padding-bottom: 2.8px;
-  background: #9a781f;
+  background: #287465;
   color: white;
   font-size: 14px;
   border: none;
@@ -45,7 +45,7 @@
 .next .btn::after {
   right: -24px;
   border-width: 12px;
-  border-color: transparent transparent transparent #9a781f;
+  border-color: transparent transparent transparent #287465;
 }
 
 .next .btn:hover::after {
@@ -54,7 +54,7 @@
 
 .prev .btn::after {
   left: -24px;
-  border-color: transparent #9a781f transparent transparent;
+  border-color: transparent #287465 transparent transparent;
   border-width: 12px;
 }
 
@@ -112,7 +112,7 @@
   position: relative;
   float: left;
   width: 12.5%;
-  height: 33px;
+  height: 40px;
   line-height: 40px;
   vertical-align: middle;
   text-align: center;
