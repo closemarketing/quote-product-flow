@@ -25,7 +25,7 @@ class PBC_Template_Wizard {
 	 * @param integer $parent_phase Parent Phase.
 	 * @return void
 	 */
-	public static function render( $parent_phase = 0 ) {
+	public static function render( $parent_phase = 0, $template = 'wizard' ) {
 		$cstep   = 1;
 		$user_id = get_current_user_id();
 
@@ -109,7 +109,7 @@ class PBC_Template_Wizard {
 
 		if ( ! defined( 'DOING_AJAX' ) ) {
 			?>
-			<div class="page-configurator">
+			<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
 			<?php
 		} //defined('DOING_AJAX')
 
@@ -119,29 +119,11 @@ class PBC_Template_Wizard {
 			</div>
 			<?php
 		}
+
+		if ( 'wizard' === $template ) {
+			SHOW::wizard_phases( $phases, $cstep );
+		}
 		?>
-		<div class="configurator_steps_nav" id="configurator_steps_nav">
-			<ul>
-			<?php
-			$steps = 1;
-			foreach ( $phases as $phase ) {
-				?>
-				<li class="configurator_steps step-<?php echo esc_attr( $steps ); ?> <?php
-				if ( $cstep === $steps ) {
-					echo 'active'; }
-				?>
-				">
-					<div class="stepContainer">
-						<div class="step-name"><?php echo esc_html( get_the_title( $phase ) ); ?></div>
-						<span class="step-arrow-button"></span>
-					</div>
-				</li>
-				<?php
-				++$steps;
-			}
-			?>
-			</ul>
-		</div>
 		<?php $parent_phase_slug = sanitize_title( get_the_title( $parent_phase ) ); ?>
 		<div class="phase_detail product-<?php echo esc_html( $parent_phase_slug ); ?>">
 			<form action="" method="post" name="configurator-form" id="configurator-form">
@@ -151,7 +133,7 @@ class PBC_Template_Wizard {
 				$phase_title = get_the_title( $phase_id );
 				$phase_slug  = sanitize_title( get_the_title( $phase_id ) );
 				?>
-				<div class="configurator-left">
+				<div class="configurator-<?php echo 'wizard' === $template ? 'left' : 'right'; ?>">
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 						<?php
@@ -267,8 +249,13 @@ class PBC_Template_Wizard {
 						}
 						?>
 					</div>
+					<?php
+					if ( 'vertical' === $template ) {
+						SHOW::action_buttons( $phases, $cstep, $template );
+					}
+					?>
 				</div>
-				<div class="configurator-right">
+				<div class="configurator-<?php echo 'wizard' === $template ? 'left' : 'right'; ?>">
 				<?php
 			} //cStep!=calculate
 
@@ -367,54 +354,10 @@ class PBC_Template_Wizard {
 				</div>
 				<div class="status_loader product_preview_status fixed hidden"></div>
 			</div>
-			<div class="configurator_form_action">
-				<?php
-				if ( $cstep == 1 ) {
-					$prev_step   = '';
-					$prev_button = '';
-				} elseif ( $cstep == 'calculate' ) {
-					$prev_step   = count( $phases );
-					$prev_button = __( 'Back', 'pbc' );
-				} else {
-					$prev_step   = $cstep - 1;
-					$prev_button = __( 'Back', 'pbc' );
-				}
-
-				if ( $cstep == 'calculate' ) {
-					$next_step   = 'calculate';
-					$next_button = '';
-				} elseif ( $cstep == count( $phases ) ) {
-					$next_step   = 'calculate';
-					$next_button = __( 'Calculate', 'pbc' );
-				} else {
-					$next_step   = $cstep + 1;
-					$next_button = __( 'Next', 'pbc' );
-				}
-				?>
-				<input type="hidden" name="pbc_current_phase" value="<?php echo $cstep; ?>"/>
-				<?php if ( $prev_step && $prev_button ) { ?>
-				<div class="prev 
-					<?php
-					if ( empty( $prev_step ) ) {
-						echo 'hidden';}
-					?>
-				">
-					<input type="hidden" name="prev_phase" value="<?php echo $prev_step; ?>"/>
-					<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo $prev_button; ?></button>
-				</div>
-				<?php } ?>
-				<div class="next">
-					<?php
-					if ( $next_step ) {
-						?>
-						<input type="hidden" name="next_phase" value="<?php echo $next_step; ?>"/><?php } ?>
-					<?php
-					if ( $next_button ) {
-						?>
-						<button type="submit" name="submit" value="next" class="btn btn-next"><?php echo $next_button; ?></button><?php } ?>
-				</div>
-			</div>
 			<?php
+			if ( 'wizard' === $template ) {
+				SHOW::action_buttons( $phases, $cstep );
+			}
 			SHOW::calculation_summary( $cstep, $phases );
 			if ( 'calculate' === $cstep ) {
 				?>

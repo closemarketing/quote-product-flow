@@ -180,4 +180,90 @@ class SHOW {
 		</div>
 		<?php
 	}
+
+	/**
+	 * Show wizard phases.
+	 *
+	 * @param array $phases Phases.
+	 * @param int   $cstep Current step.
+	 * @return void
+	 */
+	public static function wizard_phases( $phases, $cstep ) {
+		?>
+		<div class="configurator_steps_nav" id="configurator_steps_nav">
+			<ul>
+			<?php
+			$steps = 1;
+			foreach ( $phases as $phase ) {
+				?>
+				<li class="configurator_steps step-<?php echo esc_attr( $steps ); ?> <?php
+				if ( $cstep === $steps ) {
+					echo 'active'; }
+				?>
+				">
+					<div class="stepContainer">
+						<div class="step-name"><?php echo esc_html( get_the_title( $phase ) ); ?></div>
+						<span class="step-arrow-button"></span>
+					</div>
+				</li>
+				<?php
+				++$steps;
+			}
+			?>
+			</ul>
+		</div>
+		<?php
+	}
+
+	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) {
+		?>
+		<div class="configurator_form_action">
+			<?php
+			if ( $cstep == 1 ) {
+				$prev_step   = '';
+				$prev_button = '';
+			} elseif ( $cstep == 'calculate' ) {
+				$prev_step   = count( $phases );
+				$prev_button = __( 'Back', 'pbc' );
+			} else {
+				$prev_step   = $cstep - 1;
+				$prev_button = __( 'Back', 'pbc' );
+			}
+
+			if ( $cstep == 'calculate' ) {
+				$next_step   = 'calculate';
+				$next_button = '';
+			} elseif ( $cstep == count( $phases ) ) {
+				$next_step   = 'calculate';
+				$next_button = __( 'Calculate', 'pbc' );
+			} else {
+				$next_step   = $cstep + 1;
+				$next_button = __( 'Next', 'pbc' );
+			}
+			?>
+			<input type="hidden" name="pbc_current_phase" value="<?php echo $cstep; ?>"/>
+			<?php if ( $prev_step && $prev_button ) { ?>
+			<div class="prev 
+				<?php
+				if ( empty( $prev_step ) ) {
+					echo 'hidden';}
+				?>
+			">
+				<input type="hidden" name="prev_phase" value="<?php echo $prev_step; ?>"/>
+				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo $prev_button; ?></button>
+			</div>
+			<?php } ?>
+			<div class="next">
+				<?php
+				if ( $next_step ) {
+					?>
+					<input type="hidden" name="next_phase" value="<?php echo $next_step; ?>"/><?php } ?>
+				<?php
+				if ( $next_button ) {
+					?>
+					<button type="submit" name="submit" value="next" class="btn btn-next"><?php echo $next_button; ?></button><?php } ?>
+			</div>
+		</div>
+		<?php
+	}
 }

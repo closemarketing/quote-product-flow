@@ -94,11 +94,12 @@ class PBC_Public {
 
 		$pbc_atts = shortcode_atts(
 			array(
-				'pid' => 0,
+				'pid'      => 0,
+				'template' => 'wizard', // wizard, vertical.
 			),
 			$atts,
 		);
-		PBC_Template_Wizard::render( $pbc_atts['pid'] );
+		PBC_Template_Wizard::render( $pbc_atts['pid'], $pbc_atts['template'] );
 	}
 }
 

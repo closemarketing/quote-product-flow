@@ -48,7 +48,7 @@ require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
 // Helpers.
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-parts.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template-wizard.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php';
 
 // Include files.
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
