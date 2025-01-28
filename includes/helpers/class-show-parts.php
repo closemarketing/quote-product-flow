@@ -30,7 +30,7 @@ class SHOW {
 	 */
 	public static function variations_content( $variations_section, $s_var, $cstep ) {
 		?>
-		<ul>
+		<ul class="pbc_variations">
 			<?php
 			$actual_variation_tag = '';
 			foreach ( $variations_section as $variation_data ) {
@@ -43,7 +43,7 @@ class SHOW {
 						$actual_variation_tag = $variation_data['section'];
 					}
 					?>
-					<label>
+					<label class="pbc_variation_label">
 						<?php
 						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
 						if ( $imgicon ) {
