@@ -1,0 +1,183 @@
+<?php
+/**
+ * Class for show parts.
+ *
+ * @package    WordPress
+ * @author     David Perez <david@close.technology>
+ * @copyright  2022 Closemarketing
+ * @version    1.0
+ */
+
+namespace Close\PBC\Helpers;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Helper Calculate PBC.
+ *
+ * All helpers calculations.
+ *
+ * @since 1.1
+ */
+class SHOW {
+	/**
+	 * Variations sections.
+	 *
+	 * @param array $variations_section Variations sections.
+	 * @param int   $s_var Selected variation.
+	 * @param int   $cstep Current step.
+	 * @return void
+	 */
+	public static function variations_content( $variations_section, $s_var, $cstep ) {
+		?>
+		<ul>
+			<?php
+			$actual_variation_tag = '';
+			foreach ( $variations_section as $variation_data ) {
+				?>
+				<li class="variation_list">
+					<?php
+					$variation_id = (int) $variation_data['id'];
+					if ( $actual_variation_tag !== $variation_data['section'] ) {
+						echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
+						$actual_variation_tag = $variation_data['section'];
+					}
+					?>
+					<label>
+						<?php
+						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
+						if ( $imgicon ) {
+							echo '<div class="variation_img">';
+							echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+							echo '</div>';
+						}
+						$field_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+						if ( empty( $field_type ) ) {
+							?>
+							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+							<?php
+							echo esc_html( $variation_data['title'] );
+						} elseif ( 'qty' === $field_type ) {
+							$s_var = $s_var === $variation_id ? 1 : $s_var;
+							?>
+							<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
+							<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+							<?php
+							echo esc_html( $variation_data['title'] );
+						}
+						?>
+					</label>
+					<?php
+					$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
+					if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) {
+						?>
+						<div class="pbc_pricevarwrap">
+							<select class="pbc_pricevar" name="pbc_pricevar_<?php echo (int) $variation_id; ?>">
+								<?php
+								foreach ( $pricegroup as $key => $details ) {
+									if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
+										echo '<option value="' . esc_attr( $details['pbc_meaprice'] ) . '">';
+										echo esc_html( $details['pbc_meaprice'] );
+										echo '</option>';
+									}
+								}
+								?>
+							</select>
+						</div>
+						<?php
+					}
+					$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
+					if ( $pbc_descopt ) {
+						?>
+						<p class="pbc_descopt"><?php echo wpautop( $pbc_descopt ); ?></p>
+						<?php
+					}
+					?>
+				</li>
+			<?php } ?>
+		</ul>
+		<?php
+	}
+
+	/**
+	 * Calculate summary and show.
+	 *
+	 * @return void
+	 */
+	public static function calculation_summary( $cstep, $phases ) {
+		if ( ! isset( $_SESSION ) && ! isset( $_SESSION['pbc_variation'] ) && is_array( $_SESSION['pbc_variation'] ) ) {
+			return;
+		}
+		?>
+		<div class="configurator_summary">
+			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
+			<table>
+				<?php
+				$show_prices = get_option( 'pbc_budget_show_prices' );
+				if ( 'calculate' === $cstep ) {
+					$count       = count( $phases );
+					$total_price = 0;
+				} else {
+					$count = $cstep;
+				}
+				for ( $i = 1; $i <= $count; $i++ ) {
+					if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
+						continue;
+					}
+					$phase_key    = $i;
+					$var_name     = isset( $_SESSION['pbc_variation'][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION['pbc_variation'][ $i ]['var']['name'] ) : '';
+					$var_price    = ! empty( $_SESSION['pbc_variation'][ $i ]['var']['price'] ) ? (float) $_SESSION['pbc_variation'][ $i ]['var']['price'] : 0;
+					$phase_name   = isset( $_SESSION['pbc_variation'][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION['pbc_variation'][ $i ]['phase']['name'] ) : '';
+					$variation_id = isset( $_SESSION['pbc_variation'][ $i ]['var']['id'] ) ? (int) $_SESSION['pbc_variation'][ $i ]['var']['id'] : 0;
+					$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
+
+					if ( 'calculate' === $cstep && empty( $field_type ) ) {
+						$total_price += (float) $var_price;
+					} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
+						$total_price = (float) $var_price * $total_price;
+					}
+
+					?>
+					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
+						<td class="name">
+							<?php
+							if ( 'qty' === $field_type ) {
+								echo esc_html( $phase_key . '. ' . $var_name . ' x ' . $var_price );
+							} else {
+								echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
+							}
+							?>
+						</td>
+						<td class="price">
+							<?php
+							if ( $var_price && 'no' !== $show_prices ) {
+								echo esc_html( $var_price );
+								echo 'qty' === $field_type ? '' : ' €';
+							}
+							?>
+						</td>
+					</tr>
+					<?php
+				}
+				if ( 'calculate' === $cstep && 'no' !== $show_prices ) {
+					?>
+					<tr class="variation_selected phase-total_price">
+						<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
+						<td class="price">
+							<?php
+							if ( $total_price ) {
+								echo number_format( $total_price, 2, ',', '.' ) . ' €';
+							}
+							?>
+						</td>
+					</tr>
+					<tr class="variation_selected phase-total_price">
+						<td class="name"><?php _e( 'VAT not included', 'pbc' ); ?></td>
+						<td class="price"></td>
+					</tr>
+				<?php } ?>
+			</table>
+		</div>
+		<?php
+	}
+}

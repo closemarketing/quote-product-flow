@@ -436,7 +436,6 @@ if ( ! empty( $phases ) ) {
 						}
 						// sort by section asc and then title asc
 						array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
-						
 
 						// Show public.
 						$sVar = '';
@@ -459,58 +458,7 @@ if ( ! empty( $phases ) ) {
 							}
 						}
 						if ( ! empty( $variations_section ) ) {
-							?>
-							<ul>
-								<?php
-								$actual_variation_tag = '';
-								foreach ( $variations_section as $variation_data ) {
-									$variation_id = (int) $variation_data['id'];
-									if ( $actual_variation_tag !== $variation_data['section'] ) {
-										echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
-										$actual_variation_tag = $variation_data['section'];
-									}
-									?>
-									<li class="variation_list">
-										<label>
-											<?php
-											$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
-											if ( $imgicon ) {
-												echo '<div class="variation_img">';
-												echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
-												echo '</div>';
-											}
-											?>
-											<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo $cStep;?>]" value="<?php echo $variation_id; ?>" <?php if ( $variation_id == $sVar ) { echo 'checked="checked"'; } ?>/> <?php echo esc_html( $variation_data['title'] ); ?>
-										</label>
-											<?php
-											$priceVar = array();
-											$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
-											if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) { ?>
-												<div class="pbc_pricevarwrap">
-													<select class="pbc_pricevar" name="pbc_pricevar_<?php echo $variation_id;?>">
-													<?php foreach($pricegroup as $key => $details){
-														if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
-															echo '<option value="' . $details["pbc_meaprice"] . '">';
-															echo esc_html( $details["pbc_meaprice"] );
-															echo '</option>';
-														}
-													}?>
-													</select>
-												</div>
-												<?php
-											}?>
-											<?php
-											$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
-											if ( $pbc_descopt ) {
-												?>
-												<p class="pbc_descopt"><?php echo wpautop( $pbc_descopt ); ?></p>
-												<?php
-											}
-											?>
-									</li>
-								<?php } ?>
-							</ul>
-							<?php
+							SHOW::variations_content( $variations_section, $s_var, $cstep );
 						}
 					} else {
 						?>
@@ -682,68 +630,8 @@ if ( ! empty( $phases ) ) {
 					<?php if($next_button){?><button type="submit" name="submit" value="next" class="btn btn-next"><?php echo $next_button;?></button><?php }?>
 				</div>
 			</div>
-			<div class="configurator_summary">
-				<?php
-				if ( isset( $_SESSION ) && isset($_SESSION['pbc_variation']) && is_array( $_SESSION['pbc_variation'] ) ) {
-					?>
-					<h2 class="title"><?php _e( 'Actual Configuration', 'pbc' ); ?></h2>
-					<table>
-						<?php
-						$show_prices = get_option( 'pbc_budget_show_prices' );
-						if( $cStep == 'calculate' ){
-							$count       = count( $phases );
-							$total_price = 0;
-						} else {
-							$count = $cStep;
-						}
-						for ( $i = 1; $i <= $count; $i++ ) {
-							if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
-								continue;
-							}
-							$phaseKey  = $i;
-							$varId     = $_SESSION['pbc_variation'][$i]['var']['id'];
-							$varName   = $_SESSION['pbc_variation'][$i]['var']['name'];
-							$varPrice  = ! empty( $_SESSION['pbc_variation'][$i]['var']['price'] ) ? $_SESSION['pbc_variation'][$i]['var']['price'] : 0;
-							$phaseName = $_SESSION['pbc_variation'][$i]['phase']['name'];
-							
-							if ( $cStep == 'calculate' ) {
-								$total_price += (double) $varPrice;
-							}
-							?>
-							<tr class="variation_selected phase-<?php echo $phaseKey;?>">
-								<td class="name"><?php echo $phaseKey.'. '.$phaseName.': '.$varName;?></td>
-								<td class="price">
-									<?php
-									if ( $varPrice && 'no' !== $show_prices ) {
-										echo $varPrice . ' €';
-									}
-									?>
-								</td>
-							</tr>
-							<?php
-						}
-						if ( $cStep == 'calculate' && 'no' !== $show_prices ) { ?>
-							<tr class="variation_selected phase-total_price">
-								<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
-								<td class="price">
-									<?php
-									if ( $total_price ) {
-										echo number_format( $total_price, 2, ',', '.' ) . ' €';
-									}
-									?>
-								</td>
-							</tr>
-							<tr class="variation_selected phase-total_price">
-								<td class="name"><?php _e( 'VAT not included', 'pbc' );?></td>
-								<td class="price"></td>
-							</tr>
-						<?php }?>
-					</table>
-					<?php
-				}
-				?>
-			</div>
-			<?php 
+			<?php
+			SHOW::calculation_summary( $cstep, $phases );
 			if($cStep == 'calculate'){?>
 				<div class="configurator_result_share">
 					<?php if(!isset($_SESSION['pbc_output']) || $_SESSION['pbc_output']['type'] != 'success'){?>

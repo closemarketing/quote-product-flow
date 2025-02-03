@@ -17,6 +17,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 == Changelog ==
 = 1.4.0 =
 *  Added: You can add hierarchical in products, so you can have different phases.
+*  Added: You can select quantity of each products.
 
 = 1.3.1 =
 *  Included Internal libraries.
