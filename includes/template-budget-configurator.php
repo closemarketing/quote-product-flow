@@ -4,6 +4,7 @@
  */
 
 use Close\PBC\Helpers\CALC;
+use Close\PBC\Helpers\SHOW;
 
 if ( session_id() == '' ) {
 	ob_start();

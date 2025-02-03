@@ -52,6 +52,7 @@ require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php';
 
 // Include files.
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
+require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-request.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/helper-required-plugins.php';

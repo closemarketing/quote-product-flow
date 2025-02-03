@@ -21,7 +21,7 @@ class PBC_Public {
 	 * Construct of Class
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'pbc_configurator_session' ) );
+		add_action( 'wp_loaded', array( $this, 'pbc_configurator_session' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_shortcode( 'pbc', array( $this, 'pbc_configurator' ) );
 	}
