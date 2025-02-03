@@ -172,7 +172,7 @@ class SHOW {
 						</td>
 					</tr>
 					<tr class="variation_selected phase-total_price">
-						<td class="name"><?php _e( 'VAT not included', 'pbc' ); ?></td>
+						<td class="name"><?php esc_html_e( 'VAT not included', 'pbc' ); ?></td>
 						<td class="price"></td>
 					</tr>
 				<?php } ?>
