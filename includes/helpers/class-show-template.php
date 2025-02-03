@@ -48,10 +48,10 @@ class PBC_Template_Wizard {
 			$_SESSION['pbc_variation'] = array();
 		}
 
-		if ( isset( $_POST['submit'] ) ) {
-			$submit = sanitize_text_field( $_POST['submit'] );
+		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
+			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) ) {
-				$cstep = sanitize_text_field( $_POST[ $submit . '_phase' ] );
+				$cstep = sanitize_text_field( wp_unslash( $_POST[ $submit . '_phase' ] ) );
 			} else {
 				$cstep = 'calculate';
 			}
@@ -128,6 +128,7 @@ class PBC_Template_Wizard {
 		<div class="phase_detail product-<?php echo esc_html( $parent_phase_slug ); ?>">
 			<form action="" method="post" name="configurator-form" id="configurator-form">
 			<?php
+			wp_nonce_field( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce' );
 			if ( 'calculate' !== $cstep ) {
 				$phase_id    = isset( $phases[ ( (int) $cstep - 1 ) ] ) ? $phases[ ( (int) $cstep - 1 ) ] : 0;
 				$phase_title = get_the_title( $phase_id );
