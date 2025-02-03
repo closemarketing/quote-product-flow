@@ -48,10 +48,10 @@ class PBC_Template_Wizard {
 			$_SESSION['pbc_variation'] = array();
 		}
 
-		if ( isset( $_POST['submit'] ) ) {
-			$submit = sanitize_text_field( $_POST['submit'] );
+		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
+			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) ) {
-				$cstep = sanitize_text_field( $_POST[ $submit . '_phase' ] );
+				$cstep = sanitize_text_field( wp_unslash( $_POST[ $submit . '_phase' ] ) );
 			} else {
 				$cstep = 'calculate';
 			}
@@ -142,6 +142,7 @@ class PBC_Template_Wizard {
 		<div class="phase_detail product-<?php echo esc_html( $parent_phase_slug ); ?>">
 			<form action="" method="post" name="configurator-form" id="configurator-form">
 			<?php
+			wp_nonce_field( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce' );
 			if ( 'calculate' !== $cstep ) {
 				$phase_id    = isset( $phases[ ( (int) $cstep - 1 ) ] ) ? $phases[ ( (int) $cstep - 1 ) ] : 0;
 				$phase_title = get_the_title( $phase_id );
@@ -376,10 +377,10 @@ class PBC_Template_Wizard {
 					$prev_button = __( 'Back', 'pbc' );
 				}
 
-				if ( $cstep == 'calculate' ) {
+				if ( 'calculate' === $cstep ) {
 					$next_step   = 'calculate';
 					$next_button = '';
-				} elseif ( $cstep == count( $phases ) ) {
+				} elseif ( count( $phases ) === $cstep ) {
 					$next_step   = 'calculate';
 					$next_button = __( 'Calculate', 'pbc' );
 				} else {
@@ -395,19 +396,19 @@ class PBC_Template_Wizard {
 						echo 'hidden';}
 					?>
 				">
-					<input type="hidden" name="prev_phase" value="<?php echo $prev_step; ?>"/>
-					<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo $prev_button; ?></button>
+					<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
+					<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_html( $prev_button ); ?></button>
 				</div>
 				<?php } ?>
 				<div class="next">
 					<?php
 					if ( $next_step ) {
 						?>
-						<input type="hidden" name="next_phase" value="<?php echo $next_step; ?>"/><?php } ?>
+						<input type="hidden" name="next_phase" value="<?php echo esc_attr( $next_step ); ?>"/><?php } ?>
 					<?php
 					if ( $next_button ) {
 						?>
-						<button type="submit" name="submit" value="next" class="btn btn-next"><?php echo $next_button; ?></button><?php } ?>
+						<button type="submit" name="submit" value="next" class="btn btn-next"><?php echo esc_html( $next_button ); ?></button><?php } ?>
 				</div>
 			</div>
 			<?php
