@@ -113,11 +113,14 @@ class PBC_Requests {
 		}
 
 		ob_start();
+		/*
 		if ( \locate_template( 'template-budget-configurator.php' ) ) {
 			\locate_template( 'template-budget-configurator.php', true );
 		} else {
 			include WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
 		}
+		*/
+		SHOW::render_template( 'wizard' );
 		$all_details = ob_get_contents();
 		ob_end_clean();
 		echo $all_details;
