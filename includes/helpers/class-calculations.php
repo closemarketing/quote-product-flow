@@ -218,4 +218,145 @@ class CALC {
 		}
 		return $price;
 	}
+
+	/**
+	 * Sends email with configurator result
+	 *
+	 * @param array $post_data Post data.
+	 * @return array
+	 */
+	public static function configurator_result_email_send( $post_data ) {
+		$email_field = ! empty( $post_data['email_field'] ) ? sanitize_text_field( $post_data['email_field'] ) : '';
+		$name_field  = ! empty( $post_data['name_field'] ) ? sanitize_text_field( $post_data['name_field'] ) : '';
+		$phone_field = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
+		$city_field  = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
+		$state_field = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
+
+		if ( ! $email_field ) {
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Email field empty!', 'pbc' ),
+			);
+		} elseif ( ! $name_field ) {
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Name field is empty!', 'pbc' ),
+			);
+		} elseif ( ! $phone_field ) {
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Phone field is empty!', 'pbc' ),
+			);
+		} else {
+			$emails       = explode( ',', $email_field );
+			$admin_emails = get_option( 'pbc_admin_email_notification' );
+			if ( $admin_emails ) {
+				$admin_emails = explode( ',', $admin_emails );
+				$emails       = array_merge( $emails, $admin_emails );
+			}
+			$emails = array_map( 'trim', $emails );
+			if ( ! isset( $_SESSION['pbc_variation'] ) ) {
+				$result = array(
+					'type'     => 'error',
+					'response' => __( 'Configurator not ready!', 'pbc' ),
+				);
+			} else {
+				$subject         = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
+				$message         = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
+				$message        .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
+				$message        .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
+				$message        .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
+				$message        .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
+				$message        .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
+				$message        .= '<br/></div>';
+				$message        .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
+				$message        .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
+				$subtotal_price  = 0;
+				$enquiry_entries = array();
+				$i               = 0;
+				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
+					$price           = (float) $details['var']['price'];
+					$subtotal_price += $price;
+					$message        .= '<tr>';
+					$message        .= '<td>' . $details['phase']['name'] . '</td>';
+					$message        .= '<td>' . $details['var']['name'] . '</td>';
+					$message        .= '<td>';
+					if ( $price > 0 ) {
+						$message .= number_format( $price, 2, ',', '.' ) . ' €';
+					}
+					$message                           .= '</td>';
+					$message                           .= '</tr>';
+					$enquiry_entries[ $i ]['phase_var'] = $details['phase']['name'] . ': ' . $details['var']['name'];
+					$enquiry_entries[ $i ]['price']     = $price;
+					++$i;
+				}
+				$message .= '</table><br/>';
+				// Subtotal.
+				$message    .= '<table>';
+				$message    .= '<tr>';
+				$message    .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+				$message    .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
+				$message    .= '</tr>';
+				$message    .= '<tr>';
+				$message    .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
+				$vat         = $subtotal_price * 0.21;
+				$message    .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
+				$message    .= '</tr>';
+				$message    .= '<tr>';
+				$message    .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+				$message    .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
+				$message    .= '</tr>';
+				$message    .= '</table>';
+				$message    .= '<br>' . get_option( 'blogname' );
+				$headers     = array( 'Content-Type: text/html; charset=UTF-8' );
+				$attachments = array( $this->generate_engine_pdf() );
+
+				// insert_enquiry Post
+				$enquiry_post = array(
+					'post_title'  => $name_field . '-' . $phone_field,
+					'post_status' => 'publish',
+					'post_type'   => 'enquiry',
+				);
+				$post_id      = wp_insert_post( $enquiry_post );
+				if ( $post_id ) {
+					update_post_meta( $post_id, 'pbc_enquiry_name', $name_field );
+					update_post_meta( $post_id, 'pbc_enquiry_phone', $phone_field );
+					update_post_meta( $post_id, 'pbc_enquiry_email', $email_field );
+					update_post_meta( $post_id, 'pbc_enquiry_city', $city_field );
+					update_post_meta( $post_id, 'pbc_enquiry_state', $state_field );
+					if ( ! empty( $enquiry_entries ) ) {
+						$i = 0;
+						foreach ( $enquiry_entries as $entries ) {
+							update_post_meta( $post_id, 'pbc_phase_var_' . $i, $entries['phase_var'] );
+							update_post_meta( $post_id, 'pbc_price_' . $i, $entries['price'] );
+							++$i;
+						}
+					}
+				}
+
+				function set_html_content_type() {
+					return 'text/html';
+				}
+				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
+				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
+					$result = array(
+						'type'     => 'error',
+						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+					);
+				} else {
+					$filename = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
+					$file_pdf = $this->get_budget_base_dir() . $filename;
+					if ( ! empty( $attachments ) && file_exists( $file_pdf ) ) {
+						unlink( $file_pdf );
+					}
+					$result = array(
+						'type'     => 'success',
+						'response' => __( 'Mail sent!', 'pbc' ),
+					);
+				}
+				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
+			}
+		}
+		return $result;
+	}
 }

@@ -104,12 +104,15 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_submit_action_callback() {
-		$submit = isset( $_POST['submit'] ) ? esc_attr( $_POST['submit'] ) : '';
-		if ( isset( $submit ) && $submit == 'email_send' ) {
+		if ( ! check_ajax_referer( 'pbc_template_wizard_action', 'nonce', false ) ) {
+			wp_send_json_error( 'Invalid nonce' );
+		}
+		$submit = isset( $_POST['submit'] ) ? sanitize_text_field( wp_unslash( $_POST['submit'] ) ) : '';
+		if ( 'email_send' === $submit ) {
 			if ( empty( session_id() ) ) {
 				session_start();
 			}
-			$_SESSION['pbc_output'] = $this->configurator_result_email_send( $_POST );
+			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $_POST );
 		}
 
 		ob_start();
