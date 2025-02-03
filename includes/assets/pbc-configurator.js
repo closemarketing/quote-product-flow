@@ -1,5 +1,7 @@
 jQuery(function($){
-	imgLoading = '<div><img src="' + AjaxAction.assets_loading + "/></div>';
+	imgLoading = '<div><img src="' + AjaxAction.assets_loading + '"/></div>';
+
+	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		$('.product_preview').find('.product_preview_status').removeClass('hidden').html(imgLoading).show();
 		var cPhase = $('input[name=pbc_current_phase]').val();
@@ -71,9 +73,13 @@ jQuery(function($){
 			}
 		});
 	});
+
+	// Price variation selected.
 	$(document).on('click', 'select[class=pbc_pricevar]', function(){
 		$(this).parent().parent().find('input.pbc_variation').prop("checked", true);
 	});
+
+	// Price variation changed.
 	$(document).on('change', 'select[class=pbc_pricevar]', function(){
 		$('.product_preview').find('.product_preview_status').removeClass('hidden').html(imgLoading).show();
 		var cPhase = $('input[name=pbc_current_phase]').val();
@@ -141,11 +147,15 @@ jQuery(function($){
 			}
 		});
 	});
+
+	// Submit form.
 	$(document).on('click', 'button[name=submit]', function(e){
 		var submit_val = $(this).val();
 		var form_id = 'configurator-form';
 		e.preventDefault();
 		$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html(imgLoading).show();
+		var next_phase = $('input[name=next_phase]').val();
+
 		$.ajax({
 			url: AjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
@@ -154,7 +164,7 @@ jQuery(function($){
 			success: function(response) {
 				$('.page-configurator').html(response);
 				if(
-					'<?php echo $next_step;?>' != 'calculate' &&
+					next_phase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && $(document).find('input[type=radio].pbc_variation').length == 0
 				)
 				{
@@ -169,9 +179,11 @@ jQuery(function($){
 			}
 		});
 	});
+
+	// Login form submit.
 	$(document).on('submit', '#configurator_login_form', function(e){
-	e.preventDefault();
-	var form_id = 'configurator_login_form';
+		e.preventDefault();
+		var form_id = 'configurator_login_form';
 		$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html(imgLoading).show();
 		$.ajax({
 			url: AjaxAction.ajax_url,  //server script to process data
