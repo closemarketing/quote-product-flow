@@ -70,7 +70,7 @@ class PBC_Admin_Plugin {
 		/**
 		* Composer Library dependencies
 		*/
-		require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
+		// require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
 
 		/**
 		* Image Sizes
