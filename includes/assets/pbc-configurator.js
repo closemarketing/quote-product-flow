@@ -159,9 +159,9 @@ jQuery(function($){
 			dataType: "html",
 			success: function(response) {
 				$('.page-configurator').html(response);
-				if(
+				if (
 					next_phase != 'calculate' &&
-					(submit_val == 'prev' || submit_val == 'next') && $(document).find('input[type=radio].pbc_variation').length == 0
+					(submit_val == 'prev' || submit_val == 'next') && $(document).find('input.pbc_variation').length == 0
 				)
 				{
 					$(document).find('button[name=submit][value='+submit_val+']').trigger('click');

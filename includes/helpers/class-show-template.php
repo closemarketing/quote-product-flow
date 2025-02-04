@@ -29,6 +29,10 @@ class PBC_Template {
 		$cstep   = 1;
 		$user_id = get_current_user_id();
 
+		if ( empty( $_SESSION['pbc_template_loaded'] ) && empty( $_POST ) ) {
+			return;
+		}
+
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = ! empty( $default_post_parent ) ? true : false;
@@ -62,7 +66,7 @@ class PBC_Template {
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
-			if ( isset( $_POST[ $submit . '_phase' ] ) ) {
+			if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
 				$cstep = (int) $_POST[ $submit . '_phase' ];
 			} else {
 				$cstep = 'calculate';
@@ -155,16 +159,16 @@ class PBC_Template {
 							foreach ( $variations as $key => $variation ) {
 								$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
 								if ( ! empty( $pbc_depends ) ) {
-									$prevVar = array();
+									$prev_var = array();
 									foreach ( $pbc_depends as $deps ) {
 										$arr = explode( '|', $deps['pbc_depvar'] );
 										if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-											$prevVar[ (int) $arr[0] ][] = $arr[1];
+											$prev_var[ (int) $arr[0] ][] = $arr[1];
 										}
 									}
-									if ( $cstep != 1 && ! empty( $_SESSION['pbc_variation'] ) ) {
-										foreach ( $_SESSION['pbc_variation'] as $sPhaseKey => $sVariations ) {
-											if ( isset( $prevVar[ $sPhaseKey ] ) && ! in_array( $_SESSION['pbc_variation'][ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+									if ( $cstep !== 1 && ! empty( $_SESSION['pbc_variation'] ) ) {
+										foreach ( $_SESSION['pbc_variation'] as $s_phase_key => $sVariations ) {
+											if ( isset( $prev_var[ $s_phase_key ] ) && ! in_array( $_SESSION['pbc_variation'][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
 												unset( $variations[ $key ] );
 												break;
 											}
@@ -303,18 +307,18 @@ class PBC_Template {
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
 										if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
-											$prevVar = array();
+											$prev_var = array();
 											foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
 												$imgprod_arr = explode( '|', $depvarimgprod );
 												if ( ! empty( $imgprod_arr[0] ) && ! empty( $imgprod_arr[1] ) ) {
-													$prevVar[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
+													$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
 												}
 											}
-											if ( ! empty( $_SESSION['pbc_variation'] ) && ! empty( $prevVar ) ) {
-												foreach ( $prevVar as $sPhaseKey => $sVariations ) {
-													if ( isset( $prevVar[ $sPhaseKey ] ) &&
-													isset( $_SESSION['pbc_variation'][ $sPhaseKey ] ) &&
-													in_array( $_SESSION['pbc_variation'][ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+											if ( ! empty( $_SESSION['pbc_variation'] ) && ! empty( $prev_var ) ) {
+												foreach ( $prev_var as $s_phase_key => $sVariations ) {
+													if ( isset( $prev_var[ $s_phase_key ] ) &&
+													isset( $_SESSION['pbc_variation'][ $s_phase_key ] ) &&
+													in_array( $_SESSION['pbc_variation'][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
 														$imgprodid = $deps['pbc_imgprod'][0];
 													} else {
 														$imgprodid = '';
@@ -430,5 +434,6 @@ class PBC_Template {
 			</div>
 			<?php
 		}
+		$_SESSION['pbc_template_loaded'] = true;
 	}
 }

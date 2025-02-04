@@ -211,6 +211,14 @@ class SHOW {
 		<?php
 	}
 
+	/**
+	 * Show action buttons.
+	 *
+	 * @param array  $phases Phases.
+	 * @param int    $cstep Current step.
+	 * @param string $template Template.
+	 * @return void
+	 */
 	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) {
 		?>
 		<div class="configurator_form_action">
@@ -237,27 +245,22 @@ class SHOW {
 				$next_button = __( 'Next', 'pbc' );
 			}
 			?>
-			<input type="hidden" name="pbc_current_phase" value="<?php echo $cstep; ?>"/>
+			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
 			<?php if ( $prev_step && $prev_button ) { ?>
-			<div class="prev 
-				<?php
-				if ( empty( $prev_step ) ) {
-					echo 'hidden';}
-				?>
-			">
-				<input type="hidden" name="prev_phase" value="<?php echo $prev_step; ?>"/>
-				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo $prev_button; ?></button>
+			<div class="prev<?php if ( empty( $prev_step ) ) { echo ' hidden'; } ?>">
+				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
+				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
 			</div>
 			<?php } ?>
 			<div class="next">
 				<?php
 				if ( $next_step ) {
 					?>
-					<input type="hidden" name="next_phase" value="<?php echo $next_step; ?>"/><?php } ?>
+					<input type="hidden" name="next_phase" value="<?php echo esc_attr( $next_step ); ?>"/><?php } ?>
 				<?php
 				if ( $next_button ) {
 					?>
-					<button type="submit" name="submit" value="next" class="btn btn-next"><?php echo $next_button; ?></button><?php } ?>
+					<button type="submit" name="submit" value="next" class="btn btn-next"><?php echo esc_attr( $next_button ); ?></button><?php } ?>
 			</div>
 		</div>
 		<?php
