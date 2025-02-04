@@ -12,6 +12,8 @@ namespace Close\PBC\Helpers;
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\PDF;
+
 /**
  * Helper Calculate PBC.
  *
@@ -255,6 +257,8 @@ class CALC {
 				$emails       = array_merge( $emails, $admin_emails );
 			}
 			$emails = array_map( 'trim', $emails );
+			$emails = array_unique( $emails );
+			$emails = array_filter( $emails );
 			if ( ! isset( $_SESSION['pbc_variation'] ) ) {
 				$result = array(
 					'type'     => 'error',
@@ -275,18 +279,20 @@ class CALC {
 				$enquiry_entries = array();
 				$i               = 0;
 				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
+					$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 					$price           = (float) $details['var']['price'];
 					$subtotal_price += $price;
 					$message        .= '<tr>';
-					$message        .= '<td>' . $details['phase']['name'] . '</td>';
-					$message        .= '<td>' . $details['var']['name'] . '</td>';
+					$message        .= '<td>' . $phase_name . '</td>';
+					$message        .= '<td>' . $variation_name . '</td>';
 					$message        .= '<td>';
 					if ( $price > 0 ) {
 						$message .= number_format( $price, 2, ',', '.' ) . ' €';
 					}
 					$message                           .= '</td>';
 					$message                           .= '</tr>';
-					$enquiry_entries[ $i ]['phase_var'] = $details['phase']['name'] . ': ' . $details['var']['name'];
+					$enquiry_entries[ $i ]['phase_var'] = $phase_name . ': ' . $variation_name;
 					$enquiry_entries[ $i ]['price']     = $price;
 					++$i;
 				}
@@ -309,9 +315,9 @@ class CALC {
 				$message    .= '</table>';
 				$message    .= '<br>' . get_option( 'blogname' );
 				$headers     = array( 'Content-Type: text/html; charset=UTF-8' );
-				$attachments = array( $this->generate_engine_pdf() );
+				$attachments = array( PDF::generate_engine_pdf() );
 
-				// insert_enquiry Post
+				// Insert_enquiry Post.
 				$enquiry_post = array(
 					'post_title'  => $name_field . '-' . $phone_field,
 					'post_status' => 'publish',
@@ -334,10 +340,6 @@ class CALC {
 					}
 				}
 
-				function set_html_content_type() {
-					return 'text/html';
-				}
-				add_filter( 'wp_mail_content_type', 'set_html_content_type' );
 				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
 					$result = array(
 						'type'     => 'error',
@@ -345,7 +347,7 @@ class CALC {
 					);
 				} else {
 					$filename = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . date( 'Y-m-d-H-i' ) . '.pdf';
-					$file_pdf = $this->get_budget_base_dir() . $filename;
+					$file_pdf = PDF::get_budget_base_dir() . $filename;
 					if ( ! empty( $attachments ) && file_exists( $file_pdf ) ) {
 						unlink( $file_pdf );
 					}
