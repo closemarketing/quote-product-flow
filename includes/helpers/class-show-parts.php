@@ -196,11 +196,7 @@ class SHOW {
 			$steps = 1;
 			foreach ( $phases as $phase ) {
 				?>
-				<li class="configurator_steps step-<?php echo esc_attr( $steps ); ?> <?php
-				if ( $cstep === $steps ) {
-					echo 'active'; }
-				?>
-				">
+				<li class="configurator_steps step-<?php echo esc_attr( $steps ); ?><?php echo $steps === (int) $cstep ? ' active' : ''; ?>">
 					<div class="stepContainer">
 						<div class="step-name"><?php echo esc_html( get_the_title( $phase ) ); ?></div>
 						<span class="step-arrow-button"></span>
