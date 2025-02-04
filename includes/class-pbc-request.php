@@ -11,6 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 use Close\PBC\Helpers\CALC;
+use Close\PBC\Helpers\SHOW;
 use Spipu\Html2Pdf\Html2Pdf;
 
 /**
@@ -104,7 +105,7 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_submit_action_callback() {
-		if ( ! check_ajax_referer( 'pbc_template_wizard_action', 'nonce', false ) ) {
+		if ( ! check_ajax_referer( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce', false ) ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
 		$submit = isset( $_POST['submit'] ) ? sanitize_text_field( wp_unslash( $_POST['submit'] ) ) : '';
@@ -116,14 +117,7 @@ class PBC_Requests {
 		}
 
 		ob_start();
-		/*
-		if ( \locate_template( 'template-budget-configurator.php' ) ) {
-			\locate_template( 'template-budget-configurator.php', true );
-		} else {
-			include WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
-		}
-		*/
-		SHOW::render_template( 'wizard' );
+		PBC_Template::render();
 		$all_details = ob_get_contents();
 		ob_end_clean();
 		echo $all_details;
@@ -156,3 +150,4 @@ class PBC_Requests {
 		die( 0 );
 	}
 }
+new PBC_Requests();

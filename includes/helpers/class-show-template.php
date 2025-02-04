@@ -18,7 +18,7 @@ use Close\PBC\Helpers\SHOW;
  *
  * @since 1.4.0
  */
-class PBC_Template_Wizard {
+class PBC_Template {
 	/**
 	 * Render for Wizard.
 	 *
@@ -32,7 +32,19 @@ class PBC_Template_Wizard {
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = ! empty( $default_post_parent ) ? true : false;
-		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? $default_post_parent : $parent_phase;
+		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
+
+		if ( empty( $_SESSION['pbc_parent_phase'] ) ) {
+			$_SESSION['pbc_parent_phase'] = $base_parent;
+		} else {
+			$base_parent = (int) $_SESSION['pbc_parent_phase'];
+		}
+
+		if ( empty( $_SESSION['pbc_template'] ) ) {
+			$_SESSION['pbc_template'] = $template;
+		} else {
+			$template = sanitize_text_field( $_SESSION['pbc_template'] );
+		}
 
 		$args   = array(
 			'numberposts' => -1,
@@ -51,7 +63,7 @@ class PBC_Template_Wizard {
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) ) {
-				$cstep = sanitize_text_field( wp_unslash( $_POST[ $submit . '_phase' ] ) );
+				$cstep = (int) $_POST[ $submit . '_phase' ];
 			} else {
 				$cstep = 'calculate';
 			}
@@ -67,7 +79,7 @@ class PBC_Template_Wizard {
 					$variation_id = (int) $variation_id;
 					$price        = '';
 					$option_name  = '';
-					$price_var    = isset( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ? sanitize_text_field( $_POST[ 'pbc_pricevar_' . $variation_id ] ) : '';
+					$price_var    = isset( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ) : '';
 
 					// Gets variation ID in quantity input.
 					$option_qty_value = 0;

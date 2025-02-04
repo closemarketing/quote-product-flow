@@ -99,7 +99,7 @@ class PBC_Public {
 			),
 			$atts,
 		);
-		PBC_Template_Wizard::render( $pbc_atts['pid'], $pbc_atts['template'] );
+		PBC_Template::render( $pbc_atts['pid'], $pbc_atts['template'] );
 	}
 }
 
