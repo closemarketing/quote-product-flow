@@ -29,20 +29,20 @@ class SHOW {
 	 * @return void
 	 */
 	public static function variations_content( $variations_section, $s_var, $cstep ) {
+		$actual_variation_tag = '';
 		?>
 		<ul>
 			<?php
-			$actual_variation_tag = '';
 			foreach ( $variations_section as $variation_data ) {
 				?>
-				<li class="variation_list">
-					<?php
+				<?php
 					$variation_id = (int) $variation_data['id'];
 					if ( $actual_variation_tag !== $variation_data['section'] ) {
 						echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
 						$actual_variation_tag = $variation_data['section'];
 					}
-					?>
+				?>
+				<li class="variation_list">
 					<label>
 						<?php
 						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
