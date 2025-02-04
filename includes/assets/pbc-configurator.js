@@ -1,9 +1,7 @@
 jQuery(function($){
-	imgLoading = '<div><img src="' + AjaxAction.assets_loading + '"/></div>';
 
 	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
-		$('.product_preview').find('.product_preview_status').removeClass('hidden').html(imgLoading).show();
 		var cPhase = $('input[name=pbc_current_phase]').val();
 		var show_prices = '<?php echo $show_prices; ?>';
 		$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
@@ -81,7 +79,6 @@ jQuery(function($){
 
 	// Price variation changed.
 	$(document).on('change', 'select[class=pbc_pricevar]', function(){
-		$('.product_preview').find('.product_preview_status').removeClass('hidden').html(imgLoading).show();
 		var cPhase = $('input[name=pbc_current_phase]').val();
 		var select_pricevar = $(this).parent().parent().find('input.pbc_variation');
 		var show_prices = '<?php echo $show_prices; ?>';
@@ -153,7 +150,6 @@ jQuery(function($){
 		var submit_val = $(this).val();
 		var form_id = 'configurator-form';
 		e.preventDefault();
-		$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html(imgLoading).show();
 		var next_phase = $('input[name=next_phase]').val();
 
 		$.ajax({
@@ -184,7 +180,7 @@ jQuery(function($){
 	$(document).on('submit', '#configurator_login_form', function(e){
 		e.preventDefault();
 		var form_id = 'configurator_login_form';
-		$(document).find('.status_loader.phase_detail_loader').removeClass('hidden').html(imgLoading).show();
+
 		$.ajax({
 			url: AjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
