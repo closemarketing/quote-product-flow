@@ -43,7 +43,7 @@ function pbc_plugin_init() {
 	load_plugin_textdomain( 'meta-box', false, $base_path . '/languages' );
 }
 
-require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
+// require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
 
 // Helpers.
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
