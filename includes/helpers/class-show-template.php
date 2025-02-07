@@ -25,9 +25,15 @@ class PBC_Template {
 	 * @param integer $parent_phase Parent Phase.
 	 * @return void
 	 */
-	public static function render( $parent_phase = 0, $template = 'wizard' ) {
+	public static function render( $parent_phase, $template ) {
 		$cstep   = 1;
 		$user_id = get_current_user_id();
+
+		if ( empty( $_SESSION['pbc_template'] ) ) {
+			$_SESSION['pbc_template'] = $template;
+		} else {
+			$template = sanitize_text_field( $_SESSION['pbc_template'] );
+		}
 
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
@@ -38,12 +44,6 @@ class PBC_Template {
 			$_SESSION['pbc_parent_phase'] = $base_parent;
 		} else {
 			$base_parent = (int) $_SESSION['pbc_parent_phase'];
-		}
-
-		if ( empty( $_SESSION['pbc_template'] ) ) {
-			$_SESSION['pbc_template'] = $template;
-		} else {
-			$template = sanitize_text_field( $_SESSION['pbc_template'] );
 		}
 
 		$args   = array(

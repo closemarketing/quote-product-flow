@@ -24,6 +24,7 @@ class PBC_Public {
 		add_action( 'init', array( $this, 'pbc_configurator_session' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_shortcode( 'pbc', array( $this, 'pbc_configurator' ) );
+		
 	}
 	/**
 	 * Creates session
@@ -34,15 +35,6 @@ class PBC_Public {
 		if ( empty( session_id() ) ) {
 			ob_start();
 			session_start();
-		}
-		if ( empty( session_id() ) ) {
-			echo ';;--;;' . json_encode(
-				array(
-					'type' => 'error',
-					'msg'  => 'Error: Unable to initialize Session!',
-				)
-			);
-			die( 'Error: Unable to initialize Session!' );
 		}
 	}
 

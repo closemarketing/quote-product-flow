@@ -117,7 +117,9 @@ class PBC_Requests {
 		}
 
 		ob_start();
-		PBC_Template::render();
+		$parent_phase = isset( $_SESSION['pbc_parent_phase'] ) ? $_SESSION['pbc_parent_phase'] : 0;
+		$template = isset( $_SESSION['pbc_template'] ) ? $_SESSION['pbc_template'] : 'wizard';	
+		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();
 		echo $all_details;
