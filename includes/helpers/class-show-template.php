@@ -138,7 +138,7 @@ class PBC_Template {
 		?>
 		<?php $parent_phase_slug = sanitize_title( get_the_title( $parent_phase ) ); ?>
 		<div class="phase_detail product-<?php echo esc_html( $parent_phase_slug ); ?>">
-			<form action="" method="post" name="configurator-form" id="configurator-form">
+			<form action="" method="post" name="configurator-form" id="configurator-form" data-template="<?php echo esc_html( $template ); ?>">
 			<?php
 			wp_nonce_field( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce' );
 			if ( 'calculate' !== $cstep ) {

@@ -117,8 +117,8 @@ class PBC_Requests {
 		}
 
 		ob_start();
-		$parent_phase = isset( $_SESSION['pbc_parent_phase'] ) ? $_SESSION['pbc_parent_phase'] : 0;
-		$template = isset( $_SESSION['pbc_template'] ) ? $_SESSION['pbc_template'] : 'wizard';	
+		$parent_phase = isset( $_SESSION['pbc_parent_phase'] ) ? (int) $_SESSION['pbc_parent_phase'] : 0;
+		$template     = isset( $_POST['pbc_template'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_template'] ) ) : 'wizard';
 		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();

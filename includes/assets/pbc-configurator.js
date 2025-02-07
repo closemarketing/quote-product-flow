@@ -155,7 +155,7 @@ jQuery(function($){
 		$.ajax({
 			url: AjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
-			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit',
+			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template'),
 			dataType: "html",
 			success: function(response) {
 				$('.page-configurator').html(response);
