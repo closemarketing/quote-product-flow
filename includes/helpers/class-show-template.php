@@ -29,10 +29,6 @@ class PBC_Template {
 		$cstep   = 1;
 		$user_id = get_current_user_id();
 
-		if ( empty( $_SESSION['pbc_template_loaded'] ) && empty( $_POST ) ) {
-			return;
-		}
-
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = ! empty( $default_post_parent ) ? true : false;
@@ -434,6 +430,5 @@ class PBC_Template {
 			</div>
 			<?php
 		}
-		$_SESSION['pbc_template_loaded'] = true;
 	}
 }
