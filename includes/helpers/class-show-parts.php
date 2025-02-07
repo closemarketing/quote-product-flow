@@ -28,19 +28,23 @@ class SHOW {
 	 * @param int   $cstep Current step.
 	 * @return void
 	 */
-	public static function variations_content( $variations_section, $s_var, $cstep ) {
+	public static function variations_content( $variations_section, $s_var, $cstep, $template ) {
 		$actual_variation_tag = '';
-		?>
-		<ul>
-			<?php
-			foreach ( $variations_section as $variation_data ) {
-				?>
-				<?php
-					$variation_id = (int) $variation_data['id'];
-					if ( $actual_variation_tag !== $variation_data['section'] ) {
-						echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
-						$actual_variation_tag = $variation_data['section'];
-					}
+
+		if ( 'wizard' === $template ) {
+			echo '<ul>';
+		} else {
+			echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
+		}
+		foreach ( $variations_section as $variation_data ) {
+			$variation_id = (int) $variation_data['id'];
+			$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
+
+			if ( 'wizard' === $template ) {
+				if ( $actual_variation_tag !== $variation_data['section'] ) {
+					echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
+					$actual_variation_tag = $variation_data['section'];
+				}
 				?>
 				<li class="variation_list">
 					<label>
@@ -51,7 +55,6 @@ class SHOW {
 							echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
 							echo '</div>';
 						}
-						$field_type = get_post_meta( $variation_id, 'pbc_field_type', true );
 						if ( empty( $field_type ) ) {
 							?>
 							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
@@ -94,9 +97,33 @@ class SHOW {
 					}
 					?>
 				</li>
-			<?php } ?>
-		</ul>
-		<?php
+				<?php
+			} elseif ( 'vertical' === $template ) {
+				if ( empty( $field_type ) ) {
+					if ( $actual_variation_tag !== $variation_data['section'] ) {
+						?>
+						<optgroup label="<?php echo esc_html( $variation_data['section'] ); ?>">
+						<?php
+						$actual_variation_tag = $variation_data['section'];
+					}
+					?>
+					<option value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?>><?php echo esc_html( $variation_data['title'] ); ?></option>
+					<?php
+				} elseif ( 'qty' === $field_type ) {
+					$s_var = $s_var === $variation_id ? 1 : $s_var;
+					?>
+					<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
+					<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+					<?php
+					echo esc_html( $variation_data['title'] );
+				}
+			}
+		}
+		if ( 'wizard' === $template ) {
+			echo '</ul>';
+		} else {
+			echo '</select>';
+		}
 	}
 
 	/**

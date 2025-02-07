@@ -222,7 +222,7 @@ class PBC_Template {
 								}
 							}
 							if ( ! empty( $variations_section ) ) {
-								SHOW::variations_content( $variations_section, $s_var, $cstep );
+								SHOW::variations_content( $variations_section, $s_var, $cstep, $template );
 							}
 						} else {
 							?>
@@ -265,18 +265,19 @@ class PBC_Template {
 					<?php
 					if ( 'vertical' === $template ) {
 						SHOW::action_buttons( $phases, $cstep, $template );
+						SHOW::calculation_summary( $cstep, $phases );
 					}
 					?>
 				</div>
-				<div class="configurator-<?php echo 'wizard' === $template ? 'left' : 'right'; ?>">
+				<div class="configurator-<?php echo 'wizard' === $template ? 'right' : 'left'; ?>">
 				<?php
 			} //cStep!=calculate
 
-			if ( 'calculate' !== $cstep ) {
+			if ( 'calculate' !== $cstep && 'wizard' === $template ) {
 				?>
 				<script type="text/javascript">jQuery('.configurator_form_action').insertAfter('.product_preview');</script>
 				<?php
-			} elseif ( 'calculate' === $cstep ) {
+			} elseif ( 'calculate' === $cstep && 'wizard' === $template ) {
 				?>
 				<script type="text/javascript">jQuery('.configurator_form_action').insertBefore('.product_preview');</script>
 				<?php
@@ -371,7 +372,9 @@ class PBC_Template {
 			if ( 'wizard' === $template ) {
 				SHOW::action_buttons( $phases, $cstep );
 			}
-			SHOW::calculation_summary( $cstep, $phases );
+			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
+				SHOW::calculation_summary( $cstep, $phases );
+			}
 			if ( 'calculate' === $cstep ) {
 				?>
 				<div class="configurator_result_share">
