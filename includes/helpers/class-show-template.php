@@ -29,22 +29,10 @@ class PBC_Template {
 		$cstep   = 1;
 		$user_id = get_current_user_id();
 
-		if ( empty( $_SESSION['pbc_template'] ) ) {
-			$_SESSION['pbc_template'] = $template;
-		} else {
-			$template = sanitize_text_field( $_SESSION['pbc_template'] );
-		}
-
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = ! empty( $default_post_parent ) ? true : false;
 		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
-
-		if ( empty( $_SESSION['pbc_parent_phase'] ) ) {
-			$_SESSION['pbc_parent_phase'] = $base_parent;
-		} else {
-			$base_parent = (int) $_SESSION['pbc_parent_phase'];
-		}
 
 		$args   = array(
 			'numberposts' => -1,
