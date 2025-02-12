@@ -384,6 +384,10 @@ img.flipped {
 }
 
 /* Ampliar ancho general del contenedor en las páginas del configurador */
-div.site.grid-container:has(div.page-configurator.page-configurator-wizard) {
+div.site.grid-container:has(div.page-configurator) {
+  max-width: 1440px !important;
+}
+
+div.site-content:has(div.page-configurator) {
   max-width: 1440px !important;
 }
