@@ -171,7 +171,9 @@
 }
 
 .configurator-right {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   width: 49%;
   float: right;
   vertical-align: top;
@@ -208,10 +210,15 @@
   overflow: hidden;
   display: inline-block;
   vertical-align: top;
+  align-self: center;
 }
 
 .product_preview.wrap-left {
   margin-right: 20px;
+}
+
+.product_preview .image-wrap:has(img) {
+  padding-top: 64px;
 }
 
 .product_preview .image-wrap img:first-child {
@@ -220,8 +227,7 @@
 
 .product_preview .image-wrap img {
   width: 100%;
-  max-width: <?php echo esc_html($preview_width);
-  ?>px;
+  max-width: 200px;
   position: absolute;
   top: 0;
   left: 0;
