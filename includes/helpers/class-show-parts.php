@@ -42,30 +42,31 @@ class SHOW {
 						$actual_variation_tag = $variation_data['section'];
 					}
 					?>
-					<label class="pbc_variation_label">
-						<?php
-						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
-						if ( $imgicon ) {
-							echo '<div class="variation_img">';
-							echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
-							echo '</div>';
-						}
-						$field_type = get_post_meta( $variation_id, 'pbc_field_type', true );
-						if ( empty( $field_type ) ) {
-							?>
-							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+					<li class="variation_list">
+						<label class="pbc_variation_label">
 							<?php
-							echo esc_html( $variation_data['title'] );
-						} elseif ( 'qty' === $field_type ) {
-							$s_var = $s_var === $variation_id ? 1 : $s_var;
+							$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
+							if ( $imgicon ) {
+								echo '<div class="variation_img">';
+								echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+								echo '</div>';
+							}
+							$field_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+							if ( empty( $field_type ) ) {
+								?>
+								<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+								<?php
+								echo esc_html( $variation_data['title'] );
+							} elseif ( 'qty' === $field_type ) {
+								$s_var = $s_var === $variation_id ? 1 : $s_var;
+								?>
+								<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
+								<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+								<?php
+								echo esc_html( $variation_data['title'] );
+							}
 							?>
-							<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
-							<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
-							<?php
-							echo esc_html( $variation_data['title'] );
-						}
-						?>
-					</label>
+						</label>
 					<?php
 					$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
 					if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) {
