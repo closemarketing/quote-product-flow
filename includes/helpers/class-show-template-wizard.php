@@ -287,6 +287,7 @@ class PBC_Template_Wizard {
 			">
 				<div class="image-wrap">
 					<?php
+					$ssVar = '';
 					if ( ! empty( $_SESSION['pbc_variation'] ) ) {
 						$to = (int) $cstep;
 						if ( 'calculate' === $cstep ) {
@@ -353,7 +354,7 @@ class PBC_Template_Wizard {
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
 						$addclass                  = '';
-						if ( ! empty( $variations_images_flipped ) && in_array( $sVar, $variations_images_flipped ) ) {
+						if ( ! empty( $variations_images_flipped ) && in_array( $ssVar, $variations_images_flipped ) ) {
 							$addclass = 'flipped';
 						}
 						?>
