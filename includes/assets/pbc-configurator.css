@@ -382,3 +382,8 @@ img.flipped {
 .page-header {
   margin-top: 15px;
 }
+
+/* Ampliar ancho general del contenedor en las páginas del configurador */
+div.site.grid-container:has(div.page-configurator.page-configurator-wizard) {
+  max-width: 1440px !important;
+}
