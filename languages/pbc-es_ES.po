@@ -156,8 +156,8 @@ msgid "Email Notification"
 msgstr "Notificaciones por email"
 
 #: includes/class-pbc-admin-plugin.php:492
-msgid "separate multiple emails by comma"
-msgstr "separar múltiples correos por comas"
+msgid "Separate multiple emails by comma"
+msgstr "Separar múltiples correos por comas"
 
 #: includes/class-pbc-admin-plugin.php:495
 msgid "Preview width"
@@ -859,8 +859,8 @@ msgid "Send budget to email"
 msgstr "Enviar presupuesto al correo"
 
 #: includes/template-budget-configurator.php:737
-msgid "separate multiple email by comma"
-msgstr "separar múltiples correos por coma"
+msgid "Separate multiple email by comma"
+msgstr "Separar múltiples correos por coma"
 
 #: includes/template-budget-configurator.php:738
 msgid "Your name"
