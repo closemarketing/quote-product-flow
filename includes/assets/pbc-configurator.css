@@ -268,12 +268,19 @@
 
 .configurator_result_share {
   max-width: 400px;
-  margin: 20px auto;
+  margin: 40px auto;
   text-align: center;
 }
 
 .email_submit_fields {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 15px;
+}
+
+.email_submit_fields input {
+  width: 400px;
 }
 
 .configurator_summary .title {
@@ -341,10 +348,6 @@ img.flipped {
   transform: scaleX(-1);
   filter: FlipH;
   -ms-filter: "FlipH";
-}
-
-.email_submit_fields input {
-  width: 325px;
 }
 
 .configurator_login {
