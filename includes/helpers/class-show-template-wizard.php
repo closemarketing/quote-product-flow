@@ -423,12 +423,11 @@ class PBC_Template_Wizard {
 						?>
 						<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
-							<h2><?php esc_html( 'Send the budget to an email:', 'pbc' ); ?></h2>
-							<input type="text" name="email_field" placeholder="<?php _e( 'separate multiple email by comma', 'pbc' ); ?>"/><br/>
-							<input type="text" name="name_field" style="width:150px;" placeholder="<?php _e( 'Your name', 'pbc' ); ?>"/>
-							<input type="text" name="phone_field" style="width:150px;" placeholder="<?php _e( 'Phone number', 'pbc' ); ?>"/><br/>
-							<input type="text" name="city_field" style="width:150px;" placeholder="<?php _e( 'Your City', 'pbc' ); ?>"/>
-							<input type="text" name="state_field" style="width:150px;" placeholder="<?php _e( 'State', 'pbc' ); ?>"/><br/>
+							<input type="text" name="email_field" placeholder="<?php _e( 'separate multiple email by comma', 'pbc' ); ?>"/>
+							<input type="text" name="name_field" placeholder="<?php _e( 'Your name', 'pbc' ); ?>"/>
+							<input type="text" name="phone_field" placeholder="<?php _e( 'Phone number', 'pbc' ); ?>"/>
+							<input type="text" name="city_field" placeholder="<?php _e( 'Your City', 'pbc' ); ?>"/>
+							<input type="text" name="state_field" placeholder="<?php _e( 'State', 'pbc' ); ?>"/>
 							<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e( 'Send', 'pbc' ); ?></button>
 							<?php
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
