@@ -115,14 +115,16 @@ class CALC {
 	 * @return boolean
 	 */
 	public static function is_multiple_products() {
-		$args = array(
-			'post_type'   => 'phases',
-			'numberposts' => -1,
-			'post_parent' => 0,
-			'fields'      => 'ids',
+		$args          = array(
+			'post_type'      => 'phases',
+			'posts_per_page' => -1,
+			'post_parent'    => 0,
+			'fields'         => 'ids',
 		);
+		$parent_phases = get_posts( $args );
+		$total_phases  = (int) wp_count_posts( 'phases' )->publish;
 
-		return count( get_posts( $args ) ) > 1;
+		return count( $parent_phases ) !== $total_phases;
 	}
 
 	/**
