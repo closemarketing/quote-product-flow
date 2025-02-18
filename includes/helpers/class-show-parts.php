@@ -28,7 +28,7 @@ class SHOW {
 	 * @param int   $cstep Current step.
 	 * @return void
 	 */
-	public static function variations_content( $variations_section, $s_var, $cstep, $template ) {
+	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard' ) {
 		$actual_variation_tag = '';
 
 		if ( 'wizard' === $template ) {

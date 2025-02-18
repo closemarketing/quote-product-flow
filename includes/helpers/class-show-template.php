@@ -31,7 +31,7 @@ class PBC_Template {
 
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
-		$is_multiple_prods   = ! empty( $default_post_parent ) ? true : false;
+		$is_multiple_prods   = CALC::is_multiple_products();
 		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
 
 		$args   = array(
