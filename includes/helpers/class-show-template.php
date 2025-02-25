@@ -26,6 +26,16 @@ class PBC_Template {
 	 * @return void
 	 */
 	public static function render( $parent_phase, $template ) {
+		// Don't render if we're in the Gutenberg editor.
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return;
+		}
+		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+			if ( $screen && $screen->is_block_editor() ) {
+				return;
+			}
+		}
 		$cstep   = 1;
 		$user_id = get_current_user_id();
 
@@ -33,6 +43,7 @@ class PBC_Template {
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = CALC::is_multiple_products();
 		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
+		$pbc_session         = isset( $_SESSION[ 'pbc_variation_' . $base_parent ] ) ? $_SESSION[ 'pbc_variation_' . $base_parent ] : array(); // phpcs:ignore
 
 		$args   = array(
 			'numberposts' => -1,
@@ -45,7 +56,7 @@ class PBC_Template {
 		$phases = get_posts( $args );
 
 		if ( empty( $_POST ) ) {
-			$_SESSION['pbc_variation'] = array();
+			$pbc_session = array();
 		}
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
@@ -56,11 +67,11 @@ class PBC_Template {
 				$cstep = 'calculate';
 			}
 
-			if ( isset( $_POST['pbc_variation'] ) && $_POST['submit'] == 'next' ) {
-				if ( ! isset( $_SESSION['pbc_variation'] ) || ! is_array( $_SESSION['pbc_variation'] ) ) {
-					$_SESSION['pbc_variation'] = array();
+			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
+				if ( ! isset( $pbc_session ) || ! is_array( $pbc_session ) ) {
+					$pbc_session = array();
 				}
-				foreach ( $_POST['pbc_variation'] as $key => $variation_id ) {
+				foreach ( $_POST['pbc_variation'] as $key => $variation_id ) { // phpcs:ignore
 					if ( empty( $phases ) ) {
 						break;
 					}
@@ -92,16 +103,16 @@ class PBC_Template {
 					if ( $price_var ) {
 						$variation_title .= ' [' . $price_var . ']';
 					}
-					$_SESSION['pbc_variation'][ $key ]['phase']['id']   = $phase_id;
-					$_SESSION['pbc_variation'][ $key ]['phase']['name'] = get_the_title( $phase_id );
-					$_SESSION['pbc_variation'][ $key ]['var']['id']     = $variation_id;
-					$_SESSION['pbc_variation'][ $key ]['var']['name']   = $variation_title;
+					$pbc_session[ $key ]['phase']['id']   = $phase_id;
+					$pbc_session[ $key ]['phase']['name'] = get_the_title( $phase_id );
+					$pbc_session[ $key ]['var']['id']     = $variation_id;
+					$pbc_session[ $key ]['var']['name']   = $variation_title;
 					if ( $option_name ) {
-						$_SESSION['pbc_variation'][ $key ]['var']['name'] .= ' [' . $option_name . ']';
+						$pbc_session[ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
-					$_SESSION['pbc_variation'][ $key ]['var']['price'] = $price;
+					$pbc_session[ $key ]['var']['price'] = $price;
 				}
-				ksort( $_SESSION['pbc_variation'], SORT_NUMERIC );
+				ksort( $pbc_session, SORT_NUMERIC );
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
 			$cstep = (int) $_GET['phase'];
@@ -150,9 +161,9 @@ class PBC_Template {
 											$prev_var[ (int) $arr[0] ][] = $arr[1];
 										}
 									}
-									if ( $cstep !== 1 && ! empty( $_SESSION['pbc_variation'] ) ) {
-										foreach ( $_SESSION['pbc_variation'] as $s_phase_key => $sVariations ) {
-											if ( isset( $prev_var[ $s_phase_key ] ) && ! in_array( $_SESSION['pbc_variation'][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+									if ( 1 !== $cstep && ! empty( $pbc_session ) ) {
+										foreach ( $pbc_session as $s_phase_key => $sVariations ) {
+											if ( isset( $prev_var[ $s_phase_key ] ) && ! in_array( $pbc_session[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
 												unset( $variations[ $key ] );
 												break;
 											}
@@ -192,12 +203,12 @@ class PBC_Template {
 							// Show public.
 							$s_var = 0;
 							if (
-								isset( $_SESSION['pbc_variation'] ) &&
-								is_array( $_SESSION['pbc_variation'] ) &&
-								isset( $_SESSION['pbc_variation'][ $cstep ] ) &&
-								in_array( $_SESSION['pbc_variation'][ $cstep ]['var']['id'], $variations )
+								isset( $pbc_session ) &&
+								is_array( $pbc_session ) &&
+								isset( $pbc_session[ $cstep ] ) &&
+								in_array( $pbc_session[ $cstep ]['var']['id'], $variations )
 							) {
-								$s_var = isset( $_SESSION['pbc_variation'][ $cstep ]['var']['id'] ) ? (int) $_SESSION['pbc_variation'][ $cstep ]['var']['id'] : '';
+								$s_var = isset( $pbc_session[ $cstep ]['var']['id'] ) ? (int) $pbc_session[ $cstep ]['var']['id'] : '';
 							} else {
 								if ( isset( $user_id ) ) {
 									$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cstep, true );
@@ -253,7 +264,7 @@ class PBC_Template {
 					<?php
 					if ( 'vertical' === $template ) {
 						SHOW::action_buttons( $phases, $cstep, $template );
-						SHOW::calculation_summary( $cstep, $phases );
+						SHOW::calculation_summary( $pbc_session, $cstep, $phases );
 					}
 					?>
 				</div>
@@ -280,15 +291,15 @@ class PBC_Template {
 				<div class="image-wrap">
 					<?php
 					$ssVar = '';
-					if ( ! empty( $_SESSION['pbc_variation'] ) ) {
+					if ( ! empty( $pbc_session ) ) {
 						$to = (int) $cstep;
 						if ( 'calculate' === $cstep ) {
-							$to = count( $_SESSION['pbc_variation'] ) + 1;
+							$to = count( $pbc_session ) + 1;
 						}
 						for ( $i = 1; $i < $to; $i++ ) {
 							$imgprodid = $imgprodurl = '';
-							if ( isset( $_SESSION['pbc_variation'][ $i ] ) ) {
-								$ssVar        = $_SESSION['pbc_variation'][ $i ]['var']['id'];
+							if ( isset( $pbc_session[ $i ] ) ) {
+								$ssVar        = $pbc_session[ $i ]['var']['id'];
 								$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
@@ -300,11 +311,11 @@ class PBC_Template {
 													$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
 												}
 											}
-											if ( ! empty( $_SESSION['pbc_variation'] ) && ! empty( $prev_var ) ) {
+											if ( ! empty( $pbc_session ) && ! empty( $prev_var ) ) {
 												foreach ( $prev_var as $s_phase_key => $sVariations ) {
 													if ( isset( $prev_var[ $s_phase_key ] ) &&
-													isset( $_SESSION['pbc_variation'][ $s_phase_key ] ) &&
-													in_array( $_SESSION['pbc_variation'][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+													isset( $pbc_session[ $s_phase_key ] ) &&
+													in_array( $pbc_session[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
 														$imgprodid = $deps['pbc_imgprod'][0];
 													} else {
 														$imgprodid = '';
@@ -329,7 +340,7 @@ class PBC_Template {
 									$variations_images_flipped = get_option( 'variations_images_flipped' );
 									if ( ! empty( $variations_images_flipped ) ) {
 										for ( $j = 1; $j <= $to; $j++ ) {
-											if ( isset( $_SESSION['pbc_variation'][ $j ] ) && in_array( $_SESSION['pbc_variation'][ $j ]['var']['id'], $variations_images_flipped ) ) {
+											if ( isset( $pbc_session[ $j ] ) && in_array( $pbc_session[ $j ]['var']['id'], $variations_images_flipped ) ) {
 												$addclass = 'flipped';
 											}
 										}
@@ -341,7 +352,7 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $s_var ) ? CALC::get_image_variation_url( $_SESSION['pbc_variation'], $s_var ) : '';
+					$imgprodurl = isset( $s_var ) ? CALC::get_image_variation_url( $pbc_session, $s_var ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
@@ -362,7 +373,7 @@ class PBC_Template {
 				SHOW::action_buttons( $phases, $cstep );
 			}
 			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
-				SHOW::calculation_summary( $cstep, $phases );
+				SHOW::calculation_summary( $pbc_session, $cstep, $phases );
 			}
 			if ( 'calculate' === $cstep ) {
 				?>

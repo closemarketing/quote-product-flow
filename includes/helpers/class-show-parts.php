@@ -131,8 +131,8 @@ class SHOW {
 	 *
 	 * @return void
 	 */
-	public static function calculation_summary( $cstep, $phases ) {
-		if ( ! isset( $_SESSION ) && ! isset( $_SESSION['pbc_variation'] ) && is_array( $_SESSION['pbc_variation'] ) ) {
+	public static function calculation_summary( $pbc_session, $cstep, $phases ) {
+		if ( ! isset( $_SESSION ) && ! isset( $pbc_session ) && is_array( $pbc_session ) ) {
 			return;
 		}
 		?>
@@ -148,14 +148,14 @@ class SHOW {
 					$count = $cstep;
 				}
 				for ( $i = 1; $i <= $count; $i++ ) {
-					if ( ! isset( $_SESSION['pbc_variation'][ $i ] ) ) {
+					if ( ! isset( $pbc_session[ $i ] ) ) {
 						continue;
 					}
 					$phase_key    = $i;
-					$var_name     = isset( $_SESSION['pbc_variation'][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION['pbc_variation'][ $i ]['var']['name'] ) : '';
-					$var_price    = ! empty( $_SESSION['pbc_variation'][ $i ]['var']['price'] ) ? (float) $_SESSION['pbc_variation'][ $i ]['var']['price'] : 0;
-					$phase_name   = isset( $_SESSION['pbc_variation'][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION['pbc_variation'][ $i ]['phase']['name'] ) : '';
-					$variation_id = isset( $_SESSION['pbc_variation'][ $i ]['var']['id'] ) ? (int) $_SESSION['pbc_variation'][ $i ]['var']['id'] : 0;
+					$var_name     = isset( $pbc_session[ $i ]['var']['name'] ) ? sanitize_text_field( $pbc_session[ $i ]['var']['name'] ) : '';
+					$var_price    = ! empty( $pbc_session[ $i ]['var']['price'] ) ? (float) $pbc_session[ $i ]['var']['price'] : 0;
+					$phase_name   = isset( $pbc_session[ $i ]['phase']['name'] ) ? sanitize_text_field( $pbc_session[ $i ]['phase']['name'] ) : '';
+					$variation_id = isset( $pbc_session[ $i ]['var']['id'] ) ? (int) $pbc_session[ $i ]['var']['id'] : 0;
 					$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
 
 					if ( 'calculate' === $cstep && empty( $field_type ) ) {

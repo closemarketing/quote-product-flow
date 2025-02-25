@@ -730,7 +730,7 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function pbc_enquiry_pdf() {
-		$post_id = isset( $_POST['post_id'] ) ? esc_attr( $_POST['post_id'] ) : '';
+		$post_id = isset( $_POST['post_id'] ) ? (int) $_POST['post_id'] : '';
 
 		check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' );
 		if ( true ) {
