@@ -38,7 +38,9 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function variation_selected_action_callback() {
-		extract( $_REQUEST );
+		$current_phase = isset( $_REQUEST['current_phase'] ) ? (int) $_REQUEST['current_phase'] : 0;
+		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? $_REQUEST['pbc_variation'] : [];
+
 		if ( session_id() == '' ) {
 			ob_start();
 			session_start();
@@ -57,13 +59,14 @@ class PBC_Requests {
 			if ( is_user_logged_in() ) {
 				$user_id                 = get_current_user_id();
 				$phase_param['var']      = $svar;
-				$phase_param['pricevar'] = ( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? ( $_REQUEST[ "pbc_pricevar_$svar" ] ) : '';
+				$phase_param['pricevar'] = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? ( $_REQUEST[ "pbc_pricevar_$svar" ] ) : '';
 				update_user_meta( $user_id, 'pbc_phase_' . $current_phase, $phase_param );
 			}
 			// Gets image variation with filter dependency.
-			$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $svar );
-
-			$pricevar = $_REQUEST[ "pbc_pricevar_$svar" ];
+			if ( isset( $_SESSION['pbc_variation'] ) ) {
+				$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $svar );
+			}
+			$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? (float) $_REQUEST[ "pbc_pricevar_$svar" ] : null;
 			$price    = CALC::get_price_variation( $svar, $pricevar );
 
 			$option = get_the_title( $svar );
@@ -117,7 +120,7 @@ class PBC_Requests {
 		}
 
 		ob_start();
-		$parent_phase = isset( $_SESSION['pbc_parent_phase'] ) ? (int) $_SESSION['pbc_parent_phase'] : 0;
+		$parent_phase = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$template     = isset( $_POST['pbc_template'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_template'] ) ) : 'wizard';
 		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();

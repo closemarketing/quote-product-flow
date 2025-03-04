@@ -230,11 +230,12 @@ class CALC {
 	 * @return array
 	 */
 	public static function configurator_result_email_send( $post_data ) {
-		$email_field = ! empty( $post_data['email_field'] ) ? sanitize_text_field( $post_data['email_field'] ) : '';
-		$name_field  = ! empty( $post_data['name_field'] ) ? sanitize_text_field( $post_data['name_field'] ) : '';
-		$phone_field = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
-		$city_field  = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
-		$state_field = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
+		$email_field     = ! empty( $post_data['email_field'] ) ? sanitize_text_field( $post_data['email_field'] ) : '';
+		$name_field      = ! empty( $post_data['name_field'] ) ? sanitize_text_field( $post_data['name_field'] ) : '';
+		$phone_field     = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
+		$city_field      = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
+		$state_field     = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
+		$pbc_session_key = ! empty( $post_data['pbc_session_key'] ) ? sanitize_text_field( $post_data['pbc_session_key'] ) : '';
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -261,7 +262,7 @@ class CALC {
 			$emails = array_map( 'trim', $emails );
 			$emails = array_unique( $emails );
 			$emails = array_filter( $emails );
-			if ( ! isset( $_SESSION['pbc_variation'] ) ) {
+			if ( ! isset( $_SESSION[ $pbc_session_key ] ) ) {
 				$result = array(
 					'type'     => 'error',
 					'response' => __( 'Configurator not ready!', 'pbc' ),
@@ -280,7 +281,7 @@ class CALC {
 				$subtotal_price  = 0;
 				$enquiry_entries = array();
 				$i               = 0;
-				foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
+				foreach ( $_SESSION[ $pbc_session_key ] as $phaseKey => $details ) { // phpcs:ignore
 					$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
 					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 					$price           = (float) $details['var']['price'];

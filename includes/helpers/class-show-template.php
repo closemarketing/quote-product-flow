@@ -42,21 +42,21 @@ class PBC_Template {
 		// Makes default parent phase.
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = CALC::is_multiple_products();
-		$base_parent         = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
-		$pbc_session         = isset( $_SESSION[ 'pbc_variation_' . $base_parent ] ) ? $_SESSION[ 'pbc_variation_' . $base_parent ] : array(); // phpcs:ignore
+		$phase_pid           = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
+		$pbc_session_key     = 'pbc_variation_' . $phase_pid;
 
 		$args   = array(
 			'numberposts' => -1,
 			'post_type'   => 'phases',
 			'orderby'     => 'menu_order',
 			'order'       => 'ASC',
-			'post_parent' => $base_parent,
+			'post_parent' => $phase_pid,
 			'fields'      => 'ids',
 		);
 		$phases = get_posts( $args );
 
 		if ( empty( $_POST ) ) {
-			$pbc_session = array();
+			$_SESSION[ $pbc_session_key ] = array();
 		}
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
@@ -68,8 +68,8 @@ class PBC_Template {
 			}
 
 			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
-				if ( ! isset( $pbc_session ) || ! is_array( $pbc_session ) ) {
-					$pbc_session = array();
+				if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
+					$_SESSION[ $pbc_session_key ] = array();
 				}
 				foreach ( $_POST['pbc_variation'] as $key => $variation_id ) { // phpcs:ignore
 					if ( empty( $phases ) ) {
@@ -103,16 +103,16 @@ class PBC_Template {
 					if ( $price_var ) {
 						$variation_title .= ' [' . $price_var . ']';
 					}
-					$pbc_session[ $key ]['phase']['id']   = $phase_id;
-					$pbc_session[ $key ]['phase']['name'] = get_the_title( $phase_id );
-					$pbc_session[ $key ]['var']['id']     = $variation_id;
-					$pbc_session[ $key ]['var']['name']   = $variation_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = get_the_title( $phase_id );
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
 					if ( $option_name ) {
-						$pbc_session[ $key ]['var']['name'] .= ' [' . $option_name . ']';
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
-					$pbc_session[ $key ]['var']['price'] = $price;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
 				}
-				ksort( $pbc_session, SORT_NUMERIC );
+				ksort( $_SESSION[ $pbc_session_key ], SORT_NUMERIC );
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
 			$cstep = (int) $_GET['phase'];
@@ -161,9 +161,9 @@ class PBC_Template {
 											$prev_var[ (int) $arr[0] ][] = $arr[1];
 										}
 									}
-									if ( 1 !== $cstep && ! empty( $pbc_session ) ) {
-										foreach ( $pbc_session as $s_phase_key => $sVariations ) {
-											if ( isset( $prev_var[ $s_phase_key ] ) && ! in_array( $pbc_session[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+									if ( 1 !== $cstep && ! empty( $_SESSION[ $pbc_session_key ] ) ) {
+										foreach ( $_SESSION[ $pbc_session_key ] as $s_phase_key => $sVariations ) {
+											if ( isset( $prev_var[ $s_phase_key ] ) && ! in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
 												unset( $variations[ $key ] );
 												break;
 											}
@@ -203,12 +203,12 @@ class PBC_Template {
 							// Show public.
 							$s_var = 0;
 							if (
-								isset( $pbc_session ) &&
-								is_array( $pbc_session ) &&
-								isset( $pbc_session[ $cstep ] ) &&
-								in_array( $pbc_session[ $cstep ]['var']['id'], $variations )
+								isset( $_SESSION[ $pbc_session_key ] ) &&
+								is_array( $_SESSION[ $pbc_session_key ] ) &&
+								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
+								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
 							) {
-								$s_var = isset( $pbc_session[ $cstep ]['var']['id'] ) ? (int) $pbc_session[ $cstep ]['var']['id'] : '';
+								$s_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : '';
 							} else {
 								if ( isset( $user_id ) ) {
 									$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cstep, true );
@@ -264,7 +264,7 @@ class PBC_Template {
 					<?php
 					if ( 'vertical' === $template ) {
 						SHOW::action_buttons( $phases, $cstep, $template );
-						SHOW::calculation_summary( $pbc_session, $cstep, $phases );
+						SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
 					}
 					?>
 				</div>
@@ -291,15 +291,15 @@ class PBC_Template {
 				<div class="image-wrap">
 					<?php
 					$ssVar = '';
-					if ( ! empty( $pbc_session ) ) {
+					if ( ! empty( $_SESSION[ $pbc_session_key ] ) ) {
 						$to = (int) $cstep;
 						if ( 'calculate' === $cstep ) {
-							$to = count( $pbc_session ) + 1;
+							$to = count( $_SESSION[ $pbc_session_key ] ) + 1;
 						}
 						for ( $i = 1; $i < $to; $i++ ) {
 							$imgprodid = $imgprodurl = '';
-							if ( isset( $pbc_session[ $i ] ) ) {
-								$ssVar        = $pbc_session[ $i ]['var']['id'];
+							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+								$ssVar        = $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
 								$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
@@ -311,11 +311,11 @@ class PBC_Template {
 													$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
 												}
 											}
-											if ( ! empty( $pbc_session ) && ! empty( $prev_var ) ) {
+											if ( ! empty( $_SESSION[ $pbc_session_key ] ) && ! empty( $prev_var ) ) {
 												foreach ( $prev_var as $s_phase_key => $sVariations ) {
 													if ( isset( $prev_var[ $s_phase_key ] ) &&
-													isset( $pbc_session[ $s_phase_key ] ) &&
-													in_array( $pbc_session[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+													isset( $_SESSION[ $pbc_session_key ][ $s_phase_key ] ) &&
+													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
 														$imgprodid = $deps['pbc_imgprod'][0];
 													} else {
 														$imgprodid = '';
@@ -340,7 +340,7 @@ class PBC_Template {
 									$variations_images_flipped = get_option( 'variations_images_flipped' );
 									if ( ! empty( $variations_images_flipped ) ) {
 										for ( $j = 1; $j <= $to; $j++ ) {
-											if ( isset( $pbc_session[ $j ] ) && in_array( $pbc_session[ $j ]['var']['id'], $variations_images_flipped ) ) {
+											if ( isset( $_SESSION[ $pbc_session_key ][ $j ] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
 												$addclass = 'flipped';
 											}
 										}
@@ -352,7 +352,7 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $s_var ) ? CALC::get_image_variation_url( $pbc_session, $s_var ) : '';
+					$imgprodurl = isset( $s_var ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $s_var ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
@@ -373,7 +373,7 @@ class PBC_Template {
 				SHOW::action_buttons( $phases, $cstep );
 			}
 			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
-				SHOW::calculation_summary( $pbc_session, $cstep, $phases );
+				SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
 			}
 			if ( 'calculate' === $cstep ) {
 				?>
@@ -384,17 +384,19 @@ class PBC_Template {
 						?>
 						<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
-							<input type="text" name="email_field" placeholder="<?php _e( 'separate multiple email by comma', 'pbc' ); ?>"/>
-							<input type="text" name="name_field" placeholder="<?php _e( 'Your name', 'pbc' ); ?>"/>
-							<input type="text" name="phone_field" placeholder="<?php _e( 'Phone number', 'pbc' ); ?>"/>
-							<input type="text" name="city_field" placeholder="<?php _e( 'Your City', 'pbc' ); ?>"/>
-							<input type="text" name="state_field" placeholder="<?php _e( 'State', 'pbc' ); ?>"/>
-							<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php _e( 'Send', 'pbc' ); ?></button>
+							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
+							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
+							<input type="text" name="email_field" placeholder="<?php esc_html_e( 'separate multiple email by comma', 'pbc' ); ?>"/>
+							<input type="text" name="name_field" placeholder="<?php esc_html_e( 'Your name', 'pbc' ); ?>"/>
+							<input type="text" name="phone_field" placeholder="<?php esc_html_e( 'Phone number', 'pbc' ); ?>"/>
+							<input type="text" name="city_field" placeholder="<?php esc_html_e( 'Your City', 'pbc' ); ?>"/>
+							<input type="text" name="state_field" placeholder="<?php esc_html_e( 'State', 'pbc' ); ?>"/>
+							<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php esc_html_e( 'Send', 'pbc' ); ?></button>
 							<?php
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 							if ( 'no' !== $show_button_pdf ) {
 								?>
-								<a href="?phase=calculate&configurator=pdf" class="btn btn-pdf" title="Generate PDF"><?php _e( 'PDF', 'pbc' ); ?></a>
+								<a href="?phase=calculate&configurator=pdf" class="btn btn-pdf" title="<?php esc_html_e( 'Generate PDF', 'pbc' ); ?>"><?php esc_html_e( 'PDF', 'pbc' ); ?></a>
 							<?php } ?>
 						</div>
 						<?php
