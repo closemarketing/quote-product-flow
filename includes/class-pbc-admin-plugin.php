@@ -400,8 +400,7 @@ class PBC_Admin_Plugin {
 	public function price_updater_action_callback() {
 		$percentage = isset( $_POST['percentage'] ) ? (int) esc_attr( $_POST['percentage'] ) / 100 : '';
 
-		check_ajax_referer( 'pbc_price_updater_nonce', 'nonce' );
-		if ( true ) {
+		if ( check_ajax_referer( 'pbc_price_updater_nonce', 'nonce' ) ) {
 			$html       = '';
 			$count      = 0;
 			$variations = get_posts( 'posts_per_page=-1&post_type=variation&fields=ids' );
@@ -733,37 +732,36 @@ class PBC_Admin_Plugin {
 	public function pbc_enquiry_pdf() {
 		$post_id = isset( $_POST['post_id'] ) ? (int) $_POST['post_id'] : '';
 
-		$check = check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' );
-		if ( true ) {
-			if ( session_id() == '' ) {
-				ob_start();
-				session_start();
-			}
-			$parent_phase = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
-			$session_key  = 'pbc_variation_' . $parent_phase;
-			$query_args   = array(
-				'posts_per_page' => -1,
-				'post_type'      => 'phases',
-				'orderby'        => 'menu_order',
-				'post_parent'    => $parent_phase,
-				'order'          => 'ASC',
-				'fields'         => 'ids',
-			);
-			$phases       = get_posts( $query_args );
-
-			foreach ( $phases as $phase_order => $phase_id ) {
-				$_SESSION['pbc_parent_phase']                              = $parent_phase;
-				$_SESSION[ $session_key ][ $phase_order ]['phase']['id']   = $phase_id;
-				$_SESSION[ $session_key ][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
-				$_SESSION[ $session_key ][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
-				$_SESSION[ $session_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
-			}
-			$file_url = PDF::generate_engine_pdf( 'url', $post_id );
-
-			wp_send_json_success( $file_url );
-		} else {
+		if ( ! check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' ) ) {
 			wp_send_json_error( array( 'error' => 'Error' ) );
 		}
+
+		if ( session_id() == '' ) {
+			ob_start();
+			session_start();
+		}
+		$parent_phase = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
+		$session_key  = 'pbc_variation_' . $parent_phase;
+		$query_args   = array(
+			'posts_per_page' => -1,
+			'post_type'      => 'phases',
+			'orderby'        => 'menu_order',
+			'post_parent'    => $parent_phase,
+			'order'          => 'ASC',
+			'fields'         => 'ids',
+		);
+		$phases       = get_posts( $query_args );
+
+		foreach ( $phases as $phase_order => $phase_id ) {
+			$_SESSION['pbc_parent_phase']                              = $parent_phase;
+			$_SESSION[ $session_key ][ $phase_order ]['phase']['id']   = $phase_id;
+			$_SESSION[ $session_key ][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
+			$_SESSION[ $session_key ][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
+			$_SESSION[ $session_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
+		}
+		$file_url = PDF::generate_engine_pdf( 'url', $post_id );
+
+		wp_send_json_success( $file_url );
 	}
 
 
