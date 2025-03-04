@@ -3,7 +3,7 @@
  * Plugin Name: Product Budget Configurator
  * Plugin URI:  https://close.technology/wordpress-plugins/product-budget-configurator/
  * Description: Creates a configurator for complex products and makes a budget.
- * Version:     1.4.0-beta.7
+ * Version:     1.4.0-beta.8
  * Author:      Closetechnology
  * Author URI:  https://close.technology
  * Text Domain: pbc
@@ -24,7 +24,7 @@
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
 define( 'WPPBC_ITEM_NAME', 'Product Budget Configurator' );
-define( 'WPPBC_VERSION', '1.4.0-beta.7' );
+define( 'WPPBC_VERSION', '1.4.0-beta.8' );
 define( 'WPPBC_PLUGIN', __FILE__ );
 define( 'WPPBC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WPPBC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
