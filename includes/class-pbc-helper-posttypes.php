@@ -402,6 +402,7 @@ class PBC_Helper_PostTypes {
 		$enquiry_email = get_post_meta( $post_id, 'pbc_enquiry_email', true );
 		$enquiry_city  = get_post_meta( $post_id, 'pbc_enquiry_city', true );
 		$enquiry_state = get_post_meta( $post_id, 'pbc_enquiry_state', true );
+		$parent_phase  = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
 		?>
 		<div><label><strong><?php esc_html_e( 'Name:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_name ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'Phone:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_phone ); ?></label></div>
@@ -409,6 +410,10 @@ class PBC_Helper_PostTypes {
 		<div><label><strong><?php esc_html_e( 'City:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_city ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'State:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_state ); ?></label></div>
 		<?php
+		if ( $parent_phase ) {
+			$parent_phase_post = get_post( $parent_phase );
+			echo '<div><label><strong>' . esc_html__( 'Product:', 'pbc' ) . '</strong> ' . esc_html( $parent_phase_post->post_title ) . '</label></div>';
+		}
 	}
 	/**
 	 * Renders the budget Configuration

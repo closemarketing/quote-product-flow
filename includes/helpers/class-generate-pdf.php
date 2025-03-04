@@ -84,7 +84,10 @@ class PDF {
 	 * @return array
 	 */
 	public static function configurator_result_generate_pdf() {
-		if ( ! isset( $_SESSION['pbc_variation'] ) ) {
+		$parent_phase = isset( $_SESSION['pbc_parent_phase'] ) ? (int) $_SESSION['pbc_parent_phase'] : 0;
+		$session_key  = 'pbc_variation_' . $parent_phase;
+
+		if ( ! isset( $_SESSION[ $session_key ] ) ) {
 			$result = array(
 				'type'     => 'error',
 				'response' => __( 'Configurator not ready!', 'pbc' ),
@@ -133,8 +136,8 @@ class PDF {
 			$variations_images_flipped = get_option( 'variations_images_flipped' );
 			$variations_images_flipped = is_array( $variations_images_flipped ) ? array_filter( $variations_images_flipped ) : array();
 			if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
-				for ( $j = 1; $j <= count( $_SESSION['pbc_variation'] ); $j++ ) {
-					if ( isset( $_SESSION['pbc_variation'][ $j ] ) && in_array( $_SESSION['pbc_variation'][ $j ]['var']['id'], $variations_images_flipped ) ) {
+				for ( $j = 1; $j <= count( $_SESSION[ $session_key ] ); $j++ ) {
+					if ( isset( $_SESSION[ $session_key ][ $j ] ) && in_array( $_SESSION[ $session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
 						$flipped = true;
 					}
 				}
@@ -145,10 +148,10 @@ class PDF {
 			$dirname     = self::get_budget_base_dir();
 			// Make the background transparent
 			imagecolortransparent( $outputImage, $black );
-			for ( $i = 1; $i <= count( $_SESSION['pbc_variation'] ); $i++ ) {
+			for ( $i = 1; $i <= count( $_SESSION[ $session_key ] ); $i++ ) {
 				$imgprodid = $imgprodurl = '';
-				if ( isset( $_SESSION['pbc_variation'][ $i ] ) ) {
-					$ssVar        = $_SESSION['pbc_variation'][ $i ]['var']['id'];
+				if ( isset( $_SESSION[ $session_key ][ $i ] ) ) {
+					$ssVar        = $_SESSION[ $session_key ][ $i ]['var']['id'];
 					$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
 					if ( ! empty( $imgprodgroup ) ) {
 						foreach ( $imgprodgroup as $deps ) {
@@ -160,10 +163,10 @@ class PDF {
 										$prevVar[ (int) $arr[0] ][] = $arr[1];
 									}
 								}
-								if ( ! empty( $_SESSION['pbc_variation'] ) ) {
-									foreach ( $_SESSION['pbc_variation'] as $sPhaseKey => $svariations ) {
+								if ( ! empty( $_SESSION[ $session_key ] ) ) {
+									foreach ( $_SESSION[ $session_key ] as $sPhaseKey => $svariations ) {
 										if ( isset( $prevVar[ $sPhaseKey ] ) &&
-										isset( $_SESSION['pbc_variation'][ $sPhaseKey ] ) && in_array( $_SESSION['pbc_variation'][ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+										isset( $_SESSION[ $session_key ][ $sPhaseKey ] ) && in_array( $_SESSION[ $session_key ][ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
 											$imgprodid = $deps['pbc_imgprod'][0];
 											break;
 										}
@@ -209,7 +212,7 @@ class PDF {
 			$output     .= '<table class="summary">';
 			$total_price = 0;
 			$i           = 0;
-			foreach ( $_SESSION['pbc_variation'] as $phaseKey => $details ) {
+			foreach ( $_SESSION[ $session_key ] as $phaseKey => $details ) {
 				$phase_name     = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
 				$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 				$variation_id   = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;

@@ -236,6 +236,7 @@ class CALC {
 		$city_field      = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
 		$state_field     = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
 		$pbc_session_key = ! empty( $post_data['pbc_session_key'] ) ? sanitize_text_field( $post_data['pbc_session_key'] ) : '';
+		$pbc_parent_phase = ! empty( $post_data['pbc_parent_phase'] ) ? (int) $post_data['pbc_parent_phase'] : 0;
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -333,6 +334,7 @@ class CALC {
 					update_post_meta( $post_id, 'pbc_enquiry_email', $email_field );
 					update_post_meta( $post_id, 'pbc_enquiry_city', $city_field );
 					update_post_meta( $post_id, 'pbc_enquiry_state', $state_field );
+					update_post_meta( $post_id, 'pbc_parent_phase', $pbc_parent_phase );
 					if ( ! empty( $enquiry_entries ) ) {
 						$i = 0;
 						foreach ( $enquiry_entries as $entries ) {

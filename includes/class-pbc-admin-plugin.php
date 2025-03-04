@@ -507,16 +507,17 @@ class PBC_Admin_Plugin {
 					?>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="admin_email_notification"><?php _e( 'Email Notification', 'pbc' ); ?></label>
+					<label class="block" for="admin_email_notification"><?php esc_html_e( 'Email Notification', 'pbc' ); ?></label>
 					<?php
 						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
 					?>
 					<input style="width:100%;" type="text" name="admin_email_notification" value="
 					<?php
 					if ( $admin_email_notification ) {
-						echo $admin_email_notification;}
+						echo esc_html( $admin_email_notification );
+					}
 					?>
-					" placeholder="<?php _e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+					" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' ); ?></label>
@@ -624,7 +625,7 @@ class PBC_Admin_Plugin {
 					$roles      = wp_roles()->roles;
 					$user_roles = array();
 					?>
-					<p><?php esc_html_e( '', 'pbc' ); ?></p>
+					<p></p>
 					<table>
 						<?php
 						foreach ( $roles as $slug => $role ) {
@@ -732,19 +733,30 @@ class PBC_Admin_Plugin {
 	public function pbc_enquiry_pdf() {
 		$post_id = isset( $_POST['post_id'] ) ? (int) $_POST['post_id'] : '';
 
-		check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' );
+		$check = check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' );
 		if ( true ) {
 			if ( session_id() == '' ) {
 				ob_start();
 				session_start();
 			}
-			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC&fields=ids' );
+			$parent_phase = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
+			$session_key  = 'pbc_variation_' . $parent_phase;
+			$query_args   = array(
+				'posts_per_page' => -1,
+				'post_type'      => 'phases',
+				'orderby'        => 'menu_order',
+				'post_parent'    => $parent_phase,
+				'order'          => 'ASC',
+				'fields'         => 'ids',
+			);
+			$phases       = get_posts( $query_args );
 
 			foreach ( $phases as $phase_order => $phase_id ) {
-				$_SESSION['pbc_variation'][ $phase_order ]['phase']['id']   = $phase_id;
-				$_SESSION['pbc_variation'][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
-				$_SESSION['pbc_variation'][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
-				$_SESSION['pbc_variation'][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
+				$_SESSION['pbc_parent_phase']                              = $parent_phase;
+				$_SESSION[ $session_key ][ $phase_order ]['phase']['id']   = $phase_id;
+				$_SESSION[ $session_key ][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
+				$_SESSION[ $session_key ][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
+				$_SESSION[ $session_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
 			}
 			$file_url = PDF::generate_engine_pdf( 'url', $post_id );
 

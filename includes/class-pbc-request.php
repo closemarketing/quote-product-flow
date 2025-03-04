@@ -40,6 +40,8 @@ class PBC_Requests {
 	public function variation_selected_action_callback() {
 		$current_phase = isset( $_REQUEST['current_phase'] ) ? (int) $_REQUEST['current_phase'] : 0;
 		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? $_REQUEST['pbc_variation'] : [];
+		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
+		$session_key   = 'pbc_variation_' . $parent_phase;
 
 		if ( session_id() == '' ) {
 			ob_start();
@@ -63,8 +65,8 @@ class PBC_Requests {
 				update_user_meta( $user_id, 'pbc_phase_' . $current_phase, $phase_param );
 			}
 			// Gets image variation with filter dependency.
-			if ( isset( $_SESSION['pbc_variation'] ) ) {
-				$imgprodurl = CALC::get_image_variation_url( $_SESSION['pbc_variation'], $svar );
+			if ( isset( $_SESSION[ $session_key ] ) ) {
+				$imgprodurl = CALC::get_image_variation_url( sanitize_text_field( wp_unslash( $_SESSION[ $session_key ] ) ), $svar );
 			}
 			$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? (float) $_REQUEST[ "pbc_pricevar_$svar" ] : null;
 			$price    = CALC::get_price_variation( $svar, $pricevar );
@@ -77,7 +79,7 @@ class PBC_Requests {
 			$variations_images_flipped = get_option( 'variations_images_flipped' );
 			if ( ! empty( $variations_images_flipped ) ) {
 				for ( $j = 1; $j < (int) $current_phase; $j++ ) {
-					if ( isset( $_SESSION['pbc_variation'][ $j ] ) && in_array( $_SESSION['pbc_variation'][ $j ]['var']['id'], $variations_images_flipped ) ) {
+					if ( isset( $_SESSION[ $session_key ][ $j ] ) && in_array( $_SESSION[ $session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
 						$flipped = true;
 					}
 				}
