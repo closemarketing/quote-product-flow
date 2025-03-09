@@ -38,8 +38,6 @@ class PBC_Admin_Plugin {
 		add_action( 'wp_ajax_price_updater', array( $this, 'price_updater_action_callback' ) );
 		add_action( 'wp_ajax_nopriv_price_updater', array( $this, 'price_updater_action_callback' ) );
 
-		add_filter( 'template_include', array( $this, 'custom_page_template' ), 99 );
-
 		// On variation-lists admin screen.
 		add_filter( 'views_edit-variation', array( $this, 'pbc_add_print_pdf_button' ) );
 		add_action( 'admin_head-edit.php', array( $this, 'pbc_move_print_pdf_button' ) );
@@ -764,45 +762,22 @@ class PBC_Admin_Plugin {
 		wp_send_json_success( $file_url );
 	}
 
-
 	/**
-	 * Custom Page template
+	 * Add print PDF button
 	 *
-	 * @param string $template
-	 * @return string
+	 * @param array $views Views.
+	 * @return array
 	 */
-	public function custom_page_template( $template ) {
-		$budget_configurator = get_option( 'pbc_budget_configurator_page' );
-		if ( ! empty( $budget_configurator ) && \is_page( $budget_configurator ) ) {
-			if ( isset( $_POST ) && isset( $_GET['submit'] ) && $_POST['submit'] == 'email_send' ) {
-				if ( session_id() == '' ) {
-					session_start();
-				}
-				$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $_POST );
-			}
-			$get_configurator = isset( $_GET['configurator'] ) ? esc_attr( $_GET['configurator'] ) : '';
-			if ( 'pdf' === $get_configurator ) {
-				$pdf_url = PDF::generate_engine_pdf( 'url' );
-				header( "Location: $pdf_url" );
-				exit();
-			}
-			if ( \locate_template( 'template-budget-configurator.php' ) ) {
-				$new_template = \get_stylesheet_directory() . 'template-budget-configurator.php';
-			} else {
-				$new_template = WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
-			}
-			if ( '' != $new_template ) {
-				return $new_template;
-			}
-		}
-		return $template;
-	}
-
-	// add print-pdf button
 	public function pbc_add_print_pdf_button( $views ) {
 		$views['pdf-button'] = '<button id="print-pdf" type="button" class="button" title="Print PDF" style="margin:0 5px"><span class="dashicons dashicons-media-spreadsheet"></span> ' . __( 'Create List Price', 'pbc' ) . '</button><span id="print-message"></span>';
 		return $views;
 	}
+
+	/**
+	 * Move print PDF button
+	 *
+	 * @return void
+	 */
 	public function pbc_move_print_pdf_button() {
 		global $current_screen;
 		// only variation post type, exit earlier
@@ -851,12 +826,6 @@ class PBC_Admin_Plugin {
 	}
 	public function print_pdf_action_callback() {
 		extract( $_REQUEST );
-		/*
-		if(empty($ids)){
-			$ids = get_posts('posts_per_page=-1&post_type=variation&fields=ids');
-		}else{
-			$ids = explode(',',$ids);
-		}*/
 
 		ob_start();
 		/*Content of PDF file*/
@@ -903,11 +872,11 @@ class PBC_Admin_Plugin {
 			?>
 			<table>
 			<tr class="table_header">
-				<td style="width: 30%; text-align: left"><?php echo $phase->menu_order . ' . ' . $phase->post_title; ?></td>
-				<td style="width: 10%; text-align: left"><?php _e( 'Price', 'pbc' ); ?></td>
-				<td style="width: 30%; text-align: left"><?php _e( 'Depends of', 'pbc' ); ?></td>
-				<td style="width: 10%; text-align: left"><?php _e( 'Icon', 'pbc' ); ?></td>
-				<td style="width: 10%; text-align: left"><?php _e( 'Product', 'pbc' ); ?></td>
+				<td style="width: 30%; text-align: left"><?php echo esc_html( $phase->menu_order . ' . ' . $phase->post_title ); ?></td>
+				<td style="width: 10%; text-align: left"><?php esc_html_e( 'Price', 'pbc' ); ?></td>
+				<td style="width: 30%; text-align: left"><?php esc_html_e( 'Depends of', 'pbc' ); ?></td>
+				<td style="width: 10%; text-align: left"><?php esc_html_e( 'Icon', 'pbc' ); ?></td>
+				<td style="width: 10%; text-align: left"><?php esc_html_e( 'Product', 'pbc' ); ?></td>
 			</tr>
 			<?php
 			$args = array(
@@ -924,8 +893,6 @@ class PBC_Admin_Plugin {
 			$variation_in_phase = new WP_Query( $args );
 			?>
 			<?php if ( $variation_in_phase->have_posts() ) : ?>
-
-
 			<!-- the loop -->
 				<?php
 				while ( $variation_in_phase->have_posts() ) :
