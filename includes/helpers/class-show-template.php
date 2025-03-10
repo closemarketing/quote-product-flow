@@ -26,16 +26,6 @@ class PBC_Template {
 	 * @return void
 	 */
 	public static function render( $parent_phase, $template ) {
-		// Don't render if we're in the Gutenberg editor.
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			return;
-		}
-		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
-			$screen = get_current_screen();
-			if ( $screen && $screen->is_block_editor() ) {
-				return;
-			}
-		}
 		$cstep   = 1;
 		$user_id = get_current_user_id();
 
@@ -58,6 +48,9 @@ class PBC_Template {
 		if ( empty( $_POST ) ) {
 			$_SESSION[ $pbc_session_key ] = array();
 		}
+		echo '<pre>$_SESSION';
+print_r($_SESSION);
+echo '</pre>';
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
@@ -103,10 +96,10 @@ class PBC_Template {
 					if ( $price_var ) {
 						$variation_title .= ' [' . $price_var . ']';
 					}
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = get_the_title( $phase_id );
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']    = $phase_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name']  = get_the_title( $phase_id );
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']      = $variation_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']    = $variation_title;
 					if ( $option_name ) {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
@@ -152,22 +145,24 @@ class PBC_Template {
 						<?php
 						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
 						if ( ! empty( $variations ) ) {
-							foreach ( $variations as $key => $variation ) {
-								$pbc_depends = get_post_meta( $variation, 'pbc_depends', true );
-								if ( ! empty( $pbc_depends ) ) {
-									$prev_var = array();
-									foreach ( $pbc_depends as $deps ) {
-										$arr = explode( '|', $deps['pbc_depvar'] );
-										if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-											$prev_var[ (int) $arr[0] ][] = $arr[1];
-										}
+							foreach ( $variations as $key => $variation_id ) {
+								$pbc_depends = get_post_meta( $variation_id, 'pbc_depends', true );
+								if ( empty( $pbc_depends ) ) {
+									continue;
+								}
+								$prev_var = array();
+								foreach ( $pbc_depends as $deps ) {
+									$arr = explode( '|', $deps['pbc_depvar'] );
+									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
+										$prev_var[] = (int) $arr[1];
 									}
-									if ( 1 !== $cstep && ! empty( $_SESSION[ $pbc_session_key ] ) ) {
-										foreach ( $_SESSION[ $pbc_session_key ] as $s_phase_key => $sVariations ) {
-											if ( isset( $prev_var[ $s_phase_key ] ) && ! in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
-												unset( $variations[ $key ] );
-												break;
-											}
+								}
+								if ( 1 !== $cstep && ! empty( $_SESSION[ $pbc_session_key ] ) ) {
+									foreach ( $_SESSION[ $pbc_session_key ] as $s_phase_key => $sVariations ) {
+										$session_var_id = (int) $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'];
+										if ( ! in_array( $session_var_id, $prev_var, true ) ) {
+											unset( $variations[ $key ] );
+											break;
 										}
 									}
 								}
@@ -209,7 +204,7 @@ class PBC_Template {
 								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
 								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
 							) {
-								$s_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : '';
+								$s_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
 							} else {
 								if ( isset( $user_id ) ) {
 									$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cstep, true );
@@ -380,8 +375,8 @@ class PBC_Template {
 				?>
 				<div class="configurator_result_share">
 					<?php
-					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION['pbc_output']['type'] ) : '';
-					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
+					$session_type = isset( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) : '';
+					if ( ! isset( $_SESSION[ $pbc_session_key ]['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
 						<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
@@ -403,15 +398,15 @@ class PBC_Template {
 						<?php
 					}
 
-					if ( isset( $_SESSION['pbc_output'] ) ) {
+					if ( isset( $_SESSION[ $pbc_session_key ]['pbc_output'] ) ) {
 						?>
 						<div class="result_submit_action <?php echo esc_html( $session_type ); ?>">
 							<?php
-							echo $_SESSION['pbc_output']['response'];
+							echo $_SESSION[ $pbc_session_key ]['pbc_output']['response'];
 							?>
 						</div>
 						<?php
-						unset( $_SESSION['pbc_output'] );
+						unset( $_SESSION[ $pbc_session_key ]['pbc_output'] );
 					}
 					?>
 				</div>

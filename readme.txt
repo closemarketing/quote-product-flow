@@ -19,6 +19,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added: You can add hierarchical in products, so you can have different phases.
 *  Added: You can select quantity of each products.
 *  Removed: removed the template page option. Now is only shows with shortcode: [pbc]
+*  Fixed: problems with dependencies and phases.
 
 = 1.3.1 =
 *  Included Internal libraries.

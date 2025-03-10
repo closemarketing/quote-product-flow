@@ -77,8 +77,15 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function pbc_configurator( $atts = array() ) {
-		if ( is_admin() ) {
+		// Don't render if we're in the Gutenberg editor.
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			return;
+		}
+		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+			if ( $screen && $screen->is_block_editor() ) {
+				return;
+			}
 		}
 		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
 		wp_enqueue_style( 'pbc-public' );
