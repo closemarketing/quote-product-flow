@@ -199,10 +199,6 @@ class PBC_Admin_Plugin {
 	 */
 	public function pbc_display_admin_page() {
 		if ( isset( $_POST['form_submit'] ) ) {
-			if ( isset( $_POST['select_budget_page'] ) ) {
-				update_option( 'pbc_budget_configurator_page', $_POST['select_budget_page'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
 			if ( isset( $_POST['option_show_prices'] ) ) {
 				update_option( 'pbc_budget_show_prices', $_POST['option_show_prices'] );
 				$update = __( 'Successfully Saved!', 'pbc' );
@@ -443,25 +439,6 @@ class PBC_Admin_Plugin {
 		?>
 		<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
 			<div class="content">
-				<fieldset>
-					<label class="block" for="select_budget_page"><?php esc_html_e( 'Budget Configurator Page', 'pbc' ); ?></label>
-					<?php
-					$budget_configurator = get_option( 'pbc_budget_configurator_page' );
-					$pages               = get_pages();
-					if ( ! empty( $pages ) ) {
-						echo '<select name="select_budget_page">';
-						echo '<option value="">' . __( 'Select a Page', 'pbc' ) . '</option>';
-						foreach ( $pages as $page ) {
-							$option  = '<option value="' . ( $page->ID ) . '"';
-							$option .= ( $page->ID == $budget_configurator ) ? " selected='selected'" : '';
-							$option .= '>' . $page->post_title . '</option>';
-							echo $option;
-						}
-						echo '</select>';
-					}
-					?>
-					&nbsp;&nbsp;<?php _e( 'or', 'pbc' ); ?>&nbsp;<a class="create_page_link" href="<?php echo admin_url( 'post-new.php?post_type=page' ); ?>" title="<?php _e( 'Create New Page', 'pbc' ); ?>"><?php _e( 'Create Page', 'pbc' ); ?></a>
-				</fieldset>
 				<fieldset>
 					<br/>
 					<label class="block" for="variations_images_flipped"><?php _e( 'Flip Images Horizontal', 'pbc' ); ?></label>

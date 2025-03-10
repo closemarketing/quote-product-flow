@@ -48,9 +48,6 @@ class PBC_Template {
 		if ( empty( $_POST ) ) {
 			$_SESSION[ $pbc_session_key ] = array();
 		}
-		echo '<pre>$_SESSION';
-print_r($_SESSION);
-echo '</pre>';
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
