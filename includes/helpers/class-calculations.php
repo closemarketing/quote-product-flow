@@ -235,6 +235,7 @@ class CALC {
 		$phone_field      = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
 		$city_field       = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
 		$state_field      = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
+		$comments_field   = ! empty( $post_data['comments_field'] ) ? sanitize_textarea_field( $post_data['comments_field'] ) : '';
 		$pbc_session_key  = ! empty( $post_data['pbc_session_key'] ) ? sanitize_text_field( $post_data['pbc_session_key'] ) : '';
 		$pbc_parent_phase = ! empty( $post_data['pbc_parent_phase'] ) ? (int) $post_data['pbc_parent_phase'] : 0;
 
@@ -276,6 +277,7 @@ class CALC {
 				$message        .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
 				$message        .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
 				$message        .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
+				$message        .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
 				$message        .= '<br/></div>';
 				$message        .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
 				$message        .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
@@ -302,32 +304,33 @@ class CALC {
 				}
 				$message .= '</table><br/>';
 				// Subtotal.
-				$message    .= '<table>';
-				$message    .= '<tr>';
-				$message    .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
-				$message    .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
-				$message    .= '</tr>';
-				$message    .= '<tr>';
-				$message    .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
-				$vat         = $subtotal_price * 0.21;
-				$message    .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
-				$message    .= '</tr>';
-				$message    .= '<tr>';
-				$message    .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
-				$message    .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
-				$message    .= '</tr>';
-				$message    .= '</table>';
-				$message    .= '<br>' . get_option( 'blogname' );
-				$headers     = array( 'Content-Type: text/html; charset=UTF-8' );
+				$message .= '<table>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+				$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
+				$message .= '</tr>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
+				$vat      = $subtotal_price * 0.21;
+				$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
+				$message .= '</tr>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+				$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
+				$message .= '</tr>';
+				$message .= '</table>';
+				$message .= '<br>' . get_option( 'blogname' );
+				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
 				$item = array_merge(
 					[
 						'pbc_contact' => [
-							'email' => $email_field,
-							'name'  => $name_field,
-							'phone' => $phone_field,
-							'city'  => $city_field,
-							'state' => $state_field,
+							'email'    => $email_field,
+							'name'     => $name_field,
+							'phone'    => $phone_field,
+							'city'     => $city_field,
+							'state'    => $state_field,
+							'comments' => $comments_field,
 						],
 					],
 					$_SESSION
@@ -349,6 +352,8 @@ class CALC {
 					update_post_meta( $post_id, 'pbc_enquiry_city', $city_field );
 					update_post_meta( $post_id, 'pbc_enquiry_state', $state_field );
 					update_post_meta( $post_id, 'pbc_parent_phase', $pbc_parent_phase );
+					update_post_meta( $post_id, 'pbc_enquiry_comments', $comments_field );
+
 					if ( ! empty( $enquiry_entries ) ) {
 						$i = 0;
 						foreach ( $enquiry_entries as $entries ) {

@@ -402,13 +402,16 @@ class PBC_Helper_PostTypes {
 		$enquiry_email = get_post_meta( $post_id, 'pbc_enquiry_email', true );
 		$enquiry_city  = get_post_meta( $post_id, 'pbc_enquiry_city', true );
 		$enquiry_state = get_post_meta( $post_id, 'pbc_enquiry_state', true );
+		$comments      = get_post_meta( $post_id, 'pbc_enquiry_comments', true );
 		$parent_phase  = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
 		?>
+		<div><label><strong><?php esc_html_e( 'Enquiry ID:', 'pbc' ); ?></strong> <?php echo esc_html( $post_id ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'Name:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_name ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'Phone:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_phone ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'Email:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_email ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'City:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_city ); ?></label></div>
 		<div><label><strong><?php esc_html_e( 'State:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_state ); ?></label></div>
+		<div><label><strong><?php esc_html_e( 'Comments:', 'pbc' ); ?></strong> <?php echo esc_html( $comments ); ?></label></div>
 		<?php
 		if ( $parent_phase ) {
 			$parent_phase_post = get_post( $parent_phase );

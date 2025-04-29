@@ -732,11 +732,12 @@ class PBC_Admin_Plugin {
 			$item[ $item_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
 		}
 		$item['pbc_contact'] = [
-			'name'  => get_post_meta( $post_id, 'pbc_enquiry_name', true ),
-			'phone' => get_post_meta( $post_id, 'pbc_enquiry_phone', true ),
-			'email' => get_post_meta( $post_id, 'pbc_enquiry_email', true ),
-			'city'  => get_post_meta( $post_id, 'pbc_enquiry_city', true ),
-			'state' => get_post_meta( $post_id, 'pbc_enquiry_state', true ),
+			'name'     => get_post_meta( $post_id, 'pbc_enquiry_name', true ),
+			'phone'    => get_post_meta( $post_id, 'pbc_enquiry_phone', true ),
+			'email'    => get_post_meta( $post_id, 'pbc_enquiry_email', true ),
+			'city'     => get_post_meta( $post_id, 'pbc_enquiry_city', true ),
+			'state'    => get_post_meta( $post_id, 'pbc_enquiry_state', true ),
+			'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
 		];
 		$item['pbc_enquiry'] = $post_id;
 

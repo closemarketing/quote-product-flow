@@ -108,8 +108,9 @@ class PDF {
 		.product .image-wrap{ position:relative; }
 			.product .image-wrap img:first-child{ position:relative; }
 			.product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
-		table.summary, table.product, table.summary-total{ width:600px;border-collapse:collapse;border:0; margin-left:50px;}
+		table.summary, table.product, table.summary-total, table.comments { width:600px;border-collapse:collapse;border:0; margin-left:50px;}
 		table td.title{ width:500px;padding:5px 0 5px 15px; }
+		table.comments td.title{ width:600px;padding:5px 0 5px 15px; }
 		table td.value{ width:70px;padding:5px 15px 5px 0; }
 		table td.right{text-align:right;}
 		table.summary td.background, table.summary td.background{ background-color:$background_color; }
@@ -298,6 +299,13 @@ class PDF {
 		$output .= '</td>';
 		$output .= '</tr>';
 		$output .= '</table><br/>';
+
+		// Comments.
+		$comments = isset( $contact['comments'] ) ? sanitize_text_field( $contact['comments'] ) : '';
+		if ( ! empty( $comments ) ) {
+			$output .= '<table class="comments"><tr><td class="title"><p><strong>' . esc_html__( 'Comments', 'pbc' ) . '</strong><br/>';
+			$output .= wp_kses_post( $comments ) . '</p></td></tr></table><br/>';
+		}
 
 		$footer_image = get_option( 'pbc_pdf_image_footer' );
 		$footer_image = ! empty( $footer_image ) ? trim( $footer_image ) : '';

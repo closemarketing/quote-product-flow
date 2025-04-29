@@ -384,6 +384,7 @@ class PBC_Template {
 							<input type="text" name="phone_field" placeholder="<?php esc_html_e( 'Phone number', 'pbc' ); ?>"/>
 							<input type="text" name="city_field" placeholder="<?php esc_html_e( 'Your City', 'pbc' ); ?>"/>
 							<input type="text" name="state_field" placeholder="<?php esc_html_e( 'State', 'pbc' ); ?>"/>
+							<textarea name="comments_field" placeholder="<?php esc_html_e( 'Your comments', 'pbc' ); ?>"></textarea>
 							<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php esc_html_e( 'Send', 'pbc' ); ?></button>
 							<?php
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
