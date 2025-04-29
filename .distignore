@@ -13,3 +13,4 @@ vendor/spipu/html2pdf/examples
 .cursorrules
 *.pot
 *.po
+phpcs.xml.dist

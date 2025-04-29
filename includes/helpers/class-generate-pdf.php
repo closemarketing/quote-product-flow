@@ -23,24 +23,19 @@ class PDF {
 	/**
 	 * Generates PDF from session
 	 *
-	 * @param string $type_return url/path for type to return
+	 * @param array  $item        Item of budget to generate.
+	 * @param string $type_return url/path for type to return.
 	 * @return file
 	 */
-	public static function generate_engine_pdf( $type_return = 'path', $post_id = null ) {
-		if ( session_id() == '' ) {
-			ob_start();
-			session_start();
-		}
+	public static function generate_engine_pdf( $item = array(), $type_return = 'path' ) {
 		$filename      = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
 		$dirname       = self::get_budget_base_dir( 'path' );
 		$filename_path = $dirname . $filename;
 
-		$content = self::configurator_result_generate_pdf();
+		$content = self::configurator_result_generate_pdf( $item );
 
 		if ( 'error' !== $content['type'] ) {
 			try {
-				$width_mm  = 710 * 0.2646;   // 1px = 0.2646mm
-				$height_mm = 900 * 0.2646;
 				$html2pdf  = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
 				$html2pdf->setTestTdInOnePage( false );
 				$html2pdf->writeHTML( $content['response'] );
@@ -81,206 +76,240 @@ class PDF {
 	/**
 	 * Generates PDF from session
 	 *
+	 * @param array $item Item of budget to generate.
 	 * @return array
 	 */
-	public static function configurator_result_generate_pdf() {
-		$parent_phase = isset( $_SESSION['pbc_parent_phase'] ) ? (int) $_SESSION['pbc_parent_phase'] : 0;
+	public static function configurator_result_generate_pdf( $item = array() ) {
+		$parent_phase = isset( $item['pbc_parent_phase'] ) ? (int) $item['pbc_parent_phase'] : 0;
 		$session_key  = 'pbc_variation_' . $parent_phase;
+		$budget_date  = isset( $item['pbc_budget_date'] ) ? sanitize_text_field( $item['pbc_budget_date'] ) : gmdate( 'd-m-Y' );
 
-		if ( ! isset( $_SESSION[ $session_key ] ) ) {
+		if ( empty( $item[ $session_key ] ) && ! is_array( $item[ $session_key ] ) ) {
 			$result = array(
 				'type'     => 'error',
 				'response' => __( 'Configurator not ready!', 'pbc' ),
 			);
-		} else {
-			$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
-			$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1 ) ? trim( $pdf_color_odd ) : '#ffebcb';
-
-			$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
-			$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
-
-			// Starts PDF.
-			$output             = '<page backcolor="#fff">';
-			$output            .= "<style>
-			.header, .product .product-title {margin-left: 20px;}
-			.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
-			.product .product-preview{ width:300px; }
-			.product .image-wrap{ position:relative; }
-		    .product .image-wrap img:first-child{ position:relative; }
-		    .product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
-			table.summary, table.product, table.summary-total{ width:600px;border-collapse:collapse;border:0; margin-left:50px;}
-			table td.title{ width:500px;padding:5px 0 5px 15px; }
-			table td.value{ width:70px;padding:5px 15px 5px 0; }
-			table td.right{text-align:right;}
-			table.summary td.background, table.summary td.background{ background-color:$background_color; }
-			table.summary-total td.empty{width:450px;}
-			table.summary-total td.title{width:50px;}
-			img.header_image{ width:700px;height:120px; }
-			img.footer_image{ width:700px;height:70px; margin: 50px 0 0 30px;}
-			</style>";
-			$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
-			$pdf_image_selected = ! empty( $pdf_image_selected ) ? trim( $pdf_image_selected ) : '';
-			if ( ! empty( $pdf_image_selected ) ) {
-				$output .= "<img src='" . esc_url( $pdf_image_selected ) . "' width='200'/>";
-			}
-			$header_image = get_option( 'pbc_pdf_image_header' );
-			$header_image = ! empty( $header_image ) ? trim( $header_image ) : '';
-			if ( ! empty( $header_image ) ) {
-				$output .= '<table class="header"><tr><td><img src="' . esc_url( $header_image ) . '" class="header_image"/></td></tr></table><br/>';
-			}
-			$output                   .= '<table class="product"><tr><td class="product-title">';
-			$output                   .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
-			$output                   .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
-			$output                   .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
-			$flipped                   = false;
-			$variations_images_flipped = get_option( 'variations_images_flipped' );
-			$variations_images_flipped = is_array( $variations_images_flipped ) ? array_filter( $variations_images_flipped ) : array();
-			if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
-				for ( $j = 1; $j <= count( $_SESSION[ $session_key ] ); $j++ ) {
-					if ( isset( $_SESSION[ $session_key ][ $j ] ) && in_array( $_SESSION[ $session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
-						$flipped = true;
-					}
-				}
-			}
-
-			$outputImage = imagecreatetruecolor( 300, 243 );
-			$black       = imagecolorallocate( $outputImage, 0, 0, 0 );
-			$dirname     = self::get_budget_base_dir();
-			// Make the background transparent
-			imagecolortransparent( $outputImage, $black );
-			for ( $i = 1; $i <= count( $_SESSION[ $session_key ] ); $i++ ) {
-				$imgprodid = $imgprodurl = '';
-				if ( isset( $_SESSION[ $session_key ][ $i ] ) ) {
-					$ssVar        = $_SESSION[ $session_key ][ $i ]['var']['id'];
-					$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
-					if ( ! empty( $imgprodgroup ) ) {
-						foreach ( $imgprodgroup as $deps ) {
-							if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
-								$prevVar = array();
-								foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
-									$arr = explode( '|', $depvarimgprod );
-									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-										$prevVar[ (int) $arr[0] ][] = $arr[1];
-									}
-								}
-								if ( ! empty( $_SESSION[ $session_key ] ) ) {
-									foreach ( $_SESSION[ $session_key ] as $sPhaseKey => $svariations ) {
-										if ( isset( $prevVar[ $sPhaseKey ] ) &&
-										isset( $_SESSION[ $session_key ][ $sPhaseKey ] ) && in_array( $_SESSION[ $session_key ][ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
-											$imgprodid = $deps['pbc_imgprod'][0];
-											break;
-										}
-									}
-								}
-							} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
-								$imgprodid = $deps['pbc_imgprod'][0];
-								break;
-							}
-						}
-					}
-					if ( ! empty( $imgprodid ) ) {
-						$imgprodurl = wp_get_attachment_image_src( $imgprodid, 'full', true );
-					}
-					if ( ! empty( $imgprodurl ) && file_exists( $imgprodurl ) ) {
-						$extension = pathinfo( $imgprodurl[0], PATHINFO_EXTENSION );
-						switch ( $extension ) {
-							case 'png':
-								$img                  = imagecreatefrompng( $imgprodurl[0] );
-								list($width, $height) = getimagesize( $imgprodurl[0] );
-								break;
-							default:
-								// jpg, jpeg, gif others
-								$image                = imagepng( imagecreatefromstring( file_get_contents( $imgprodurl[0] ) ), $dirname . 'product-image-for-pdf.png' );
-								list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
-								$img                  = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
-						}
-
-						// Flip it vertically
-						if ( $flipped ) {
-							imageflip( $img, IMG_FLIP_HORIZONTAL );
-						}
-						imagecopyresized( $outputImage, $img, 0, 0, 0, 0, 300, 243, $width, $height );
-						// $output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
-					}
-				}
-			}
-			imagepng( $outputImage, $dirname . '/product-image-for-pdf.png' );
-			imagedestroy( $outputImage );
-			$output .= '<img phaseid="' . $i . '" src="' . $dirname . '/product-image-for-pdf.png" alt="product image"/>';
-			$output .= '</div></td></tr></table><br/><br/>';
-
-			$output     .= '<table class="summary">';
-			$total_price = 0;
-			$i           = 0;
-			foreach ( $_SESSION[ $session_key ] as $phaseKey => $details ) {
-				$phase_name     = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
-				$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-				$variation_id   = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
-				$bg             = ( $i % 2 ) == 0 ? 'background' : '';
-
-				$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
-				$price          = (float) str_replace( ',', '.', $details['var']['price'] );
-				if ( 'qty' === $variation_type ) {
-					$total_price = $price * $total_price;
-				} else {
-					$total_price += $price;
-				}
-				$output .= '<tr>';
-				$output .= '<td class="title ' . $bg . '">' . $phase_name . ' ' . $variation_name . '</td>';
-				$output .= '<td class="value right ' . $bg . '">';
-				if ( $price > 0 ) {
-					$output .= number_format( $price, 2, ',', '.' ) . ' €';
-				}
-				$output .= '</td>';
-				$output .= '</tr>';
-				++$i;
-			}
-			if ( ! $total_price ) {
-				$total_price = 0;
-				$tax         = 0;
-			}
-			$tax            = $total_price * 0.21;
-			$total_pricevat = $total_price + $total_price * 0.21;
-
-			$output .= '</table>';
-			$output .= '<table class="summary-total"><tr>';
-			$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
-			$output .= '<td class="value right">';
-			if ( $tax > 0 ) {
-				$output .= number_format( $tax, 2, ',', '.' ) . ' €';
-			}
-			$output .= '</td>';
-			$output .= '</tr>';
-			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
-			$output .= '<td class="value right">';
-			if ( $total_price > 0 ) {
-				$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
-			}
-			$output .= '</td>';
-			$output .= '</tr>';
-			$output .= '<tr>';
-			$color   = CALC::calculate_color_text( $background_total );
-			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
-			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
-			if ( $total_pricevat > 0 ) {
-				$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
-			}
-			$output .= '</td>';
-			$output .= '</tr>';
-			$output .= '</table><br/>';
-
-			$footer_image = get_option( 'pbc_pdf_image_footer' );
-			$footer_image = ! empty( $footer_image ) ? trim( $footer_image ) : '';
-			if ( ! empty( $footer_image ) ) {
-				$output .= '<table class="footer"><tr><td><img src="' . esc_url( $footer_image ) . '" class="footer_image"/></td></tr></table><br/>';
-			}
-
-			$output .= '</page>';
-			$result  = array(
-				'type'     => 'success',
-				'response' => $output,
-			);
 		}
+		$total_vars       = count( $item[ $session_key ] );
+		$itemv            = $item[ $session_key ];
+		$contact          = isset( $item['pbc_contact'] ) ? $item['pbc_contact'] : array();
+		$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
+		$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1 ) ? trim( $pdf_color_odd ) : '#ffebcb';
+
+		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
+		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
+
+		// Starts PDF.
+		$output             = '<page backcolor="#fff">';
+		$output            .= "<style>
+		.header, .product .product-title {margin-left: 20px;}
+		.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
+		.product .product-preview{ width:300px; }
+		.product .image-wrap{ position:relative; }
+			.product .image-wrap img:first-child{ position:relative; }
+			.product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
+		table.summary, table.product, table.summary-total{ width:600px;border-collapse:collapse;border:0; margin-left:50px;}
+		table td.title{ width:500px;padding:5px 0 5px 15px; }
+		table td.value{ width:70px;padding:5px 15px 5px 0; }
+		table td.right{text-align:right;}
+		table.summary td.background, table.summary td.background{ background-color:$background_color; }
+		table.summary-total td.empty{width:450px;}
+		table.summary-total td.title{width:50px;}
+		img.header_image{ width:700px;height:120px; }
+		img.footer_image{ width:700px;height:70px; margin: 50px 0 0 30px;}
+		</style>";
+		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
+		$pdf_image_selected = ! empty( $pdf_image_selected ) ? trim( $pdf_image_selected ) : '';
+		if ( ! empty( $pdf_image_selected ) ) {
+			$output .= "<img src='" . esc_url( $pdf_image_selected ) . "' width='200'/>";
+		}
+		$header_image = get_option( 'pbc_pdf_image_header' );
+		$header_image = ! empty( $header_image ) ? trim( $header_image ) : '';
+		if ( ! empty( $header_image ) ) {
+			$output .= '<table class="header"><tr><td><img src="' . esc_url( $header_image ) . '" class="header_image"/></td></tr></table><br/>';
+		}
+		$output .= '<table class="product"><tr><td class="product-title">';
+		$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
+		$output .= '<p><strong>' . esc_html__( 'Date', 'pbc' ) . ': ' . $budget_date . '</strong></p>';
+
+		// Budget ID.
+		$budget_id = isset( $item['pbc_enquiry'] ) ? (int) $item['pbc_enquiry'] : 0;
+		if ( ! empty( $budget_id ) ) {
+			$output .= '<p><strong>' . esc_html__( 'Budget ID', 'pbc' ) . ': ' . $budget_id . '</strong></p>';
+		}
+
+		// Contact.
+		if ( ! empty( $contact ) ) {
+			$output .= '<p><strong>' . esc_html__( 'Contact', 'pbc' ) . ': ' . $contact['name'] . '</strong>';
+			if ( ! empty( $contact['email'] ) ) {
+				$output .= '<br/><strong>' . esc_html__( 'Email', 'pbc' ) . ':</strong> ' . $contact['email'];
+			}
+			if ( ! empty( $contact['phone'] ) ) {
+				$output .= '<br/><strong>' . esc_html__( 'Phone', 'pbc' ) . ':</strong> ' . $contact['phone'];
+			}
+			if ( ! empty( $contact['city'] ) ) {
+				$output .= '<br/><strong>' . esc_html__( 'City', 'pbc' ) . ':</strong> ' . $contact['city'];
+			}
+			if ( ! empty( $contact['state'] ) ) {
+				$output .= '<br/><strong>' . esc_html__( 'State', 'pbc' ) . ':</strong> ' . $contact['state'] . '';
+			}
+			$output .= '</p>';
+		}
+
+		$output .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
+		$output .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
+
+		// Flipped images.
+		$flipped                   = false;
+		$variations_images_flipped = get_option( 'variations_images_flipped' );
+		$variations_images_flipped = is_array( $variations_images_flipped ) ? array_filter( $variations_images_flipped ) : array();
+		if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
+			for ( $j = 1; $j <= $total_vars; $j++ ) {
+				if ( isset( $itemv[ $j ] ) && in_array( $itemv[ $j ]['var']['id'], $variations_images_flipped ) ) {
+					$flipped = true;
+				}
+			}
+		}
+
+		$outputImage = imagecreatetruecolor( 300, 243 );
+		$black       = imagecolorallocate( $outputImage, 0, 0, 0 );
+		$dirname     = self::get_budget_base_dir();
+
+		// Make the background transparent.
+		imagecolortransparent( $outputImage, $black );
+		for ( $i = 0; $i <= $total_vars; $i++ ) {
+			$imgprodid  = '';
+			$imgprodurl = '';
+			if ( ! empty( $itemv[ $i ]['var']['id'] ) ) {
+				$ssVar        = $itemv[ $i ]['var']['id'];
+				$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
+				if ( ! empty( $imgprodgroup ) ) {
+					foreach ( $imgprodgroup as $deps ) {
+						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
+							$prevVar = array();
+							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+								$arr = explode( '|', $depvarimgprod );
+								if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
+									$prevVar[ (int) $arr[0] ][] = $arr[1];
+								}
+							}
+							if ( ! empty( $itemv ) ) {
+								foreach ( $itemv as $sPhaseKey => $svariations ) {
+									if ( isset( $prevVar[ $sPhaseKey ] ) &&
+									isset( $itemv[ $sPhaseKey ] ) && in_array( $itemv[ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+										$imgprodid = $deps['pbc_imgprod'][0];
+										break;
+									}
+								}
+							}
+						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
+							$imgprodid = $deps['pbc_imgprod'][0];
+							break;
+						}
+					}
+				}
+				if ( ! empty( $imgprodid ) ) {
+					$imgprodurl = wp_get_attachment_image_src( $imgprodid, 'full', true );
+				}
+				if ( ! empty( $imgprodurl ) && file_exists( $imgprodurl ) ) {
+					$extension = pathinfo( $imgprodurl[0], PATHINFO_EXTENSION );
+					switch ( $extension ) {
+						case 'png':
+							$img                  = imagecreatefrompng( $imgprodurl[0] );
+							list($width, $height) = getimagesize( $imgprodurl[0] );
+							break;
+						default:
+							// jpg, jpeg, gif others
+							$image                = imagepng( imagecreatefromstring( file_get_contents( $imgprodurl[0] ) ), $dirname . 'product-image-for-pdf.png' );
+							list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
+							$img                  = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
+					}
+
+					// Flip it vertically
+					if ( $flipped ) {
+						imageflip( $img, IMG_FLIP_HORIZONTAL );
+					}
+					imagecopyresized( $outputImage, $img, 0, 0, 0, 0, 300, 243, $width, $height );
+					// $output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
+				}
+			}
+		}
+		imagepng( $outputImage, $dirname . '/product-image-for-pdf.png' );
+		imagedestroy( $outputImage );
+		$output .= '<img phaseid="' . $i . '" src="' . $dirname . '/product-image-for-pdf.png" alt="product image"/>';
+		$output .= '</div></td></tr></table><br/><br/>';
+
+		$output     .= '<table class="summary">';
+		$total_price = 0;
+		$i           = 0;
+		foreach ( $itemv as $details ) {
+			$phase_name     = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+			$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+			$variation_id   = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
+			$bg             = ( $i % 2 ) == 0 ? 'background' : '';
+
+			$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+			$price          = (float) str_replace( ',', '.', $details['var']['price'] );
+			if ( 'qty' === $variation_type ) {
+				$total_price = $price * $total_price;
+			} else {
+				$total_price += $price;
+			}
+			$output .= '<tr>';
+			$output .= '<td class="title ' . $bg . '">' . $phase_name . ' ' . $variation_name . '</td>';
+			$output .= '<td class="value right ' . $bg . '">';
+			if ( $price > 0 ) {
+				$output .= number_format( $price, 2, ',', '.' ) . ' €';
+			}
+			$output .= '</td>';
+			$output .= '</tr>';
+			++$i;
+		}
+		if ( ! $total_price ) {
+			$total_price = 0;
+			$tax         = 0;
+		}
+		$tax            = $total_price * 0.21;
+		$total_pricevat = $total_price + $total_price * 0.21;
+
+		$output .= '</table>';
+		$output .= '<table class="summary-total"><tr>';
+		$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
+		$output .= '<td class="value right">';
+		if ( $tax > 0 ) {
+			$output .= number_format( $tax, 2, ',', '.' ) . ' €';
+		}
+		$output .= '</td>';
+		$output .= '</tr>';
+		$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
+		$output .= '<td class="value right">';
+		if ( $total_price > 0 ) {
+			$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
+		}
+		$output .= '</td>';
+		$output .= '</tr>';
+		$output .= '<tr>';
+		$color   = CALC::calculate_color_text( $background_total );
+		$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
+		$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
+		if ( $total_pricevat > 0 ) {
+			$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
+		}
+		$output .= '</td>';
+		$output .= '</tr>';
+		$output .= '</table><br/>';
+
+		$footer_image = get_option( 'pbc_pdf_image_footer' );
+		$footer_image = ! empty( $footer_image ) ? trim( $footer_image ) : '';
+		if ( ! empty( $footer_image ) ) {
+			$output .= '<table class="footer"><tr><td><img src="' . esc_url( $footer_image ) . '" class="footer_image"/></td></tr></table><br/>';
+		}
+
+		$output .= '</page>';
+		$result  = array(
+			'type'     => 'success',
+			'response' => $output,
+		);
 		return $result;
 	}
 }

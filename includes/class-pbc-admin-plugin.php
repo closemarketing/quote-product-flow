@@ -710,13 +710,8 @@ class PBC_Admin_Plugin {
 		if ( ! check_ajax_referer( 'pbc_enquiry_pdf_nonce', 'nonce' ) ) {
 			wp_send_json_error( array( 'error' => 'Error' ) );
 		}
-
-		if ( session_id() == '' ) {
-			ob_start();
-			session_start();
-		}
 		$parent_phase = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
-		$session_key  = 'pbc_variation_' . $parent_phase;
+		$item_key     = 'pbc_variation_' . $parent_phase;
 		$query_args   = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'phases',
@@ -727,15 +722,25 @@ class PBC_Admin_Plugin {
 		);
 		$phases       = get_posts( $query_args );
 
+		$item = [];
 		foreach ( $phases as $phase_order => $phase_id ) {
-			$_SESSION['pbc_parent_phase']                              = $parent_phase;
-			$_SESSION[ $session_key ][ $phase_order ]['phase']['id']   = $phase_id;
-			$_SESSION[ $session_key ][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
-			$_SESSION[ $session_key ][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
-			$_SESSION[ $session_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
+			$item['pbc_date']                                   = get_the_date( 'd-m-Y', $post_id );
+			$item['pbc_parent_phase']                           = $parent_phase;
+			$item[ $item_key ][ $phase_order ]['phase']['id']   = $phase_id;
+			$item[ $item_key ][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
+			$item[ $item_key ][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
+			$item[ $item_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
 		}
-		$file_url = PDF::generate_engine_pdf( 'url', $post_id );
+		$item['pbc_contact'] = [
+			'name'  => get_post_meta( $post_id, 'pbc_enquiry_name', true ),
+			'phone' => get_post_meta( $post_id, 'pbc_enquiry_phone', true ),
+			'email' => get_post_meta( $post_id, 'pbc_enquiry_email', true ),
+			'city'  => get_post_meta( $post_id, 'pbc_enquiry_city', true ),
+			'state' => get_post_meta( $post_id, 'pbc_enquiry_state', true ),
+		];
+		$item['pbc_enquiry'] = $post_id;
 
+		$file_url = PDF::generate_engine_pdf( $item, 'url' );
 		wp_send_json_success( $file_url );
 	}
 
