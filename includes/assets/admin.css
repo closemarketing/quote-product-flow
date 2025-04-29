@@ -22,6 +22,10 @@ fieldset label.block {
    margin-bottom: 2px;
 }
 
+.pbc_field {
+	width: 100%;
+}
+
 .save_bar {
    padding: 0 10px;
    text-align: right;

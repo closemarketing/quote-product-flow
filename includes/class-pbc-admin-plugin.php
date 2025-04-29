@@ -10,7 +10,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-use Close\PBC\Helpers\CALC;
 use Close\PBC\Helpers\PDF;
 
 /**
@@ -198,63 +197,11 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function pbc_display_admin_page() {
-		if ( isset( $_POST['form_submit'] ) ) {
-			if ( isset( $_POST['option_show_prices'] ) ) {
-				update_option( 'pbc_budget_show_prices', $_POST['option_show_prices'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
-			if ( isset( $_POST['option_show_final_button_pdf'] ) ) {
-				update_option( 'pbc_budget_show_button_pdf', $_POST['option_show_final_button_pdf'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
-			if ( isset( $_POST['pdf_image_selected'] ) ) {
-				update_option( 'pbc_pdf_image_selected', $_POST['pdf_image_selected'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
-			if ( isset( $_POST['pdf_image_header'] ) ) {
-				update_option( 'pbc_pdf_image_header', $_POST['pdf_image_header'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
-			if ( isset( $_POST['pdf_image_footer'] ) ) {
-				update_option( 'pbc_pdf_image_footer', $_POST['pdf_image_footer'] );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
-			if ( isset( $_POST['pdf_color_odd'] ) ) {
-				update_option( 'pbc_pdf_color_odd', $_POST['pdf_color_odd'] );
-
-				if ( isset( $_POST['pdf_color_total'] ) ) {
-					update_option( 'pbc_pdf_color_total', $_POST['pdf_color_total'] );
-					$update = __( 'Successfully Saved!', 'pbc' );
-				}$update = __( 'Successfully Saved!', 'pbc' );
-			}
-			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array( '' );
-			update_option( 'variations_images_flipped', $variations_images_flipped );
-
-			$admin_email_notification = isset( $_POST['admin_email_notification'] ) ? $_POST['admin_email_notification'] : array( '' );
-			update_option( 'pbc_admin_email_notification', $admin_email_notification );
-
-			// Preview width.
-			if ( isset( $_POST['preview_width'] ) ) {
-				update_option( 'pbc_preview_width', sanitize_text_field( $_POST['preview_width'] ) );
-				$update = __( 'Successfully Saved!', 'pbc' );
-			}
-
-			// Roles discount.
-			$roles = wp_roles()->roles;
-			foreach ( $roles as $slug => $role ) {
-				if ( ! empty( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
-					update_option( 'pbc_discount_user_' . $slug, (int) $_POST[ 'pbc_discount_user_' . $slug ] );
-				}
-			}
-		}
-
-		if ( isset( $_POST['submit_license'] ) ) {
-			$license_apikey     = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field( $_POST['pbc_license_apikey'] ) : '';
-			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field( $_POST['pbc_license_product_id'] ) : '';
-
-			update_option( 'pbc_license_apikey', $license_apikey );
-			update_option( 'pbc_license_product_id', $license_product_id );
-			$this->validate_license( $_POST );
+		$return = $this->save_post_options();
+		if ( 'ok' === $return ) {
+			$update = __( 'Successfully Saved!', 'pbc' );
+		} elseif ( 'error' === $return ) {
+			$error = __( 'Error saving settings', 'pbc' );
 		}
 		?>
 		<div class='wrap'>
@@ -328,6 +275,65 @@ class PBC_Admin_Plugin {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Save post options
+	 *
+	 * @return string ok|error
+	 */
+	private function save_post_options() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$status = '';
+		// Verify nonce.
+		if ( isset( $_POST['pbc_nonce'] ) && ! wp_verify_nonce( sanitize_key( $_POST['pbc_nonce'] ), 'pbc_nonce' ) ) {
+			wp_die( esc_html__( 'Security check failed. Please try again.', 'pbc' ) );
+			return;
+		}
+		if ( isset( $_POST['form_submit'] ) ) {
+			$status = 'ok';
+			$fields = array(
+				'option_show_prices'           => 'pbc_budget_show_prices',
+				'option_show_final_button_pdf' => 'pbc_budget_show_button_pdf',
+				'pdf_image_selected'           => 'pbc_pdf_image_selected',
+				'pdf_image_header'             => 'pbc_pdf_image_header',
+				'pdf_image_footer'             => 'pbc_pdf_image_footer',
+				'pdf_color_odd'                => 'pbc_pdf_color_odd',
+				'pdf_color_total'              => 'pbc_pdf_color_total',
+				'admin_email_notification'     => 'pbc_admin_email_notification',
+				'preview_width'                => 'pbc_preview_width',
+			);
+			foreach ( $fields as $field_key => $field ) {
+				if ( isset( $_POST[ $field_key ] ) ) {
+					update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
+				}
+			}
+
+			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array( '' );
+			$variations_images_flipped = array_map( 'intval', $variations_images_flipped );
+			update_option( 'variations_images_flipped', $variations_images_flipped );
+
+			// Roles discount.
+			$roles = wp_roles()->roles;
+			foreach ( $roles as $slug => $role ) {
+				if ( ! empty( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
+					update_option( 'pbc_discount_user_' . $slug, (int) $_POST[ 'pbc_discount_user_' . $slug ] );
+				}
+			}
+		}
+
+		if ( isset( $_POST['submit_license'] ) ) {
+			$license_apikey     = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_license_apikey'] ) ) : '';
+			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_license_product_id'] ) ) : '';
+
+			update_option( 'pbc_license_apikey', $license_apikey );
+			update_option( 'pbc_license_product_id', $license_product_id );
+			$this->validate_license( $_POST );
+		}
+
+		return $status;
 	}
 	/**
 	 * Import Meta Box Callback
@@ -485,25 +491,14 @@ class PBC_Admin_Plugin {
 					<?php
 						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
 					?>
-					<input style="width:100%;" type="text" name="admin_email_notification" value="
-					<?php
-					if ( $admin_email_notification ) {
-						echo esc_html( $admin_email_notification );
-					}
-					?>
-					" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if ( $admin_email_notification ) { echo esc_html( $admin_email_notification ); } ?>" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' ); ?></label>
 					<?php
 						$preview_width = get_option( 'pbc_preview_width' );
 					?>
-					<input style="width:100%;" type="text" name="preview_width" value="
-					<?php
-					if ( $preview_width ) {
-						echo $preview_width;}
-					?>
-					" placeholder="<?php _e( 'default: 570', 'pbc' ); ?>" />
+					<input class="pbc_field" type="text" name="preview_width" value="<?php if ( $preview_width ) { echo $preview_width; } ?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
@@ -537,67 +532,40 @@ class PBC_Admin_Plugin {
 					<?php
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
-					<input type="text" name="pdf_image_selected" value="
-					<?php
-					if ( $pdf_image_selected ) {
-						echo esc_url( $pdf_image_selected ); }
-					?>
-					" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					<input class="pbc_field" type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) { echo esc_url( $pdf_image_selected ); } ?>" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
 					?>
-					<input type="text" name="pdf_image_header" value="
-					<?php
-					if ( $pdf_image_header ) {
-						echo esc_url( $pdf_image_header ); }
-					?>
-					" />
+					<input class="pbc_field" type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) { echo esc_url( $pdf_image_header ); } ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
 					?>
-					<input type="text" name="pdf_image_footer" value="
-					<?php
-					if ( $pdf_image_footer ) {
-						echo esc_url( $pdf_image_footer ); }
-					?>
-					" />
+					<input class="pbc_field" type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) { echo esc_url( $pdf_image_footer ); } ?>" />
 				</fieldset>
 				<fieldset>
-					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label>
-					<?php
+					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label><?php
 						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
 					?>
-					<input type="text" name="pdf_color_odd" value="
-					<?php
-					if ( $pdf_color_odd ) {
-						echo esc_url( $pdf_color_odd ); }
-					?>
-					" />
+					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 					?>
-					<input type="text" name="pdf_color_total" value="
-					<?php
-					if ( $pdf_color_total ) {
-						echo esc_url( $pdf_color_total ); }
-					?>
-					" />
+					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" />
 				</fieldset>
 
 				<h2><?php esc_html_e( 'Roles Discount', 'pbc' ); ?></h2>
 				<fieldset>
 					<?php
-					$roles      = wp_roles()->roles;
-					$user_roles = array();
+					$roles = wp_roles()->roles;
 					?>
 					<p></p>
 					<table>
@@ -616,6 +584,7 @@ class PBC_Admin_Plugin {
 
 			<div class="save_bar">
 				<input type="hidden" name="form_submit" value="true"/>
+				<input type="hidden" name="pbc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'pbc_nonce' ) ); ?>"/>
 				<input type="submit" value="<?php esc_html_e( 'Save', 'pbc' ); ?>" class="button button-primary submit-button" />
 			</div>
 		</form>
