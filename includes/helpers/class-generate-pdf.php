@@ -172,12 +172,12 @@ class PDF {
 			}
 		}
 
-		$outputImage = imagecreatetruecolor( 300, 243 );
-		$black       = imagecolorallocate( $outputImage, 0, 0, 0 );
-		$dirname     = self::get_budget_base_dir();
+		$output_image = imagecreatetruecolor( 300, 243 );
+		$black        = imagecolorallocate( $output_image, 0, 0, 0 );
+		$dirname      = self::get_budget_base_dir();
 
 		// Make the background transparent.
-		imagecolortransparent( $outputImage, $black );
+		imagecolortransparent( $output_image, $black );
 		for ( $i = 0; $i <= $total_vars; $i++ ) {
 			$imgprodid  = '';
 			$imgprodurl = '';
@@ -212,7 +212,7 @@ class PDF {
 				if ( ! empty( $imgprodid ) ) {
 					$imgprodurl = wp_get_attachment_image_src( $imgprodid, 'full', true );
 				}
-				if ( ! empty( $imgprodurl ) && file_exists( $imgprodurl ) ) {
+				if ( ! empty( $imgprodurl ) && wp_remote_retrieve_response_code( wp_remote_head( $imgprodurl[0] ) ) === 200 ) {
 					$extension = pathinfo( $imgprodurl[0], PATHINFO_EXTENSION );
 					switch ( $extension ) {
 						case 'png':
@@ -220,24 +220,27 @@ class PDF {
 							list($width, $height) = getimagesize( $imgprodurl[0] );
 							break;
 						default:
-							// jpg, jpeg, gif others
-							$image                = imagepng( imagecreatefromstring( file_get_contents( $imgprodurl[0] ) ), $dirname . 'product-image-for-pdf.png' );
+							// jpg, jpeg, gif others.
+							$img                  = imagepng( imagecreatefromstring( file_get_contents( $imgprodurl[0] ) ), $dirname . 'product-image-for-pdf.png' );
 							list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
 							$img                  = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
 					}
 
-					// Flip it vertically
+					// Flip it vertically.
 					if ( $flipped ) {
 						imageflip( $img, IMG_FLIP_HORIZONTAL );
 					}
-					imagecopyresized( $outputImage, $img, 0, 0, 0, 0, 300, 243, $width, $height );
-					// $output .= '<img phaseid="'.$i.'" src="'.$imgprodurl[0].'" alt="product image"/>';
+					// Calculate proportional width based on height.
+					$new_height = 243;
+					$new_width  = ( $width / $height ) * $new_height;
+					$x_position = max( 0, ( 300 - $new_width ) / 2 );
+					imagecopyresized( $output_image, $img, $x_position, 0, 0, 0, $new_width, $new_height, $width, $height );
 				}
 			}
 		}
-		imagepng( $outputImage, $dirname . '/product-image-for-pdf.png' );
-		imagedestroy( $outputImage );
-		$output .= '<img phaseid="' . $i . '" src="' . $dirname . '/product-image-for-pdf.png" alt="product image"/>';
+		imagepng( $output_image, $dirname . '/product-image-for-pdf.png' );
+		imagedestroy( $output_image );
+		$output .= '<img phaseid="' . $i . '" src="' . $dirname . '/product-image-for-pdf.png" alt="product image" height="500px" width="auto" />';
 		$output .= '</div></td></tr></table><br/><br/>';
 
 		$output     .= '<table class="summary">';

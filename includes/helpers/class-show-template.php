@@ -53,6 +53,9 @@ class PBC_Template {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
 				$cstep = (int) $_POST[ $submit . '_phase' ];
+			} elseif ( 'generate_pdf' === $submit && isset( $_SESSION['pbc_output'] ) ) {
+				echo '<script>window.open("' . esc_url( sanitize_url( $_SESSION['pbc_output'] ) ) . '", "_blank");</script>';
+				$cstep = 'calculate';
 			} else {
 				$cstep = 'calculate';
 			}
@@ -93,10 +96,10 @@ class PBC_Template {
 					if ( $price_var ) {
 						$variation_title .= ' [' . $price_var . ']';
 					}
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']    = $phase_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name']  = get_the_title( $phase_id );
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']      = $variation_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']    = $variation_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = get_the_title( $phase_id );
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
 					if ( $option_name ) {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
@@ -390,7 +393,7 @@ class PBC_Template {
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 							if ( 'no' !== $show_button_pdf ) {
 								?>
-								<a href="?phase=calculate&configurator=pdf" class="btn btn-pdf" title="<?php esc_html_e( 'Generate PDF', 'pbc' ); ?>"><?php esc_html_e( 'PDF', 'pbc' ); ?></a>
+								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate PDF', 'pbc' ); ?></button>
 							<?php } ?>
 						</div>
 						<?php

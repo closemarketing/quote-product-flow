@@ -11,8 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 use Close\PBC\Helpers\CALC;
-use Close\PBC\Helpers\SHOW;
-use Spipu\Html2Pdf\Html2Pdf;
+use Close\PBC\Helpers\PDF;
 
 /**
  * Class for admin
@@ -119,6 +118,10 @@ class PBC_Requests {
 				session_start();
 			}
 			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $_POST );
+		} elseif ( 'generate_pdf' === $submit ) {
+			$item                     = $_SESSION;
+			$item['pbc_parent_phase'] = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
+			$_SESSION['pbc_output']   = PDF::generate_engine_pdf( $item, 'url' );
 		}
 
 		ob_start();
@@ -131,6 +134,11 @@ class PBC_Requests {
 		die( 0 );
 	}
 
+	/**
+	 * AJAX Callback for configurator login
+	 *
+	 * @return void
+	 */
 	public function configurator_login_action_callback() {
 		extract( $_POST );
 		$login = wp_signon(
