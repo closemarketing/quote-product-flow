@@ -72,6 +72,7 @@ class PBC_Template {
 					$price        = '';
 					$option_name  = '';
 					$price_var    = isset( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ) : '';
+					$field_type   = 'price';
 
 					// Gets variation ID in quantity input.
 					$option_qty_value = 0;
@@ -88,18 +89,22 @@ class PBC_Template {
 					if ( empty( $option_qty_value ) ) {
 						$price = CALC::get_price_variation( $variation_id, $price_var );
 					} else {
-						$price = $option_qty_value;
+						$price      = $option_qty_value;
+						$field_type = 'qty';
 					}
 
 					$phase_id        = $phases[ (int) $key - 1 ];
+					$phase_title     = get_the_title( $phase_id );
 					$variation_title = get_the_title( $variation_id );
 					if ( $price_var ) {
 						$variation_title .= ' [' . $price_var . ']';
 					}
+
 					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = get_the_title( $phase_id );
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = $field_type;
 					if ( $option_name ) {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}

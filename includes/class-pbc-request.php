@@ -119,8 +119,23 @@ class PBC_Requests {
 			}
 			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $_POST );
 		} elseif ( 'generate_pdf' === $submit ) {
-			$item                     = $_SESSION;
+			$item = array_merge(
+				[
+					'pbc_contact' => [
+						'email'    => '',
+						'name'     => '',
+						'phone'    => '',
+						'city'     => '',
+						'state'    => '',
+						'comments' => '',
+					],
+				],
+				$_SESSION
+			);
+
+			$item['pbc_session_key']  = isset( $_POST['pbc_session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_session_key'] ) ) : '';
 			$item['pbc_parent_phase'] = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
+			$item['pbc_enquiry']      = CALC::configurator_save_enquiry( $item );
 			$_SESSION['pbc_output']   = PDF::generate_engine_pdf( $item, 'url' );
 		}
 

@@ -224,6 +224,59 @@ class CALC {
 	}
 
 	/**
+	 * Save enquiry post
+	 *
+	 * @param array $item Data to save.
+	 * @return int
+	 */
+	public static function configurator_save_enquiry( $item ) {
+		$contact          = $item['pbc_contact'] ?? [];
+		$email_field      = ! empty( $contact['email_field'] ) ? sanitize_text_field( $contact['email_field'] ) : '';
+		$name_field       = ! empty( $contact['name_field'] ) ? sanitize_text_field( $contact['name_field'] ) : '';
+		$phone_field      = ! empty( $contact['phone_field'] ) ? sanitize_text_field( $contact['phone_field'] ) : '';
+		$city_field       = ! empty( $contact['city_field'] ) ? sanitize_text_field( $contact['city_field'] ) : '';
+		$state_field      = ! empty( $contact['state_field'] ) ? sanitize_text_field( $contact['state_field'] ) : '';
+		$comments_field   = ! empty( $contact['comments_field'] ) ? sanitize_textarea_field( $contact['comments_field'] ) : '';
+		$pbc_session_key  = ! empty( $item['pbc_session_key'] ) ? sanitize_text_field( $item['pbc_session_key'] ) : '';
+		$pbc_parent_phase = ! empty( $item['pbc_parent_phase'] ) ? (int) $item['pbc_parent_phase'] : 0;
+
+		$meta = [
+			'pbc_enquiry_name'     => $name_field,
+			'pbc_enquiry_phone'    => $phone_field,
+			'pbc_enquiry_email'    => $email_field,
+			'pbc_enquiry_city'     => $city_field,
+			'pbc_enquiry_state'    => $state_field,
+			'pbc_parent_phase'     => $pbc_parent_phase,
+			'pbc_enquiry_comments' => $comments_field,
+		];
+		// Calculate enquiry entries.
+		$i = 0;
+		foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
+			$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+			$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+			$price           = (float) $details['var']['price'];
+
+			$meta[ 'pbc_phase_name_' . $i ] = $phase_name;
+			$meta[ 'pbc_phase_var_' . $i ]  = $variation_name;
+			$meta[ 'pbc_price_' . $i ]      = number_format( $price, 2, ',', '.' );
+			$meta[ 'pbc_type_' . $i ]       = isset( $details['var']['type'] ) ? sanitize_text_field( $details['var']['type'] ) : '';
+			++$i;
+		}
+		$meta['pbc_total_var'] = count( $item[ $pbc_session_key ] );
+
+		$title  = __( 'Enquiry', 'pbc' ) . ' - ' . gmdate( 'Y-m-d H:i:s' );
+		$title .= ! empty( $name_field ) ? ' - ' . $name_field . '-' . $phone_field : '';
+
+		$enquiry_post = array(
+			'post_title'  => $title,
+			'post_status' => 'publish',
+			'post_type'   => 'enquiry',
+			'meta_input'  => $meta,
+		);
+		return wp_insert_post( $enquiry_post );
+	}
+
+	/**
 	 * Sends email with configurator result
 	 *
 	 * @param array $post_data Post data.
@@ -282,8 +335,8 @@ class CALC {
 				$message        .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
 				$message        .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
 				$subtotal_price  = 0;
-				$enquiry_entries = array();
-				$i               = 0;
+
+				$i = 0;
 				foreach ( $_SESSION[ $pbc_session_key ] as $details ) { // phpcs:ignore
 					$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
 					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
@@ -296,10 +349,8 @@ class CALC {
 					if ( $price > 0 ) {
 						$message .= number_format( $price, 2, ',', '.' ) . ' €';
 					}
-					$message                           .= '</td>';
-					$message                           .= '</tr>';
-					$enquiry_entries[ $i ]['phase_var'] = $phase_name . ': ' . $variation_name;
-					$enquiry_entries[ $i ]['price']     = $price;
+					$message .= '</td>';
+					$message .= '</tr>';
 					++$i;
 				}
 				$message .= '</table><br/>';
@@ -337,31 +388,10 @@ class CALC {
 				);
 
 				// Insert_enquiry Post.
-				$enquiry_post = array(
-					'post_title'  => $name_field . '-' . $phone_field,
-					'post_status' => 'publish',
-					'post_type'   => 'enquiry',
-				);
-				$post_id      = wp_insert_post( $enquiry_post );
+				$post_id = self::configurator_save_enquiry( $item );
 				if ( $post_id ) {
 					$item['pbc_enquiry'] = $post_id;
 					$attachments         = array( PDF::generate_engine_pdf( $item ) );
-					update_post_meta( $post_id, 'pbc_enquiry_name', $name_field );
-					update_post_meta( $post_id, 'pbc_enquiry_phone', $phone_field );
-					update_post_meta( $post_id, 'pbc_enquiry_email', $email_field );
-					update_post_meta( $post_id, 'pbc_enquiry_city', $city_field );
-					update_post_meta( $post_id, 'pbc_enquiry_state', $state_field );
-					update_post_meta( $post_id, 'pbc_parent_phase', $pbc_parent_phase );
-					update_post_meta( $post_id, 'pbc_enquiry_comments', $comments_field );
-
-					if ( ! empty( $enquiry_entries ) ) {
-						$i = 0;
-						foreach ( $enquiry_entries as $entries ) {
-							update_post_meta( $post_id, 'pbc_phase_var_' . $i, $entries['phase_var'] );
-							update_post_meta( $post_id, 'pbc_price_' . $i, $entries['price'] );
-							++$i;
-						}
-					}
 				}
 
 				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
