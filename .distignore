@@ -14,3 +14,8 @@ vendor/spipu/html2pdf/examples
 *.pot
 *.po
 phpcs.xml.dist
+vendor/spipu/html2pdf/Tests
+vendor/spipu/html2pdf/examples
+vendor/spipu/html2pdf/doc
+vendor/spipu/html2pdf/.github
+vender/bin/
