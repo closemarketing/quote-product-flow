@@ -396,7 +396,7 @@ class PBC_Template {
 					$session_type = isset( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) : '';
 					if ( ! isset( $_SESSION[ $pbc_session_key ]['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
-						<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
+						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
 							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
@@ -416,7 +416,7 @@ class PBC_Template {
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 							if ( 'no' !== $show_button_pdf ) {
 								?>
-								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate PDF', 'pbc' ); ?></button>
+								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate Budget', 'pbc' ); ?></button>
 							<?php } ?>
 						</div>
 						<?php
