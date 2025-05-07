@@ -113,21 +113,27 @@ class PBC_Requests {
 			wp_send_json_error( 'Invalid nonce' );
 		}
 		$submit = isset( $_POST['submit'] ) ? sanitize_text_field( wp_unslash( $_POST['submit'] ) ) : '';
-		if ( 'email_send' === $submit ) {
+		$item   = [];
+		if ( 'email_send' === $submit || 'generate_pdf' === $submit ) {
 			if ( empty( session_id() ) ) {
 				session_start();
 			}
-			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $_POST );
-		} elseif ( 'generate_pdf' === $submit ) {
+			$email_field    = ! empty( $_POST['email_field'] ) ? sanitize_email( wp_unslash( $_POST['email_field'] ) ) : '';
+			$name_field     = ! empty( $_POST['name_field'] ) ? sanitize_text_field( wp_unslash( $_POST['name_field'] ) ) : '';
+			$phone_field    = ! empty( $_POST['phone_field'] ) ? sanitize_text_field( wp_unslash( $_POST['phone_field'] ) ) : '';
+			$city_field     = ! empty( $_POST['city_field'] ) ? sanitize_text_field( wp_unslash( $_POST['city_field'] ) ) : '';
+			$state_field    = ! empty( $_POST['state_field'] ) ? sanitize_text_field( wp_unslash( $_POST['state_field'] ) ) : '';
+			$comments_field = ! empty( $_POST['comments_field'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments_field'] ) ) : '';
+
 			$item = array_merge(
 				[
 					'pbc_contact' => [
-						'email'    => '',
-						'name'     => '',
-						'phone'    => '',
-						'city'     => '',
-						'state'    => '',
-						'comments' => '',
+						'email'    => $email_field,
+						'name'     => $name_field,
+						'phone'    => $phone_field,
+						'city'     => $city_field,
+						'state'    => $state_field,
+						'comments' => $comments_field,
 					],
 				],
 				$_SESSION
@@ -135,8 +141,13 @@ class PBC_Requests {
 
 			$item['pbc_session_key']  = isset( $_POST['pbc_session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_session_key'] ) ) : '';
 			$item['pbc_parent_phase'] = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
-			$item['pbc_enquiry']      = CALC::configurator_save_enquiry( $item );
-			$_SESSION['pbc_output']   = PDF::generate_engine_pdf( $item, 'url' );
+		}
+
+		if ( 'email_send' === $submit ) {
+			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $item );
+		} elseif ( 'generate_pdf' === $submit ) {
+			$item['pbc_enquiry']    = CALC::configurator_save_enquiry( $item );
+			$_SESSION['pbc_output'] = PDF::generate_engine_pdf( $item, 'url' );
 		}
 
 		ob_start();

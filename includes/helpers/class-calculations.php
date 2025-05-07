@@ -303,18 +303,17 @@ class CALC {
 	/**
 	 * Sends email with configurator result
 	 *
-	 * @param array $post_data Post data.
+	 * @param array $item Post data.
 	 * @return array
 	 */
-	public static function configurator_result_email_send( $post_data ) {
-		$email_field      = ! empty( $post_data['email_field'] ) ? sanitize_text_field( $post_data['email_field'] ) : '';
-		$name_field       = ! empty( $post_data['name_field'] ) ? sanitize_text_field( $post_data['name_field'] ) : '';
-		$phone_field      = ! empty( $post_data['phone_field'] ) ? sanitize_text_field( $post_data['phone_field'] ) : '';
-		$city_field       = ! empty( $post_data['city_field'] ) ? sanitize_text_field( $post_data['city_field'] ) : '';
-		$state_field      = ! empty( $post_data['state_field'] ) ? sanitize_text_field( $post_data['state_field'] ) : '';
-		$comments_field   = ! empty( $post_data['comments_field'] ) ? sanitize_textarea_field( $post_data['comments_field'] ) : '';
-		$pbc_session_key  = ! empty( $post_data['pbc_session_key'] ) ? sanitize_text_field( $post_data['pbc_session_key'] ) : '';
-		$pbc_parent_phase = ! empty( $post_data['pbc_parent_phase'] ) ? (int) $post_data['pbc_parent_phase'] : 0;
+	public static function configurator_result_email_send( $item ) {
+		$email_field     = $item['pbc_contact']['email'] ?? '';
+		$name_field      = $item['pbc_contact']['name'] ?? '';
+		$phone_field     = $item['pbc_contact']['phone'] ?? '';
+		$city_field      = $item['pbc_contact']['city'] ?? '';
+		$state_field     = $item['pbc_contact']['state'] ?? '';
+		$comments_field  = $item['pbc_contact']['comments'] ?? '';
+		$pbc_session_key = $item['pbc_session_key'] ?? '';
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -361,7 +360,7 @@ class CALC {
 				$subtotal_price = 0;
 
 				$i = 0;
-				foreach ( $_SESSION[ $pbc_session_key ] as $details ) { // phpcs:ignore
+				foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
 					$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
 					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 					$price           = (float) $details['var']['price'];
@@ -396,20 +395,6 @@ class CALC {
 				$message .= '</table>';
 				$message .= '<br>' . get_option( 'blogname' );
 				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
-
-				$item = array_merge(
-					[
-						'pbc_contact' => [
-							'email'    => $email_field,
-							'name'     => $name_field,
-							'phone'    => $phone_field,
-							'city'     => $city_field,
-							'state'    => $state_field,
-							'comments' => $comments_field,
-						],
-					],
-					$_SESSION
-				);
 
 				// Insert_enquiry Post.
 				$post_id = self::configurator_save_enquiry( $item );

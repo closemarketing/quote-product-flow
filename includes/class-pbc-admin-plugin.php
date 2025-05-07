@@ -294,15 +294,16 @@ class PBC_Admin_Plugin {
 		if ( isset( $_POST['form_submit'] ) ) {
 			$status = 'ok';
 			$fields = array(
-				'option_show_prices'           => 'pbc_budget_show_prices',
-				'option_show_final_button_pdf' => 'pbc_budget_show_button_pdf',
-				'pdf_image_selected'           => 'pbc_pdf_image_selected',
-				'pdf_image_header'             => 'pbc_pdf_image_header',
-				'pdf_image_footer'             => 'pbc_pdf_image_footer',
-				'pdf_color_odd'                => 'pbc_pdf_color_odd',
-				'pdf_color_total'              => 'pbc_pdf_color_total',
-				'admin_email_notification'     => 'pbc_admin_email_notification',
-				'preview_width'                => 'pbc_preview_width',
+				'option_show_prices'             => 'pbc_budget_show_prices',
+				'option_show_final_button_pdf'   => 'pbc_budget_show_button_pdf',
+				'option_show_final_button_email' => 'pbc_budget_show_button_email',
+				'pdf_image_selected'             => 'pbc_pdf_image_selected',
+				'pdf_image_header'               => 'pbc_pdf_image_header',
+				'pdf_image_footer'               => 'pbc_pdf_image_footer',
+				'pdf_color_odd'                  => 'pbc_pdf_color_odd',
+				'pdf_color_total'                => 'pbc_pdf_color_total',
+				'admin_email_notification'       => 'pbc_admin_email_notification',
+				'preview_width'                  => 'pbc_preview_width',
 			);
 			foreach ( $fields as $field_key => $field ) {
 				if ( isset( $_POST[ $field_key ] ) ) {
@@ -521,6 +522,19 @@ class PBC_Admin_Plugin {
 						echo '<select name="option_show_final_button_pdf">';
 						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
 						echo '<option value="no" ' . selected( $show_button_pdf, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '</select>';
+					}
+					?>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="option_show_final_button_email"><?php esc_html_e( 'Show final button Email?', 'pbc' ); ?></label>
+					<?php
+					$show_button_email = get_option( 'pbc_budget_show_button_email' );
+					$pages             = get_pages();
+					if ( ! empty( $pages ) ) {
+						echo '<select name="option_show_final_button_email">';
+						echo '<option value="yes" ' . selected( $show_button_email, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_button_email, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
 						echo '</select>';
 					}
 					?>
