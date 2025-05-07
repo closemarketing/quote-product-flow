@@ -407,7 +407,7 @@ class PBC_Helper_PostTypes {
 		?>
 		<div><label><strong><?php esc_html_e( 'Enquiry ID:', 'pbc' ); ?></strong> <?php echo esc_html( $post_id ); ?></label></div>
 		<?php if ( ! empty( $enquiry_name ) ) { ?>
-			<div><label><strong><?php esc_html_e( 'Name:', 'pbc' ); ?></strong> <?php echo esc_html( ∑ ); ?></label></div>
+			<div><label><strong><?php esc_html_e( 'Name:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_name ); ?></label></div>
 		<?php } ?>
 		<?php if ( ! empty( $enquiry_phone ) ) { ?>
 			<div><label><strong><?php esc_html_e( 'Phone:', 'pbc' ); ?></strong> <?php echo esc_html( $enquiry_phone ); ?></label></div>
