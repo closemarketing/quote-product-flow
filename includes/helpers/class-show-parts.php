@@ -36,6 +36,7 @@ class SHOW {
 		} else {
 			echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
 		}
+
 		foreach ( $variations_section as $variation_data ) {
 			$variation_id = (int) $variation_data['id'];
 			$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );

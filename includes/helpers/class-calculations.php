@@ -110,6 +110,30 @@ class CALC {
 		return $contrast > 500 ? '#000000' : '#ffffff';
 	}
 	/**
+	 * Adjusts the brightness of a hex color.
+	 *
+	 * @param string $hex   Hex color code.
+	 * @param int    $steps Steps to adjust brightness.
+	 * @return string Adjusted hex color code.
+	 */
+	public static function adjust_brightness( $hex, $steps ) {
+		// Remove hash if present.
+		$hex = str_replace( '#', '', $hex );
+
+		// Convert to RGB.
+		$r = hexdec( substr( $hex, 0, 2 ) );
+		$g = hexdec( substr( $hex, 2, 2 ) );
+		$b = hexdec( substr( $hex, 4, 2 ) );
+
+		// Adjust brightness.
+		$r = max( 0, min( 255, $r + $steps ) );
+		$g = max( 0, min( 255, $g + $steps ) );
+		$b = max( 0, min( 255, $b + $steps ) );
+
+		// Convert back to hex.
+		return sprintf( '#%02x%02x%02x', $r, $g, $b );
+	}
+	/**
 	 * Returns if product is multiple
 	 *
 	 * @return boolean
@@ -323,18 +347,18 @@ class CALC {
 					'response' => __( 'Configurator not ready!', 'pbc' ),
 				);
 			} else {
-				$subject         = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
-				$message         = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
-				$message        .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
-				$message        .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
-				$message        .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
-				$message        .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
-				$message        .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
-				$message        .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
-				$message        .= '<br/></div>';
-				$message        .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
-				$message        .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
-				$subtotal_price  = 0;
+				$subject        = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
+				$message        = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
+				$message       .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
+				$message       .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
+				$message       .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
+				$message       .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
+				$message       .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
+				$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
+				$message       .= '<br/></div>';
+				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
+				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
+				$subtotal_price = 0;
 
 				$i = 0;
 				foreach ( $_SESSION[ $pbc_session_key ] as $details ) { // phpcs:ignore

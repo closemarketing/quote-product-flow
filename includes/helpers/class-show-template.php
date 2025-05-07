@@ -49,6 +49,25 @@ class PBC_Template {
 			$_SESSION[ $pbc_session_key ] = array();
 		}
 
+		// Add inline style for the template.
+		$color_main = get_option( 'pbc_pdf_color_total' );
+		$color_alt  = get_option( 'pbc_pdf_color_odd' );
+
+		$custom_css = '
+		.page-configurator .btn, .page-configurator button[type="submit"] {
+			background-color: ' . esc_attr( $color_main ) . ';
+			color: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ';);
+		}
+		.page-configurator .prev .btn {
+			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+		}
+		.page-configurator .btn:hover, .page-configurator button[type="submit"]:hover {
+			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+		}';
+
+		// Output the inline style.
+		wp_add_inline_style( 'pbc-public', $custom_css );
+
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
@@ -151,24 +170,26 @@ class PBC_Template {
 						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
 						if ( ! empty( $variations ) ) {
 							foreach ( $variations as $key => $variation_id ) {
-								$pbc_depends = get_post_meta( $variation_id, 'pbc_depends', true );
-								if ( empty( $pbc_depends ) ) {
+								if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
+									break;
+								}
+								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
+								if ( empty( $depends ) ) {
 									continue;
 								}
-								$prev_var = array();
-								foreach ( $pbc_depends as $deps ) {
-									$arr = explode( '|', $deps['pbc_depvar'] );
+								$depends_ids = array();
+								foreach ( $depends as $depend ) {
+									$arr = explode( '|', $depend['pbc_depvar'] );
 									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-										$prev_var[] = (int) $arr[1];
+										$depends_ids[ (int) $arr[0] ] = (int) $arr[1];
 									}
 								}
-								if ( 1 !== $cstep && ! empty( $_SESSION[ $pbc_session_key ] ) ) {
-									foreach ( $_SESSION[ $pbc_session_key ] as $s_phase_key => $sVariations ) {
-										$session_var_id = (int) $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'];
-										if ( ! in_array( $session_var_id, $prev_var, true ) ) {
-											unset( $variations[ $key ] );
-											break;
-										}
+
+								foreach ( $depends_ids as $depends_key => $depends_id ) {
+									$variation_compare_id = (int) $_SESSION[ $pbc_session_key ][ $depends_key ]['var']['id'];
+									if ( $depends_id !== $variation_compare_id ) {
+										unset( $variations[ $key ] );
+										break;
 									}
 								}
 							}
@@ -202,27 +223,19 @@ class PBC_Template {
 							}
 
 							// Show public.
-							$s_var = 0;
+							$selected_var = 0;
 							if (
 								isset( $_SESSION[ $pbc_session_key ] ) &&
 								is_array( $_SESSION[ $pbc_session_key ] ) &&
 								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
 								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
 							) {
-								$s_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
+								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
 							} else {
-								if ( isset( $user_id ) ) {
-									$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cstep, true );
-									if ( ! empty( $pbc_phase ) && ! empty( $pbc_phase['var'] ) ) {
-										$s_var = $pbc_phase['var'];
-									}
-								}
-								if ( empty( $s_var ) ) {
-									$s_var = $variations[ current( array_keys( $variations ) ) ];
-								}
+								$selected_var = $variations[ current( array_keys( $variations ) ) ];
 							}
 							if ( ! empty( $variations_section ) ) {
-								SHOW::variations_content( $variations_section, $s_var, $cstep, $template );
+								SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
 							}
 						} else {
 							?>

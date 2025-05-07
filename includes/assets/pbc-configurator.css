@@ -37,17 +37,6 @@
   margin-left: 10px;
 }
 
-.next .btn::after,
-.prev .btn::after {
-  border-style: solid;
-}
-
-.next .btn::after {
-  right: -24px;
-  border-width: 12px;
-  border-color: transparent transparent transparent #9a781f;
-}
-
 .next .btn:hover::after {
   border-left-color: black;
 }
