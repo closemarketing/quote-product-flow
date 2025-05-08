@@ -167,8 +167,17 @@ class PBC_Template {
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 						<?php
+						$prev_variations_ids = array();
+						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
+							foreach ( $_SESSION[ $pbc_session_key ] as $prev_var ) {
+								if ( isset( $prev_var['var']['id'] ) ) {
+									$prev_variations_ids[] = (int) $prev_var['var']['id'];
+								}
+							}
+						}
+
 						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
-						if ( ! empty( $variations ) ) {
+						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
 							foreach ( $variations as $key => $variation_id ) {
 								if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
 									break;
@@ -181,16 +190,13 @@ class PBC_Template {
 								foreach ( $depends as $depend ) {
 									$arr = explode( '|', $depend['pbc_depvar'] );
 									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-										$depends_ids[ (int) $arr[0] ] = (int) $arr[1];
+										$depends_ids[] = (int) $arr[1];
 									}
 								}
 
-								foreach ( $depends_ids as $depends_key => $depends_id ) {
-									$variation_compare_id = (int) $_SESSION[ $pbc_session_key ][ $depends_key ]['var']['id'];
-									if ( $depends_id !== $variation_compare_id ) {
-										unset( $variations[ $key ] );
-										break;
-									}
+								$dependant_variations = array_intersect( $depends_ids, $prev_variations_ids );
+								if ( empty( $dependant_variations ) && ! empty( $depends_ids ) ) {
+									unset( $variations[ $key ] );
 								}
 							}
 							$variations = array_values( $variations );
