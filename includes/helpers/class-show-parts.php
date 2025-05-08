@@ -146,9 +146,8 @@ class SHOW {
 			$role = isset( $_SESSION[ $pbc_session_key ]['role_slug'] ) ? sanitize_key( $_SESSION[ $pbc_session_key ]['role_slug'] ) : '';
 			if ( $role ) {
 				$role_name = $role ? wp_roles()->get_names()[ $role ] : $role;
-				$role_discount = isset( $_SESSION[ $pbc_session_key ]['role_discount'] ) ? $_SESSION[ $pbc_session_key ]['role_discount'] : 0;
 				?>
-				<div class="role"><?php echo esc_html( $role_name ); if ( ! empty( $role_discount ) ) { echo ' (' . (float) $role_discount . '%)'; } ?></div>
+				<div class="role"><?php echo esc_html( $role_name ); ?></div>
 				<?php
 			}
 			?>
