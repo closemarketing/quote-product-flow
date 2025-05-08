@@ -47,6 +47,11 @@ class PBC_Template {
 
 		if ( empty( $_POST ) ) {
 			$_SESSION[ $pbc_session_key ] = array();
+			// Get role and discount.
+			$role_discount = CALC::get_user_discount_and_role( $user_id );
+
+			$_SESSION[ $pbc_session_key ]['role']     = $role_discount['role'] ?? '';
+			$_SESSION[ $pbc_session_key ]['discount'] = $role_discount['discount'] ?? '';
 		}
 
 		// Add inline style for the template.

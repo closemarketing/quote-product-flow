@@ -220,6 +220,29 @@ class CALC {
 	}
 
 	/**
+	 * Gets the user discount and role
+	 *
+	 * @return array
+	 */
+	public static function get_user_discount_and_role() {
+		$user = wp_get_current_user();
+		if ( ! empty( $user->roles ) ) {
+			$role_slug     = $user->roles[0];
+			$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
+			if ( ! empty( $role_discount ) ) {
+				return [
+					'role'     => $role_slug,
+					'discount' => $role_discount,
+				];
+			}
+		}
+		return [
+			'role'     => '',
+			'discount' => 0,
+		];
+	}
+
+	/**
 	 * Gets the price variation with roles
 	 *
 	 * @param int    $variation_id Variation ID.

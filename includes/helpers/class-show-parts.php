@@ -142,6 +142,15 @@ class SHOW {
 		}
 		?>
 		<div class="configurator_summary">
+			<?php
+			$role = isset( $_SESSION[ $pbc_session_key ]['role'] ) ? sanitize_key( $_SESSION[ $pbc_session_key ]['role'] ) : '';
+			if ( $role ) {
+				$role_name = $role ? wp_roles()->get_names()[ $role ] : $role;
+				?>
+				<div class="role"><?php echo esc_html( $role_name ); ?></div>
+				<?php
+			}
+			?>
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 			<table>
 				<?php
