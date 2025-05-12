@@ -299,6 +299,9 @@ class CALC {
 		// Calculate enquiry entries.
 		$i = 0;
 		foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
+			if ( ! is_array( $details ) ) {
+				continue;
+			}
 			$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
 			$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 			$price           = (float) $details['var']['price'];
@@ -384,6 +387,9 @@ class CALC {
 
 				$i = 0;
 				foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
+					if ( ! is_array( $details ) ) {
+						continue;
+					}
 					$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
 					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 					$price           = (float) $details['var']['price'];

@@ -249,6 +249,9 @@ class PDF {
 		$total_qty   = 1;
 
 		foreach ( $itemv as $details ) {
+			if ( ! is_array( $details ) ) {
+				continue;
+			}
 			$variation_name  = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) . ': ' : '';
 			$variation_name .= isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 			$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
