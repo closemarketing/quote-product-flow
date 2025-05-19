@@ -341,6 +341,7 @@ class PBC_Admin_Plugin {
 	 * Callback function for add_meta_box import section
 	 */
 	public function phases_lists_meta_box_callback() {
+		$total_count = 0;
 		?>
 		<table class="phases-lists-table">
 			<tr>
@@ -349,8 +350,7 @@ class PBC_Admin_Plugin {
 				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' ); ?></th>
 			</tr>
 			<?php
-			$total_count = 0;
-			$phases      = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
 			if ( ! empty( $phases ) ) {
 				foreach ( $phases as $phase ) {
 					?>
