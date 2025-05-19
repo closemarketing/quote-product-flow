@@ -41,9 +41,14 @@ class PBC_Template {
 			'orderby'     => 'menu_order',
 			'order'       => 'ASC',
 			'post_parent' => $phase_pid,
-			'fields'      => 'ids',
 		);
-		$phases = get_posts( $args );
+		$post_phases  = get_posts( $args );
+		$phases       = array();
+		$phases_order = array();
+		foreach ( $post_phases as $post_phase ) {
+			$phases[]       = $post_phase->ID;
+			$phases_order[] = $post_phase->menu_order;
+		}
 
 		if ( empty( $_POST ) ) {
 			$_SESSION[ $pbc_session_key ] = array();
@@ -56,7 +61,6 @@ class PBC_Template {
 
 		// Add inline style for the template.
 		$color_main = get_option( 'pbc_pdf_color_total' );
-		$color_alt  = get_option( 'pbc_pdf_color_odd' );
 
 		$custom_css = '
 		.page-configurator .btn, .page-configurator button[type="submit"] {
@@ -194,14 +198,19 @@ class PBC_Template {
 								$depends_ids = array();
 								foreach ( $depends as $depend ) {
 									$arr = explode( '|', $depend['pbc_depvar'] );
-									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-										$depends_ids[] = (int) $arr[1];
+									if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
+										$order                   = array_search( (int) $arr[0], $phases_order, true );
+										$depends_ids[ $order ][] = (int) $arr[1];
 									}
 								}
 
-								$dependant_variations = array_intersect( $depends_ids, $prev_variations_ids );
-								if ( empty( $dependant_variations ) && ! empty( $depends_ids ) ) {
-									unset( $variations[ $key ] );
+								for ( $i = 0; $i < $cstep; $i++ ) {
+									if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+										$depkey = array_search( $prev_variations_ids[ $i ], $depends_ids[ $i ], true );
+										if ( false === $depkey ) {
+											unset( $variations[ $key ] );
+										}
+									}
 								}
 							}
 							$variations = array_values( $variations );
