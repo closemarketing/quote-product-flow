@@ -176,15 +176,6 @@ class PBC_Template {
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 						<?php
-						$prev_variations_ids = array();
-						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
-							foreach ( $_SESSION[ $pbc_session_key ] as $prev_var ) {
-								if ( isset( $prev_var['var']['id'] ) ) {
-									$prev_variations_ids[] = (int) $prev_var['var']['id'];
-								}
-							}
-						}
-
 						$variations = CALC::get_variations_dependencies( $phase_id );
 						if ( empty( $variations ) ) {
 							?>
