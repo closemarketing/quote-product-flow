@@ -185,82 +185,26 @@ class PBC_Template {
 							}
 						}
 
-						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
-						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
-							foreach ( $variations as $key => $variation_id ) {
-								if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
-									break;
-								}
-								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
-								if ( empty( $depends ) ) {
-									continue;
-								}
-								$depends_ids = array();
-								foreach ( $depends as $depend ) {
-									$arr = explode( '|', $depend['pbc_depvar'] );
-									if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-										$order                   = array_search( (int) $arr[0], $phases_order, true );
-										$depends_ids[ $order ][] = (int) $arr[1];
-									}
-								}
-
-								for ( $i = 0; $i < $cstep; $i++ ) {
-									if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
-										$depkey = array_search( $prev_variations_ids[ $i ], $depends_ids[ $i ], true );
-										if ( false === $depkey ) {
-											unset( $variations[ $key ] );
-										}
-									}
-								}
-							}
-							$variations = array_values( $variations );
-
-							// Order variations per section.
-							$variations_section = array();
-							foreach ( $variations as $variation_id ) {
-								$term_list            = (array) wp_get_post_terms(
-									$variation_id,
-									'variation_tag',
-									array(
-										'fields' => 'all',
-									)
-								);
-								$variations_section[] = array(
-									'id'      => $variation_id,
-									'section' => isset( $term_list[0]->name ) ? $term_list[0]->name : '',
-									'title'   => get_the_title( $variation_id ),
-								);
-							}
-
-							// Order by sections and title.
-							foreach ( $variations_section as $key => $val ) {
-									$temp_arr['section'][ $key ] = $val['section'];
-									$temp_arr['title'][ $key ]   = $val['title'];
-							}
-							// Sort by section asc and then title asc.
-							if ( ! empty( $temp_arr['section'] ) && ! empty( $temp_arr['title'] ) ) {
-								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
-							}
-
-							// Show public.
-							$selected_var = 0;
-							if (
-								isset( $_SESSION[ $pbc_session_key ] ) &&
-								is_array( $_SESSION[ $pbc_session_key ] ) &&
-								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
-								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
-							) {
-								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
-							} else {
-								$selected_var = $variations[ current( array_keys( $variations ) ) ];
-							}
-							if ( ! empty( $variations_section ) ) {
-								SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
-							}
-						} else {
+						$variations = CALC::get_variations_dependencies( $phase_id );
+						if ( empty( $variations ) ) {
 							?>
 							<div class="error"><?php esc_html_e( 'No Variations Available', 'pbc' ); ?></div>
 							<?php
+						}// Show public.
+						$selected_var = 0;
+						$variations_ids = array_column( $variations, 'post_id' );
+						if (
+							isset( $_SESSION[ $pbc_session_key ] ) &&
+							is_array( $_SESSION[ $pbc_session_key ] ) &&
+							isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
+							in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations_ids )
+						) {
+							$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
+						} else {
+							$selected_var = $variations[ current( array_keys( $variations_ids ) ) ];
+						}
+						if ( ! empty( $variations_section ) ) {
+							SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
 						}
 						?>
 					</div>
@@ -269,8 +213,8 @@ class PBC_Template {
 					if ( ! empty( $variations ) ) {
 						$index_var = 1;
 						echo '<div class="phase_descvar">';
-						foreach ( $variations as $variation_id ) {
-							$descvar = get_post_meta( $variation_id, 'pbc_descvar', true );
+						foreach ( $variations as $variation ) {
+							$descvar = $variation['descvar'] ?? '';
 							if ( ! empty( $descvar ) ) {
 								echo '<div class="descvar descvar_' . esc_attr( $variation_id );
 								if ( $index_var > 1 ) {
