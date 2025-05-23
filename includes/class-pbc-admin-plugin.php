@@ -40,7 +40,6 @@ class PBC_Admin_Plugin {
 		// On variation-lists admin screen.
 		add_filter( 'views_edit-variation', array( $this, 'pbc_add_print_pdf_button' ) );
 		add_action( 'admin_head-edit.php', array( $this, 'pbc_move_print_pdf_button' ) );
-		add_action( 'wp_ajax_print_pdf', array( $this, 'print_pdf_action_callback' ) );
 
 		// Creates license activation.
 		register_activation_hook( WPPBC_PLUGIN, array( $this, 'license_instance_activation' ) );
@@ -295,15 +294,16 @@ class PBC_Admin_Plugin {
 		if ( isset( $_POST['form_submit'] ) ) {
 			$status = 'ok';
 			$fields = array(
-				'option_show_prices'           => 'pbc_budget_show_prices',
-				'option_show_final_button_pdf' => 'pbc_budget_show_button_pdf',
-				'pdf_image_selected'           => 'pbc_pdf_image_selected',
-				'pdf_image_header'             => 'pbc_pdf_image_header',
-				'pdf_image_footer'             => 'pbc_pdf_image_footer',
-				'pdf_color_odd'                => 'pbc_pdf_color_odd',
-				'pdf_color_total'              => 'pbc_pdf_color_total',
-				'admin_email_notification'     => 'pbc_admin_email_notification',
-				'preview_width'                => 'pbc_preview_width',
+				'option_show_prices'             => 'pbc_budget_show_prices',
+				'option_show_final_button_pdf'   => 'pbc_budget_show_button_pdf',
+				'option_show_final_button_email' => 'pbc_budget_show_button_email',
+				'pdf_image_selected'             => 'pbc_pdf_image_selected',
+				'pdf_image_header'               => 'pbc_pdf_image_header',
+				'pdf_image_footer'               => 'pbc_pdf_image_footer',
+				'pdf_color_odd'                  => 'pbc_pdf_color_odd',
+				'pdf_color_total'                => 'pbc_pdf_color_total',
+				'admin_email_notification'       => 'pbc_admin_email_notification',
+				'preview_width'                  => 'pbc_preview_width',
 			);
 			foreach ( $fields as $field_key => $field ) {
 				if ( isset( $_POST[ $field_key ] ) ) {
@@ -341,6 +341,7 @@ class PBC_Admin_Plugin {
 	 * Callback function for add_meta_box import section
 	 */
 	public function phases_lists_meta_box_callback() {
+		$total_count = 0;
 		?>
 		<table class="phases-lists-table">
 			<tr>
@@ -349,8 +350,7 @@ class PBC_Admin_Plugin {
 				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' ); ?></th>
 			</tr>
 			<?php
-			$total_count = 0;
-			$phases      = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
+			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
 			if ( ! empty( $phases ) ) {
 				foreach ( $phases as $phase ) {
 					?>
@@ -526,6 +526,19 @@ class PBC_Admin_Plugin {
 					}
 					?>
 				</fieldset>
+				<fieldset>
+					<label class="block" for="option_show_final_button_email"><?php esc_html_e( 'Show final button Email?', 'pbc' ); ?></label>
+					<?php
+					$show_button_email = get_option( 'pbc_budget_show_button_email' );
+					$pages             = get_pages();
+					if ( ! empty( $pages ) ) {
+						echo '<select name="option_show_final_button_email">';
+						echo '<option value="yes" ' . selected( $show_button_email, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_button_email, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '</select>';
+					}
+					?>
+				</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
 					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
@@ -681,34 +694,35 @@ class PBC_Admin_Plugin {
 		}
 		$parent_phase = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
 		$item_key     = 'pbc_variation_' . $parent_phase;
-		$query_args   = array(
-			'posts_per_page' => -1,
-			'post_type'      => 'phases',
-			'orderby'        => 'menu_order',
-			'post_parent'    => $parent_phase,
-			'order'          => 'ASC',
-			'fields'         => 'ids',
-		);
-		$phases       = get_posts( $query_args );
 
-		$item = [];
-		foreach ( $phases as $phase_order => $phase_id ) {
-			$item['pbc_date']                                   = get_the_date( 'd-m-Y', $post_id );
-			$item['pbc_parent_phase']                           = $parent_phase;
-			$item[ $item_key ][ $phase_order ]['phase']['id']   = $phase_id;
-			$item[ $item_key ][ $phase_order ]['phase']['name'] = get_the_title( $phase_id );
-			$item[ $item_key ][ $phase_order ]['var']['name']   = get_post_meta( $post_id, 'pbc_phase_var_' . $phase_order, true );
-			$item[ $item_key ][ $phase_order ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $phase_order, true );
-		}
-		$item['pbc_contact'] = [
-			'name'     => get_post_meta( $post_id, 'pbc_enquiry_name', true ),
-			'phone'    => get_post_meta( $post_id, 'pbc_enquiry_phone', true ),
-			'email'    => get_post_meta( $post_id, 'pbc_enquiry_email', true ),
-			'city'     => get_post_meta( $post_id, 'pbc_enquiry_city', true ),
-			'state'    => get_post_meta( $post_id, 'pbc_enquiry_state', true ),
-			'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
+		$item = [
+			'pbc_date'         => get_the_date( 'd-m-Y', $post_id ),
+			'pbc_parent_phase' => $parent_phase,
+			'pbc_contact'      => [
+				'name'     => get_post_meta( $post_id, 'pbc_enquiry_name', true ),
+				'phone'    => get_post_meta( $post_id, 'pbc_enquiry_phone', true ),
+				'email'    => get_post_meta( $post_id, 'pbc_enquiry_email', true ),
+				'city'     => get_post_meta( $post_id, 'pbc_enquiry_city', true ),
+				'state'    => get_post_meta( $post_id, 'pbc_enquiry_state', true ),
+				'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
+			],
+			'pbc_enquiry'      => $post_id,
 		];
-		$item['pbc_enquiry'] = $post_id;
+
+		$total_vars = get_post_meta( $post_id, 'pbc_total_var', true );
+		$total_vars = (int) $total_vars;
+		$total_vars = 0 === $total_vars ? 30 : $total_vars;
+
+		for ( $i = 0; $i < $total_vars; $i++ ) {
+			$variation_name = get_post_meta( $post_id, 'pbc_phase_var_' . $i, true );
+			if ( empty( $variation_name ) ) {
+				continue;
+			}
+			$item[ $item_key ][ $i ]['phase']['name'] = get_post_meta( $post_id, 'pbc_phase_name_' . $i, true );
+			$item[ $item_key ][ $i ]['var']['name']   = $variation_name;
+			$item[ $item_key ][ $i ]['var']['price']  = get_post_meta( $post_id, 'pbc_price_' . $i, true );
+			$item[ $item_key ][ $i ]['var']['type']   = get_post_meta( $post_id, 'pbc_type_' . $i, true );
+		}
 
 		$file_url = PDF::generate_engine_pdf( $item, 'url' );
 		wp_send_json_success( $file_url );
@@ -775,195 +789,6 @@ class PBC_Admin_Plugin {
 
 		</script>
 		<?php
-	}
-	public function print_pdf_action_callback() {
-		extract( $_REQUEST );
-
-		ob_start();
-		/*Content of PDF file*/
-		?>
-		<style>
-			table {
-				border-collapse: collapse;
-				width: 112%;
-				font-size: 11pt;
-			}
-			table, th, td {
-				border: 1px solid black;
-				padding: 10px;
-			}
-			tr.table_header {
-				background-color: black;
-				color: white;
-			}
-			.imagepdf {
-				width: 60px;
-			}
-		</style>
-		<?php
-		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
-		if ( $pdf_image_selected ) {
-			?>
-			<img src="<?php echo $pdf_image_selected; ?>" width='200'/>
-		<?php } ?>
-		<h1>
-		<?php
-		_e( 'List Price for', 'pbc' );
-		echo ' ' . get_bloginfo( 'name' );
-		?>
-		</h1>
-		<p><strong>
-		<?php
-		_e( 'Date', 'pbc' );
-		echo ': ' . date( 'd-m-Y' );
-		?>
-		</strong></p>
-		<?php
-		$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
-		foreach ( $phases as $phase ) {
-			?>
-			<table>
-			<tr class="table_header">
-				<td style="width: 30%; text-align: left"><?php echo esc_html( $phase->menu_order . ' . ' . $phase->post_title ); ?></td>
-				<td style="width: 10%; text-align: left"><?php esc_html_e( 'Price', 'pbc' ); ?></td>
-				<td style="width: 30%; text-align: left"><?php esc_html_e( 'Depends of', 'pbc' ); ?></td>
-				<td style="width: 10%; text-align: left"><?php esc_html_e( 'Icon', 'pbc' ); ?></td>
-				<td style="width: 10%; text-align: left"><?php esc_html_e( 'Product', 'pbc' ); ?></td>
-			</tr>
-			<?php
-			$args = array(
-				'numberposts' => -1,
-				'post_type'   => 'variation',
-				'meta_query'  => array(
-					array(
-						'key'   => 'pbc_phase',
-						'value' => $phase->ID,
-					),
-				),
-			);
-
-			$variation_in_phase = new WP_Query( $args );
-			?>
-			<?php if ( $variation_in_phase->have_posts() ) : ?>
-			<!-- the loop -->
-				<?php
-				while ( $variation_in_phase->have_posts() ) :
-					$variation_in_phase->the_post();
-					?>
-				<tr>
-					<td style="width: 30%; text-align: left"><?php // * Title ?>
-						<strong><?php the_title(); ?></strong>
-					</td>
-					<td style="width: 10%; text-align: left">
-						<?php
-						// Price group.
-						$price_group  = rwmb_meta( 'pbc_pricegroup' );
-						$price_column = '';
-						foreach ( $price_group as $price_item ) {
-							if ( isset( $price_item['pbc_meaprice'] ) ) {
-								$price_column .= $price_item['pbc_meaprice'] . ' - ' . $price_item['pbc_pricem'] . ' €';
-							} else { // Price without any option
-								$price_column .= $price_item['pbc_pricem'] . ' €';
-							}
-							$price_column .= '<br/>';
-						}
-						echo $price_column;
-						?>
-					</td>
-					<td style="width: 30%; text-align: left; font-size: 9pt;">
-						<?php
-						// Depends of.
-						$depends_group  = rwmb_meta( 'pbc_depends' );
-						$depends_column = '';
-						foreach ( $depends_group as $depends_item ) {
-							$variation_id   = substr( $depends_item['pbc_depvar'], 3 );
-							$variation_post = get_post( $variation_id );
-							$phase_id_dp    = get_post_meta( $variation_id, 'pbc_phase', true );
-							$phase_post_dp  = get_post( $phase_id_dp );
-
-							if ( $phase_post_dp->menu_order < 10 ) {
-								$phase_order = '0' . $phase_post_dp->menu_order;
-							} else {
-								$phase_order = $phase_post_dp->menu_order;
-							}
-							$depends_column .= $phase_order . ' - ' . $phase_post_dp->post_title . ' - ';
-							$depends_column .= $variation_post->post_title . '<br/>';
-						}
-						echo $depends_column;
-						?>
-					</td>
-					<td style="width: 10%; text-align: left">
-					<?php
-					// * Image Icon
-						$imgicon = get_post_meta( get_the_id(), 'pbc_imgicon', true );
-					if ( $imgicon ) {
-						$icon_image = wp_get_attachment_image_src( $imgicon, array( 105, 75 ), true );
-						echo '<img class="imagepdf" src="' . $icon_image[0] . '" />';
-					}
-					?>
-					</td>
-					<td style="width: 10%; text-align: left">
-					<?php
-					// * Image Product
-						$imgprod = get_post_meta( get_the_id(), 'pbc_imgprod', true );
-					if ( $imgprod ) {
-						$icon_image = wp_get_attachment_image_src( $imgprod, array( 105, 75 ), true );
-						echo '<img class="imagepdf" src="' . $icon_image[0] . '" />';
-					}
-					?>
-					</td>
-				</tr>
-			<?php endwhile; ?>
-				<?php wp_reset_postdata(); ?>
-
-			<?php endif; ?>
-			</table>
-			<?php
-		}
-		$content = ob_get_contents();
-		ob_end_clean();
-
-		if ( is_file(
-			WPPBC_PLUGIN_DIR .
-			'/lib/html2pdf/html2pdf.class.php'
-		)
-		) {
-			require_once WPPBC_PLUGIN_DIR .
-			'/lib/html2pdf/html2pdf.class.php';
-			try {
-				$files = glob( WPPBC_PLUGIN_DIR . '/pdf/*' ); // get all file names
-				foreach ( $files as $file ) { // iterate files
-					if ( is_file( $file ) ) {
-						unlink( $file ); // delete file
-					}
-				}
-				$filename  = __( 'List Price', 'pbc' ) . ' ' . get_bloginfo( 'name' ) . ' ' . date( 'Y-m-d H:i' );
-				$width_mm  = 710 * 0.2646;   // 1px = 0.2646mm
-				$height_mm = 900 * 0.2646;
-				$html2pdf  = new \HTML2PDF( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
-				$html2pdf->setTestTdInOnePage( false );
-				$html2pdf->writeHTML( $content );
-				$html2pdf->Output( WPPBC_PLUGIN_DIR . "/pdf/$filename.pdf", 'F' );
-				// $html2pdf->close();
-				$return = array(
-					'type' => 'success',
-					'msg'  => WPPBC_PLUGIN_URL . "pdf/$filename.pdf",
-				);
-			} catch ( Html2PdfException $e ) {
-				$formatter = new ExceptionFormatter( $e );
-				$return    = array(
-					'type' => 'error',
-					'msg'  => "Unexpected Error!<br>Can't load PDF this time!<br>" . $formatter->getHtmlMessage(),
-				);
-			}
-		} else {
-			$return = array(
-				'type' => 'error',
-				'msg'  => 'Error: PDF Library Not Present',
-			);
-		}
-		echo ';;--;;' . json_encode( $return );
-		die( 0 );
 	}
 	/**
 	 * # LICENSE

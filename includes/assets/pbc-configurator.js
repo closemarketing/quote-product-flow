@@ -3,11 +3,11 @@ jQuery(function($){
 	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
-		var show_prices = '<?php echo $show_prices; ?>';
+		var show_prices = PBCAjaxAction.show_prices;
 		$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
 		$('.phase_descvar .descvar_' + $(this).val() ).addClass('actived').removeClass('hidden');
 		$.ajax({
-			url: AjaxAction.ajax_url,  //server script to process data
+			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
 			data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
 			dataType: "html",
@@ -81,9 +81,9 @@ jQuery(function($){
 	$(document).on('change', 'select[class=pbc_pricevar]', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
 		var select_pricevar = $(this).parent().parent().find('input.pbc_variation');
-		var show_prices = '<?php echo $show_prices; ?>';
+		var show_prices = PBCAjaxAction.show_prices;
 		$.ajax({
-			url: AjaxAction.ajax_url,  //server script to process data
+			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
 			data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
 			dataType: "html",
@@ -153,7 +153,7 @@ jQuery(function($){
 		var next_phase = $('input[name=next_phase]').val();
 
 		$.ajax({
-			url: AjaxAction.ajax_url,  //server script to process data
+			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
 			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template'),
 			dataType: "html",
@@ -183,7 +183,7 @@ jQuery(function($){
 		var form_id = 'configurator_login_form';
 
 		$.ajax({
-			url: AjaxAction.ajax_url,  //server script to process data
+			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
 			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&action=configurator_login',
 			dataType: "html",

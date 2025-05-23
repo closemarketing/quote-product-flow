@@ -41,13 +41,41 @@ class PBC_Template {
 			'orderby'     => 'menu_order',
 			'order'       => 'ASC',
 			'post_parent' => $phase_pid,
-			'fields'      => 'ids',
 		);
-		$phases = get_posts( $args );
+		$post_phases  = get_posts( $args );
+		$phases       = array();
+		$phases_order = array();
+		foreach ( $post_phases as $post_phase ) {
+			$phases[]       = $post_phase->ID;
+			$phases_order[] = $post_phase->menu_order;
+		}
 
 		if ( empty( $_POST ) ) {
 			$_SESSION[ $pbc_session_key ] = array();
+			// Get role and discount.
+			$role_discount = CALC::get_user_discount_and_role( $user_id );
+
+			$_SESSION[ $pbc_session_key ]['role_slug']     = $role_discount['role'] ?? '';
+			$_SESSION[ $pbc_session_key ]['role_discount'] = $role_discount['discount'] ?? '';
 		}
+
+		// Add inline style for the template.
+		$color_main = get_option( 'pbc_pdf_color_total' );
+
+		$custom_css = '
+		.page-configurator .btn, .page-configurator button[type="submit"] {
+			background-color: ' . esc_attr( $color_main ) . ';
+			color: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ';);
+		}
+		.page-configurator .prev .btn {
+			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+		}
+		.page-configurator .btn:hover, .page-configurator button[type="submit"]:hover {
+			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+		}';
+
+		// Output the inline style.
+		wp_add_inline_style( 'pbc-public', $custom_css );
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
@@ -72,6 +100,7 @@ class PBC_Template {
 					$price        = '';
 					$option_name  = '';
 					$price_var    = isset( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ) : '';
+					$field_type   = 'price';
 
 					// Gets variation ID in quantity input.
 					$option_qty_value = 0;
@@ -88,18 +117,22 @@ class PBC_Template {
 					if ( empty( $option_qty_value ) ) {
 						$price = CALC::get_price_variation( $variation_id, $price_var );
 					} else {
-						$price = $option_qty_value;
+						$price      = $option_qty_value;
+						$field_type = 'qty';
 					}
 
 					$phase_id        = $phases[ (int) $key - 1 ];
+					$phase_title     = get_the_title( $phase_id );
 					$variation_title = get_the_title( $variation_id );
 					if ( $price_var ) {
 						$variation_title .= ' [' . $price_var . ']';
 					}
+
 					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = get_the_title( $phase_id );
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = $field_type;
 					if ( $option_name ) {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
@@ -143,26 +176,39 @@ class PBC_Template {
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 						<?php
+						$prev_variations_ids = array();
+						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
+							foreach ( $_SESSION[ $pbc_session_key ] as $prev_var ) {
+								if ( isset( $prev_var['var']['id'] ) ) {
+									$prev_variations_ids[] = (int) $prev_var['var']['id'];
+								}
+							}
+						}
+
 						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
-						if ( ! empty( $variations ) ) {
+						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
 							foreach ( $variations as $key => $variation_id ) {
-								$pbc_depends = get_post_meta( $variation_id, 'pbc_depends', true );
-								if ( empty( $pbc_depends ) ) {
+								if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
+									break;
+								}
+								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
+								if ( empty( $depends ) ) {
 									continue;
 								}
-								$prev_var = array();
-								foreach ( $pbc_depends as $deps ) {
-									$arr = explode( '|', $deps['pbc_depvar'] );
-									if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-										$prev_var[] = (int) $arr[1];
+								$depends_ids = array();
+								foreach ( $depends as $depend ) {
+									$arr = explode( '|', $depend['pbc_depvar'] );
+									if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
+										$order                   = array_search( (int) $arr[0], $phases_order, true );
+										$depends_ids[ $order ][] = (int) $arr[1];
 									}
 								}
-								if ( 1 !== $cstep && ! empty( $_SESSION[ $pbc_session_key ] ) ) {
-									foreach ( $_SESSION[ $pbc_session_key ] as $s_phase_key => $sVariations ) {
-										$session_var_id = (int) $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'];
-										if ( ! in_array( $session_var_id, $prev_var, true ) ) {
+
+								for ( $i = 0; $i < $cstep; $i++ ) {
+									if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+										$depkey = array_search( $prev_variations_ids[ $i ], $depends_ids[ $i ], true );
+										if ( false === $depkey ) {
 											unset( $variations[ $key ] );
-											break;
 										}
 									}
 								}
@@ -197,27 +243,19 @@ class PBC_Template {
 							}
 
 							// Show public.
-							$s_var = 0;
+							$selected_var = 0;
 							if (
 								isset( $_SESSION[ $pbc_session_key ] ) &&
 								is_array( $_SESSION[ $pbc_session_key ] ) &&
 								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
 								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
 							) {
-								$s_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
+								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
 							} else {
-								if ( isset( $user_id ) ) {
-									$pbc_phase = get_user_meta( $user_id, 'pbc_phase_' . $cstep, true );
-									if ( ! empty( $pbc_phase ) && ! empty( $pbc_phase['var'] ) ) {
-										$s_var = $pbc_phase['var'];
-									}
-								}
-								if ( empty( $s_var ) ) {
-									$s_var = $variations[ current( array_keys( $variations ) ) ];
-								}
+								$selected_var = $variations[ current( array_keys( $variations ) ) ];
 							}
 							if ( ! empty( $variations_section ) ) {
-								SHOW::variations_content( $variations_section, $s_var, $cstep, $template );
+								SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
 							}
 						} else {
 							?>
@@ -378,7 +416,7 @@ class PBC_Template {
 					$session_type = isset( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) : '';
 					if ( ! isset( $_SESSION[ $pbc_session_key ]['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
-						<h2><?php esc_html_e( 'Send budget to email', 'pbc' ); ?></h2>
+						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
 							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
@@ -388,12 +426,17 @@ class PBC_Template {
 							<input type="text" name="city_field" placeholder="<?php esc_html_e( 'Your City', 'pbc' ); ?>"/>
 							<input type="text" name="state_field" placeholder="<?php esc_html_e( 'State', 'pbc' ); ?>"/>
 							<textarea name="comments_field" placeholder="<?php esc_html_e( 'Your comments', 'pbc' ); ?>"></textarea>
-							<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php esc_html_e( 'Send', 'pbc' ); ?></button>
 							<?php
+							$show_button_email = get_option( 'pbc_budget_show_button_email' );
+							if ( 'no' !== $show_button_email ) {
+								?>
+								<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php esc_html_e( 'Send', 'pbc' ); ?></button>
+								<?php
+							}
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 							if ( 'no' !== $show_button_pdf ) {
 								?>
-								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate PDF', 'pbc' ); ?></button>
+								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate Budget', 'pbc' ); ?></button>
 							<?php } ?>
 						</div>
 						<?php

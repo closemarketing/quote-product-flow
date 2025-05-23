@@ -131,16 +131,16 @@ class PDF {
 		}
 		$output .= '<table class="product"><tr><td class="product-title">';
 		$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
-		$output .= '<p><strong>' . esc_html__( 'Date', 'pbc' ) . ': ' . $budget_date . '</strong></p>';
+		$output .= '<strong>' . esc_html__( 'Date', 'pbc' ) . ':</strong> ' . $budget_date . '<br/>';
 
 		// Budget ID.
 		$budget_id = isset( $item['pbc_enquiry'] ) ? (int) $item['pbc_enquiry'] : 0;
 		if ( ! empty( $budget_id ) ) {
-			$output .= '<p><strong>' . esc_html__( 'Budget ID', 'pbc' ) . ': ' . $budget_id . '</strong></p>';
+			$output .= '<strong>' . esc_html__( 'Budget ID', 'pbc' ) . ':</strong> ' . $budget_id . '<br/>';
 		}
 
 		// Contact.
-		if ( ! empty( $contact ) ) {
+		if ( ! empty( $contact['email'] ) ) {
 			$output .= '<p><strong>' . esc_html__( 'Contact', 'pbc' ) . ': ' . $contact['name'] . '</strong>';
 			if ( ! empty( $contact['email'] ) ) {
 				$output .= '<br/><strong>' . esc_html__( 'Email', 'pbc' ) . ':</strong> ' . $contact['email'];
@@ -246,55 +246,77 @@ class PDF {
 		$output     .= '<table class="summary">';
 		$total_price = 0;
 		$i           = 0;
+		$total_qty   = 1;
+
 		foreach ( $itemv as $details ) {
-			$phase_name     = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
-			$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-			$variation_id   = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
-			$bg             = ( $i % 2 ) == 0 ? 'background' : '';
+			if ( ! is_array( $details ) ) {
+				continue;
+			}
+			$variation_name  = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) . ': ' : '';
+			$variation_name .= isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+			$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
+			$bg              = ( $i % 2 ) == 0 ? 'background' : '';
 
 			$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+			$variation_type = ! empty( $details['var']['id'] ) ? $details['var']['type'] : $variation_type;
 			$price          = (float) str_replace( ',', '.', $details['var']['price'] );
 			if ( 'qty' === $variation_type ) {
-				$total_price = $price * $total_price;
+				$total_qty = $price;
 			} else {
 				$total_price += $price;
+
+				$output .= '<tr>';
+				$output .= '<td class="title ' . $bg . '">' . $variation_name . '</td>';
+				$output .= '<td class="value right ' . $bg . '">';
+				if ( $price > 0 ) {
+					$output .= number_format( $price, 2, ',', '.' ) . ' €';
+				}
+				$output .= '</td>';
+				$output .= '</tr>';
 			}
-			$output .= '<tr>';
-			$output .= '<td class="title ' . $bg . '">' . $phase_name . ' ' . $variation_name . '</td>';
-			$output .= '<td class="value right ' . $bg . '">';
-			if ( $price > 0 ) {
-				$output .= number_format( $price, 2, ',', '.' ) . ' €';
-			}
-			$output .= '</td>';
-			$output .= '</tr>';
 			++$i;
 		}
 		if ( ! $total_price ) {
 			$total_price = 0;
 			$tax         = 0;
 		}
-		$tax            = $total_price * 0.21;
-		$total_pricevat = $total_price + $total_price * 0.21;
+		$tax            = ( $total_price * 0.21 ) * $total_qty;
+		$total_pricevat = ( $total_price + $total_price * 0.21 ) * $total_qty;
 
 		$output .= '</table>';
-		$output .= '<table class="summary-total"><tr>';
-		$output .= '<td class="empty">&nbsp;</td><td class="title right">IVA 21%</td>';
+
+		// Summary.
+		$output .= '<br/><br/><table class="summary-total"><tr>';
+		$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
 		$output .= '<td class="value right">';
 		if ( $tax > 0 ) {
 			$output .= number_format( $tax, 2, ',', '.' ) . ' €';
 		}
 		$output .= '</td>';
 		$output .= '</tr>';
-		$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">Subtotal</td>';
+
+		// Subtotal.
+		$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'pbc' ) . '</td>';
 		$output .= '<td class="value right">';
 		if ( $total_price > 0 ) {
 			$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
 		}
 		$output .= '</td>';
 		$output .= '</tr>';
+
+		// Quantity.
+		$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'pbc' ) . '</td>';
+		$output .= '<td class="value right">';
+		if ( $total_price > 0 ) {
+			$output .= number_format( $total_qty, 2, ',', '.' );
+		}
+		$output .= '</td>';
+		$output .= '</tr>';
+
+		// Total.
 		$output .= '<tr>';
 		$color   = CALC::calculate_color_text( $background_total );
-		$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">Total</td>';
+		$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'pbc' ) . '</td>';
 		$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 		if ( $total_pricevat > 0 ) {
 			$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';

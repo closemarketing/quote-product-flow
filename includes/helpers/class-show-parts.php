@@ -36,6 +36,7 @@ class SHOW {
 		} else {
 			echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
 		}
+
 		foreach ( $variations_section as $variation_data ) {
 			$variation_id = (int) $variation_data['id'];
 			$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
@@ -141,6 +142,15 @@ class SHOW {
 		}
 		?>
 		<div class="configurator_summary">
+			<?php
+			$role = isset( $_SESSION[ $pbc_session_key ]['role_slug'] ) ? sanitize_key( $_SESSION[ $pbc_session_key ]['role_slug'] ) : '';
+			if ( $role ) {
+				$role_name = $role ? wp_roles()->get_names()[ $role ] : $role;
+				?>
+				<div class="role"><?php echo esc_html( $role_name ); ?></div>
+				<?php
+			}
+			?>
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 			<table>
 				<?php
