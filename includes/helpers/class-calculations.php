@@ -340,6 +340,8 @@ class CALC {
 		$state_field     = $item['pbc_contact']['state'] ?? '';
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
+		$show_prices     = get_option( 'pbc_budget_show_prices' );
+		$show_prices     = ! empty( $show_prices ) && 'no' === $show_prices ? false : true;
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -398,7 +400,7 @@ class CALC {
 					$message        .= '<td>' . $phase_name . '</td>';
 					$message        .= '<td>' . $variation_name . '</td>';
 					$message        .= '<td>';
-					if ( $price > 0 ) {
+					if ( $price > 0 && $show_prices ) {
 						$message .= number_format( $price, 2, ',', '.' ) . ' €';
 					}
 					$message .= '</td>';
@@ -407,21 +409,24 @@ class CALC {
 				}
 				$message .= '</table><br/>';
 				// Subtotal.
-				$message .= '<table>';
-				$message .= '<tr>';
-				$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
-				$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
-				$message .= '</tr>';
-				$message .= '<tr>';
-				$message .= '<td>' . __( 'VAT:', 'pbc' ) . '</td>';
-				$vat      = $subtotal_price * 0.21;
-				$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
-				$message .= '</tr>';
-				$message .= '<tr>';
-				$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
-				$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
-				$message .= '</tr>';
-				$message .= '</table>';
+				if ( $show_prices ) {
+					$message .= '<table>';
+					$message .= '<tr>';
+					$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+					$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
+					$message .= '</tr>';
+					$message .= '<tr>';
+					$message .= '<td>' . __( 'Tax:', 'pbc' ) . '</td>';
+					$vat      = $subtotal_price * 0.21;
+					$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
+					$message .= '</tr>';
+					$message .= '<tr>';
+					$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+					$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
+					$message .= '</tr>';
+					$message .= '</table>';
+				}
+
 				$message .= '<br>' . get_option( 'blogname' );
 				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
