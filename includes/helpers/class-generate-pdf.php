@@ -104,7 +104,7 @@ class PDF {
 		$output            .= "<style>
 		.header, .product .product-title {margin-left: 20px;}
 		.product .product-title{ width:400px;text-align:left;vertical-align:bottom; }
-		.product .product-preview{ width:300px; }
+		.product .product-preview{ width:300px; background-color: #fff; }
 		.product .image-wrap{ position:relative; }
 			.product .image-wrap img:first-child{ position:relative; }
 			.product .image-wrap img{ width:100%;max-width:300px;position:absolute;top:0;left:0; }
