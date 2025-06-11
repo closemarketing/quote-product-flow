@@ -26,6 +26,14 @@ fieldset label.block {
 	width: 100%;
 }
 
+.pbc_field_inline {
+	width: calc(100% - 105px);
+}
+
+.pbc_field_inline + button.select-image {
+	width: 100px;
+}
+
 .save_bar {
    padding: 0 10px;
    text-align: right;
