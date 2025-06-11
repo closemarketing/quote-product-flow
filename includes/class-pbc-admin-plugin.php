@@ -543,7 +543,7 @@ class PBC_Admin_Plugin {
 				</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
-					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
+					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image Logo (200px width)', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
@@ -1262,17 +1262,22 @@ class PBC_Admin_Plugin {
 		}
 	}
 
-    /**
+	/**
 	 * Get attachment ID from URL
+	 *
+	 * @param string $url Attachment URL.
+	 * @return int|null Attachment ID or null if not found.
 	 */
-	public function get_attachment_id($url) {
+	public function get_attachment_id( $url ) {
 		global $wpdb;
-		$attachment_id = $wpdb->get_var( $wpdb->prepare( 
-			"SELECT ID FROM $wpdb->posts WHERE guid = %s AND post_type = 'attachment'", 
-			$url 
-		) );
+		$attachment_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE guid = %s AND post_type = 'attachment'",
+				$url
+			)
+		);
 
-		return $attachment_id;
+		return (int) $attachment_id;
 	}
 }
 
