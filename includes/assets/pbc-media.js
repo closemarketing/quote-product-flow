@@ -42,4 +42,7 @@ jQuery(function($){
 		wp.media.frames.pbc.on('select', gk_media_set_image);
 		wp.media.frames.pbc.open();
 	});
+    $(document).find('.pbc_color_picker').each(function(){
+        $(this).wpColorPicker();
+    });
 });

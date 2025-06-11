@@ -80,10 +80,12 @@ class PBC_Admin_Plugin {
 	}
 
 	public function enqueue_admin_scripts() {
+        wp_enqueue_style( 'wp-color-picker' );
+
 		wp_register_script(
 			'pbc-media',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-media.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-color-picker' ),
 			WPPBC_VERSION,
 			true
 		);
@@ -565,14 +567,14 @@ class PBC_Admin_Plugin {
 					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label><?php
 						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
 					?>
-					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" />
+					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" class="pbc_color_picker" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 					?>
-					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" />
+					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
 				</fieldset>
 
 				<h2><?php esc_html_e( 'Roles Discount', 'pbc' ); ?></h2>
