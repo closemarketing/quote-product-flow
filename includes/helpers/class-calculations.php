@@ -384,7 +384,11 @@ class CALC {
 				$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
 				$message       .= '<br/></div>';
 				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
-				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
+				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th>';
+				if ( $show_prices ) {
+					$message .= '<th>' . __( 'Price', 'pbc' ) . '</th>';
+				}
+				$message       .= '</tr>';
 				$subtotal_price = 0;
 
 				$i = 0;
