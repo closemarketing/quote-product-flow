@@ -27,11 +27,11 @@ fieldset label.block {
 }
 
 .pbc_field_inline {
-	width: calc(100% - 105px);
+	width: calc(100% - 145px);
 }
 
 .pbc_field_inline + button.select-image {
-	width: 100px;
+	width: 140px;
 }
 
 .save_bar {
