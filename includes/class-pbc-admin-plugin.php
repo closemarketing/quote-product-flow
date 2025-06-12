@@ -547,21 +547,30 @@ class PBC_Admin_Plugin {
 					<?php
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
-					<input class="pbc_field_inline" id="select_PDF_image" type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) { echo esc_url( $pdf_image_selected ); } ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_selected ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					<div class="pbc_field_preview"><?php if ( $pdf_image_selected ) { ?><img src="<?php echo esc_url( $pdf_image_selected ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div><input id="select_PDF_image" type="hidden" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {
+									echo esc_url( $pdf_image_selected );
+								} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_selected ); ?>" />
+					<button class="select-image button select-image-selected" data-name="pdf_image_selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
 					?>
-					<input class="pbc_field_inline" type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) { echo esc_url( $pdf_image_header ); } ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_header ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_header"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					<div class="pbc_field_preview"><?php if ( $pdf_image_header ) { ?><img src="<?php echo esc_url( $pdf_image_header ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
+					<input id="select_pdf_image_header" type="hidden" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {
+						echo esc_url( $pdf_image_header );
+					} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_header ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_header"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
 					?>
-					<input class="pbc_field_inline" type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) { echo esc_url( $pdf_image_footer ); } ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_footer ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_footer"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					<div class="pbc_field_preview"><?php if ( $pdf_image_footer ) { ?><img src="<?php echo esc_url( $pdf_image_footer ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
+					<input id="select_pdf_image_footer" type="hidden" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {
+						echo esc_url( $pdf_image_footer );
+					} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_footer ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_footer"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label><?php

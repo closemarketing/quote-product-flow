@@ -26,14 +26,37 @@ fieldset label.block {
 	width: 100%;
 }
 
-.pbc_field_inline {
-	width: calc(100% - 145px);
-}
-
-.pbc_field_inline + button.select-image {
+button.select-image.select-image-selected {
 	width: 140px;
+    vertical-align: middle;
+    display: inline-block;
+}
+.pbc_field_preview {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
 }
 
+.pbc_field_preview img {
+	margin-right: 20px;
+	width: 100%;
+    max-width: 100px;
+}
+.pbc_field_preview_remove {
+    position: absolute;
+    right: 20px;
+    top: 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    display: none;
+}
+.pbc_field_preview img:hover + .pbc_field_preview_remove,
+.pbc_field_preview_remove:hover {
+    display: block;
+}
 .save_bar {
    padding: 0 10px;
    text-align: right;

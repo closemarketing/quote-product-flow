@@ -38,6 +38,7 @@ jQuery(function($){
 			selection.each(function(attachment) {
 				var url = attachment.attributes.url;
 				$('input[name="' + input_name + '"]').val(url);
+                $('input[name="' + input_name + '"]').parents('fieldset').find('.pbc_field_preview').html('<img src="' + url + '" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span>');
                 $('input[name="' + input_name + '"]').attr('data-imageId', attachment.attributes.id);
 			});
 		};
@@ -57,6 +58,13 @@ jQuery(function($){
 		wp.media.frames[frame_name].on('select', gk_media_set_image);
 		wp.media.frames[frame_name].open();
 	});
+    $(document).on('click', '.pbc_field_preview_remove', function(event){
+        var current_button = $(this);
+        var input_name = current_button.parents('fieldset').find('input');
+        input_name.val('');
+        input_name.attr('data-imageId', '');
+        current_button.parents('fieldset').find('.pbc_field_preview').html('');
+    });
     $(document).find('.pbc_color_picker').each(function(){
         $(this).wpColorPicker();
     });
