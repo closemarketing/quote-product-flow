@@ -89,6 +89,13 @@ class PBC_Admin_Plugin {
 			WPPBC_VERSION,
 			true
 		);
+        wp_localize_script(
+			'pbc-media',
+			'pbc_media_strings',
+			array(
+				'no_image_selected' => __('Please select an image file (jpeg, png) only', 'pbc'),
+			)
+		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
 
 		wp_enqueue_script(
