@@ -118,64 +118,55 @@ class CALC {
 			$variations_dep[ $key ]['depends'] = $depends_ids;
 		}
 		if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
+							foreach ( $variations as $key => $variation ) {
+								if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
+									break;
+								}
+								$depends_ids = $variation['depends'] ?? array();
+								if ( empty( $depends_ids ) ) {
+									continue;
+								}
 
-			$prev_variations_ids = array();
-			if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
-				foreach ( $_SESSION[ $pbc_session_key ] as $prev_var ) {
-					if ( isset( $prev_var['var']['id'] ) ) {
-						$prev_variations_ids[] = (int) $prev_var['var']['id'];
-					}
-				}
-			}
-			foreach ( $variations as $key => $variation ) {
-				if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
-					break;
-				}
-				$depends_ids = $variation['depends'] ?? array();
-				if ( empty( $depends_ids ) ) {
-					continue;
-				}
+								for ( $i = 0; $i < $cstep; $i++ ) {
+									if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+										$depkey = array_search( $prev_variations_ids[ $i ], $depends_ids[ $i ], true );
+										if ( false === $depkey ) {
+											unset( $variations[ $key ] );
+										}
+									}
+								}
+							}
+							$variations = array_values( $variations );
 
-				for ( $i = 0; $i < $cstep; $i++ ) {
-					if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
-						$depkey = array_search( $prev_variations_ids[ $i ], $depends_ids[ $i ], true );
-						if ( false === $depkey ) {
-							unset( $variations[ $key ] );
-						}
-					}
-				}
-			}
-			$variations = array_values( $variations );
+							// Order variations per section.
+							$variations_section = array();
+							foreach ( $variations as $variation ) {
+								$term_list            = (array) wp_get_post_terms(
+									$variation['post_id'],
+									'variation_tag',
+									array(
+										'fields' => 'all',
+									)
+								);
+								$variations_section[] = array(
+									'id'      => $variation['post_id'],
+									'section' => isset( $term_list[0]->name ) ? $term_list[0]->name : '',
+									'title'   => $variation['post_title'],
+								);
+							}
 
-			// Order variations per section.
-			$variations_section = array();
-			foreach ( $variations as $variation ) {
-				$term_list            = (array) wp_get_post_terms(
-					$variation['post_id'],
-					'variation_tag',
-					array(
-						'fields' => 'all',
-					)
-				);
-				$variations_section[] = array(
-					'id'      => $variation['post_id'],
-					'section' => isset( $term_list[0]->name ) ? $term_list[0]->name : '',
-					'title'   => $variation['post_title'],
-				);
-			}
+							// Order by sections and title.
+							foreach ( $variations_section as $key => $val ) {
+									$temp_arr['section'][ $key ] = $val['section'];
+									$temp_arr['title'][ $key ]   = $val['title'];
+							}
+							// Sort by section asc and then title asc.
+							if ( ! empty( $temp_arr['section'] ) && ! empty( $temp_arr['title'] ) ) {
+								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
+							}
 
-			// Order by sections and title.
-			foreach ( $variations_section as $key => $val ) {
-					$temp_arr['section'][ $key ] = $val['section'];
-					$temp_arr['title'][ $key ]   = $val['title'];
-			}
-			// Sort by section asc and then title asc.
-			if ( ! empty( $temp_arr['section'] ) && ! empty( $temp_arr['title'] ) ) {
-				array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
-			}
-
-			
-		} 
+							
+						} 
 
 		return $variations_dep;
 	}
