@@ -80,10 +80,12 @@ class PBC_Admin_Plugin {
 	}
 
 	public function enqueue_admin_scripts() {
+        wp_enqueue_style( 'wp-color-picker' );
+
 		wp_register_script(
 			'pbc-media',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-media.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-color-picker' ),
 			WPPBC_VERSION,
 			true
 		);
@@ -541,38 +543,47 @@ class PBC_Admin_Plugin {
 				</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
-					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image', 'pbc' ); ?></label>
+					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image Logo (200px width)', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
-					<input class="pbc_field" type="text" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) { echo esc_url( $pdf_image_selected ); } ?>" /><button class="select-image button select-image-selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					<div class="pbc_field_preview"><?php if ( $pdf_image_selected ) { ?><img src="<?php echo esc_url( $pdf_image_selected ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div><input id="select_PDF_image" type="hidden" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {
+									echo esc_url( $pdf_image_selected );
+								} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_selected ); ?>" />
+					<button class="select-image button select-image-selected" data-name="pdf_image_selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_header"><?php esc_html_e( 'Set PDF Image Header (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
 					?>
-					<input class="pbc_field" type="text" name="pdf_image_header" value="<?php if ( $pdf_image_header ) { echo esc_url( $pdf_image_header ); } ?>" />
+					<div class="pbc_field_preview"><?php if ( $pdf_image_header ) { ?><img src="<?php echo esc_url( $pdf_image_header ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
+					<input id="select_pdf_image_header" type="hidden" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {
+						echo esc_url( $pdf_image_header );
+					} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_header ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_header"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
 					?>
-					<input class="pbc_field" type="text" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) { echo esc_url( $pdf_image_footer ); } ?>" />
+					<div class="pbc_field_preview"><?php if ( $pdf_image_footer ) { ?><img src="<?php echo esc_url( $pdf_image_footer ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
+					<input id="select_pdf_image_footer" type="hidden" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {
+						echo esc_url( $pdf_image_footer );
+					} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_footer ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_footer"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label><?php
 						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
 					?>
-					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" />
+					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" class="pbc_color_picker" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 					?>
-					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" />
+					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
 				</fieldset>
 
 				<h2><?php esc_html_e( 'Roles Discount', 'pbc' ); ?></h2>
@@ -707,6 +718,7 @@ class PBC_Admin_Plugin {
 				'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
 			],
 			'pbc_enquiry'      => $post_id,
+            'pbc_admin'        => true,
 		];
 
 		$total_vars = get_post_meta( $post_id, 'pbc_total_var', true );
@@ -1258,6 +1270,24 @@ class PBC_Admin_Plugin {
 				<?php
 			}
 		}
+	}
+
+	/**
+	 * Get attachment ID from URL
+	 *
+	 * @param string $url Attachment URL.
+	 * @return int|null Attachment ID or null if not found.
+	 */
+	public function get_attachment_id( $url ) {
+		global $wpdb;
+		$attachment_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE guid = %s AND post_type = 'attachment'",
+				$url
+			)
+		);
+
+		return (int) $attachment_id;
 	}
 }
 

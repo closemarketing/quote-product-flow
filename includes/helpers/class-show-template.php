@@ -70,7 +70,7 @@ class PBC_Template {
 		.page-configurator .prev .btn {
 			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
 		}
-		.page-configurator .btn:hover, .page-configurator button[type="submit"]:hover {
+		.page-configurator .btn:hover, .page-configurator .btn:focus, .page-configurator button[type="submit"]:hover, .page-configurator button[type="submit"]:focus {
 			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
 		}';
 
