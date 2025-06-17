@@ -187,33 +187,36 @@ class PBC_Template {
 
 						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
 						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
-							foreach ( $variations as $key => $variation_id ) {
-								if ( 1 === $cstep || empty( $_SESSION[ $pbc_session_key ] ) ) {
-									break;
-								}
+							$variations_depends = array();
+							foreach ( $variations as $variation_id ) {
 								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
-								if ( empty( $depends ) ) {
-									continue;
-								}
-								$depends_ids = array();
-								foreach ( $depends as $depend ) {
-									$arr = explode( '|', $depend['pbc_depvar'] );
-									if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-										$order                   = array_search( (int) $arr[0], $phases_order, true );
-										$depends_ids[ $order ][] = (int) $arr[1];
-									}
-								}
-
-								for ( $i = 0; $i < $cstep; $i++ ) {
-									if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
-										$depkey = array_search( $prev_variations_ids[ $i ], $depends_ids[ $i ], true );
-										if ( false === $depkey ) {
-											unset( $variations[ $key ] );
+								if ( ! empty( $depends ) ) {
+									$variations_depends[$variation_id] = array();
+									foreach ( $depends as $depend ) {
+										$arr = explode( '|', $depend['pbc_depvar'] );
+										if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
+											$order = array_search( (int)$arr[0], $phases_order, true );
+											$variations_depends[$variation_id][$order][] = (int)$arr[1];
 										}
 									}
 								}
 							}
-							$variations = array_values( $variations );
+
+							$variations = array_filter($variations, function($variation_id) use ($prev_variations_ids, $variations_depends, $cstep) {
+								if (!isset($variations_depends[$variation_id])) {
+									return true;
+								}
+								
+								$depends_ids = $variations_depends[$variation_id];
+								for ($i = 0; $i < $cstep; $i++) {
+									if (isset($prev_variations_ids[$i]) && isset($depends_ids[$i])) {
+										if (!in_array($prev_variations_ids[$i], $depends_ids[$i], true)) {
+											return false;
+										}
+									}
+								}
+								return true;
+							});
 
 							// Order variations per section.
 							$variations_section = array();

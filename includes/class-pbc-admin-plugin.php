@@ -725,6 +725,7 @@ class PBC_Admin_Plugin {
 				'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
 			],
 			'pbc_enquiry'      => $post_id,
+            'pbc_admin'        => true,
 		];
 
 		$total_vars = get_post_meta( $post_id, 'pbc_total_var', true );

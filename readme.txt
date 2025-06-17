@@ -20,8 +20,10 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added: You can select quantity of each products.
 *  Added: Print PDF now saves it internally and gets client data.
 *  Added: Prices per roles discount.
+*  Added: Don't show prices in PDF if the option is not selected. Show them in admin.
 *  Removed: removed the template page option. Now is only shows with shortcode: [pbc]
 *  Fixed: problems with dependencies and phases.
+*  Fixed: problems with image alpha webp.
 
 = 1.3.1 =
 *  Included Internal libraries.
