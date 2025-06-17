@@ -98,6 +98,9 @@ class PDF {
 
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
+		$show_prices     = get_option( 'pbc_budget_show_prices' );
+		$show_prices     = ! empty( $show_prices ) && 'no' === $show_prices ? false : true;
+        $show_prices     = isset( $item['pbc_admin'] ) ? true : $show_prices;
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';
@@ -268,7 +271,7 @@ class PDF {
 				$output .= '<tr>';
 				$output .= '<td class="title ' . $bg . '">' . $variation_name . '</td>';
 				$output .= '<td class="value right ' . $bg . '">';
-				if ( $price > 0 ) {
+				if ( $price > 0 && $show_prices ) {
 					$output .= number_format( $price, 2, ',', '.' ) . ' €';
 				}
 				$output .= '</td>';
@@ -285,45 +288,47 @@ class PDF {
 
 		$output .= '</table>';
 
-		// Summary.
-		$output .= '<br/><br/><table class="summary-total"><tr>';
-		$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
-		$output .= '<td class="value right">';
-		if ( $tax > 0 ) {
-			$output .= number_format( $tax, 2, ',', '.' ) . ' €';
-		}
-		$output .= '</td>';
-		$output .= '</tr>';
+        if ( $show_prices ) {
+            // Summary.
+            $output .= '<br/><br/><table class="summary-total"><tr>';
+            $output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
+            $output .= '<td class="value right">';
+            if ( $tax > 0 ) {
+                $output .= number_format( $tax, 2, ',', '.' ) . ' €';
+            }
+            $output .= '</td>';
+            $output .= '</tr>';
 
-		// Subtotal.
-		$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'pbc' ) . '</td>';
-		$output .= '<td class="value right">';
-		if ( $total_price > 0 ) {
-			$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
-		}
-		$output .= '</td>';
-		$output .= '</tr>';
+            // Subtotal.
+            $output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'pbc' ) . '</td>';
+            $output .= '<td class="value right">';
+            if ( $total_price > 0 ) {
+                $output .= number_format( $total_price, 2, ',', '.' ) . ' €';
+            }
+            $output .= '</td>';
+            $output .= '</tr>';
 
-		// Quantity.
-		$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'pbc' ) . '</td>';
-		$output .= '<td class="value right">';
-		if ( $total_price > 0 ) {
-			$output .= number_format( $total_qty, 2, ',', '.' );
-		}
-		$output .= '</td>';
-		$output .= '</tr>';
+            // Quantity.
+            $output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'pbc' ) . '</td>';
+            $output .= '<td class="value right">';
+            if ( $total_price > 0 ) {
+                $output .= number_format( $total_qty, 2, ',', '.' );
+            }
+            $output .= '</td>';
+            $output .= '</tr>';
 
-		// Total.
-		$output .= '<tr>';
-		$color   = CALC::calculate_color_text( $background_total );
-		$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'pbc' ) . '</td>';
-		$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
-		if ( $total_pricevat > 0 ) {
-			$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
-		}
-		$output .= '</td>';
-		$output .= '</tr>';
-		$output .= '</table><br/>';
+            // Total.
+            $output .= '<tr>';
+            $color   = CALC::calculate_color_text( $background_total );
+            $output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'pbc' ) . '</td>';
+            $output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
+            if ( $total_pricevat > 0 ) {
+                $output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
+            }
+            $output .= '</td>';
+            $output .= '</tr>';
+            $output .= '</table><br/>';
+        }
 
 		// Comments.
 		$comments = isset( $contact['comments'] ) ? sanitize_text_field( $contact['comments'] ) : '';
