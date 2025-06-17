@@ -174,76 +174,7 @@ class PDF {
 				}
 			}
 		}
-
-		$output_image = imagecreatetruecolor( 300, 243 );
-		$black        = imagecolorallocate( $output_image, 0, 0, 0 );
-		$dirname      = self::get_budget_base_dir();
-
-		// Make the background transparent.
-		imagecolortransparent( $output_image, $black );
-		for ( $i = 0; $i <= $total_vars; $i++ ) {
-			$imgprodid  = '';
-			$imgprodurl = '';
-			if ( ! empty( $itemv[ $i ]['var']['id'] ) ) {
-				$ssVar        = $itemv[ $i ]['var']['id'];
-				$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
-				if ( ! empty( $imgprodgroup ) ) {
-					foreach ( $imgprodgroup as $deps ) {
-						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
-							$prevVar = array();
-							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
-								$arr = explode( '|', $depvarimgprod );
-								if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-									$prevVar[ (int) $arr[0] ][] = $arr[1];
-								}
-							}
-							if ( ! empty( $itemv ) ) {
-								foreach ( $itemv as $sPhaseKey => $svariations ) {
-									if ( isset( $prevVar[ $sPhaseKey ] ) &&
-									isset( $itemv[ $sPhaseKey ] ) && in_array( $itemv[ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
-										$imgprodid = $deps['pbc_imgprod'][0];
-										break;
-									}
-								}
-							}
-						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
-							$imgprodid = $deps['pbc_imgprod'][0];
-							break;
-						}
-					}
-				}
-				if ( ! empty( $imgprodid ) ) {
-					$imgprodurl = wp_get_attachment_image_src( $imgprodid, 'full', true );
-				}
-				if ( ! empty( $imgprodurl ) && wp_remote_retrieve_response_code( wp_remote_head( $imgprodurl[0] ) ) === 200 ) {
-					$extension = pathinfo( $imgprodurl[0], PATHINFO_EXTENSION );
-					switch ( $extension ) {
-						case 'png':
-							$img                  = imagecreatefrompng( $imgprodurl[0] );
-							list($width, $height) = getimagesize( $imgprodurl[0] );
-							break;
-						default:
-							// jpg, jpeg, gif others.
-							$img                  = imagepng( imagecreatefromstring( file_get_contents( $imgprodurl[0] ) ), $dirname . 'product-image-for-pdf.png' );
-							list($width, $height) = getimagesize( $dirname . 'product-image-for-pdf.png' );
-							$img                  = imagecreatefrompng( $dirname . 'product-image-for-pdf.png' );
-					}
-
-					// Flip it vertically.
-					if ( $flipped ) {
-						imageflip( $img, IMG_FLIP_HORIZONTAL );
-					}
-					// Calculate proportional width based on height.
-					$new_height = 243;
-					$new_width  = ( $width / $height ) * $new_height;
-					$x_position = max( 0, ( 300 - $new_width ) / 2 );
-					imagecopyresized( $output_image, $img, $x_position, 0, 0, 0, $new_width, $new_height, $width, $height );
-				}
-			}
-		}
-		imagepng( $output_image, $dirname . '/product-image-for-pdf.png' );
-		imagedestroy( $output_image );
-		$output .= '<img phaseid="' . $i . '" src="' . $dirname . '/product-image-for-pdf.png" alt="product image" height="500px" width="auto" />';
+        $output .= self::generateProductImage($itemv, $total_vars, $flipped);
 		$output .= '</div></td></tr></table><br/><br/>';
 
 		$output     .= '<table class="summary">';
@@ -350,4 +281,175 @@ class PDF {
 		);
 		return $result;
 	}
+
+    public static function generateProductImage($itemv, $total_vars, $flipped) {
+        // Define the output image dimensions
+        $output_width = 300;
+        $output_height = 243;
+
+        // Create the true color image for the output
+        $output_image = imagecreatetruecolor($output_width, $output_height);
+
+        // --- Transparency Setup for Output Image ---
+        // 1. Turn OFF alpha blending for the output image.
+        imagealphablending($output_image, false);
+
+        // 2. Enable saving alpha channel for the output image.
+        //    Ensures the transparency information is preserved when the image is saved.
+        imagesavealpha($output_image, true);
+
+        // 3. Allocate a fully transparent color (alpha 127 = 100% transparent)
+        $transparent_color = imagecolorallocatealpha($output_image, 0, 0, 0, 127);
+
+        // 4. Fill the entire output image with the fully transparent color
+        imagefill($output_image, 0, 0, $transparent_color);
+        // --- End Transparency Setup ---
+
+        $dirname = self::get_budget_base_dir();
+
+        // Ensure the directory exists and is writable
+        if (!is_dir($dirname)) {
+            if (!mkdir($dirname, 0755, true)) {
+                error_log("Failed to create directory: " . $dirname);
+                return '<p style="color:red;">Error: Output directory not found or writable.</p>';
+            }
+        }
+
+        for ($i = 0; $i <= $total_vars; $i++) {
+            $imgprodid = '';
+            $imgprodurl = '';
+
+            if (!empty($itemv[$i]['var']['id'])) {
+                $ssVar = $itemv[$i]['var']['id'];
+                $imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
+
+                if (!empty($imgprodgroup)) {
+                    foreach ($imgprodgroup as $deps) {
+                        if (isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod'])) {
+                            $prevVar = array();
+                            foreach ($deps['pbc_depvarimgprod'] as $depvarimgprod) {
+                                $arr = explode('|', $depvarimgprod);
+                                if (!empty($arr[0]) && !empty($arr[1])) {
+                                    $prevVar[(int)$arr[0]][] = $arr[1];
+                                }
+                            }
+
+                            if (!empty($itemv)) {
+                                foreach ($itemv as $sPhaseKey => $svariations) {
+                                    if (isset($prevVar[$sPhaseKey]) &&
+                                        isset($itemv[$sPhaseKey]) && in_array($itemv[$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey])) {
+                                        $imgprodid = $deps['pbc_imgprod'][0];
+                                        break 2;
+                                    }
+                                }
+                            }
+                        } elseif ((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod'])) {
+                            $imgprodid = $deps['pbc_imgprod'][0];
+                            break;
+                        }
+                    }
+                }
+
+                if (!empty($imgprodid)) {
+                    $imgprodurl_array = wp_get_attachment_image_src($imgprodid, 'full', true);
+                    $imgprodurl = $imgprodurl_array[0] ?? '';
+                }
+
+                if (!empty($imgprodurl) && wp_remote_retrieve_response_code(wp_remote_head($imgprodurl)) === 200) {
+                    $extension = pathinfo($imgprodurl, PATHINFO_EXTENSION);
+                    $img = false;
+                    $width = 0;
+                    $height = 0;
+
+                    // Attempt to get image size first to avoid unnecessary image creation
+                    $image_size_info = @getimagesize($imgprodurl); 
+                    if ($image_size_info) {
+                        list($width, $height, $type) = $image_size_info;
+
+                        switch (strtolower($extension)) {
+                            case 'png':
+                                $img = imagecreatefrompng($imgprodurl);
+                                break;
+                            case 'jpg':
+                            case 'jpeg':
+                                $img = imagecreatefromjpeg($imgprodurl);
+                                break;
+                            case 'gif':
+                                $img = imagecreatefromgif($imgprodurl);
+                                break;
+                            case 'webp':
+                                $img = imagecreatefromwebp($imgprodurl);
+                                break;
+                            default:
+                                error_log("Unsupported image format: " . $extension . " for URL: " . $imgprodurl);
+                                continue 2;
+                        }
+                    } else {
+                        error_log("DEBUG: Failed to get image size for URL: " . $imgprodurl);
+                        continue;
+                    }
+
+                    if ($img) {
+                        error_log("DEBUG: Image loaded for product ID: " . $imgprodid . " from URL: " . $imgprodurl);
+                        error_log("DEBUG: Source dimensions (width, height): " . $width . ", " . $height);
+
+                        // If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
+                        // and imagesavealpha is true if you were modifying it before copying.
+                        // For imagecopyresampled, the destination's alpha settings are primary.
+                        if (in_array(strtolower($extension), ['png', 'webp'])) {
+                            imagealphablending($img, true);
+                            imagesavealpha($img, true);
+                        }
+                        // Flip it horizontally if $flipped is true
+                        if ($flipped) {
+                            imageflip($img, IMG_FLIP_HORIZONTAL);
+                        }
+
+                        // Calculate proportional new dimensions
+                        $new_height = $output_height;
+                        $new_width = ($height > 0) ? ($width / $height) * $new_height : $output_width;
+
+                        if ($new_width > $output_width) {
+                            $new_width = $output_width;
+                            $new_height = ($width > 0) ? ($height / $width) * $new_width : $output_height;
+                        }
+
+                        $x_position = max(0, (int)(($output_width - $new_width) / 2));
+                        $y_position = max(0, (int)(($output_height - $new_height) / 2));
+
+                        error_log("DEBUG: Calculated copy dimensions (new_width, new_height): " . (int)$new_width . ", " . (int)$new_height);
+                        error_log("DEBUG: Copy positions (x_position, y_position): " . $x_position . ", " . $y_position);
+
+                        // --- Critical: Re-enable alpha blending on the output image just before copying ---
+                        // This ensures that the alpha channels of the source images are correctly blended
+                        // with the output image's transparent background.
+                        imagealphablending($output_image, true);
+
+                        // Copy and resample the image onto the output canvas
+                        imagecopyresampled($output_image, $img, $x_position, $y_position, 0, 0, (int)$new_width, (int)$new_height, $width, $height);
+                        imagedestroy($img); // Free memory for the source image
+                    } else {
+                        error_log("DEBUG: Failed to create image resource for URL: " . $imgprodurl);
+                    }
+                } else {
+                    error_log("DEBUG: Image URL not found or inaccessible: " . $imgprodurl);
+                }
+            }
+        }
+
+        $output_file_name = 'product-image-for-pdf.png';
+        $output_file_path = $dirname . $output_file_name;
+
+        // Save the final image. Check if saving was successful.
+        if (!imagepng($output_image, $output_file_path)) {
+            error_log("Failed to save image to: " . $output_file_path);
+            imagedestroy($output_image);
+            return '<p style="color:red;">Error: Failed to save product image.</p>';
+        }
+        imagedestroy($output_image); // Free memory for the output image
+
+        // Provide the direct file system path for Html2Pdf
+        $output = '<img phaseid="' . $i . '" src="' . $output_file_path . '" alt="product image" height="500px" width="auto" />';
+        return $output;
+    }
 }
