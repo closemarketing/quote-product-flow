@@ -322,7 +322,7 @@ class PBC_Admin_Plugin {
 				if ( isset( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
 					update_option( 'pbc_discount_user_' . $slug, (int) $_POST[ 'pbc_discount_user_' . $slug ] );
 				}
-                $show_prices = 0;
+                $show_prices = '';
                 if ( isset( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ) $show_prices = $_POST[ 'pbc_show_prices_user_' . $slug ];
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
@@ -595,7 +595,11 @@ class PBC_Admin_Plugin {
 							echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
 							echo '</label></td>';
 							echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
-                            echo '<td><input type="checkbox" id="pbc_show_prices_user_' . esc_html( $slug ) . '" name="pbc_show_prices_user_' . esc_html( $slug ) . '" value="1" ' . checked( $show_prices, 1, false ) . ' />'.esc_html__( 'Yes', 'pbc' ).'</td>';
+                            echo '<td><select name="pbc_show_prices_user_' . esc_html( $slug ) . '">';
+                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Default', 'pbc' ) . '</option>';
+                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+                            echo '<option value="no" ' . selected( $show_prices, 'no', false ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+                            echo '</select></td>';
                             echo '</tr>';
 						}
 						?>
