@@ -10,7 +10,7 @@ composer.json
 composer.lock
 .wordpress-org
 vendor/spipu/html2pdf/examples
-.cursorrules
+.cursor
 *.pot
 *.po
 phpcs.xml.dist
