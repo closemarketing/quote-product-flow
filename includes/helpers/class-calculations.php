@@ -30,7 +30,7 @@ class CALC {
 	 * @return string
 	 */
 	public static function get_image_variation_url( $session_variation, $variation_id = 0 ) {
-		if ( ! isset( $variation_id ) ) {
+		if ( empty( $variation_id ) ) {
 			return '';
 		}
 		$imgprodgroup = get_post_meta( $variation_id, 'pbc_imgprodgroup', true );
@@ -431,7 +431,8 @@ class CALC {
 				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
 				// Insert_enquiry Post.
-				$post_id = self::configurator_save_enquiry( $item );
+				$post_id     = self::configurator_save_enquiry( $item );
+				$attachments = [];
 				if ( $post_id ) {
 					$item['pbc_enquiry'] = $post_id;
 					$attachments         = array( PDF::generate_engine_pdf( $item ) );

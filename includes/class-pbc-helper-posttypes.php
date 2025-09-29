@@ -369,7 +369,6 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function pbc_metabox_enquiry() {
-
 		add_meta_box(
 			'enquiry-details',
 			__( 'Enquiry Details', 'pbc' ),

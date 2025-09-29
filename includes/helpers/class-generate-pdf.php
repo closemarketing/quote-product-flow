@@ -41,7 +41,7 @@ class PDF {
 				$html2pdf->writeHTML( $content['response'] );
 				$html2pdf->Output( $filename_path, 'F' );
 				// $html2pdf->close();
-			} catch ( Html2PdfException $e ) {
+			} catch ( \Spipu\Html2Pdf\Exception $e ) {
 				// error
 				// $formatter = new ExceptionFormatter($e);
 				// echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();

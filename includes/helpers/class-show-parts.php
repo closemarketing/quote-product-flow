@@ -155,9 +155,9 @@ class SHOW {
 			<table>
 				<?php
 				$show_prices = get_option( 'pbc_budget_show_prices' );
+				$total_price = 0;
 				if ( 'calculate' === $cstep ) {
-					$count       = count( $phases );
-					$total_price = 0;
+					$count = count( $phases );
 				} else {
 					$count = $cstep;
 				}
@@ -288,7 +288,7 @@ class SHOW {
 			?>
 			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
 			<?php if ( $prev_step && $prev_button ) { ?>
-			<div class="prev<?php if ( empty( $prev_step ) ) { echo ' hidden'; } ?>">
+			<div class="prev<?php if ( ! $prev_step ) { echo ' hidden'; } ?>">
 				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
 				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
 			</div>

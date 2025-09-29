@@ -56,11 +56,6 @@ class PBC_Admin_Plugin {
 	 */
 	public function init() {
 		/**
-		* Composer Library dependencies
-		*/
-		require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
-
-		/**
 		* Image Sizes
 		*/
 		add_image_size( 'pbc_icon', 150, 230, false );

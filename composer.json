@@ -10,14 +10,15 @@
 		}
 	],
 	"require": {
-		"tgmpa/tgm-plugin-activation": "^2.6",
 		"wpackagist-plugin/meta-box": "^5.6.7",
 		"meta-box/meta-box-group": "dev-master",
 		"spipu/html2pdf": "^5.2"
 	},
 	"config": {
 		"allow-plugins": {
-			"composer/installers": true
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
 		}
 	},
 	"extra": {
@@ -33,5 +34,16 @@
 			"vendor/meta-box/meta-box/meta-box.php",
 			"vendor/meta-box/meta-box-group/meta-box-group.php"
 		]
+	},
+	"require-dev": {
+		"phpstan/phpstan": "^2.1",
+		"wp-coding-standards/wpcs": "^3.2",
+		"szepeviktor/phpstan-wordpress": "^2.0",
+		"phpstan/extension-installer": "^1.4"
+	},
+	"scripts": {
+		"format": "phpcbf --standard=phpcs.xml.dist",
+		"lint": "phpcs --standard=phpcs.xml.dist",
+		"phpstan": "phpstan analyse --memory-limit=2048M"
 	}
 }
