@@ -322,8 +322,7 @@ class PBC_Admin_Plugin {
 				if ( isset( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
 					update_option( 'pbc_discount_user_' . $slug, (int) $_POST[ 'pbc_discount_user_' . $slug ] );
 				}
-                $show_prices = '';
-                if ( isset( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ) $show_prices = $_POST[ 'pbc_show_prices_user_' . $slug ];
+				$show_prices = isset( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ) : '';
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
 		}
