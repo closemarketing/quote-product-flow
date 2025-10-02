@@ -26,20 +26,27 @@ jQuery(function($){
 		});
 
 		// Function used for the image selection and media manager closing
-		var gk_media_set_image = function() {
-			var selection = wp.media.frames[frame_name].state().get('selection');
+		var gk_media_set_image = function(event) {
 			
+			var selection = wp.media.frames[frame_name].state().get('selection');
 			// no selection
 			if (!selection) {
 				return;
 			}
-
+            
 			// iterate through selected elements
 			selection.each(function(attachment) {
-				var url = attachment.attributes.url;
-				$('input[name="' + input_name + '"]').val(url);
-                $('input[name="' + input_name + '"]').parents('fieldset').find('.pbc_field_preview').html('<img src="' + url + '" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span>');
-                $('input[name="' + input_name + '"]').attr('data-imageId', attachment.attributes.id);
+                if(attachment.attributes.mime == 'image/jpeg' || attachment.attributes.mime == 'image/png' || attachment.attributes.mime == 'image/webp') {
+                    var url = attachment.attributes.url;
+                    $('input[name="' + input_name + '"]').val(url);
+                    $('input[name="' + input_name + '"]').parents('fieldset').find('.pbc_field_preview').html('<img src="' + url + '" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span>');
+                    $('input[name="' + input_name + '"]').attr('data-imageId', attachment.attributes.id);
+                } else {
+                    if(event == 'select') {
+                        alert(pbc_media_strings.no_image_selected);
+                        return;
+                    }
+                }
 			});
 		};
 
@@ -54,8 +61,12 @@ jQuery(function($){
 			}
 		});
 
-		wp.media.frames[frame_name].on('close', gk_media_set_image);
-		wp.media.frames[frame_name].on('select', gk_media_set_image);
+		wp.media.frames[frame_name].on('select', function() {
+			gk_media_set_image('select');
+		});
+		wp.media.frames[frame_name].on('close', function() {
+			gk_media_set_image('close');
+		});
 		wp.media.frames[frame_name].open();
 	});
     $(document).on('click', '.pbc_field_preview_remove', function(event){
