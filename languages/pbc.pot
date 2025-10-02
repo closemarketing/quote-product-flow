@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product Budget Configurator\n"
-"POT-Creation-Date: 2025-06-16 08:20+0200\n"
+"POT-Creation-Date: 2025-10-02 13:14+0200\n"
 "PO-Revision-Date: 2022-05-10 22:22+0200\n"
 "Last-Translator: David <david@closemarketing.es>\n"
 "Language-Team: David <david@closemarketing.es>\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.7\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: pbc.php\n"
@@ -36,7 +36,7 @@ msgid "Phases of Configurator"
 msgstr ""
 
 #: includes/class-pbc-admin-plugin.php:149
-#: includes/class-pbc-admin-plugin.php:351
+#: includes/class-pbc-admin-plugin.php:352
 #: includes/class-pbc-helper-posttypes.php:52
 msgid "Phases"
 msgstr ""
@@ -100,116 +100,128 @@ msgstr ""
 msgid "Security check failed. Please try again."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:350
+#: includes/class-pbc-admin-plugin.php:351
 #: includes/class-pbc-helper-posttypes.php:479
 msgid "Order"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:352
+#: includes/class-pbc-admin-plugin.php:353
 msgid "Number of Variations"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:377
+#: includes/class-pbc-admin-plugin.php:378
 msgid "Total: "
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:391
+#: includes/class-pbc-admin-plugin.php:392
 msgid "Set the percentage to bulk update prices (you can use negative values)"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:393
+#: includes/class-pbc-admin-plugin.php:394
 msgid "Update Prices"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:411
+#: includes/class-pbc-admin-plugin.php:412
 msgid "Percentage cannot be 0."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:430
+#: includes/class-pbc-admin-plugin.php:431
 #, php-format
 msgid "Changed %s variation prices"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:436
+#: includes/class-pbc-admin-plugin.php:437
 msgid "Error"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:452
+#: includes/class-pbc-admin-plugin.php:453
 msgid "Flip Images Horizontal"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:492
+#: includes/class-pbc-admin-plugin.php:493
 msgid "Email Notification"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:496
+#: includes/class-pbc-admin-plugin.php:497
 msgid "separate multiple emails by comma"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:499
+#: includes/class-pbc-admin-plugin.php:500
 msgid "Preview width"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:503
+#: includes/class-pbc-admin-plugin.php:504
 msgid "default: 570"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:506
-msgid "Show prices?"
-msgstr ""
-
-#: includes/class-pbc-admin-plugin.php:512
-#: includes/class-pbc-admin-plugin.php:525
-#: includes/class-pbc-admin-plugin.php:538
-msgid "Yes"
+#: includes/class-pbc-admin-plugin.php:507
+msgid "Show final button PDF?"
 msgstr ""
 
 #: includes/class-pbc-admin-plugin.php:513
 #: includes/class-pbc-admin-plugin.php:526
-#: includes/class-pbc-admin-plugin.php:539
+#: includes/class-pbc-admin-plugin.php:599
+msgid "Yes"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:514
+#: includes/class-pbc-admin-plugin.php:527
+#: includes/class-pbc-admin-plugin.php:600
 msgid "No"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:519
-msgid "Show final button PDF?"
-msgstr ""
-
-#: includes/class-pbc-admin-plugin.php:532
+#: includes/class-pbc-admin-plugin.php:520
 msgid "Show final button Email?"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:544
+#: includes/class-pbc-admin-plugin.php:532
 msgid "Budget Options"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:546
+#: includes/class-pbc-admin-plugin.php:534
 msgid "Set PDF Image Logo (200px width)"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:553
-#: includes/class-pbc-admin-plugin.php:563
-#: includes/class-pbc-admin-plugin.php:573
+#: includes/class-pbc-admin-plugin.php:541
+#: includes/class-pbc-admin-plugin.php:551
+#: includes/class-pbc-admin-plugin.php:561
 msgid "Select image"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:556
+#: includes/class-pbc-admin-plugin.php:544
 msgid "Set PDF Image Header (1000px width) Height 75px optional"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:566
+#: includes/class-pbc-admin-plugin.php:554
 msgid "Set PDF Image Footer (1000px width) Height 75px optional"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:576
+#: includes/class-pbc-admin-plugin.php:564
 msgid "Color for odd entries (hex code)"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:582
+#: includes/class-pbc-admin-plugin.php:570
 msgid "Color for total (hex code)"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:589
-msgid "Roles Discount"
+#: includes/class-pbc-admin-plugin.php:577
+msgid "Set the role specific options"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:585
+msgid "Role"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:586
+msgid "Discount"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:587
+msgid "Show Prices"
+msgstr ""
+
+#: includes/class-pbc-admin-plugin.php:598
+msgid "Default"
 msgstr ""
 
 #: includes/class-pbc-admin-plugin.php:612
@@ -262,52 +274,52 @@ msgstr ""
 msgid "Instance:"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:749
+#: includes/class-pbc-admin-plugin.php:750
 msgid "Create List Price"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:828
+#: includes/class-pbc-admin-plugin.php:829
 #, php-format
 msgid ""
 "The <strong>%1$s</strong> License has not been activated, so the plugin is "
 "inactive! %2$sClick here%3$s to activate it."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:843
+#: includes/class-pbc-admin-plugin.php:844
 msgid "Activated"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:847
+#: includes/class-pbc-admin-plugin.php:848
 msgid "Deactivated"
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:889
+#: includes/class-pbc-admin-plugin.php:890
 msgid "License AutoTranslate deactivated. "
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:919
+#: includes/class-pbc-admin-plugin.php:920
 msgid "AutoTranslate activated. "
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:927
+#: includes/class-pbc-admin-plugin.php:928
 msgid ""
 "Connection failed to the License Key API server. Try again later. There may "
 "be a problem on your server preventing outgoing requests, or the store is "
 "blocking your request to activate the plugin/theme."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:936
+#: includes/class-pbc-admin-plugin.php:937
 msgid ""
 "The API Key activation could not be commpleted due to an unknown error "
 "possibly on the store server The activation results were empty."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:949
-#: includes/class-pbc-admin-plugin.php:976
+#: includes/class-pbc-admin-plugin.php:950
+#: includes/class-pbc-admin-plugin.php:977
 msgid "The API Key is missing from the deactivation request."
 msgstr ""
 
-#: includes/class-pbc-admin-plugin.php:1261
+#: includes/class-pbc-admin-plugin.php:1262
 #, php-format
 msgid ""
 "<b>Warning!</b> You're blocking external requests which means you won't be "
@@ -317,7 +329,7 @@ msgstr ""
 #: includes/class-pbc-helper-posttypes.php:53
 #: includes/class-pbc-helper-posttypes.php:227
 #: includes/class-pbc-helper-posttypes.php:478
-#: includes/helpers/class-calculations.php:387
+#: includes/helpers/class-calculations.php:388
 msgid "Phase"
 msgstr ""
 
@@ -356,7 +368,7 @@ msgstr ""
 #: includes/class-pbc-helper-posttypes.php:81
 #: includes/class-pbc-helper-posttypes.php:273
 #: includes/class-pbc-helper-posttypes.php:570
-#: includes/helpers/class-calculations.php:387
+#: includes/helpers/class-calculations.php:388
 msgid "Variation"
 msgstr ""
 
@@ -476,7 +488,7 @@ msgid "Default by price"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:251
-#: includes/helpers/class-generate-pdf.php:308
+#: includes/helpers/class-generate-pdf.php:244
 msgid "Quantity"
 msgstr ""
 
@@ -508,7 +520,7 @@ msgstr ""
 #: includes/class-pbc-helper-posttypes.php:310
 #: includes/class-pbc-helper-posttypes.php:447
 #: includes/class-pbc-helper-posttypes.php:572
-#: includes/helpers/class-calculations.php:387
+#: includes/helpers/class-calculations.php:388
 msgid "Price"
 msgstr ""
 
@@ -541,32 +553,32 @@ msgid "Enquiry ID:"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:410
-#: includes/helpers/class-calculations.php:379
+#: includes/helpers/class-calculations.php:380
 msgid "Name:"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:413
-#: includes/helpers/class-calculations.php:381
+#: includes/helpers/class-calculations.php:382
 msgid "Phone:"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:416
-#: includes/helpers/class-calculations.php:380
+#: includes/helpers/class-calculations.php:381
 msgid "Email:"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:419
-#: includes/helpers/class-calculations.php:382
+#: includes/helpers/class-calculations.php:383
 msgid "City:"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:422
-#: includes/helpers/class-calculations.php:383
+#: includes/helpers/class-calculations.php:384
 msgid "State:"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:425
-#: includes/helpers/class-calculations.php:384
+#: includes/helpers/class-calculations.php:385
 msgid "Comments:"
 msgstr ""
 
@@ -583,7 +595,7 @@ msgid "Shortcode"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:519
-#: includes/helpers/class-generate-pdf.php:133
+#: includes/helpers/class-generate-pdf.php:137
 msgid "Budget"
 msgstr ""
 
@@ -596,12 +608,12 @@ msgid "Configuration"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:522
-#: includes/helpers/class-generate-pdf.php:134
+#: includes/helpers/class-generate-pdf.php:138
 msgid "Date"
 msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:549
-#: includes/helpers/class-show-parts.php:216
+#: includes/helpers/class-show-parts.php:218
 msgid "VAT not included"
 msgstr ""
 
@@ -765,107 +777,107 @@ msgstr ""
 msgid "Please contact the administrator of this site for help."
 msgstr ""
 
-#: includes/helpers/class-calculations.php:349
+#: includes/helpers/class-calculations.php:350
 msgid "Email field empty!"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:354
+#: includes/helpers/class-calculations.php:355
 msgid "Name field is empty!"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:359
+#: includes/helpers/class-calculations.php:360
 msgid "Phone field is empty!"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:374
+#: includes/helpers/class-calculations.php:375
 #: includes/helpers/class-generate-pdf.php:90
 msgid "Configurator not ready!"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:377
+#: includes/helpers/class-calculations.php:378
 msgid "Budget Configurator"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:378
+#: includes/helpers/class-calculations.php:379
 msgid "Enquiry details:"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:386
+#: includes/helpers/class-calculations.php:387
 msgid "Configuration details:"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:415
+#: includes/helpers/class-calculations.php:416
 msgid "Subtotal:"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:419
+#: includes/helpers/class-calculations.php:420
 msgid "Tax:"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:424
+#: includes/helpers/class-calculations.php:425
 msgid "Total:"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:443
+#: includes/helpers/class-calculations.php:444
 msgid "Error in sending mail. Please try again!"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:446
+#: includes/helpers/class-calculations.php:447
 #: includes/helpers/class-generate-pdf.php:31
 msgid "budget"
 msgstr ""
 
-#: includes/helpers/class-calculations.php:453
+#: includes/helpers/class-calculations.php:454
 msgid "Mail sent!"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:139
+#: includes/helpers/class-generate-pdf.php:143
 msgid "Budget ID"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:144
+#: includes/helpers/class-generate-pdf.php:148
 msgid "Contact"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:146
+#: includes/helpers/class-generate-pdf.php:150
 msgid "Email"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:149
+#: includes/helpers/class-generate-pdf.php:153
 msgid "Phone"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:152
+#: includes/helpers/class-generate-pdf.php:156
 msgid "City"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:155
-#: includes/helpers/class-show-template.php:427
+#: includes/helpers/class-generate-pdf.php:159
+#: includes/helpers/class-show-template.php:458
 msgid "State"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:160
+#: includes/helpers/class-generate-pdf.php:164
 msgid "Characteristics selected"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:161
+#: includes/helpers/class-generate-pdf.php:165
 msgid "Lists of options selected:"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:290
+#: includes/helpers/class-generate-pdf.php:226
 msgid "Taxes"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:299
+#: includes/helpers/class-generate-pdf.php:235
 msgid "Subtotal"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:319
-#: includes/helpers/class-show-parts.php:206
+#: includes/helpers/class-generate-pdf.php:255
+#: includes/helpers/class-show-parts.php:208
 msgid "Total"
 msgstr ""
 
-#: includes/helpers/class-generate-pdf.php:331
+#: includes/helpers/class-generate-pdf.php:268
 msgid "Comments"
 msgstr ""
 
@@ -873,16 +885,16 @@ msgstr ""
 msgid "Actual Configuration"
 msgstr ""
 
-#: includes/helpers/class-show-parts.php:272
-#: includes/helpers/class-show-parts.php:275
+#: includes/helpers/class-show-parts.php:274
+#: includes/helpers/class-show-parts.php:277
 msgid "Back"
 msgstr ""
 
-#: includes/helpers/class-show-parts.php:283
+#: includes/helpers/class-show-parts.php:285
 msgid "Calculate"
 msgstr ""
 
-#: includes/helpers/class-show-parts.php:286
+#: includes/helpers/class-show-parts.php:288
 msgid "Next"
 msgstr ""
 
@@ -890,39 +902,39 @@ msgstr ""
 msgid "No Phases Available"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:262
+#: includes/helpers/class-show-template.php:265
 msgid "No Variations Available"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:419
+#: includes/helpers/class-show-template.php:450
 msgid "Client Details"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:423
+#: includes/helpers/class-show-template.php:454
 msgid "separate multiple email by comma"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:424
+#: includes/helpers/class-show-template.php:455
 msgid "Your name"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:425
+#: includes/helpers/class-show-template.php:456
 msgid "Phone number"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:426
+#: includes/helpers/class-show-template.php:457
 msgid "Your City"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:428
+#: includes/helpers/class-show-template.php:459
 msgid "Your comments"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:433
+#: includes/helpers/class-show-template.php:464
 msgid "Send"
 msgstr ""
 
-#: includes/helpers/class-show-template.php:439
+#: includes/helpers/class-show-template.php:470
 msgid "Generate Budget"
 msgstr ""
 

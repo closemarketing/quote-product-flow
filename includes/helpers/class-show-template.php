@@ -311,11 +311,39 @@ class PBC_Template {
 
 			if ( 'calculate' !== $cstep && 'wizard' === $template ) {
 				?>
-				<script type="text/javascript">jQuery('.configurator_form_action').insertAfter('.product_preview');</script>
+				<script type="text/javascript">
+				(function() {
+					function moveConfiguratorAction() {
+						if (typeof jQuery !== 'undefined') {
+							jQuery(document).ready(function($) {
+								$('.configurator_form_action').insertAfter('.product_preview');
+							});
+						} else {
+                            // Fallback: try again after a short delay
+                            setTimeout(moveConfiguratorAction, 100);
+						}
+					}
+					moveConfiguratorAction();
+				})();
+				</script>
 				<?php
 			} elseif ( 'calculate' === $cstep && 'wizard' === $template ) {
 				?>
-				<script type="text/javascript">jQuery('.configurator_form_action').insertBefore('.product_preview');</script>
+				<script type="text/javascript">
+				(function() {
+					function moveConfiguratorAction() {
+						if (typeof jQuery !== 'undefined') {
+							jQuery(document).ready(function($) {
+								$('.configurator_form_action').insertBefore('.product_preview');
+							});
+						} else {
+                            // Fallback: try again after a short delay
+                            setTimeout(moveConfiguratorAction, 100);
+						}
+					}
+					moveConfiguratorAction();
+				})();
+				</script>
 				<?php
 			}
 			?>

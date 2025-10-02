@@ -21,6 +21,11 @@ fieldset label.block {
    display: block;
    margin-bottom: 2px;
 }
+.roles-table th,
+.roles-table td {
+   text-align: left;
+   padding: 5px 10px;
+}
 
 .pbc_field {
 	width: 100%;
