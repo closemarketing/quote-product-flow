@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b784bf3b4b9da5d4a54fa227a4b8aad",
+    "content-hash": "37b27339c827c64e8c3f692923881ace",
     "packages": [
         {
             "name": "composer/installers",
@@ -694,8 +694,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d618573eed4a1b6b75e37b2e0b65ac65c885d88e",
-                "reference": "d618573eed4a1b6b75e37b2e0b65ac65c885d88e",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/git",
+                "reference": "git",
                 "shasum": ""
             },
             "require": {

@@ -1,4 +1,8 @@
 {
+	"name": "closemarketing/product-budget-configurator",
+	"description": "WordPress plugin for product budget configuration and quote generation",
+	"type": "wordpress-plugin",
+	"license": "proprietary",
 	"repositories": [
 		{
 			"type": "composer",
