@@ -311,11 +311,39 @@ class PBC_Template {
 
 			if ( 'calculate' !== $cstep && 'wizard' === $template ) {
 				?>
-				<script type="text/javascript">jQuery('.configurator_form_action').insertAfter('.product_preview');</script>
+				<script type="text/javascript">
+				(function() {
+					function moveConfiguratorAction() {
+						if (typeof jQuery !== 'undefined') {
+							jQuery(document).ready(function($) {
+								$('.configurator_form_action').insertAfter('.product_preview');
+							});
+						} else {
+                            // Fallback: try again after a short delay
+                            setTimeout(moveConfiguratorAction, 100);
+						}
+					}
+					moveConfiguratorAction();
+				})();
+				</script>
 				<?php
 			} elseif ( 'calculate' === $cstep && 'wizard' === $template ) {
 				?>
-				<script type="text/javascript">jQuery('.configurator_form_action').insertBefore('.product_preview');</script>
+				<script type="text/javascript">
+				(function() {
+					function moveConfiguratorAction() {
+						if (typeof jQuery !== 'undefined') {
+							jQuery(document).ready(function($) {
+								$('.configurator_form_action').insertBefore('.product_preview');
+							});
+						} else {
+                            // Fallback: try again after a short delay
+                            setTimeout(moveConfiguratorAction, 100);
+						}
+					}
+					moveConfiguratorAction();
+				})();
+				</script>
 				<?php
 			}
 			?>
@@ -416,8 +444,8 @@ class PBC_Template {
 				?>
 				<div class="configurator_result_share">
 					<?php
-					$session_type = isset( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ]['pbc_output']['type'] ) : '';
-					if ( ! isset( $_SESSION[ $pbc_session_key ]['pbc_output'] ) || 'success' !== $session_type ) {
+					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION['pbc_output']['type'] ) : '';
+					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
 						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
@@ -444,16 +472,15 @@ class PBC_Template {
 						</div>
 						<?php
 					}
-
-					if ( isset( $_SESSION[ $pbc_session_key ]['pbc_output'] ) ) {
+					if ( isset( $_SESSION['pbc_output']['response'] ) ) {
 						?>
 						<div class="result_submit_action <?php echo esc_html( $session_type ); ?>">
 							<?php
-							echo $_SESSION[ $pbc_session_key ]['pbc_output']['response'];
+							echo $_SESSION['pbc_output']['response'];
 							?>
 						</div>
 						<?php
-						unset( $_SESSION[ $pbc_session_key ]['pbc_output'] );
+						unset( $_SESSION['pbc_output'] );
 					}
 					?>
 				</div>

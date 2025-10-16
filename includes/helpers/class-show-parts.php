@@ -154,8 +154,9 @@ class SHOW {
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 			<table>
 				<?php
-				$show_prices = get_option( 'pbc_budget_show_prices' );
-				$total_price = 0;
+				$user        = wp_get_current_user();
+				$show_prices = get_option( 'pbc_show_prices_user_' . ( $user->roles[0] ?? '' ) );
+				$show_prices = 'yes' === $show_prices ? 'yes' : 'no';
 				if ( 'calculate' === $cstep ) {
 					$count = count( $phases );
 				} else {

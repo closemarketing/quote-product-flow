@@ -84,6 +84,13 @@ class PBC_Admin_Plugin {
 			WPPBC_VERSION,
 			true
 		);
+        wp_localize_script(
+			'pbc-media',
+			'pbc_media_strings',
+			array(
+				'no_image_selected' => __('Please select an image file (jpeg, png) only', 'pbc'),
+			)
+		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
 
 		wp_enqueue_script(
@@ -291,7 +298,6 @@ class PBC_Admin_Plugin {
 		if ( isset( $_POST['form_submit'] ) ) {
 			$status = 'ok';
 			$fields = array(
-				'option_show_prices'             => 'pbc_budget_show_prices',
 				'option_show_final_button_pdf'   => 'pbc_budget_show_button_pdf',
 				'option_show_final_button_email' => 'pbc_budget_show_button_email',
 				'pdf_image_selected'             => 'pbc_pdf_image_selected',
@@ -315,9 +321,11 @@ class PBC_Admin_Plugin {
 			// Roles discount.
 			$roles = wp_roles()->roles;
 			foreach ( $roles as $slug => $role ) {
-				if ( ! empty( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
+				if ( isset( $_POST[ 'pbc_discount_user_' . $slug ] ) ) {
 					update_option( 'pbc_discount_user_' . $slug, (int) $_POST[ 'pbc_discount_user_' . $slug ] );
 				}
+				$show_prices = isset( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ) : '';
+				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
 		}
 
@@ -498,19 +506,6 @@ class PBC_Admin_Plugin {
 					<input class="pbc_field" type="text" name="preview_width" value="<?php if ( $preview_width ) { echo $preview_width; } ?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
-					<label class="block" for="option_show_prices"><?php esc_html_e( 'Show prices?', 'pbc' ); ?></label>
-					<?php
-					$show_prices = get_option( 'pbc_budget_show_prices' );
-					$pages       = get_pages();
-					if ( ! empty( $pages ) ) {
-						echo '<select name="option_show_prices">';
-						echo '<option value="yes" ' . selected( $show_prices, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
-						echo '<option value="no" ' . selected( $show_prices, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
-						echo '</select>';
-					}
-					?>
-				</fieldset>
-				<fieldset>
 					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show final button PDF?', 'pbc' ); ?></label>
 					<?php
 					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
@@ -581,20 +576,32 @@ class PBC_Admin_Plugin {
 					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
 				</fieldset>
 
-				<h2><?php esc_html_e( 'Roles Discount', 'pbc' ); ?></h2>
+				<h2><?php esc_html_e( 'Set the role specific options', 'pbc' ); ?></h2>
 				<fieldset>
 					<?php
 					$roles = wp_roles()->roles;
 					?>
 					<p></p>
-					<table>
+					<table class="roles-table">
+                        <tr>
+                            <th><?php esc_html_e( 'Role', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( 'Discount', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( 'Show Prices', 'pbc' ); ?></th>
+                        </tr>
 						<?php
 						foreach ( $roles as $slug => $role ) {
-							$value = get_option( 'pbc_discount_user_' . $slug );
+							$discount = get_option( 'pbc_discount_user_' . $slug );
+                            $show_prices = get_option( 'pbc_show_prices_user_' . $slug );
 							echo '<tr>';
 							echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
 							echo '</label></td>';
-							echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $value . '" /> % </td></tr>';
+							echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
+                            echo '<td><select name="pbc_show_prices_user_' . esc_html( $slug ) . '">';
+                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Default', 'pbc' ) . '</option>';
+                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+                            echo '<option value="no" ' . selected( $show_prices, 'no', false ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+                            echo '</select></td>';
+                            echo '</tr>';
 						}
 						?>
 					</table>

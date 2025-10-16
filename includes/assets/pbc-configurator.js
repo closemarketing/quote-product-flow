@@ -147,7 +147,9 @@ jQuery(function($){
 
 	// Submit form.
 	$(document).on('click', 'button[name=submit]', function(e){
+        var thisButton = $(this);
 		var submit_val = $(this).val();
+        thisButton.prop('disabled', true);
 		var form_id = 'configurator-form';
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
@@ -158,6 +160,7 @@ jQuery(function($){
 			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template'),
 			dataType: "html",
 			success: function(response) {
+                thisButton.prop('disabled', false);
 				$('.page-configurator').html(response);
 				if (
 					next_phase != 'calculate' &&
