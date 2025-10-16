@@ -8,7 +8,7 @@
 
 // Define plugin constants that are used throughout the codebase
 if (!defined('WPPBC_PLUGIN_URL')) {
-    define('WPPBC_PLUGIN_URL', 'http://localhost/wp-content/plugins/connect-ecommerce/');
+    define('WPPBC_PLUGIN_URL', 'http://localhost/wp-content/plugins/product-budget-configurator/');
 }
 
 if ( !defined('WPPBC_PLUGIN_PATH') ) {

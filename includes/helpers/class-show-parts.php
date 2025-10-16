@@ -157,6 +157,7 @@ class SHOW {
 				$user        = wp_get_current_user();
 				$show_prices = get_option( 'pbc_show_prices_user_' . ( $user->roles[0] ?? '' ) );
 				$show_prices = 'yes' === $show_prices ? 'yes' : 'no';
+				$total_price = 0;
 				if ( 'calculate' === $cstep ) {
 					$count = count( $phases );
 				} else {

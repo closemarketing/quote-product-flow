@@ -52,6 +52,8 @@ class PDF {
 		} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
 			return self::get_budget_base_dir( 'url' ) . $filename;
 		}
+
+		return '';
 	}
 
 	/**

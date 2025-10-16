@@ -4,6 +4,7 @@ parameters:
         - includes
     bootstrapFiles:
         - tests/phpstan-bootstrap.php
+        - tests/phpstan-spipu-html2pdf.php
     excludePaths:
         - vendor/
         - node_modules (?)

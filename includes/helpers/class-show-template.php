@@ -417,7 +417,7 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $s_var ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $s_var ) : '';
+					$imgprodurl = isset( $ssVar ) && ! empty( $ssVar ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $ssVar ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
