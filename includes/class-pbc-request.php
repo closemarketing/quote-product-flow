@@ -41,6 +41,7 @@ class PBC_Requests {
 		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? $_REQUEST['pbc_variation'] : [];
 		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$session_key   = 'pbc_variation_' . $parent_phase;
+		$option        = '';
 
 		if ( session_id() == '' ) {
 			ob_start();
@@ -70,8 +71,8 @@ class PBC_Requests {
 			$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? (float) $_REQUEST[ "pbc_pricevar_$svar" ] : null;
 			$price    = CALC::get_price_variation( $svar, $pricevar );
 
-			$option = get_the_title( $svar );
-			if ( isset( $option_name ) && $option_name ) {
+			$option_name = get_the_title( $svar );
+			if ( ! empty( $option_name ) ) {
 				$option .= ' [' . $option_name . ']';
 			}
 
@@ -89,12 +90,12 @@ class PBC_Requests {
 		}
 
 		$price   = empty( $price ) ? '-' : number_format( $price, 2, ',', '.' ) . ' €';
-		$option  = ! isset( $option ) ? '-' : $option;
-		$flipped = ! isset( $flipped ) ? false : $flipped;
+		$option  = empty( $option ) ? '-' : $option;
+		$flipped = empty( $flipped ) ? false : $flipped;
 		echo ';;--;;' . json_encode(
 			array(
 				'type'    => 'success',
-				'url'     => $imgprodurl,
+				'url'     => $imgprodurl ?? '',
 				'option'  => $option,
 				'flipped' => $flipped,
 				'price'   => $price,
@@ -169,8 +170,8 @@ class PBC_Requests {
 		extract( $_POST );
 		$login = wp_signon(
 			array(
-				'user_login'    => $username,
-				'user_password' => $password,
+				'user_login'    => $username ?? '',
+				'user_password' => $password ?? '',
 				'remember'      => true,
 			),
 			false
@@ -179,8 +180,6 @@ class PBC_Requests {
 			ob_start();
 			if ( \locate_template( 'template-budget-configurator.php' ) ) {
 				\locate_template( 'template-budget-configurator.php', true );
-			} else {
-				include WPPBC_PLUGIN_DIR . '/includes/template-budget-configurator.php';
 			}
 			$all_details = ob_get_contents();
 			ob_end_clean();

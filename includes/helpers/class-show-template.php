@@ -53,7 +53,7 @@ class PBC_Template {
 		if ( empty( $_POST ) ) {
 			$_SESSION[ $pbc_session_key ] = array();
 			// Get role and discount.
-			$role_discount = CALC::get_user_discount_and_role( $user_id );
+			$role_discount = CALC::get_user_discount_and_role();
 
 			$_SESSION[ $pbc_session_key ]['role_slug']     = $role_discount['role'] ?? '';
 			$_SESSION[ $pbc_session_key ]['role_discount'] = $role_discount['discount'] ?? '';
@@ -400,7 +400,7 @@ class PBC_Template {
 								if ( isset( $imgprodid ) && $imgprodid ) {
 									$imgprodurl = wp_get_attachment_image_src( $imgprodid, 'full', true );
 								}
-								if ( isset( $imgprodurl ) && $imgprodurl ) {
+								if ( $imgprodurl ) {
 									$addclass                  = '';
 									$variations_images_flipped = get_option( 'variations_images_flipped' );
 									if ( ! empty( $variations_images_flipped ) ) {
@@ -417,7 +417,7 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $s_var ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $s_var ) : '';
+					$imgprodurl = isset( $ssVar ) && ! empty( $ssVar ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $ssVar ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );

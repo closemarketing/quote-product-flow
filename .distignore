@@ -28,3 +28,5 @@ uni2cid_ag15.php
 cid0*.*
 freesans*.*
 freeserif*.*
+phpstan.neon.dist
+tests/
