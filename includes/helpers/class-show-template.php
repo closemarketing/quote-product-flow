@@ -202,21 +202,23 @@ class PBC_Template {
 								}
 							}
 
-							$variations = array_filter($variations, function($variation_id) use ($prev_variations_ids, $variations_depends, $cstep) {
-								if (!isset($variations_depends[$variation_id])) {
-									return true;
-								}
-								
-								$depends_ids = $variations_depends[$variation_id];
-								for ($i = 0; $i < $cstep; $i++) {
-									if (isset($prev_variations_ids[$i]) && isset($depends_ids[$i])) {
-										if (!in_array($prev_variations_ids[$i], $depends_ids[$i], true)) {
-											return false;
+							$variations = array_filter(
+								$variations,
+								function ( $variation_id ) use ( $prev_variations_ids, $variations_depends, $cstep ) {
+									if ( ! isset( $variations_depends[ $variation_id ] ) ) {
+										return true;
+									}
+									$depends_ids = $variations_depends[ $variation_id ];
+									for ( $i = 0; $i < $cstep; $i++ ) {
+										if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+											if ( ! in_array( $prev_variations_ids[ $i ], $depends_ids[ $i ], true ) ) {
+												return false;
+											}
 										}
 									}
+									return true;
 								}
-								return true;
-							});
+							);
 
 							// Order variations per section.
 							$variations_section = array();
@@ -319,8 +321,8 @@ class PBC_Template {
 								$('.configurator_form_action').insertAfter('.product_preview');
 							});
 						} else {
-                            // Fallback: try again after a short delay
-                            setTimeout(moveConfiguratorAction, 100);
+							// Fallback: try again after a short delay
+							setTimeout(moveConfiguratorAction, 100);
 						}
 					}
 					moveConfiguratorAction();
@@ -337,8 +339,8 @@ class PBC_Template {
 								$('.configurator_form_action').insertBefore('.product_preview');
 							});
 						} else {
-                            // Fallback: try again after a short delay
-                            setTimeout(moveConfiguratorAction, 100);
+							// Fallback: try again after a short delay
+							setTimeout(moveConfiguratorAction, 100);
 						}
 					}
 					moveConfiguratorAction();
