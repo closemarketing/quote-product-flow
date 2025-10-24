@@ -172,8 +172,8 @@ class PBC_Requests {
 		
 		$login = wp_signon(
 			array(
-				'user_login'    => $username ?? '',
-				'user_password' => $password ?? '',
+				'user_login'    => $username,
+				'user_password' => $password,
 				'remember'      => true,
 			),
 			false
