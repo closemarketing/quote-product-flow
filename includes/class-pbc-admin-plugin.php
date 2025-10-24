@@ -1029,7 +1029,7 @@ class PBC_Admin_Plugin {
 		 *
 		 * Stored result when first activating software.
 		 */
-		return get_option( 'pbc_license_activated' ) == 'Activated';
+		return 'Activated' === get_option( 'pbc_license_activated' );
 	}
 
 	/**

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "37b27339c827c64e8c3f692923881ace",
+    "content-hash": "cf26ffa0fb98cf5df60a87b0278bf9bb",
     "packages": [
         {
             "name": "composer/installers",
@@ -166,16 +166,16 @@
         },
         {
             "name": "spipu/html2pdf",
-            "version": "v5.3.0",
+            "version": "v5.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spipu/html2pdf.git",
-                "reference": "c71c189b5009e96b869ebf9eb93eee38c56bc9f0"
+                "reference": "98416dd8eadd3b966f41430b841d3e4dd6eadc6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spipu/html2pdf/zipball/c71c189b5009e96b869ebf9eb93eee38c56bc9f0",
-                "reference": "c71c189b5009e96b869ebf9eb93eee38c56bc9f0",
+                "url": "https://api.github.com/repos/spipu/html2pdf/zipball/98416dd8eadd3b966f41430b841d3e4dd6eadc6f",
+                "reference": "98416dd8eadd3b966f41430b841d3e4dd6eadc6f",
                 "shasum": ""
             },
             "require": {
@@ -208,7 +208,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Html2Pdf is a HTML to PDF converter written in PHP5 (it uses TCPDF). OFFICIAL PACKAGE",
+            "description": "Html2Pdf is a HTML to PDF converter written in PHP - It uses TCPDF - OFFICIAL PACKAGE",
             "homepage": "http://html2pdf.fr/",
             "keywords": [
                 "html",
@@ -217,22 +217,22 @@
             ],
             "support": {
                 "issues": "https://github.com/spipu/html2pdf/issues",
-                "source": "https://github.com/spipu/html2pdf/tree/v5.3.0"
+                "source": "https://github.com/spipu/html2pdf/tree/v5.3.3"
             },
-            "time": "2025-01-08T09:42:05+00:00"
+            "time": "2025-06-08T21:47:59+00:00"
         },
         {
             "name": "tecnickcom/tcpdf",
-            "version": "6.8.0",
+            "version": "6.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/TCPDF.git",
-                "reference": "14ffa0e308f5634aa2489568b4b90b24073b6731"
+                "reference": "ca5b6de294512145db96bcbc94e61696599c391d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/14ffa0e308f5634aa2489568b4b90b24073b6731",
-                "reference": "14ffa0e308f5634aa2489568b4b90b24073b6731",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/ca5b6de294512145db96bcbc94e61696599c391d",
+                "reference": "ca5b6de294512145db96bcbc94e61696599c391d",
                 "shasum": ""
             },
             "require": {
@@ -245,8 +245,6 @@
                     "config",
                     "include",
                     "tcpdf.php",
-                    "tcpdf_parser.php",
-                    "tcpdf_import.php",
                     "tcpdf_barcodes_1d.php",
                     "tcpdf_barcodes_2d.php",
                     "include/tcpdf_colors.php",
@@ -284,27 +282,27 @@
             ],
             "support": {
                 "issues": "https://github.com/tecnickcom/TCPDF/issues",
-                "source": "https://github.com/tecnickcom/TCPDF/tree/6.8.0"
+                "source": "https://github.com/tecnickcom/TCPDF/tree/6.10.0"
             },
             "funding": [
                 {
-                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&currency_code=GBP&business=paypal@tecnick.com&item_name=donation%20for%20tcpdf%20project",
+                    "url": "https://www.paypal.com/donate/?hosted_button_id=NZUEC5XS8MFBJ",
                     "type": "custom"
                 }
             ],
-            "time": "2024-12-23T13:34:57+00:00"
+            "time": "2025-05-27T18:02:28+00:00"
         },
         {
             "name": "wpackagist-plugin/meta-box",
-            "version": "5.10.6",
+            "version": "5.10.14",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/meta-box/",
-                "reference": "tags/5.10.6"
+                "reference": "tags/5.10.14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/meta-box.5.10.6.zip"
+                "url": "https://downloads.wordpress.org/plugin/meta-box.5.10.14.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -964,5 +962,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

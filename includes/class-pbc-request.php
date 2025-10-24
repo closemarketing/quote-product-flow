@@ -43,11 +43,11 @@ class PBC_Requests {
 		$session_key   = 'pbc_variation_' . $parent_phase;
 		$option        = '';
 
-		if ( session_id() == '' ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			ob_start();
 			session_start();
 		}
-		if ( session_id() == '' ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			echo ';;--;;' . json_encode(
 				array(
 					'type' => 'error',
@@ -167,11 +167,13 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_login_action_callback() {
-		extract( $_POST );
+		$username = isset( $_POST['username'] ) ? sanitize_text_field( wp_unslash( $_POST['username'] ) ) : '';
+		$password = isset( $_POST['password'] ) ? sanitize_text_field( wp_unslash( $_POST['password'] ) ) : '';
+		
 		$login = wp_signon(
 			array(
-				'user_login'    => $username ?? '',
-				'user_password' => $password ?? '',
+				'user_login'    => $username,
+				'user_password' => $password,
 				'remember'      => true,
 			),
 			false
