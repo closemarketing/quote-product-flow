@@ -32,7 +32,7 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function pbc_configurator_session() {
-		if ( empty( session_id() ) ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			ob_start();
 			session_start();
 		}
@@ -69,7 +69,7 @@ class PBC_Public {
 			array(
 				'ajax_url'       => admin_url( 'admin-ajax.php' ),
 				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
-				'show_prices'    => $show_prices == 'yes' ? 'yes' : 'no',
+				'show_prices'    => 'yes' === $show_prices ? 'yes' : 'no',
 				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
 			)
 		);

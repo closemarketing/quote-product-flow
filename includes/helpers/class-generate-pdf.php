@@ -101,8 +101,9 @@ class PDF {
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
         $user = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = $show_prices == 'yes' ? true : false;
+		$user_role       = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices     = get_option( 'pbc_show_prices_user_' . $user_role );
+		$show_prices     = 'yes' === $show_prices ? true : false;
         $show_prices     = isset( $item['pbc_admin'] ) ? true : $show_prices;
 
 		// Starts PDF.
@@ -170,7 +171,7 @@ class PDF {
 		$flipped                   = false;
 		$variations_images_flipped = get_option( 'variations_images_flipped' );
 		$variations_images_flipped = is_array( $variations_images_flipped ) ? array_filter( $variations_images_flipped ) : array();
-		if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
+		if ( ! empty( $variations_images_flipped ) ) {
 			for ( $j = 1; $j <= $total_vars; $j++ ) {
 				if ( isset( $itemv[ $j ] ) && in_array( $itemv[ $j ]['var']['id'], $variations_images_flipped ) ) {
 					$flipped = true;

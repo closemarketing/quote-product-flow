@@ -341,8 +341,9 @@ class CALC {
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
 		$user = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = $show_prices == 'yes' ? true : false;
+		$user_role       = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices     = get_option( 'pbc_show_prices_user_' . $user_role );
+		$show_prices     = 'yes' === $show_prices ? true : false;
 
 		if ( ! $email_field ) {
 			$result = array(
