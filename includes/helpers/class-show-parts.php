@@ -23,9 +23,10 @@ class SHOW {
 	/**
 	 * Variations sections.
 	 *
-	 * @param array $variations_section Variations sections.
-	 * @param int   $s_var Selected variation.
-	 * @param int   $cstep Current step.
+	 * @param array  $variations_section Variations sections.
+	 * @param int    $s_var Selected variation.
+	 * @param int    $cstep Current step.
+	 * @param string $template Template type (wizard or vertical).
 	 * @return void
 	 */
 	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard' ) {
@@ -93,7 +94,7 @@ class SHOW {
 					$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
 					if ( $pbc_descopt ) {
 						?>
-						<p class="pbc_descopt"><?php echo wpautop( $pbc_descopt ); ?></p>
+						<p class="pbc_descopt"><?php echo wp_kses_post( wpautop( $pbc_descopt ) ); ?></p>
 						<?php
 					}
 					?>
@@ -266,10 +267,10 @@ class SHOW {
 		?>
 		<div class="configurator_form_action">
 			<?php
-			if ( $cstep == 1 ) {
+			if ( 1 === $cstep ) {
 				$prev_step   = '';
 				$prev_button = '';
-			} elseif ( $cstep == 'calculate' ) {
+			} elseif ( 'calculate' === $cstep ) {
 				$prev_step   = count( $phases );
 				$prev_button = __( 'Back', 'pbc' );
 			} else {
@@ -277,10 +278,10 @@ class SHOW {
 				$prev_button = __( 'Back', 'pbc' );
 			}
 
-			if ( $cstep == 'calculate' ) {
+			if ( 'calculate' === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = '';
-			} elseif ( $cstep == count( $phases ) ) {
+			} elseif ( count( $phases ) === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = __( 'Calculate', 'pbc' );
 			} else {
@@ -290,7 +291,12 @@ class SHOW {
 			?>
 			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
 			<?php if ( $prev_step && $prev_button ) { ?>
-			<div class="prev<?php if ( ! $prev_step ) { echo ' hidden'; } ?>">
+			<div class="prev
+				<?php
+			if ( ! $prev_step ) {
+					echo ' hidden'; }
+?>
+">
 				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
 				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
 			</div>

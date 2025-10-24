@@ -23,6 +23,7 @@ class PBC_Template {
 	 * Render for Wizard.
 	 *
 	 * @param integer $parent_phase Parent Phase.
+	 * @param string  $template      Template type (wizard or vertical).
 	 * @return void
 	 */
 	public static function render( $parent_phase, $template ) {
@@ -35,7 +36,7 @@ class PBC_Template {
 		$phase_pid           = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
 		$pbc_session_key     = 'pbc_variation_' . $phase_pid;
 
-		$args   = array(
+		$args         = array(
 			'numberposts' => -1,
 			'post_type'   => 'phases',
 			'orderby'     => 'menu_order',
@@ -191,32 +192,35 @@ class PBC_Template {
 							foreach ( $variations as $variation_id ) {
 								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
 								if ( ! empty( $depends ) ) {
-									$variations_depends[$variation_id] = array();
+									$variations_depends[ $variation_id ] = array();
 									foreach ( $depends as $depend ) {
 										$arr = explode( '|', $depend['pbc_depvar'] );
 										if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-											$order = array_search( (int)$arr[0], $phases_order, true );
-											$variations_depends[$variation_id][$order][] = (int)$arr[1];
+											$order = array_search( (int) $arr[0], $phases_order, true );
+											$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
 										}
 									}
 								}
 							}
 
-							$variations = array_filter($variations, function($variation_id) use ($prev_variations_ids, $variations_depends, $cstep) {
-								if (!isset($variations_depends[$variation_id])) {
+							$variations = array_filter(
+								$variations,
+								function ( $variation_id ) use ( $prev_variations_ids, $variations_depends, $cstep ) {
+								if ( ! isset( $variations_depends[ $variation_id ] ) ) {
+										return true;
+								}
+
+									$depends_ids = $variations_depends[ $variation_id ];
+								for ( $i = 0; $i < $cstep; $i++ ) {
+										if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+											if ( ! in_array( $prev_variations_ids[ $i ], $depends_ids[ $i ], true ) ) {
+												return false;
+											}
+											}
+								}
 									return true;
 								}
-								
-								$depends_ids = $variations_depends[$variation_id];
-								for ($i = 0; $i < $cstep; $i++) {
-									if (isset($prev_variations_ids[$i]) && isset($depends_ids[$i])) {
-										if (!in_array($prev_variations_ids[$i], $depends_ids[$i], true)) {
-											return false;
-										}
-									}
-								}
-								return true;
-							});
+							);
 
 							// Order variations per section.
 							$variations_section = array();
@@ -282,7 +286,7 @@ class PBC_Template {
 									echo ' actived';
 								}
 								echo '">';
-								echo wpautop( $descvar );
+								echo wp_kses_post( wpautop( $descvar ) );
 								echo '</div>';
 							}
 							++$index_var;
@@ -294,7 +298,7 @@ class PBC_Template {
 						<?php
 						$phase_post = get_post( $phase_id );
 						if ( ! empty( $phase_post->post_content ) ) {
-							echo $phase_post->post_content;
+							echo wp_kses_post( $phase_post->post_content );
 						}
 						?>
 					</div>
@@ -319,8 +323,8 @@ class PBC_Template {
 								$('.configurator_form_action').insertAfter('.product_preview');
 							});
 						} else {
-                            // Fallback: try again after a short delay
-                            setTimeout(moveConfiguratorAction, 100);
+							// Fallback: try again after a short delay
+							setTimeout(moveConfiguratorAction, 100);
 						}
 					}
 					moveConfiguratorAction();
@@ -337,8 +341,8 @@ class PBC_Template {
 								$('.configurator_form_action').insertBefore('.product_preview');
 							});
 						} else {
-                            // Fallback: try again after a short delay
-                            setTimeout(moveConfiguratorAction, 100);
+							// Fallback: try again after a short delay
+							setTimeout(moveConfiguratorAction, 100);
 						}
 					}
 					moveConfiguratorAction();
@@ -355,7 +359,7 @@ class PBC_Template {
 			">
 				<div class="image-wrap">
 					<?php
-					$ssVar = '';
+					$ss_var = '';
 					if ( ! empty( $_SESSION[ $pbc_session_key ] ) ) {
 						$to = (int) $cstep;
 						if ( 'calculate' === $cstep ) {
@@ -364,8 +368,8 @@ class PBC_Template {
 						for ( $i = 1; $i < $to; $i++ ) {
 							$imgprodid = $imgprodurl = '';
 							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
-								$ssVar        = $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
-								$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
+								$ss_var       = $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
+								$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
 										if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
@@ -377,10 +381,10 @@ class PBC_Template {
 												}
 											}
 											if ( ! empty( $_SESSION[ $pbc_session_key ] ) && ! empty( $prev_var ) ) {
-												foreach ( $prev_var as $s_phase_key => $sVariations ) {
+												foreach ( $prev_var as $s_phase_key => $s_variations ) {
 													if ( isset( $prev_var[ $s_phase_key ] ) &&
 													isset( $_SESSION[ $pbc_session_key ][ $s_phase_key ] ) &&
-													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
 														$imgprodid = $deps['pbc_imgprod'][0];
 													} else {
 														$imgprodid = '';
@@ -405,7 +409,7 @@ class PBC_Template {
 									$variations_images_flipped = get_option( 'variations_images_flipped' );
 									if ( ! empty( $variations_images_flipped ) ) {
 										for ( $j = 1; $j <= $to; $j++ ) {
-											if ( isset( $_SESSION[ $pbc_session_key ][ $j ] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
+											if ( isset( $_SESSION[ $pbc_session_key ][ $j ] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped, true ) ) {
 												$addclass = 'flipped';
 											}
 										}
@@ -417,12 +421,12 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $ssVar ) && ! empty( $ssVar ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $ssVar ) : '';
+					$imgprodurl = isset( $ss_var ) && ! empty( $ss_var ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $ss_var ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
 						$addclass                  = '';
-						if ( ! empty( $variations_images_flipped ) && in_array( $ssVar, $variations_images_flipped ) ) {
+						if ( ! empty( $variations_images_flipped ) && in_array( $ss_var, $variations_images_flipped, true ) ) {
 							$addclass = 'flipped';
 						}
 						?>

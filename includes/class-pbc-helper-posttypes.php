@@ -680,7 +680,7 @@ class PBC_Helper_PostTypes {
 				printf(
 					'<option value="%s"%s>%s</option>',
 					esc_html( $value ),
-					$value == $current_v ? ' selected="selected"' : '',
+					$value === $current_v ? ' selected="selected"' : '',
 					esc_html( $label )
 				);
 			}
@@ -703,7 +703,7 @@ class PBC_Helper_PostTypes {
 		global $pagenow;
 		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
 
-		if ( 'variation' == $type && is_admin() && 'edit.php' === $pagenow ) {
+		if ( 'variation' === $type && is_admin() && 'edit.php' === $pagenow ) {
 			if ( isset( $_GET['pbc_filter_phase'] ) && '' !== $_GET['pbc_filter_phase'] ) {
 				$query->query_vars['meta_key']   = 'pbc_phase';
 				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) );

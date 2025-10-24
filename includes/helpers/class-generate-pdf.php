@@ -36,7 +36,7 @@ class PDF {
 
 		if ( 'error' !== $content['type'] ) {
 			try {
-				$html2pdf  = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
+				$html2pdf = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
 				$html2pdf->setTestTdInOnePage( false );
 				$html2pdf->writeHTML( $content['response'] );
 				$html2pdf->Output( $filename_path, 'F' );
@@ -100,10 +100,10 @@ class PDF {
 
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
-        $user = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = $show_prices == 'yes' ? true : false;
-        $show_prices     = isset( $item['pbc_admin'] ) ? true : $show_prices;
+		$user             = wp_get_current_user();
+		$show_prices      = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
+		$show_prices      = $show_prices == 'yes' ? true : false;
+		$show_prices      = isset( $item['pbc_admin'] ) ? true : $show_prices;
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';
@@ -177,7 +177,7 @@ class PDF {
 				}
 			}
 		}
-        $output .= self::generateProductImage($itemv, $total_vars, $flipped);
+		$output .= self::generateProductImage( $itemv, $total_vars, $flipped );
 		$output .= '</div></td></tr></table><br/><br/>';
 
 		$output     .= '<table class="summary">';
@@ -222,47 +222,47 @@ class PDF {
 
 		$output .= '</table>';
 
-        if ( $show_prices ) {
-            // Summary.
-            $output .= '<br/><br/><table class="summary-total"><tr>';
-            $output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
-            $output .= '<td class="value right">';
-            if ( $tax > 0 ) {
-                $output .= number_format( $tax, 2, ',', '.' ) . ' €';
-            }
-            $output .= '</td>';
-            $output .= '</tr>';
+		if ( $show_prices ) {
+			// Summary.
+			$output .= '<br/><br/><table class="summary-total"><tr>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
+			$output .= '<td class="value right">';
+			if ( $tax > 0 ) {
+				$output .= number_format( $tax, 2, ',', '.' ) . ' €';
+			}
+			$output .= '</td>';
+			$output .= '</tr>';
 
-            // Subtotal.
-            $output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'pbc' ) . '</td>';
-            $output .= '<td class="value right">';
-            if ( $total_price > 0 ) {
-                $output .= number_format( $total_price, 2, ',', '.' ) . ' €';
-            }
-            $output .= '</td>';
-            $output .= '</tr>';
+			// Subtotal.
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'pbc' ) . '</td>';
+			$output .= '<td class="value right">';
+			if ( $total_price > 0 ) {
+				$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
+			}
+			$output .= '</td>';
+			$output .= '</tr>';
 
-            // Quantity.
-            $output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'pbc' ) . '</td>';
-            $output .= '<td class="value right">';
-            if ( $total_price > 0 ) {
-                $output .= number_format( $total_qty, 2, ',', '.' );
-            }
-            $output .= '</td>';
-            $output .= '</tr>';
+			// Quantity.
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'pbc' ) . '</td>';
+			$output .= '<td class="value right">';
+			if ( $total_price > 0 ) {
+				$output .= number_format( $total_qty, 2, ',', '.' );
+			}
+			$output .= '</td>';
+			$output .= '</tr>';
 
-            // Total.
-            $output .= '<tr>';
-            $color   = CALC::calculate_color_text( $background_total );
-            $output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'pbc' ) . '</td>';
-            $output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
-            if ( $total_pricevat > 0 ) {
-                $output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
-            }
-            $output .= '</td>';
-            $output .= '</tr>';
-            $output .= '</table><br/>';
-        }
+			// Total.
+			$output .= '<tr>';
+			$color   = CALC::calculate_color_text( $background_total );
+			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'pbc' ) . '</td>';
+			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
+			if ( $total_pricevat > 0 ) {
+				$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
+			}
+			$output .= '</td>';
+			$output .= '</tr>';
+			$output .= '</table><br/>';
+		}
 
 		// Comments.
 		$comments = isset( $contact['comments'] ) ? sanitize_text_field( $contact['comments'] ) : '';
@@ -285,174 +285,174 @@ class PDF {
 		return $result;
 	}
 
-    public static function generateProductImage($itemv, $total_vars, $flipped) {
-        // Define the output image dimensions
-        $output_width = 300;
-        $output_height = 243;
+	public static function generateProductImage( $itemv, $total_vars, $flipped ) {
+		// Define the output image dimensions
+		$output_width  = 300;
+		$output_height = 243;
 
-        // Create the true color image for the output
-        $output_image = imagecreatetruecolor($output_width, $output_height);
+		// Create the true color image for the output
+		$output_image = imagecreatetruecolor( $output_width, $output_height );
 
-        // --- Transparency Setup for Output Image ---
-        // 1. Turn OFF alpha blending for the output image.
-        imagealphablending($output_image, false);
+		// --- Transparency Setup for Output Image ---
+		// 1. Turn OFF alpha blending for the output image.
+		imagealphablending( $output_image, false );
 
-        // 2. Enable saving alpha channel for the output image.
-        //    Ensures the transparency information is preserved when the image is saved.
-        imagesavealpha($output_image, true);
+		// 2. Enable saving alpha channel for the output image.
+		// Ensures the transparency information is preserved when the image is saved.
+		imagesavealpha( $output_image, true );
 
-        // 3. Allocate a fully transparent color (alpha 127 = 100% transparent)
-        $transparent_color = imagecolorallocatealpha($output_image, 0, 0, 0, 127);
+		// 3. Allocate a fully transparent color (alpha 127 = 100% transparent)
+		$transparent_color = imagecolorallocatealpha( $output_image, 0, 0, 0, 127 );
 
-        // 4. Fill the entire output image with the fully transparent color
-        imagefill($output_image, 0, 0, $transparent_color);
-        // --- End Transparency Setup ---
+		// 4. Fill the entire output image with the fully transparent color
+		imagefill( $output_image, 0, 0, $transparent_color );
+		// --- End Transparency Setup ---
 
-        $dirname = self::get_budget_base_dir();
+		$dirname = self::get_budget_base_dir();
 
-        // Ensure the directory exists and is writable
-        if (!is_dir($dirname)) {
-            if (!mkdir($dirname, 0755, true)) {
-                error_log("Failed to create directory: " . $dirname);
-                return '<p style="color:red;">Error: Output directory not found or writable.</p>';
-            }
-        }
+		// Ensure the directory exists and is writable
+		if ( ! is_dir( $dirname ) ) {
+			if ( ! mkdir( $dirname, 0755, true ) ) {
+				error_log( 'Failed to create directory: ' . $dirname );
+				return '<p style="color:red;">Error: Output directory not found or writable.</p>';
+			}
+		}
 
-        for ($i = 0; $i <= $total_vars; $i++) {
-            $imgprodid = '';
-            $imgprodurl = '';
+		for ( $i = 0; $i <= $total_vars; $i++ ) {
+			$imgprodid  = '';
+			$imgprodurl = '';
 
-            if (!empty($itemv[$i]['var']['id'])) {
-                $ssVar = $itemv[$i]['var']['id'];
-                $imgprodgroup = get_post_meta($ssVar, 'pbc_imgprodgroup', true);
+			if ( ! empty( $itemv[ $i ]['var']['id'] ) ) {
+				$ssVar        = $itemv[ $i ]['var']['id'];
+				$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
 
-                if (!empty($imgprodgroup)) {
-                    foreach ($imgprodgroup as $deps) {
-                        if (isset($deps['pbc_depvarimgprod']) && !empty($deps['pbc_depvarimgprod']) && isset($deps['pbc_imgprod'])) {
-                            $prevVar = array();
-                            foreach ($deps['pbc_depvarimgprod'] as $depvarimgprod) {
-                                $arr = explode('|', $depvarimgprod);
-                                if (!empty($arr[0]) && !empty($arr[1])) {
-                                    $prevVar[(int)$arr[0]][] = $arr[1];
-                                }
-                            }
+				if ( ! empty( $imgprodgroup ) ) {
+					foreach ( $imgprodgroup as $deps ) {
+						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
+							$prevVar = array();
+							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+								$arr = explode( '|', $depvarimgprod );
+								if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
+									$prevVar[ (int) $arr[0] ][] = $arr[1];
+								}
+							}
 
-                            if (!empty($itemv)) {
-                                foreach ($itemv as $sPhaseKey => $svariations) {
-                                    if (isset($prevVar[$sPhaseKey]) &&
-                                        isset($itemv[$sPhaseKey]) && in_array($itemv[$sPhaseKey]['var']['id'], $prevVar[$sPhaseKey])) {
-                                        $imgprodid = $deps['pbc_imgprod'][0];
-                                        break 2;
-                                    }
-                                }
-                            }
-                        } elseif ((!isset($deps['pbc_depvarimgprod']) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod'])) {
-                            $imgprodid = $deps['pbc_imgprod'][0];
-                            break;
-                        }
-                    }
-                }
+							if ( ! empty( $itemv ) ) {
+								foreach ( $itemv as $sPhaseKey => $svariations ) {
+									if ( isset( $prevVar[ $sPhaseKey ] ) &&
+										isset( $itemv[ $sPhaseKey ] ) && in_array( $itemv[ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+										$imgprodid = $deps['pbc_imgprod'][0];
+										break 2;
+									}
+								}
+							}
+						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
+							$imgprodid = $deps['pbc_imgprod'][0];
+							break;
+						}
+					}
+				}
 
-                if (!empty($imgprodid)) {
-                    $imgprodurl_array = wp_get_attachment_image_src($imgprodid, 'full', true);
-                    $imgprodurl = $imgprodurl_array[0] ?? '';
-                }
+				if ( ! empty( $imgprodid ) ) {
+					$imgprodurl_array = wp_get_attachment_image_src( $imgprodid, 'full', true );
+					$imgprodurl       = $imgprodurl_array[0] ?? '';
+				}
 
-                if (!empty($imgprodurl) && wp_remote_retrieve_response_code(wp_remote_head($imgprodurl)) === 200) {
-                    $extension = pathinfo($imgprodurl, PATHINFO_EXTENSION);
-                    $img = false;
-                    $width = 0;
-                    $height = 0;
+				if ( ! empty( $imgprodurl ) && wp_remote_retrieve_response_code( wp_remote_head( $imgprodurl ) ) === 200 ) {
+					$extension = pathinfo( $imgprodurl, PATHINFO_EXTENSION );
+					$img       = false;
+					$width     = 0;
+					$height    = 0;
 
-                    // Attempt to get image size first to avoid unnecessary image creation
-                    $image_size_info = @getimagesize($imgprodurl); 
-                    if ($image_size_info) {
-                        list($width, $height, $type) = $image_size_info;
+					// Attempt to get image size first to avoid unnecessary image creation
+					$image_size_info = @getimagesize( $imgprodurl );
+					if ( $image_size_info ) {
+						list($width, $height, $type) = $image_size_info;
 
-                        switch (strtolower($extension)) {
-                            case 'png':
-                                $img = imagecreatefrompng($imgprodurl);
-                                break;
-                            case 'jpg':
-                            case 'jpeg':
-                                $img = imagecreatefromjpeg($imgprodurl);
-                                break;
-                            case 'gif':
-                                $img = imagecreatefromgif($imgprodurl);
-                                break;
-                            case 'webp':
-                                $img = imagecreatefromwebp($imgprodurl);
-                                break;
-                            default:
-                                error_log("Unsupported image format: " . $extension . " for URL: " . $imgprodurl);
-                                continue 2;
-                        }
-                    } else {
-                        error_log("DEBUG: Failed to get image size for URL: " . $imgprodurl);
-                        continue;
-                    }
+						switch ( strtolower( $extension ) ) {
+							case 'png':
+								$img = imagecreatefrompng( $imgprodurl );
+								break;
+							case 'jpg':
+							case 'jpeg':
+								$img = imagecreatefromjpeg( $imgprodurl );
+								break;
+							case 'gif':
+								$img = imagecreatefromgif( $imgprodurl );
+								break;
+							case 'webp':
+								$img = imagecreatefromwebp( $imgprodurl );
+								break;
+							default:
+								error_log( 'Unsupported image format: ' . $extension . ' for URL: ' . $imgprodurl );
+								continue 2;
+						}
+					} else {
+						error_log( 'DEBUG: Failed to get image size for URL: ' . $imgprodurl );
+						continue;
+					}
 
-                    if ($img) {
-                        error_log("DEBUG: Image loaded for product ID: " . $imgprodid . " from URL: " . $imgprodurl);
-                        error_log("DEBUG: Source dimensions (width, height): " . $width . ", " . $height);
+					if ( $img ) {
+						error_log( 'DEBUG: Image loaded for product ID: ' . $imgprodid . ' from URL: ' . $imgprodurl );
+						error_log( 'DEBUG: Source dimensions (width, height): ' . $width . ', ' . $height );
 
-                        // If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
-                        // and imagesavealpha is true if you were modifying it before copying.
-                        // For imagecopyresampled, the destination's alpha settings are primary.
-                        if (in_array(strtolower($extension), ['png', 'webp'])) {
-                            imagealphablending($img, true);
-                            imagesavealpha($img, true);
-                        }
-                        // Flip it horizontally if $flipped is true
-                        if ($flipped) {
-                            imageflip($img, IMG_FLIP_HORIZONTAL);
-                        }
+						// If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
+						// and imagesavealpha is true if you were modifying it before copying.
+						// For imagecopyresampled, the destination's alpha settings are primary.
+						if ( in_array( strtolower( $extension ), [ 'png', 'webp' ] ) ) {
+							imagealphablending( $img, true );
+							imagesavealpha( $img, true );
+						}
+						// Flip it horizontally if $flipped is true
+						if ( $flipped ) {
+							imageflip( $img, IMG_FLIP_HORIZONTAL );
+						}
 
-                        // Calculate proportional new dimensions
-                        $new_height = $output_height;
-                        $new_width = ($height > 0) ? ($width / $height) * $new_height : $output_width;
+						// Calculate proportional new dimensions
+						$new_height = $output_height;
+						$new_width  = ( $height > 0 ) ? ( $width / $height ) * $new_height : $output_width;
 
-                        if ($new_width > $output_width) {
-                            $new_width = $output_width;
-                            $new_height = ($width > 0) ? ($height / $width) * $new_width : $output_height;
-                        }
+						if ( $new_width > $output_width ) {
+							$new_width  = $output_width;
+							$new_height = ( $width > 0 ) ? ( $height / $width ) * $new_width : $output_height;
+						}
 
-                        $x_position = max(0, (int)(($output_width - $new_width) / 2));
-                        $y_position = max(0, (int)(($output_height - $new_height) / 2));
+						$x_position = max( 0, (int) ( ( $output_width - $new_width ) / 2 ) );
+						$y_position = max( 0, (int) ( ( $output_height - $new_height ) / 2 ) );
 
-                        error_log("DEBUG: Calculated copy dimensions (new_width, new_height): " . (int)$new_width . ", " . (int)$new_height);
-                        error_log("DEBUG: Copy positions (x_position, y_position): " . $x_position . ", " . $y_position);
+						error_log( 'DEBUG: Calculated copy dimensions (new_width, new_height): ' . (int) $new_width . ', ' . (int) $new_height );
+						error_log( 'DEBUG: Copy positions (x_position, y_position): ' . $x_position . ', ' . $y_position );
 
-                        // --- Critical: Re-enable alpha blending on the output image just before copying ---
-                        // This ensures that the alpha channels of the source images are correctly blended
-                        // with the output image's transparent background.
-                        imagealphablending($output_image, true);
+						// --- Critical: Re-enable alpha blending on the output image just before copying ---
+						// This ensures that the alpha channels of the source images are correctly blended
+						// with the output image's transparent background.
+						imagealphablending( $output_image, true );
 
-                        // Copy and resample the image onto the output canvas
-                        imagecopyresampled($output_image, $img, $x_position, $y_position, 0, 0, (int)$new_width, (int)$new_height, $width, $height);
-                        imagedestroy($img); // Free memory for the source image
-                    } else {
-                        error_log("DEBUG: Failed to create image resource for URL: " . $imgprodurl);
-                    }
-                } else {
-                    error_log("DEBUG: Image URL not found or inaccessible: " . $imgprodurl);
-                }
-            }
-        }
+						// Copy and resample the image onto the output canvas
+						imagecopyresampled( $output_image, $img, $x_position, $y_position, 0, 0, (int) $new_width, (int) $new_height, $width, $height );
+						imagedestroy( $img ); // Free memory for the source image
+					} else {
+						error_log( 'DEBUG: Failed to create image resource for URL: ' . $imgprodurl );
+					}
+				} else {
+					error_log( 'DEBUG: Image URL not found or inaccessible: ' . $imgprodurl );
+				}
+			}
+		}
 
-        $output_file_name = 'product-image-for-pdf.png';
-        $output_file_path = $dirname . $output_file_name;
+		$output_file_name = 'product-image-for-pdf.png';
+		$output_file_path = $dirname . $output_file_name;
 
-        // Save the final image. Check if saving was successful.
-        if (!imagepng($output_image, $output_file_path)) {
-            error_log("Failed to save image to: " . $output_file_path);
-            imagedestroy($output_image);
-            return '<p style="color:red;">Error: Failed to save product image.</p>';
-        }
-        imagedestroy($output_image); // Free memory for the output image
+		// Save the final image. Check if saving was successful.
+		if ( ! imagepng( $output_image, $output_file_path ) ) {
+			error_log( 'Failed to save image to: ' . $output_file_path );
+			imagedestroy( $output_image );
+			return '<p style="color:red;">Error: Failed to save product image.</p>';
+		}
+		imagedestroy( $output_image ); // Free memory for the output image
 
-        // Provide the direct file system path for Html2Pdf
-        $output = '<img phaseid="' . $i . '" src="' . $output_file_path . '" alt="product image" height="500px" width="auto" />';
-        return $output;
-    }
+		// Provide the direct file system path for Html2Pdf
+		$output = '<img phaseid="' . $i . '" src="' . $output_file_path . '" alt="product image" height="500px" width="auto" />';
+		return $output;
+	}
 }

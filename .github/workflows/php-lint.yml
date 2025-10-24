@@ -54,3 +54,6 @@ jobs:
 
       - name: PHP PHPStan
         run: composer phpstan
+
+      - name: PHP PHPStan
+        run: composer lint

@@ -46,8 +46,8 @@
 		"phpstan/extension-installer": "^1.4"
 	},
 	"scripts": {
-		"format": "phpcbf --standard=phpcs.xml.dist",
-		"lint": "phpcs --standard=phpcs.xml.dist",
+		"format": "phpcbf --standard=.phpcs.xml.dist",
+		"lint": "phpcs --standard=.phpcs.xml.dist",
 		"phpstan": "phpstan analyse --memory-limit=2048M"
 	}
 }

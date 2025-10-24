@@ -30,3 +30,4 @@ freesans*.*
 freeserif*.*
 phpstan.neon.dist
 tests/
+.phplint.yml
