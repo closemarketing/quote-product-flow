@@ -10,6 +10,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\CALC;
+
 /**
  * Public classes.
  *

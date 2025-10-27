@@ -48,7 +48,7 @@
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"phpstan/extension-installer": "^1.4",
 		"yoast/phpunit-polyfills": "^1.0",
-		"wp-phpunit/wp-phpunit": "^6.3"
+		"wp-phpunit/wp-phpunit": "^5.9"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist",
