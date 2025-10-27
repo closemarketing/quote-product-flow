@@ -32,7 +32,7 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function pbc_configurator_session() {
-		if ( empty( session_id() ) ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			ob_start();
 			session_start();
 		}

@@ -56,11 +56,6 @@ class PBC_Admin_Plugin {
 	 */
 	public function init() {
 		/**
-		* Composer Library dependencies
-		*/
-		require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
-
-		/**
 		* Image Sizes
 		*/
 		add_image_size( 'pbc_icon', 150, 230, false );
@@ -902,19 +897,19 @@ class PBC_Admin_Plugin {
 
 			if ( ! empty( $deactivation_result ) ) {
 
-				if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
-					update_option( 'pbc_license_activated', 'Deactivated' );
-					update_option( 'pbc_license_apikey', '' );
-					update_option( 'pbc_license_product_id', '' );
-					add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
+			if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
+				update_option( 'pbc_license_activated', 'Deactivated' );
+				update_option( 'pbc_license_apikey', '' );
+				update_option( 'pbc_license_product_id', '' );
+				add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
 
-					return;
-				}
+				return;
+			}
 
-				if ( isset( $deactivation_result['data']['error_code'] ) && ! empty( $this->data ) && ! empty( 'pbc_license_activated' ) ) {
-					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
-					update_option( 'pbc_license_activated', 'Deactivated' );
-				}
+			if ( isset( $deactivation_result['data'] ) && isset( $deactivation_result['data']['error_code'] ) && ! empty( $deactivation_result['data']['error_code'] ) ) {
+				add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
+				update_option( 'pbc_license_activated', 'Deactivated' );
+			}
 			}
 			return;
 		}
@@ -1046,7 +1041,7 @@ class PBC_Admin_Plugin {
 		 *
 		 * Stored result when first activating software.
 		 */
-		return get_option( 'pbc_license_activated' ) == 'Activated';
+		return 'Activated' === get_option( 'pbc_license_activated' );
 	}
 
 	/**
@@ -1211,11 +1206,9 @@ class PBC_Admin_Plugin {
 				'upgrade_notice' => $response['data']['package']['upgrade_notice'],
 			);
 
-			if ( isset( $new_version ) && isset( $curr_version ) ) {
-				if ( version_compare( $new_version, $curr_version, '>' ) ) {
-					$transient->response['pbc'] = (object) $package;
-					unset( $transient->no_update['pbc'] );
-				}
+			if ( version_compare( $new_version, $curr_version, '>' ) ) {
+				$transient->response['pbc'] = (object) $package;
+				unset( $transient->no_update['pbc'] );
 			}
 		}
 
