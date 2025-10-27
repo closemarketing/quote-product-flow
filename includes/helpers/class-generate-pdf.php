@@ -98,10 +98,11 @@ class PDF {
 
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
-        $user = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = $show_prices == 'yes' ? true : false;
-        $show_prices     = isset( $item['pbc_admin'] ) ? true : $show_prices;
+		$user             = wp_get_current_user();
+		$user_role        = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices      = PBC_Admin_Plugin::get_show_prices_for_user( $user_role );
+		$show_prices      = 'yes' === $show_prices ? true : false;
+		$show_prices      = isset( $item['pbc_admin'] ) ? true : $show_prices;
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';

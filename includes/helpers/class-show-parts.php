@@ -155,11 +155,11 @@ class SHOW {
 			<table>
 				<?php
 				$user        = wp_get_current_user();
-				$show_prices = get_option( 'pbc_show_prices_user_' . $user->roles[0] ?? '' );
-				$show_prices = 'yes' === $show_prices ? 'yes' : 'no';
+				$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+				$show_prices = PBC_Admin_Plugin::get_show_prices_for_user( $user_role );
+				$total_price = 0;
 				if ( 'calculate' === $cstep ) {
-					$count       = count( $phases );
-					$total_price = 0;
+					$count = count( $phases );
 				} else {
 					$count = $cstep;
 				}

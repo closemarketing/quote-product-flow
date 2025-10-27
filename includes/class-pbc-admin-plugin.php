@@ -305,6 +305,7 @@ class PBC_Admin_Plugin {
 			$fields = array(
 				'option_show_final_button_pdf'   => 'pbc_budget_show_button_pdf',
 				'option_show_final_button_email' => 'pbc_budget_show_button_email',
+				'option_show_prices_global'      => 'pbc_show_prices_global',
 				'pdf_image_selected'             => 'pbc_pdf_image_selected',
 				'pdf_image_header'               => 'pbc_pdf_image_header',
 				'pdf_image_footer'               => 'pbc_pdf_image_footer',
@@ -536,6 +537,17 @@ class PBC_Admin_Plugin {
 					}
 					?>
 				</fieldset>
+			<fieldset>
+				<label class="block" for="option_show_prices_global"><?php esc_html_e( '¿Mostrar precios (Global)?', 'pbc' ); ?></label>
+				<?php
+				$show_prices_global = get_option( 'pbc_show_prices_global', 'yes' );
+				?>
+				<select name="option_show_prices_global">
+					<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Sí', 'pbc' ); ?></option>
+					<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'pbc' ); ?></option>
+				</select>
+				<p class="description"><?php esc_html_e( 'Configuración global para mostrar precios. Se puede personalizar por rol de usuario más abajo.', 'pbc' ); ?></p>
+			</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
 					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image Logo (200px width)', 'pbc' ); ?></label>
@@ -587,28 +599,28 @@ class PBC_Admin_Plugin {
 					$roles = wp_roles()->roles;
 					?>
 					<p></p>
-					<table class="roles-table">
+				<table class="roles-table">
                         <tr>
-                            <th><?php esc_html_e( 'Role', 'pbc' ); ?></th>
-                            <th><?php esc_html_e( 'Discount', 'pbc' ); ?></th>
-                            <th><?php esc_html_e( 'Show Prices', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( 'Perfil', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( 'Descuento', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( '¿Mostrar precios?', 'pbc' ); ?></th>
                         </tr>
-						<?php
-						foreach ( $roles as $slug => $role ) {
-							$discount = get_option( 'pbc_discount_user_' . $slug );
+					<?php
+					foreach ( $roles as $slug => $role ) {
+						$discount = get_option( 'pbc_discount_user_' . $slug );
                             $show_prices = get_option( 'pbc_show_prices_user_' . $slug );
-							echo '<tr>';
-							echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
-							echo '</label></td>';
-							echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
+						echo '<tr>';
+						echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
+						echo '</label></td>';
+						echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
                             echo '<td><select name="pbc_show_prices_user_' . esc_html( $slug ) . '">';
-                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Default', 'pbc' ) . '</option>';
-                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Por defecto', 'pbc' ) . '</option>';
+                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Sí', 'pbc' ) . '</option>';
                             echo '<option value="no" ' . selected( $show_prices, 'no', false ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
                             echo '</select></td>';
                             echo '</tr>';
-						}
-						?>
+					}
+					?>
 					</table>
 				</fieldset>
 			</div>
@@ -1295,6 +1307,32 @@ class PBC_Admin_Plugin {
 		);
 
 		return (int) $attachment_id;
+	}
+
+	/**
+	 * Get show prices setting for user.
+	 *
+	 * Checks user role setting first, then falls back to global setting.
+	 *
+	 * @param string $user_role User role slug.
+	 * @return string 'yes' or 'no'
+	 */
+	public static function get_show_prices_for_user( $user_role = '' ) {
+		// Get user role specific setting.
+		if ( ! empty( $user_role ) ) {
+			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
+			// If role has specific setting (not empty/default), use it.
+			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
+				return 'yes';
+			}
+			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
+				return 'no';
+			}
+		}
+
+		// Fall back to global setting.
+		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
+		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
 }
 
