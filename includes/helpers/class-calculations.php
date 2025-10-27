@@ -341,10 +341,10 @@ class CALC {
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
 
-		$user            = wp_get_current_user();
-		$user_role       = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
-		$show_prices     = PBC_Admin_Plugin::get_show_prices_for_user( $user_role );
-		$show_prices     = 'yes' === $show_prices ? true : false;
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = self::get_show_prices_for_user( $user_role );
+		$show_prices = 'yes' === $show_prices ? true : false;
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -461,5 +461,29 @@ class CALC {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Get show prices setting for user.
+	 *
+	 * Checks user role setting first, then falls back to global setting.
+	 *
+	 * @param string $user_role User role slug.
+	 * @return string 'yes' or 'no'
+	 */
+	public static function get_show_prices_for_user( $user_role = '' ) {
+		if ( ! empty( $user_role ) ) {
+			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
+
+			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
+				return 'yes';
+			}
+			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
+				return 'no';
+			}
+		}
+
+		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
+		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
 }

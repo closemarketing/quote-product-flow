@@ -1,0 +1,70 @@
+name: PHPUnit Testing
+
+on:
+  push:
+    branches:
+      - trunk
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - trunk
+      - main
+      - master
+      - develop
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/trunk' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+jobs:
+  phpunit:
+    name: Run tests (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.2', '8.1', '7.4']
+
+    services:
+      database:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: wordpress_tests
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: phpunit-polyfills:1.1
+          extensions: mbstring, xml, zip, intl, pdo, mysql
+          coverage: none
+
+      - name: Install SVN
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: '--prefer-dist --no-progress'
+
+      - name: Setup tests
+        run: bash bin/install-wp-tests.sh wordpress_tests root root 127.0.0.1 latest true
+
+      - name: Run tests
+        run: composer test
+

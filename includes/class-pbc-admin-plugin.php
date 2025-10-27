@@ -1301,32 +1301,6 @@ class PBC_Admin_Plugin {
 
 		return (int) $attachment_id;
 	}
-
-	/**
-	 * Get show prices setting for user.
-	 *
-	 * Checks user role setting first, then falls back to global setting.
-	 *
-	 * @param string $user_role User role slug.
-	 * @return string 'yes' or 'no'
-	 */
-	public static function get_show_prices_for_user( $user_role = '' ) {
-		// Get user role specific setting.
-		if ( ! empty( $user_role ) ) {
-			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
-			// If role has specific setting (not empty/default), use it.
-			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
-				return 'yes';
-			}
-			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
-				return 'no';
-			}
-		}
-
-		// Fall back to global setting.
-		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
-		return 'yes' === $global_setting ? 'yes' : 'no';
-	}
 }
 
 new PBC_Admin_Plugin();

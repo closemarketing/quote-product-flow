@@ -62,7 +62,7 @@ class PBC_Public {
 		$current_user = wp_get_current_user();
 		$roles        = (array) $current_user->roles;
 		$user_role    = ! empty( $roles ) ? $roles[0] : '';
-		$show_prices  = PBC_Admin_Plugin::get_show_prices_for_user( $user_role );
+		$show_prices  = CALC::get_show_prices_for_user( $user_role );
 
 		wp_localize_script(
 			'pbc-public',

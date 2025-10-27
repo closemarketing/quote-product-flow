@@ -9,3 +9,6 @@ node_modules/
 
 # OS or Editor folders
 ._*.cache
+
+# PHPUnit
+.phpunit.result.cache
