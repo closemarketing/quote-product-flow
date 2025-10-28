@@ -100,11 +100,10 @@ class PDF {
 
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
-        $user = wp_get_current_user();
-		$user_role       = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user_role );
-		$show_prices     = 'yes' === $show_prices ? true : false;
-        $show_prices     = isset( $item['pbc_admin'] ) ? true : $show_prices;
+
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = CALC::get_show_prices_for_user( $user_role );
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';

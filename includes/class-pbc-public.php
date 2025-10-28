@@ -10,6 +10,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Close\PBC\Helpers\CALC;
+
 /**
  * Public classes.
  *
@@ -60,8 +62,9 @@ class PBC_Public {
 		);
 
 		$current_user = wp_get_current_user();
-		$roles = (array) $current_user->roles;
-		$show_prices = get_option( 'pbc_show_prices_user_' . $roles[0] );
+		$roles        = (array) $current_user->roles;
+		$user_role    = ! empty( $roles ) ? $roles[0] : '';
+		$show_prices  = CALC::get_show_prices_for_user( $user_role );
 
 		wp_localize_script(
 			'pbc-public',
@@ -69,7 +72,7 @@ class PBC_Public {
 			array(
 				'ajax_url'       => admin_url( 'admin-ajax.php' ),
 				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
-				'show_prices'    => 'yes' === $show_prices ? 'yes' : 'no',
+				'show_prices'    => $show_prices,
 				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
 			)
 		);

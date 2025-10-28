@@ -155,12 +155,12 @@ class SHOW {
 			}
 			?>
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
-			<table>
-				<?php
+		<table>
+			<?php
 				$user        = wp_get_current_user();
 				$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
-				$show_prices = get_option( 'pbc_show_prices_user_' . $user_role );
-				$show_prices = 'yes' === $show_prices ? 'yes' : 'no';
+
+				$show_prices = CALC::get_show_prices_for_user( $user_role );
 				$total_price = 0;
 				if ( 'calculate' === $cstep ) {
 					$count = count( $phases );
