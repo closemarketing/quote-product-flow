@@ -533,15 +533,15 @@ class PBC_Admin_Plugin {
 					?>
 				</fieldset>
 			<fieldset>
-				<label class="block" for="option_show_prices_global"><?php esc_html_e( '¿Mostrar precios (Global)?', 'pbc' ); ?></label>
+				<label class="block" for="option_show_prices_global"><?php esc_html_e( 'Show prices (Global)?', 'pbc' ); ?></label>
 				<?php
 				$show_prices_global = get_option( 'pbc_show_prices_global', 'yes' );
 				?>
 				<select name="option_show_prices_global">
-					<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Sí', 'pbc' ); ?></option>
+					<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Yes', 'pbc' ); ?></option>
 					<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'pbc' ); ?></option>
 				</select>
-				<p class="description"><?php esc_html_e( 'Configuración global para mostrar precios. Se puede personalizar por rol de usuario más abajo.', 'pbc' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Global configuration to show prices. Can be customized by user role below.', 'pbc' ); ?></p>
 			</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
@@ -595,25 +595,25 @@ class PBC_Admin_Plugin {
 					?>
 					<p></p>
 				<table class="roles-table">
-                        <tr>
-                            <th><?php esc_html_e( 'Perfil', 'pbc' ); ?></th>
-                            <th><?php esc_html_e( 'Descuento', 'pbc' ); ?></th>
-                            <th><?php esc_html_e( '¿Mostrar precios?', 'pbc' ); ?></th>
-                        </tr>
+					<tr>
+						<th><?php esc_html_e( 'Profile', 'pbc' ); ?></th>
+						<th><?php esc_html_e( 'Discount', 'pbc' ); ?></th>
+						<th><?php esc_html_e( 'Show prices?', 'pbc' ); ?></th>
+					</tr>
 					<?php
 					foreach ( $roles as $slug => $role ) {
-						$discount = get_option( 'pbc_discount_user_' . $slug );
-                            $show_prices = get_option( 'pbc_show_prices_user_' . $slug );
+						$discount    = get_option( 'pbc_discount_user_' . $slug );
+						$show_prices = get_option( 'pbc_show_prices_user_' . $slug );
 						echo '<tr>';
 						echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
 						echo '</label></td>';
 						echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
-                            echo '<td><select name="pbc_show_prices_user_' . esc_html( $slug ) . '">';
-                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Por defecto', 'pbc' ) . '</option>';
-                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Sí', 'pbc' ) . '</option>';
-                            echo '<option value="no" ' . selected( $show_prices, 'no', false ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
-                            echo '</select></td>';
-                            echo '</tr>';
+						echo '<td><select name="pbc_show_prices_user_' . esc_html( $slug ) . '">';
+						echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'By default', 'pbc' ) . '</option>';
+						echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_prices, 'no', false ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '</select></td>';
+						echo '</tr>';
 					}
 					?>
 					</table>

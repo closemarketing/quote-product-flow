@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Product  Budget Configurator\n"
-"POT-Creation-Date: 2025-10-02 13:14+0200\n"
+"POT-Creation-Date: 2025-10-28 11:34+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: David Pérez <david@close.marketing>\n"
 "Language-Team: \n"
@@ -10,242 +10,259 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.7\n"
+"X-Generator: Poedit 3.8\n"
+
+#: includes/class-pbc-admin-plugin.php:91
+msgid "Please select an image file (jpeg, png) only"
+msgstr "Selecciona sólo un archivo de imagen (jpeg, png)"
 
 #. Plugin Name of the plugin/theme
-#: includes/class-pbc-admin-plugin.php:128
-#: includes/class-pbc-admin-plugin.php:140
+#: includes/class-pbc-admin-plugin.php:130
+#: includes/class-pbc-admin-plugin.php:142
 msgid "Product Budget Configurator"
 msgstr "Product Budget Configurator"
 
-#: includes/class-pbc-admin-plugin.php:141
+#: includes/class-pbc-admin-plugin.php:143
 msgid "Settings"
 msgstr "Configuración"
 
-#: includes/class-pbc-admin-plugin.php:148
+#: includes/class-pbc-admin-plugin.php:150
 msgid "Phases of Configurator"
 msgstr "Fases del configurador"
 
-#: includes/class-pbc-admin-plugin.php:149
-#: includes/class-pbc-admin-plugin.php:352
+#: includes/class-pbc-admin-plugin.php:151
+#: includes/class-pbc-admin-plugin.php:355
 #: includes/class-pbc-helper-posttypes.php:52
 msgid "Phases"
 msgstr "Fases"
 
-#: includes/class-pbc-admin-plugin.php:156
+#: includes/class-pbc-admin-plugin.php:158
 msgid "Variations in Phases"
 msgstr "Variaciones en Fases"
 
-#: includes/class-pbc-admin-plugin.php:157
+#: includes/class-pbc-admin-plugin.php:159
 #: includes/class-pbc-helper-posttypes.php:80
 msgid "Variations"
 msgstr "Variaciones"
 
-#: includes/class-pbc-admin-plugin.php:164
+#: includes/class-pbc-admin-plugin.php:166
 msgid "Sections in variations"
 msgstr "Secciones en variaciones"
 
-#: includes/class-pbc-admin-plugin.php:165
+#: includes/class-pbc-admin-plugin.php:167
 #: includes/class-pbc-helper-posttypes.php:111
 msgid "Sections"
 msgstr "Secciones"
 
-#: includes/class-pbc-admin-plugin.php:173
+#: includes/class-pbc-admin-plugin.php:175
 msgid "Enquiries Received"
 msgstr "Presupuestos recibidos"
 
-#: includes/class-pbc-admin-plugin.php:174
+#: includes/class-pbc-admin-plugin.php:176
 #: includes/class-pbc-helper-posttypes.php:140
 msgid "Enquiries"
 msgstr "Presupuestos"
 
-#: includes/class-pbc-admin-plugin.php:203
+#: includes/class-pbc-admin-plugin.php:205
 msgid "Successfully Saved!"
 msgstr "¡Guardado correctamente!"
 
-#: includes/class-pbc-admin-plugin.php:205
+#: includes/class-pbc-admin-plugin.php:207
 msgid "Error saving settings"
 msgstr "Error al guardar los ajustes"
 
-#: includes/class-pbc-admin-plugin.php:209
+#: includes/class-pbc-admin-plugin.php:211
 msgid "Global Settings"
 msgstr "Configuración Global"
 
-#: includes/class-pbc-admin-plugin.php:224
+#: includes/class-pbc-admin-plugin.php:226
 msgid "All Phases Lists"
 msgstr "Listado todas las Fases"
 
-#: includes/class-pbc-admin-plugin.php:234
+#: includes/class-pbc-admin-plugin.php:236
 msgid "License"
 msgstr "Licencia"
 
-#: includes/class-pbc-admin-plugin.php:254
+#: includes/class-pbc-admin-plugin.php:256
 msgid "Price Updater"
 msgstr "Actualizador de precios"
 
-#: includes/class-pbc-admin-plugin.php:261
+#: includes/class-pbc-admin-plugin.php:263
 msgid "General Settings"
 msgstr "Opciones Generales"
 
-#: includes/class-pbc-admin-plugin.php:293
+#: includes/class-pbc-admin-plugin.php:295
 msgid "Security check failed. Please try again."
 msgstr "Error en la comprobación de seguridad. Por favor inténtalo de nuevo."
 
-#: includes/class-pbc-admin-plugin.php:351
-#: includes/class-pbc-helper-posttypes.php:479
+#: includes/class-pbc-admin-plugin.php:354
+#: includes/class-pbc-helper-posttypes.php:478
 msgid "Order"
 msgstr "Orden"
 
-#: includes/class-pbc-admin-plugin.php:353
+#: includes/class-pbc-admin-plugin.php:356
 msgid "Number of Variations"
 msgstr "Número de variaciones"
 
-#: includes/class-pbc-admin-plugin.php:378
+#: includes/class-pbc-admin-plugin.php:381
 msgid "Total: "
 msgstr "Total: "
 
-#: includes/class-pbc-admin-plugin.php:392
+#: includes/class-pbc-admin-plugin.php:395
 msgid "Set the percentage to bulk update prices (you can use negative values)"
 msgstr ""
 "Establece el porcentaje de actualización masiva de los precios (puede "
 "utilizar valores negativos)"
 
-#: includes/class-pbc-admin-plugin.php:394
+#: includes/class-pbc-admin-plugin.php:397
 msgid "Update Prices"
 msgstr "Actualizar Precios"
 
-#: includes/class-pbc-admin-plugin.php:412
+#: includes/class-pbc-admin-plugin.php:415
 msgid "Percentage cannot be 0."
 msgstr "El porcentaje no puede ser 0."
 
-#: includes/class-pbc-admin-plugin.php:431
+#: includes/class-pbc-admin-plugin.php:434
 #, php-format
 msgid "Changed %s variation prices"
 msgstr "Cambió %s los precios de las variaciones"
 
-#: includes/class-pbc-admin-plugin.php:437
+#: includes/class-pbc-admin-plugin.php:440
 msgid "Error"
 msgstr "Error"
 
-#: includes/class-pbc-admin-plugin.php:453
+#: includes/class-pbc-admin-plugin.php:456
 msgid "Flip Images Horizontal"
 msgstr "Voltear Imágenes Horizontal"
 
-#: includes/class-pbc-admin-plugin.php:493
+#: includes/class-pbc-admin-plugin.php:496
 msgid "Email Notification"
 msgstr "Notificaciones por email"
 
-#: includes/class-pbc-admin-plugin.php:497
+#: includes/class-pbc-admin-plugin.php:500
 msgid "separate multiple emails by comma"
 msgstr "separar múltiples correos por comas"
 
-#: includes/class-pbc-admin-plugin.php:500
+#: includes/class-pbc-admin-plugin.php:503
 msgid "Preview width"
 msgstr "Ancho de la vista previa"
 
-#: includes/class-pbc-admin-plugin.php:504
+#: includes/class-pbc-admin-plugin.php:507
 msgid "default: 570"
 msgstr "por defecto: 570"
 
-#: includes/class-pbc-admin-plugin.php:507
+#: includes/class-pbc-admin-plugin.php:510
 msgid "Show final button PDF?"
 msgstr "¿Mostrar botón final PDF?"
 
-#: includes/class-pbc-admin-plugin.php:513
-#: includes/class-pbc-admin-plugin.php:526
-#: includes/class-pbc-admin-plugin.php:599
+#: includes/class-pbc-admin-plugin.php:516
+#: includes/class-pbc-admin-plugin.php:529
+#: includes/class-pbc-admin-plugin.php:541
+#: includes/class-pbc-admin-plugin.php:613
 msgid "Yes"
 msgstr "Sí"
 
-#: includes/class-pbc-admin-plugin.php:514
-#: includes/class-pbc-admin-plugin.php:527
-#: includes/class-pbc-admin-plugin.php:600
+#: includes/class-pbc-admin-plugin.php:517
+#: includes/class-pbc-admin-plugin.php:530
+#: includes/class-pbc-admin-plugin.php:542
+#: includes/class-pbc-admin-plugin.php:614
 msgid "No"
 msgstr "No"
 
-#: includes/class-pbc-admin-plugin.php:520
+#: includes/class-pbc-admin-plugin.php:523
 msgid "Show final button Email?"
 msgstr "¿Mostrar botón final del Correo electrónico?"
 
-#: includes/class-pbc-admin-plugin.php:532
+#: includes/class-pbc-admin-plugin.php:536
+msgid "Show prices (Global)?"
+msgstr "¿Mostrar precios (Global)?"
+
+#: includes/class-pbc-admin-plugin.php:544
+msgid ""
+"Global configuration to show prices. Can be customized by user role below."
+msgstr ""
+"Configuración global para mostrar precios. Se puede personalizar por rol de "
+"usuario a continuación."
+
+#: includes/class-pbc-admin-plugin.php:546
 msgid "Budget Options"
 msgstr "Opciones del Presupuesto"
 
-#: includes/class-pbc-admin-plugin.php:534
+#: includes/class-pbc-admin-plugin.php:548
 msgid "Set PDF Image Logo (200px width)"
 msgstr "Establecer logotipo de imagen PDF (200px de ancho)"
 
-#: includes/class-pbc-admin-plugin.php:541
-#: includes/class-pbc-admin-plugin.php:551
-#: includes/class-pbc-admin-plugin.php:561
+#: includes/class-pbc-admin-plugin.php:555
+#: includes/class-pbc-admin-plugin.php:565
+#: includes/class-pbc-admin-plugin.php:575
 msgid "Select image"
 msgstr "Seleccionar imagen"
 
-#: includes/class-pbc-admin-plugin.php:544
+#: includes/class-pbc-admin-plugin.php:558
 msgid "Set PDF Image Header (1000px width) Height 75px optional"
 msgstr ""
 "Establecer cabecera de imagen PDF (1000px de ancho) Altura 75px opcional"
 
-#: includes/class-pbc-admin-plugin.php:554
+#: includes/class-pbc-admin-plugin.php:568
 msgid "Set PDF Image Footer (1000px width) Height 75px optional"
 msgstr ""
 "Establecer pie de página de imagen PDF (1000px de ancho) Altura 75px opcional"
 
-#: includes/class-pbc-admin-plugin.php:564
+#: includes/class-pbc-admin-plugin.php:578
 msgid "Color for odd entries (hex code)"
 msgstr "Color para las entradas impares (código hexadecimal)"
 
-#: includes/class-pbc-admin-plugin.php:570
+#: includes/class-pbc-admin-plugin.php:584
 msgid "Color for total (hex code)"
 msgstr "Color para el total (código hexadecimal)"
 
-#: includes/class-pbc-admin-plugin.php:577
+#: includes/class-pbc-admin-plugin.php:591
 msgid "Set the role specific options"
 msgstr "Establecer las opciones específicas del perfil"
 
-#: includes/class-pbc-admin-plugin.php:585
-msgid "Role"
+#: includes/class-pbc-admin-plugin.php:599
+msgid "Profile"
 msgstr "Perfil"
 
-#: includes/class-pbc-admin-plugin.php:586
+#: includes/class-pbc-admin-plugin.php:600
 msgid "Discount"
 msgstr "Descuento"
 
-#: includes/class-pbc-admin-plugin.php:587
-msgid "Show Prices"
+#: includes/class-pbc-admin-plugin.php:601
+msgid "Show prices?"
 msgstr "¿Mostrar precios?"
 
-#: includes/class-pbc-admin-plugin.php:598
-msgid "Default"
+#: includes/class-pbc-admin-plugin.php:612
+msgid "By default"
 msgstr "Por defecto"
 
-#: includes/class-pbc-admin-plugin.php:612
+#: includes/class-pbc-admin-plugin.php:626
 msgid "Save"
 msgstr "Guardar"
 
-#: includes/class-pbc-admin-plugin.php:627
-#: includes/class-pbc-admin-plugin.php:636
+#: includes/class-pbc-admin-plugin.php:641
+#: includes/class-pbc-admin-plugin.php:650
 msgid "License API Key"
 msgstr "Clave API de la licencia"
 
-#: includes/class-pbc-admin-plugin.php:639
-#: includes/class-pbc-admin-plugin.php:648
+#: includes/class-pbc-admin-plugin.php:653
+#: includes/class-pbc-admin-plugin.php:662
 msgid "License Product ID"
 msgstr "ID de producto de la licencia"
 
-#: includes/class-pbc-admin-plugin.php:651
+#: includes/class-pbc-admin-plugin.php:665
 msgid "Status:"
 msgstr "Estado:"
 
-#: includes/class-pbc-admin-plugin.php:658
+#: includes/class-pbc-admin-plugin.php:672
 msgid "Save license"
 msgstr "Guardar licencia"
 
-#: includes/class-pbc-admin-plugin.php:663
+#: includes/class-pbc-admin-plugin.php:677
 msgid "What is the license for?"
 msgstr "¿Para qué sirve la licencia?"
 
-#: includes/class-pbc-admin-plugin.php:666
+#: includes/class-pbc-admin-plugin.php:680
 #, php-format
 msgid ""
 "With the <a href=\"%s\" target=\"_blank\">Product Budget Configurator</a> "
@@ -257,11 +274,11 @@ msgstr ""
 "automáticas de las novedades o cambios que se produzcan en su sistema, por "
 "lo que siempre tendrá en funcionamiento las traducciones automáticas."
 
-#: includes/class-pbc-admin-plugin.php:671
+#: includes/class-pbc-admin-plugin.php:685
 msgid "How do I get a license?"
 msgstr "¿Cómo puedo obtener una licencia?"
 
-#: includes/class-pbc-admin-plugin.php:674
+#: includes/class-pbc-admin-plugin.php:688
 #, php-format
 msgid ""
 "Visit the <a href=\"%s\" target=\"_blank\">Product Budget Configurator</a> "
@@ -272,15 +289,15 @@ msgstr ""
 "presupuesto de productos</a> y adquiera las licencias que necesite, en "
 "función del número de multisitios de WordPress que utilice."
 
-#: includes/class-pbc-admin-plugin.php:678
+#: includes/class-pbc-admin-plugin.php:692
 msgid "Instance:"
 msgstr "Instancia:"
 
-#: includes/class-pbc-admin-plugin.php:750
+#: includes/class-pbc-admin-plugin.php:764
 msgid "Create List Price"
 msgstr "Crear Tarifa Precios"
 
-#: includes/class-pbc-admin-plugin.php:829
+#: includes/class-pbc-admin-plugin.php:843
 #, php-format
 msgid ""
 "The <strong>%1$s</strong> License has not been activated, so the plugin is "
@@ -289,23 +306,23 @@ msgstr ""
 "La licencia de <strong>%1$s</strong> no ha sido activada, por lo que el "
 "plugin no recibirá actualizaciones %2$sHaz clic aquí%3$s para activarlo."
 
-#: includes/class-pbc-admin-plugin.php:844
+#: includes/class-pbc-admin-plugin.php:858
 msgid "Activated"
 msgstr "Activado"
 
-#: includes/class-pbc-admin-plugin.php:848
+#: includes/class-pbc-admin-plugin.php:862
 msgid "Deactivated"
 msgstr "Desactivado"
 
-#: includes/class-pbc-admin-plugin.php:890
+#: includes/class-pbc-admin-plugin.php:904
 msgid "License AutoTranslate deactivated. "
 msgstr "Licencia AutoTranslate desactivada. "
 
-#: includes/class-pbc-admin-plugin.php:920
+#: includes/class-pbc-admin-plugin.php:934
 msgid "AutoTranslate activated. "
 msgstr "AutoTranslate activado. "
 
-#: includes/class-pbc-admin-plugin.php:928
+#: includes/class-pbc-admin-plugin.php:942
 msgid ""
 "Connection failed to the License Key API server. Try again later. There may "
 "be a problem on your server preventing outgoing requests, or the store is "
@@ -316,7 +333,7 @@ msgstr ""
 "solicitudes salientes, o la tienda está bloqueando su solicitud para activar "
 "el tema/plugin."
 
-#: includes/class-pbc-admin-plugin.php:937
+#: includes/class-pbc-admin-plugin.php:951
 msgid ""
 "The API Key activation could not be commpleted due to an unknown error "
 "possibly on the store server The activation results were empty."
@@ -325,12 +342,12 @@ msgstr ""
 "desconocido posiblemente en el servidor de la tienda Los resultados de la "
 "activación estaban vacíos."
 
-#: includes/class-pbc-admin-plugin.php:950
-#: includes/class-pbc-admin-plugin.php:977
+#: includes/class-pbc-admin-plugin.php:964
+#: includes/class-pbc-admin-plugin.php:991
 msgid "The API Key is missing from the deactivation request."
 msgstr "Falta la clave de la API en la solicitud de desactivación."
 
-#: includes/class-pbc-admin-plugin.php:1262
+#: includes/class-pbc-admin-plugin.php:1274
 #, php-format
 msgid ""
 "<b>Warning!</b> You're blocking external requests which means you won't be "
@@ -341,8 +358,8 @@ msgstr ""
 
 #: includes/class-pbc-helper-posttypes.php:53
 #: includes/class-pbc-helper-posttypes.php:227
-#: includes/class-pbc-helper-posttypes.php:478
-#: includes/helpers/class-calculations.php:388
+#: includes/class-pbc-helper-posttypes.php:477
+#: includes/helpers/class-calculations.php:390
 msgid "Phase"
 msgstr "Fase"
 
@@ -380,8 +397,8 @@ msgstr "No encontramos una fase en la basura"
 
 #: includes/class-pbc-helper-posttypes.php:81
 #: includes/class-pbc-helper-posttypes.php:273
-#: includes/class-pbc-helper-posttypes.php:570
-#: includes/helpers/class-calculations.php:388
+#: includes/class-pbc-helper-posttypes.php:569
+#: includes/helpers/class-calculations.php:390
 msgid "Variation"
 msgstr "Variación"
 
@@ -501,7 +518,7 @@ msgid "Default by price"
 msgstr "Por defecto por precio"
 
 #: includes/class-pbc-helper-posttypes.php:251
-#: includes/helpers/class-generate-pdf.php:244
+#: includes/helpers/class-generate-pdf.php:246
 msgid "Quantity"
 msgstr "Cantidad"
 
@@ -510,7 +527,7 @@ msgid "Icon image"
 msgstr "Imagen de icono"
 
 #: includes/class-pbc-helper-posttypes.php:265
-#: includes/class-pbc-helper-posttypes.php:573
+#: includes/class-pbc-helper-posttypes.php:572
 msgid "Depends of"
 msgstr "Depende de"
 
@@ -531,9 +548,9 @@ msgid "Product image"
 msgstr "Imagen del producto"
 
 #: includes/class-pbc-helper-posttypes.php:310
-#: includes/class-pbc-helper-posttypes.php:447
-#: includes/class-pbc-helper-posttypes.php:572
-#: includes/helpers/class-calculations.php:388
+#: includes/class-pbc-helper-posttypes.php:446
+#: includes/class-pbc-helper-posttypes.php:571
+#: includes/helpers/class-calculations.php:390
 msgid "Price"
 msgstr "Precio"
 
@@ -553,369 +570,221 @@ msgstr "Descripción después de la opción"
 msgid "Description"
 msgstr "Descripción"
 
-#: includes/class-pbc-helper-posttypes.php:375
+#: includes/class-pbc-helper-posttypes.php:374
 msgid "Enquiry Details"
 msgstr "Detalles del Presupuesto"
 
-#: includes/class-pbc-helper-posttypes.php:384
+#: includes/class-pbc-helper-posttypes.php:383
 msgid "Budget Configuration"
 msgstr "Configuración del presupuesto"
 
-#: includes/class-pbc-helper-posttypes.php:408
+#: includes/class-pbc-helper-posttypes.php:407
 msgid "Enquiry ID:"
 msgstr "Presupuesto Nº:"
 
-#: includes/class-pbc-helper-posttypes.php:410
-#: includes/helpers/class-calculations.php:380
+#: includes/class-pbc-helper-posttypes.php:409
+#: includes/helpers/class-calculations.php:382
 msgid "Name:"
 msgstr "Nombre:"
 
-#: includes/class-pbc-helper-posttypes.php:413
-#: includes/helpers/class-calculations.php:382
+#: includes/class-pbc-helper-posttypes.php:412
+#: includes/helpers/class-calculations.php:384
 msgid "Phone:"
 msgstr "Teléfono:"
 
-#: includes/class-pbc-helper-posttypes.php:416
-#: includes/helpers/class-calculations.php:381
+#: includes/class-pbc-helper-posttypes.php:415
+#: includes/helpers/class-calculations.php:383
 msgid "Email:"
 msgstr "Correo:"
 
-#: includes/class-pbc-helper-posttypes.php:419
-#: includes/helpers/class-calculations.php:383
+#: includes/class-pbc-helper-posttypes.php:418
+#: includes/helpers/class-calculations.php:385
 msgid "City:"
 msgstr "Ciudad:"
 
-#: includes/class-pbc-helper-posttypes.php:422
-#: includes/helpers/class-calculations.php:384
+#: includes/class-pbc-helper-posttypes.php:421
+#: includes/helpers/class-calculations.php:386
 msgid "State:"
 msgstr "Provincia:"
 
-#: includes/class-pbc-helper-posttypes.php:425
-#: includes/helpers/class-calculations.php:385
+#: includes/class-pbc-helper-posttypes.php:424
+#: includes/helpers/class-calculations.php:387
 msgid "Comments:"
 msgstr "Comentarios:"
 
-#: includes/class-pbc-helper-posttypes.php:430
+#: includes/class-pbc-helper-posttypes.php:429
 msgid "Product:"
 msgstr "Producto:"
 
-#: includes/class-pbc-helper-posttypes.php:446
+#: includes/class-pbc-helper-posttypes.php:445
 msgid "Phase/Variation"
 msgstr "Fase/Variación"
 
-#: includes/class-pbc-helper-posttypes.php:480
+#: includes/class-pbc-helper-posttypes.php:479
 msgid "Shortcode"
 msgstr "Código corto"
 
-#: includes/class-pbc-helper-posttypes.php:519
-#: includes/helpers/class-generate-pdf.php:137
+#: includes/class-pbc-helper-posttypes.php:518
+#: includes/helpers/class-generate-pdf.php:139
 msgid "Budget"
 msgstr "Presupuesto"
 
-#: includes/class-pbc-helper-posttypes.php:520
+#: includes/class-pbc-helper-posttypes.php:519
 msgid "Details"
 msgstr "Detalles"
 
-#: includes/class-pbc-helper-posttypes.php:521
+#: includes/class-pbc-helper-posttypes.php:520
 msgid "Configuration"
 msgstr "Configuración"
 
-#: includes/class-pbc-helper-posttypes.php:522
-#: includes/helpers/class-generate-pdf.php:138
+#: includes/class-pbc-helper-posttypes.php:521
+#: includes/helpers/class-generate-pdf.php:140
 msgid "Date"
 msgstr "Fecha"
 
-#: includes/class-pbc-helper-posttypes.php:549
-#: includes/helpers/class-show-parts.php:218
+#: includes/class-pbc-helper-posttypes.php:548
+#: includes/helpers/class-show-parts.php:222
 msgid "VAT not included"
 msgstr "IVA no incluido"
 
-#: includes/class-pbc-helper-posttypes.php:554
+#: includes/class-pbc-helper-posttypes.php:553
 msgid "Generate PDF"
 msgstr "Generar PDF"
 
-#: includes/class-pbc-helper-posttypes.php:571
+#: includes/class-pbc-helper-posttypes.php:570
 msgid "Phase and section"
 msgstr "Fase y sección"
 
-#: includes/class-pbc-helper-posttypes.php:574
+#: includes/class-pbc-helper-posttypes.php:573
 msgid "Icon"
 msgstr "Icono"
 
-#: includes/class-pbc-helper-posttypes.php:575
+#: includes/class-pbc-helper-posttypes.php:574
 msgid "Product Images"
 msgstr "Imágenes de producto"
 
-#: includes/class-pbc-helper-posttypes.php:677
+#: includes/class-pbc-helper-posttypes.php:676
 msgid "All Phases"
 msgstr "Todas las Fases"
 
-#: includes/helper-required-plugins.php:45
-msgid "Install Required Plugins"
-msgstr "Instalar Plugins requeridos"
-
-#: includes/helper-required-plugins.php:46
-msgid "Install Plugins"
-msgstr "Instalar Plugins"
-
-#. translators: %s: plugin name.
-#: includes/helper-required-plugins.php:48
-#, php-format
-msgid "Installing Plugin: %s"
-msgstr "Instalando Plugin: %s"
-
-#. translators: %s: plugin name.
-#: includes/helper-required-plugins.php:50
-#, php-format
-msgid "Updating Plugin: %s"
-msgstr "Actualizando plugin: %s"
-
-#: includes/helper-required-plugins.php:51
-msgid "Something went wrong with the plugin API."
-msgstr "Algo no ha funcionado con la API del plugin."
-
-#. translators: 1: plugin name(s).
-#: includes/helper-required-plugins.php:54
-#, php-format
-msgid "This theme requires the following plugin: %1$s."
-msgid_plural "This theme requires the following plugins: %1$s."
-msgstr[0] "Este tema requiere el siguiente plugin: %1$s."
-msgstr[1] "Este tema requiere los siguientes plugin: %1$s."
-
-#. translators: 1: plugin name(s).
-#: includes/helper-required-plugins.php:60
-#, php-format
-msgid "This theme recommends the following plugin: %1$s."
-msgid_plural "This theme recommends the following plugins: %1$s."
-msgstr[0] "Este tema recomienda el siguiente plugin: %1$s."
-msgstr[1] "Este tema recomienda los siguientes plugin: %1$s."
-
-#. translators: 1: plugin name(s).
-#: includes/helper-required-plugins.php:66
-#, php-format
-msgid ""
-"The following plugin needs to be updated to its latest version to ensure "
-"maximum compatibility with this theme: %1$s."
-msgid_plural ""
-"The following plugins need to be updated to their latest version to ensure "
-"maximum compatibility with this theme: %1$s."
-msgstr[0] ""
-"El siguiente plugin necesita ser actualizado a su última versión para "
-"garantizar la máxima compatibilidad con este tema: %1$s."
-msgstr[1] ""
-"Los siguientes plugins necesitan ser actualizados a su última versión para "
-"garantizar la máxima compatibilidad con este tema: %1$s."
-
-#. translators: 1: plugin name(s).
-#: includes/helper-required-plugins.php:72
-#, php-format
-msgid "There is an update available for: %1$s."
-msgid_plural "There are updates available for the following plugins: %1$s."
-msgstr[0] "Hay una actualización disponible para: %1$s."
-msgstr[1] "Hay actualizaciones disponibles para: %1$s."
-
-#. translators: 1: plugin name(s).
-#: includes/helper-required-plugins.php:78
-#, php-format
-msgid "The following required plugin is currently inactive: %1$s."
-msgid_plural "The following required plugins are currently inactive: %1$s."
-msgstr[0] "El siguiente plugin requerido esta inactivo: %1$s."
-msgstr[1] "Los siguientes plugins requeridos estan inactivos: %1$s."
-
-#. translators: 1: plugin name(s).
-#: includes/helper-required-plugins.php:84
-#, php-format
-msgid "The following recommended plugin is currently inactive: %1$s."
-msgid_plural "The following recommended plugins are currently inactive: %1$s."
-msgstr[0] "El siguiente plugin recomendado esta inactivo: %1$s."
-msgstr[1] "Los siguientes plugins recomendados estan inactivos: %1$s."
-
-#: includes/helper-required-plugins.php:89
-msgid "Begin installing plugin"
-msgid_plural "Begin installing plugins"
-msgstr[0] "Comenzar instalación del plugin"
-msgstr[1] "Comenzar instalación de los plugin"
-
-#: includes/helper-required-plugins.php:94
-msgid "Begin updating plugin"
-msgid_plural "Begin updating plugins"
-msgstr[0] "Empezamos actualizando el plugin"
-msgstr[1] "Empezamos actualizando los plugins"
-
-#: includes/helper-required-plugins.php:99
-msgid "Begin activating plugin"
-msgid_plural "Begin activating plugins"
-msgstr[0] "Comenzar activación de plugin"
-msgstr[1] "Comenzar activación de los plugins"
-
-#: includes/helper-required-plugins.php:103
-msgid "Return to Required Plugins Installer"
-msgstr "Volver al Instalador de plugins requeridos"
-
-#: includes/helper-required-plugins.php:104
-msgid "Plugin activated successfully."
-msgstr "Plugin activado correctamente ."
-
-#: includes/helper-required-plugins.php:105
-msgid "The following plugin was activated successfully:"
-msgstr "El siguiente plugin se ha activado correctamente:"
-
-#. translators: 1: plugin name.
-#: includes/helper-required-plugins.php:107
-#, php-format
-msgid "No action taken. Plugin %1$s was already active."
-msgstr "Sin acción. El plugin %1$s ya se encuentra activo."
-
-#. translators: 1: plugin name.
-#: includes/helper-required-plugins.php:109
-#, php-format
-msgid ""
-"Plugin not activated. A higher version of %s is needed for this theme. "
-"Please update the plugin."
-msgstr ""
-"Plugin no activado. Este tema necesita una versión superior de %s. Por "
-"favor, actualiza el plugin."
-
-#. translators: 1: dashboard link.
-#: includes/helper-required-plugins.php:111
-#, php-format
-msgid "All plugins installed and activated successfully. %1$s"
-msgstr "Todos los plugins se instalaron y activaron correctamente. %1$s"
-
-#: includes/helper-required-plugins.php:112
-msgid "Dismiss this notice"
-msgstr "Descartar este aviso"
-
-#: includes/helper-required-plugins.php:113
-msgid ""
-"There are one or more required or recommended plugins to install, update or "
-"activate."
-msgstr ""
-"Hay uno o más plugins requeridos o recomendados para instalar, actualizar o "
-"activar."
-
-#: includes/helper-required-plugins.php:114
-msgid "Please contact the administrator of this site for help."
-msgstr "Para más ayuda, contacta con el administrador de la web."
-
-#: includes/helpers/class-calculations.php:350
+#: includes/helpers/class-calculations.php:352
 msgid "Email field empty!"
 msgstr "¡El campo de correo está vacío!"
 
-#: includes/helpers/class-calculations.php:355
+#: includes/helpers/class-calculations.php:357
 msgid "Name field is empty!"
 msgstr "¡El campo de nombre está vacío!"
 
-#: includes/helpers/class-calculations.php:360
+#: includes/helpers/class-calculations.php:362
 msgid "Phone field is empty!"
 msgstr "¡El campo de teléfono está vacío!"
 
-#: includes/helpers/class-calculations.php:375
-#: includes/helpers/class-generate-pdf.php:90
+#: includes/helpers/class-calculations.php:377
+#: includes/helpers/class-generate-pdf.php:92
 msgid "Configurator not ready!"
 msgstr "¡Configurador no está funcionando!"
 
-#: includes/helpers/class-calculations.php:378
+#: includes/helpers/class-calculations.php:380
 msgid "Budget Configurator"
 msgstr "Configurador Presupuestos"
 
-#: includes/helpers/class-calculations.php:379
+#: includes/helpers/class-calculations.php:381
 msgid "Enquiry details:"
 msgstr "Detalles del Presupuesto:"
 
-#: includes/helpers/class-calculations.php:387
+#: includes/helpers/class-calculations.php:389
 msgid "Configuration details:"
 msgstr "Detalles de configuración:"
 
-#: includes/helpers/class-calculations.php:416
+#: includes/helpers/class-calculations.php:418
 msgid "Subtotal:"
 msgstr "Subtotal:"
 
-#: includes/helpers/class-calculations.php:420
+#: includes/helpers/class-calculations.php:422
 msgid "Tax:"
 msgstr "Impuesto:"
 
-#: includes/helpers/class-calculations.php:425
+#: includes/helpers/class-calculations.php:427
 msgid "Total:"
 msgstr "Total:"
 
-#: includes/helpers/class-calculations.php:444
+#: includes/helpers/class-calculations.php:447
 msgid "Error in sending mail. Please try again!"
 msgstr "Error enviando el email, por favor ¡intenta más tarde!"
 
-#: includes/helpers/class-calculations.php:447
+#: includes/helpers/class-calculations.php:450
 #: includes/helpers/class-generate-pdf.php:31
 msgid "budget"
 msgstr "presupuesto"
 
-#: includes/helpers/class-calculations.php:454
+#: includes/helpers/class-calculations.php:457
 msgid "Mail sent!"
 msgstr "¡Correo enviado!"
 
-#: includes/helpers/class-generate-pdf.php:143
+#: includes/helpers/class-generate-pdf.php:145
 msgid "Budget ID"
 msgstr "Presupuesto Nº"
 
-#: includes/helpers/class-generate-pdf.php:148
+#: includes/helpers/class-generate-pdf.php:150
 msgid "Contact"
 msgstr "Contacto"
 
-#: includes/helpers/class-generate-pdf.php:150
+#: includes/helpers/class-generate-pdf.php:152
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: includes/helpers/class-generate-pdf.php:153
+#: includes/helpers/class-generate-pdf.php:155
 msgid "Phone"
 msgstr "Teléfono"
 
-#: includes/helpers/class-generate-pdf.php:156
+#: includes/helpers/class-generate-pdf.php:158
 msgid "City"
 msgstr "Ciudad"
 
-#: includes/helpers/class-generate-pdf.php:159
-#: includes/helpers/class-show-template.php:458
+#: includes/helpers/class-generate-pdf.php:161
+#: includes/helpers/class-show-template.php:460
 msgid "State"
 msgstr "Provincia"
 
-#: includes/helpers/class-generate-pdf.php:164
+#: includes/helpers/class-generate-pdf.php:166
 msgid "Characteristics selected"
 msgstr "Características seleccionadas"
 
-#: includes/helpers/class-generate-pdf.php:165
+#: includes/helpers/class-generate-pdf.php:167
 msgid "Lists of options selected:"
 msgstr "Listas de opciones seleccionadas:"
 
-#: includes/helpers/class-generate-pdf.php:226
+#: includes/helpers/class-generate-pdf.php:228
 msgid "Taxes"
 msgstr "Impuesto"
 
-#: includes/helpers/class-generate-pdf.php:235
+#: includes/helpers/class-generate-pdf.php:237
 msgid "Subtotal"
 msgstr "Subtotal"
 
-#: includes/helpers/class-generate-pdf.php:255
-#: includes/helpers/class-show-parts.php:208
+#: includes/helpers/class-generate-pdf.php:257
+#: includes/helpers/class-show-parts.php:212
 msgid "Total"
 msgstr "Total"
 
-#: includes/helpers/class-generate-pdf.php:268
+#: includes/helpers/class-generate-pdf.php:270
 msgid "Comments"
 msgstr "Comentarios"
 
-#: includes/helpers/class-show-parts.php:154
+#: includes/helpers/class-show-parts.php:157
 msgid "Actual Configuration"
 msgstr "Configuración Actual"
 
-#: includes/helpers/class-show-parts.php:274
-#: includes/helpers/class-show-parts.php:277
+#: includes/helpers/class-show-parts.php:278
+#: includes/helpers/class-show-parts.php:281
 msgid "Back"
 msgstr "Atrás"
 
-#: includes/helpers/class-show-parts.php:285
+#: includes/helpers/class-show-parts.php:289
 msgid "Calculate"
 msgstr "Calcular"
 
-#: includes/helpers/class-show-parts.php:288
+#: includes/helpers/class-show-parts.php:292
 msgid "Next"
 msgstr "Siguiente"
 
@@ -923,39 +792,39 @@ msgstr "Siguiente"
 msgid "No Phases Available"
 msgstr "No hay fases disponibles"
 
-#: includes/helpers/class-show-template.php:265
+#: includes/helpers/class-show-template.php:267
 msgid "No Variations Available"
 msgstr "No hay variaciones disponibles"
 
-#: includes/helpers/class-show-template.php:450
+#: includes/helpers/class-show-template.php:452
 msgid "Client Details"
 msgstr "Datos del Cliente"
 
-#: includes/helpers/class-show-template.php:454
+#: includes/helpers/class-show-template.php:456
 msgid "separate multiple email by comma"
 msgstr "separar múltiples correos por coma"
 
-#: includes/helpers/class-show-template.php:455
+#: includes/helpers/class-show-template.php:457
 msgid "Your name"
 msgstr "Nombre"
 
-#: includes/helpers/class-show-template.php:456
+#: includes/helpers/class-show-template.php:458
 msgid "Phone number"
 msgstr "Teléfono"
 
-#: includes/helpers/class-show-template.php:457
+#: includes/helpers/class-show-template.php:459
 msgid "Your City"
 msgstr "Ciudad"
 
-#: includes/helpers/class-show-template.php:459
+#: includes/helpers/class-show-template.php:461
 msgid "Your comments"
 msgstr "Tus comentarios"
 
-#: includes/helpers/class-show-template.php:464
+#: includes/helpers/class-show-template.php:466
 msgid "Send"
 msgstr "Enviar"
 
-#: includes/helpers/class-show-template.php:470
+#: includes/helpers/class-show-template.php:472
 msgid "Generate Budget"
 msgstr "Generar Presupuesto"
 
@@ -976,6 +845,132 @@ msgstr "Closetechnology"
 #. Author URI of the plugin/theme
 msgid "https://close.technology"
 msgstr "https://close.technology"
+
+#~ msgid "Perfil"
+#~ msgstr "Perfil"
+
+#, fuzzy
+#~| msgid "Description"
+#~ msgid "Descuento"
+#~ msgstr "Descripción"
+
+#~ msgid "Role"
+#~ msgstr "Perfil"
+
+#~ msgid "Install Required Plugins"
+#~ msgstr "Instalar Plugins requeridos"
+
+#~ msgid "Install Plugins"
+#~ msgstr "Instalar Plugins"
+
+#, php-format
+#~ msgid "Installing Plugin: %s"
+#~ msgstr "Instalando Plugin: %s"
+
+#, php-format
+#~ msgid "Updating Plugin: %s"
+#~ msgstr "Actualizando plugin: %s"
+
+#~ msgid "Something went wrong with the plugin API."
+#~ msgstr "Algo no ha funcionado con la API del plugin."
+
+#, php-format
+#~ msgid "This theme requires the following plugin: %1$s."
+#~ msgid_plural "This theme requires the following plugins: %1$s."
+#~ msgstr[0] "Este tema requiere el siguiente plugin: %1$s."
+#~ msgstr[1] "Este tema requiere los siguientes plugin: %1$s."
+
+#, php-format
+#~ msgid "This theme recommends the following plugin: %1$s."
+#~ msgid_plural "This theme recommends the following plugins: %1$s."
+#~ msgstr[0] "Este tema recomienda el siguiente plugin: %1$s."
+#~ msgstr[1] "Este tema recomienda los siguientes plugin: %1$s."
+
+#, php-format
+#~ msgid ""
+#~ "The following plugin needs to be updated to its latest version to ensure "
+#~ "maximum compatibility with this theme: %1$s."
+#~ msgid_plural ""
+#~ "The following plugins need to be updated to their latest version to "
+#~ "ensure maximum compatibility with this theme: %1$s."
+#~ msgstr[0] ""
+#~ "El siguiente plugin necesita ser actualizado a su última versión para "
+#~ "garantizar la máxima compatibilidad con este tema: %1$s."
+#~ msgstr[1] ""
+#~ "Los siguientes plugins necesitan ser actualizados a su última versión "
+#~ "para garantizar la máxima compatibilidad con este tema: %1$s."
+
+#, php-format
+#~ msgid "There is an update available for: %1$s."
+#~ msgid_plural "There are updates available for the following plugins: %1$s."
+#~ msgstr[0] "Hay una actualización disponible para: %1$s."
+#~ msgstr[1] "Hay actualizaciones disponibles para: %1$s."
+
+#, php-format
+#~ msgid "The following required plugin is currently inactive: %1$s."
+#~ msgid_plural "The following required plugins are currently inactive: %1$s."
+#~ msgstr[0] "El siguiente plugin requerido esta inactivo: %1$s."
+#~ msgstr[1] "Los siguientes plugins requeridos estan inactivos: %1$s."
+
+#, php-format
+#~ msgid "The following recommended plugin is currently inactive: %1$s."
+#~ msgid_plural ""
+#~ "The following recommended plugins are currently inactive: %1$s."
+#~ msgstr[0] "El siguiente plugin recomendado esta inactivo: %1$s."
+#~ msgstr[1] "Los siguientes plugins recomendados estan inactivos: %1$s."
+
+#~ msgid "Begin installing plugin"
+#~ msgid_plural "Begin installing plugins"
+#~ msgstr[0] "Comenzar instalación del plugin"
+#~ msgstr[1] "Comenzar instalación de los plugin"
+
+#~ msgid "Begin updating plugin"
+#~ msgid_plural "Begin updating plugins"
+#~ msgstr[0] "Empezamos actualizando el plugin"
+#~ msgstr[1] "Empezamos actualizando los plugins"
+
+#~ msgid "Begin activating plugin"
+#~ msgid_plural "Begin activating plugins"
+#~ msgstr[0] "Comenzar activación de plugin"
+#~ msgstr[1] "Comenzar activación de los plugins"
+
+#~ msgid "Return to Required Plugins Installer"
+#~ msgstr "Volver al Instalador de plugins requeridos"
+
+#~ msgid "Plugin activated successfully."
+#~ msgstr "Plugin activado correctamente ."
+
+#~ msgid "The following plugin was activated successfully:"
+#~ msgstr "El siguiente plugin se ha activado correctamente:"
+
+#, php-format
+#~ msgid "No action taken. Plugin %1$s was already active."
+#~ msgstr "Sin acción. El plugin %1$s ya se encuentra activo."
+
+#, php-format
+#~ msgid ""
+#~ "Plugin not activated. A higher version of %s is needed for this theme. "
+#~ "Please update the plugin."
+#~ msgstr ""
+#~ "Plugin no activado. Este tema necesita una versión superior de %s. Por "
+#~ "favor, actualiza el plugin."
+
+#, php-format
+#~ msgid "All plugins installed and activated successfully. %1$s"
+#~ msgstr "Todos los plugins se instalaron y activaron correctamente. %1$s"
+
+#~ msgid "Dismiss this notice"
+#~ msgstr "Descartar este aviso"
+
+#~ msgid ""
+#~ "There are one or more required or recommended plugins to install, update "
+#~ "or activate."
+#~ msgstr ""
+#~ "Hay uno o más plugins requeridos o recomendados para instalar, actualizar "
+#~ "o activar."
+
+#~ msgid "Please contact the administrator of this site for help."
+#~ msgstr "Para más ayuda, contacta con el administrador de la web."
 
 #~ msgid "Set PDF Image"
 #~ msgstr "Establece imagen PDF"
