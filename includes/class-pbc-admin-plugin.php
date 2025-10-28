@@ -56,11 +56,6 @@ class PBC_Admin_Plugin {
 	 */
 	public function init() {
 		/**
-		* Composer Library dependencies
-		*/
-		require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
-
-		/**
 		* Image Sizes
 		*/
 		add_image_size( 'pbc_icon', 150, 230, false );
@@ -305,6 +300,7 @@ class PBC_Admin_Plugin {
 			$fields = array(
 				'option_show_final_button_pdf'   => 'pbc_budget_show_button_pdf',
 				'option_show_final_button_email' => 'pbc_budget_show_button_email',
+				'option_show_prices_global'      => 'pbc_show_prices_global',
 				'pdf_image_selected'             => 'pbc_pdf_image_selected',
 				'pdf_image_header'               => 'pbc_pdf_image_header',
 				'pdf_image_footer'               => 'pbc_pdf_image_footer',
@@ -536,6 +532,17 @@ class PBC_Admin_Plugin {
 					}
 					?>
 				</fieldset>
+			<fieldset>
+				<label class="block" for="option_show_prices_global"><?php esc_html_e( '¿Mostrar precios (Global)?', 'pbc' ); ?></label>
+				<?php
+				$show_prices_global = get_option( 'pbc_show_prices_global', 'yes' );
+				?>
+				<select name="option_show_prices_global">
+					<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Sí', 'pbc' ); ?></option>
+					<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'pbc' ); ?></option>
+				</select>
+				<p class="description"><?php esc_html_e( 'Configuración global para mostrar precios. Se puede personalizar por rol de usuario más abajo.', 'pbc' ); ?></p>
+			</fieldset>
 				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
 				<fieldset>
 					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image Logo (200px width)', 'pbc' ); ?></label>
@@ -587,28 +594,28 @@ class PBC_Admin_Plugin {
 					$roles = wp_roles()->roles;
 					?>
 					<p></p>
-					<table class="roles-table">
+				<table class="roles-table">
                         <tr>
-                            <th><?php esc_html_e( 'Role', 'pbc' ); ?></th>
-                            <th><?php esc_html_e( 'Discount', 'pbc' ); ?></th>
-                            <th><?php esc_html_e( 'Show Prices', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( 'Perfil', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( 'Descuento', 'pbc' ); ?></th>
+                            <th><?php esc_html_e( '¿Mostrar precios?', 'pbc' ); ?></th>
                         </tr>
-						<?php
-						foreach ( $roles as $slug => $role ) {
-							$discount = get_option( 'pbc_discount_user_' . $slug );
+					<?php
+					foreach ( $roles as $slug => $role ) {
+						$discount = get_option( 'pbc_discount_user_' . $slug );
                             $show_prices = get_option( 'pbc_show_prices_user_' . $slug );
-							echo '<tr>';
-							echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
-							echo '</label></td>';
-							echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
+						echo '<tr>';
+						echo '<td><label class="block" for="pbc_discount_user_' . esc_html( $slug ) . '">' . esc_html( $role['name'] );
+						echo '</label></td>';
+						echo '<td><input type="text" id="pbc_discount_user_' . esc_html( $slug ) . '" name="pbc_discount_user_' . esc_html( $slug ) . '" value="' . (int) $discount . '" /> % </td>';
                             echo '<td><select name="pbc_show_prices_user_' . esc_html( $slug ) . '">';
-                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Default', 'pbc' ) . '</option>';
-                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
+                            echo '<option value=""' . selected( $show_prices, '', false ) . '>' . esc_html__( 'Por defecto', 'pbc' ) . '</option>';
+                            echo '<option value="yes" ' . selected( $show_prices, 'yes', false ) . '>' . esc_html__( 'Sí', 'pbc' ) . '</option>';
                             echo '<option value="no" ' . selected( $show_prices, 'no', false ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
                             echo '</select></td>';
                             echo '</tr>';
-						}
-						?>
+					}
+					?>
 					</table>
 				</fieldset>
 			</div>
@@ -890,19 +897,19 @@ class PBC_Admin_Plugin {
 
 			if ( ! empty( $deactivation_result ) ) {
 
-				if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
-					update_option( 'pbc_license_activated', 'Deactivated' );
-					update_option( 'pbc_license_apikey', '' );
-					update_option( 'pbc_license_product_id', '' );
-					add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
+			if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
+				update_option( 'pbc_license_activated', 'Deactivated' );
+				update_option( 'pbc_license_apikey', '' );
+				update_option( 'pbc_license_product_id', '' );
+				add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
 
-					return;
-				}
+				return;
+			}
 
-				if ( isset( $deactivation_result['data']['error_code'] ) && ! empty( $this->data ) && ! empty( 'pbc_license_activated' ) ) {
-					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
-					update_option( 'pbc_license_activated', 'Deactivated' );
-				}
+			if ( isset( $deactivation_result['data'] ) && isset( $deactivation_result['data']['error_code'] ) && ! empty( $deactivation_result['data']['error_code'] ) ) {
+				add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
+				update_option( 'pbc_license_activated', 'Deactivated' );
+			}
 			}
 			return;
 		}
@@ -1034,7 +1041,7 @@ class PBC_Admin_Plugin {
 		 *
 		 * Stored result when first activating software.
 		 */
-		return get_option( 'pbc_license_activated' ) == 'Activated';
+		return 'Activated' === get_option( 'pbc_license_activated' );
 	}
 
 	/**
@@ -1199,11 +1206,9 @@ class PBC_Admin_Plugin {
 				'upgrade_notice' => $response['data']['package']['upgrade_notice'],
 			);
 
-			if ( isset( $new_version ) && isset( $curr_version ) ) {
-				if ( version_compare( $new_version, $curr_version, '>' ) ) {
-					$transient->response['pbc'] = (object) $package;
-					unset( $transient->no_update['pbc'] );
-				}
+			if ( version_compare( $new_version, $curr_version, '>' ) ) {
+				$transient->response['pbc'] = (object) $package;
+				unset( $transient->no_update['pbc'] );
 			}
 		}
 

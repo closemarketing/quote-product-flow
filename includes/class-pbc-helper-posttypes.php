@@ -27,7 +27,7 @@ class PBC_Helper_PostTypes {
 	public function __construct() {
 		add_action( 'init', array( $this, 'pbc_register_cpt' ) );
 		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation' ) );
-		add_filter( 'add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry' ) );
+		add_action( 'add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry' ) );
 
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
 		add_action( 'manage_phases_posts_custom_column', array( $this, 'manage_phases_columns' ), 10, 2 );
@@ -369,7 +369,6 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function pbc_metabox_enquiry() {
-
 		add_meta_box(
 			'enquiry-details',
 			__( 'Enquiry Details', 'pbc' ),
@@ -698,7 +697,7 @@ class PBC_Helper_PostTypes {
 	 * and variation to the name of your custom post type
 	 *
 	 * @param (wp_query object) $query Query.
-	 * @return void
+	 * @return object Modified query object.
 	 */
 	public function pbc_posts_filter( $query ) {
 		global $pagenow;
@@ -710,6 +709,8 @@ class PBC_Helper_PostTypes {
 				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) );
 			}
 		}
+
+		return $query;
 	}
 }
 

@@ -30,7 +30,7 @@ class CALC {
 	 * @return string
 	 */
 	public static function get_image_variation_url( $session_variation, $variation_id = 0 ) {
-		if ( ! isset( $variation_id ) ) {
+		if ( empty( $variation_id ) ) {
 			return '';
 		}
 		$imgprodgroup = get_post_meta( $variation_id, 'pbc_imgprodgroup', true );
@@ -340,9 +340,11 @@ class CALC {
 		$state_field     = $item['pbc_contact']['state'] ?? '';
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
-		$user = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = $show_prices == 'yes' ? true : false;
+
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = self::get_show_prices_for_user( $user_role );
+		$show_prices = 'yes' === $show_prices ? true : false;
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -432,7 +434,8 @@ class CALC {
 				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
 				// Insert_enquiry Post.
-				$post_id = self::configurator_save_enquiry( $item );
+				$post_id     = self::configurator_save_enquiry( $item );
+				$attachments = [];
 				if ( $post_id ) {
 					$item['pbc_enquiry'] = $post_id;
 					$attachments         = array( PDF::generate_engine_pdf( $item ) );
@@ -458,5 +461,29 @@ class CALC {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Get show prices setting for user.
+	 *
+	 * Checks user role setting first, then falls back to global setting.
+	 *
+	 * @param string $user_role User role slug.
+	 * @return string 'yes' or 'no'
+	 */
+	public static function get_show_prices_for_user( $user_role = '' ) {
+		if ( ! empty( $user_role ) ) {
+			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
+
+			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
+				return 'yes';
+			}
+			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
+				return 'no';
+			}
+		}
+
+		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
+		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
 }

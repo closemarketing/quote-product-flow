@@ -23,6 +23,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added: Don't show prices in PDF if the option is not selected. Show them in admin.
 *  Removed: removed the template page option. Now is only shows with shortcode: [pbc].
 *  Removed: removed bullets points.
+*  Added: Price visibility toggle.
 *  Fixed: problems with dependencies and phases.
 *  Fixed: problems with image alpha webp.
 

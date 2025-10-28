@@ -23,9 +23,11 @@ class SHOW {
 	/**
 	 * Variations sections.
 	 *
-	 * @param array $variations_section Variations sections.
-	 * @param int   $s_var Selected variation.
-	 * @param int   $cstep Current step.
+	 * @param array  $variations_section Variations sections.
+	 * @param int    $s_var Selected variation.
+	 * @param int    $cstep Current step.
+	 * @param string $template Template.
+	 *
 	 * @return void
 	 */
 	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard' ) {
@@ -145,21 +147,23 @@ class SHOW {
 			<?php
 			$role = isset( $_SESSION[ $pbc_session_key ]['role_slug'] ) ? sanitize_key( $_SESSION[ $pbc_session_key ]['role_slug'] ) : '';
 			if ( $role ) {
-				$role_name = $role ? wp_roles()->get_names()[ $role ] : $role;
+				$role_names = wp_roles()->get_names();
+				$role_name  = isset( $role_names[ $role ] ) ? $role_names[ $role ] : $role;
 				?>
 				<div class="role"><?php echo esc_html( $role_name ); ?></div>
 				<?php
 			}
 			?>
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
-			<table>
-				<?php
+		<table>
+			<?php
 				$user        = wp_get_current_user();
-				$show_prices = get_option( 'pbc_show_prices_user_' . $user->roles[0] ?? '' );
-				$show_prices = 'yes' === $show_prices ? 'yes' : 'no';
+				$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+
+				$show_prices = CALC::get_show_prices_for_user( $user_role );
+				$total_price = 0;
 				if ( 'calculate' === $cstep ) {
-					$count       = count( $phases );
-					$total_price = 0;
+					$count = count( $phases );
 				} else {
 					$count = $cstep;
 				}
@@ -266,10 +270,10 @@ class SHOW {
 		?>
 		<div class="configurator_form_action">
 			<?php
-			if ( $cstep == 1 ) {
+			if ( 1 === $cstep ) {
 				$prev_step   = '';
 				$prev_button = '';
-			} elseif ( $cstep == 'calculate' ) {
+			} elseif ( 'calculate' === $cstep ) {
 				$prev_step   = count( $phases );
 				$prev_button = __( 'Back', 'pbc' );
 			} else {
@@ -277,10 +281,10 @@ class SHOW {
 				$prev_button = __( 'Back', 'pbc' );
 			}
 
-			if ( $cstep == 'calculate' ) {
+			if ( 'calculate' === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = '';
-			} elseif ( $cstep == count( $phases ) ) {
+			} elseif ( $cstep === count( $phases ) ) {
 				$next_step   = 'calculate';
 				$next_button = __( 'Calculate', 'pbc' );
 			} else {
@@ -290,7 +294,7 @@ class SHOW {
 			?>
 			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
 			<?php if ( $prev_step && $prev_button ) { ?>
-			<div class="prev<?php if ( empty( $prev_step ) ) { echo ' hidden'; } ?>">
+			<div class="prev">
 				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
 				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
 			</div>
