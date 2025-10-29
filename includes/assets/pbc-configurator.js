@@ -177,23 +177,11 @@ jQuery(function($){
 			success: function(response) {
 				console.log('PBC: AJAX success! Response length:', response.length);
                 thisButton.prop('disabled', false);
-				
-				// Extract PDF URL from response if generating PDF.
-				if (submit_val === 'generate_pdf' || submit_val === 'email_send') {
-					console.log('PBC: Looking for PDF URL in response...');
-					var scriptMatch = response.match(/<script[^>]*>window\.open\(['"]([^'"]+)['"]/);
-					console.log('PBC: Script match:', scriptMatch);
-					if (scriptMatch && scriptMatch[1]) {
-						console.log('PBC: Opening PDF URL:', scriptMatch[1]);
-						// Open PDF in new window.
-						window.open(scriptMatch[1], '_blank');
-					} else {
-						console.log('PBC: No PDF URL found in response');
-						console.log('PBC: Response preview:', response.substring(0, 500));
-					}
-				}
-				
-				$('.page-configurator').html(response);
+			
+			// Note: PDF opens automatically via script tag in response.
+			// No need to manually open it here as it would create duplicate tabs.
+			
+			$('.page-configurator').html(response);
 				if (
 					next_phase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && 
