@@ -32,42 +32,31 @@ class PDF {
 		$dirname       = self::get_budget_base_dir( 'path' );
 		$filename_path = $dirname . $filename;
 
-		error_log( 'PBC PDF: Starting PDF generation - ' . $filename );
-		error_log( 'PBC PDF: Directory: ' . $dirname );
-		error_log( 'PBC PDF: Full path: ' . $filename_path );
+		$content = self::configurator_result_generate_pdf( $item );
 
-	$content = self::configurator_result_generate_pdf( $item );
+		if ( 'error' === $content['type'] ) {
+			return null;
+		}
 
-	if ( 'error' === $content['type'] ) {
-		error_log( 'PBC PDF: Content generation error - ' . $content['response'] );
-		return null;
-	}
-
-	try {
+		try {
 			$html2pdf = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
 			$html2pdf->setTestTdInOnePage( false );
 			$html2pdf->writeHTML( $content['response'] );
 			$html2pdf->Output( $filename_path, 'F' );
-			error_log( 'PBC PDF: PDF file generated successfully' );
 		} catch ( \Spipu\Html2Pdf\Exception\Html2PdfException $e ) {
-			error_log( 'PBC PDF: Html2Pdf Exception - ' . $e->getMessage() );
 			return null;
 		} catch ( \Exception $e ) {
-			error_log( 'PBC PDF: General Exception - ' . $e->getMessage() );
 			return null;
 		}
 
 		if ( is_file( $filename_path ) ) {
-			error_log( 'PBC PDF: File exists, returning ' . $type_return );
 			if ( 'path' === $type_return ) {
 				return $filename_path;
 			} elseif ( 'url' === $type_return ) {
 				$url = self::get_budget_base_dir( 'url' ) . $filename;
-				error_log( 'PBC PDF: Returning URL - ' . $url );
 				return $url;
 			}
 		} else {
-			error_log( 'PBC PDF: File does not exist after generation attempt' );
 			return null;
 		}
 
@@ -115,7 +104,6 @@ class PDF {
 
 		// If it's now a valid local file, return it.
 		if ( file_exists( $local_path ) ) {
-			error_log( 'PBC PDF: Converted URL to local path: ' . $url . ' => ' . $local_path );
 			return $local_path;
 		}
 
@@ -124,12 +112,10 @@ class PDF {
 		if ( $attachment_id ) {
 			$local_path = get_attached_file( $attachment_id );
 			if ( $local_path && file_exists( $local_path ) ) {
-				error_log( 'PBC PDF: Converted URL via attachment ID: ' . $url . ' => ' . $local_path );
 				return $local_path;
 			}
 		}
 
-		error_log( 'PBC PDF: Could not convert URL to local path: ' . $url );
 		return $url;
 	}
 
@@ -144,11 +130,7 @@ class PDF {
 		$session_key  = 'pbc_variation_' . $parent_phase;
 		$budget_date  = isset( $item['pbc_budget_date'] ) ? sanitize_text_field( $item['pbc_budget_date'] ) : gmdate( 'd-m-Y' );
 
-		error_log( 'PBC PDF Content: parent_phase=' . $parent_phase . ', session_key=' . $session_key );
-		error_log( 'PBC PDF Content: item keys=' . implode( ', ', array_keys( $item ) ) );
-
 		if ( empty( $item[ $session_key ] ) || ! is_array( $item[ $session_key ] ) ) {
-			error_log( 'PBC PDF Content: Session data empty or not array' );
 			$result = array(
 				'type'     => 'error',
 				'response' => __( 'Configurator not ready!', 'pbc' ),
@@ -383,12 +365,9 @@ class PDF {
         // Ensure the directory exists and is writable
         if (!is_dir($dirname)) {
             if (!mkdir($dirname, 0755, true)) {
-                error_log('PBC PDF: Failed to create directory: ' . $dirname);
                 return '<p style="color:red;">Error: Output directory not found or writable.</p>';
             }
         }
-
-        error_log('PBC PDF: Starting product image generation. Total vars: ' . $total_vars);
 
         for ($i = 0; $i <= $total_vars; $i++) {
             $imgprodid = '';
@@ -436,7 +415,6 @@ class PDF {
                     
                     // Check if the file exists locally.
                     if (!file_exists($imgprodpath)) {
-                        error_log('PBC PDF: Image file not found: ' . $imgprodpath);
                         continue;
                     }
 
@@ -465,17 +443,13 @@ class PDF {
                                 $img = imagecreatefromwebp($imgprodpath);
                                 break;
                             default:
-                                error_log('PBC PDF: Unsupported image format: ' . $extension . ' for file: ' . $imgprodpath);
                                 continue 2;
                         }
                     } else {
-                        error_log('PBC PDF: Failed to get image size for file: ' . $imgprodpath);
                         continue;
                     }
 
                     if ($img) {
-                        error_log('PBC PDF: Image loaded for product ID: ' . $imgprodid . ' from path: ' . $imgprodpath);
-                        error_log('PBC PDF: Source dimensions (width, height): ' . $width . ', ' . $height);
 
                         // If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
                         // and imagesavealpha is true if you were modifying it before copying.
@@ -501,9 +475,6 @@ class PDF {
                         $x_position = max(0, (int)(($output_width - $new_width) / 2));
                         $y_position = max(0, (int)(($output_height - $new_height) / 2));
 
-                        error_log('PBC PDF: Calculated copy dimensions (new_width, new_height): ' . (int)$new_width . ', ' . (int)$new_height);
-                        error_log('PBC PDF: Copy positions (x_position, y_position): ' . $x_position . ', ' . $y_position);
-
                         // --- Critical: Re-enable alpha blending on the output image just before copying ---
                         // This ensures that the alpha channels of the source images are correctly blended
                         // with the output image's transparent background.
@@ -512,11 +483,7 @@ class PDF {
                         // Copy and resample the image onto the output canvas
                         imagecopyresampled($output_image, $img, $x_position, $y_position, 0, 0, (int)$new_width, (int)$new_height, $width, $height);
                         imagedestroy($img); // Free memory for the source image
-                    } else {
-                        error_log('PBC PDF: Failed to create image resource for path: ' . $imgprodpath);
                     }
-                } else {
-                    error_log('PBC PDF: Image URL not found: ' . $imgprodurl);
                 }
             }
         }
@@ -526,17 +493,14 @@ class PDF {
 
         // Save the final image. Check if saving was successful.
         if (!imagepng($output_image, $output_file_path)) {
-            error_log('PBC PDF: Failed to save image to: ' . $output_file_path);
             imagedestroy($output_image);
             return '<p style="color:red;">Error: Failed to save product image.</p>';
         }
-        
-        error_log('PBC PDF: Product image saved successfully to: ' . $output_file_path);
+
         imagedestroy($output_image); // Free memory for the output image
 
         // Provide the direct file system path for Html2Pdf
         $output = '<img phaseid="' . $i . '" src="' . $output_file_path . '" alt="product image" height="500px" width="auto" />';
-        error_log('PBC PDF: Returning image HTML tag with path: ' . $output_file_path);
         return $output;
     }
 }

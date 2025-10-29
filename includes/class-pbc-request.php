@@ -112,14 +112,12 @@ class PBC_Requests {
 	public function configurator_submit_action_callback() {
 		// Verify nonce.
 		if ( ! check_ajax_referer( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce', false ) ) {
-			error_log( 'PBC: Invalid nonce in configurator_submit_action_callback' );
 			wp_send_json_error( 'Invalid nonce' );
 		}
 
 		// Start or resume session.
 		if ( empty( session_id() ) ) {
 			if ( ! session_start() ) {
-				error_log( 'PBC: Failed to start session in configurator_submit_action_callback' );
 				wp_send_json_error( 'Session error' );
 			}
 		}
@@ -154,19 +152,11 @@ class PBC_Requests {
 		}
 
 		if ( 'email_send' === $submit ) {
-			error_log( 'PBC: Processing email send' );
 			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $item );
 		} elseif ( 'generate_pdf' === $submit ) {
-			error_log( 'PBC: Processing PDF generation' );
 			$item['pbc_enquiry']    = CALC::configurator_save_enquiry( $item );
 			$pdf_url                = PDF::generate_engine_pdf( $item, 'url' );
 			$_SESSION['pbc_output'] = $pdf_url;
-			
-			if ( empty( $pdf_url ) ) {
-				error_log( 'PBC: Failed to generate PDF - empty URL returned' );
-			} else {
-				error_log( 'PBC: PDF generated successfully: ' . $pdf_url );
-			}
 		}
 
 		ob_start();

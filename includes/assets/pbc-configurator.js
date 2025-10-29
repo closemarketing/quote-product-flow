@@ -1,8 +1,4 @@
 jQuery(function($){
-	console.log('PBC: JavaScript loaded and ready!');
-	console.log('PBC: jQuery version:', $.fn.jquery);
-	console.log('PBC: AJAX URL:', typeof PBCAjaxAction !== 'undefined' ? PBCAjaxAction.ajax_url : 'NOT DEFINED');
-
 	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
@@ -150,32 +146,21 @@ jQuery(function($){
 
 	// Submit form.
 	$(document).on('click', 'button[name=submit]', function(e){
-		console.log('PBC: Button clicked');
         var thisButton = $(this);
 		var submit_val = $(this).val();
-		console.log('PBC: Submit value:', submit_val);
         thisButton.prop('disabled', true);
 		var form_id = 'configurator-form';
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
-		
-		console.log('PBC: Form ID:', form_id);
-		console.log('PBC: AJAX URL:', PBCAjaxAction.ajax_url);
-		console.log('PBC: Next phase:', next_phase);
 
 		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template');
-		console.log('PBC: Form data length:', formData.length);
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
 			data: formData,
 			dataType: "html",
-			beforeSend: function() {
-				console.log('PBC: AJAX request starting...');
-			},
 			success: function(response) {
-				console.log('PBC: AJAX success! Response length:', response.length);
                 thisButton.prop('disabled', false);
 			
 			// Note: PDF opens automatically via script tag in response.
