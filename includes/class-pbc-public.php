@@ -44,24 +44,27 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+		// Use timestamp to force cache refresh during development.
+		$version = WPPBC_VERSION . '-' . filemtime( WPPBC_PLUGIN_PATH . 'includes/assets/pbc-configurator.js' );
+
 		wp_register_style(
 			'pbc-public',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.css',
 			array(),
-			WPPBC_VERSION
+			$version
 		);
 
 		wp_register_script(
 			'pbc-public',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.js',
 			array( 'jquery' ),
-			WPPBC_VERSION,
+			$version,
 			true
 		);
 
 		$current_user = wp_get_current_user();
-		$roles = (array) $current_user->roles;
-		$show_prices = get_option( 'pbc_show_prices_user_' . $roles[0] );
+		$roles        = (array) $current_user->roles;
+		$show_prices  = get_option( 'pbc_show_prices_user_' . $roles[0] );
 
 		wp_localize_script(
 			'pbc-public',
@@ -69,8 +72,9 @@ class PBC_Public {
 			array(
 				'ajax_url'       => admin_url( 'admin-ajax.php' ),
 				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
-				'show_prices'    => $show_prices == 'yes' ? 'yes' : 'no',
+				'show_prices'    => 'yes' === $show_prices ? 'yes' : 'no',
 				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
+				'debug'          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 			)
 		);
 	}

@@ -1,4 +1,7 @@
 jQuery(function($){
+	console.log('PBC: JavaScript loaded and ready!');
+	console.log('PBC: jQuery version:', $.fn.jquery);
+	console.log('PBC: AJAX URL:', typeof PBCAjaxAction !== 'undefined' ? PBCAjaxAction.ajax_url : 'NOT DEFINED');
 
 	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
@@ -147,20 +150,49 @@ jQuery(function($){
 
 	// Submit form.
 	$(document).on('click', 'button[name=submit]', function(e){
+		console.log('PBC: Button clicked');
         var thisButton = $(this);
 		var submit_val = $(this).val();
+		console.log('PBC: Submit value:', submit_val);
         thisButton.prop('disabled', true);
 		var form_id = 'configurator-form';
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
+		
+		console.log('PBC: Form ID:', form_id);
+		console.log('PBC: AJAX URL:', PBCAjaxAction.ajax_url);
+		console.log('PBC: Next phase:', next_phase);
+
+		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template');
+		console.log('PBC: Form data length:', formData.length);
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
-			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template'),
+			data: formData,
 			dataType: "html",
+			beforeSend: function() {
+				console.log('PBC: AJAX request starting...');
+			},
 			success: function(response) {
+				console.log('PBC: AJAX success! Response length:', response.length);
                 thisButton.prop('disabled', false);
+				
+				// Extract PDF URL from response if generating PDF.
+				if (submit_val === 'generate_pdf' || submit_val === 'email_send') {
+					console.log('PBC: Looking for PDF URL in response...');
+					var scriptMatch = response.match(/<script[^>]*>window\.open\(['"]([^'"]+)['"]/);
+					console.log('PBC: Script match:', scriptMatch);
+					if (scriptMatch && scriptMatch[1]) {
+						console.log('PBC: Opening PDF URL:', scriptMatch[1]);
+						// Open PDF in new window.
+						window.open(scriptMatch[1], '_blank');
+					} else {
+						console.log('PBC: No PDF URL found in response');
+						console.log('PBC: Response preview:', response.substring(0, 500));
+					}
+				}
+				
 				$('.page-configurator').html(response);
 				if (
 					next_phase != 'calculate' &&
@@ -176,6 +208,15 @@ jQuery(function($){
 						$(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
 					}
 				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error('PBC: AJAX Error!');
+				console.error('PBC: Status:', textStatus);
+				console.error('PBC: Error:', errorThrown);
+				console.error('PBC: Status Code:', jqXHR.status);
+				console.error('PBC: Response Text:', jqXHR.responseText);
+				thisButton.prop('disabled', false);
+				alert('Error en la petición AJAX: ' + textStatus + '\nCódigo: ' + jqXHR.status + '\nPor favor, abre la consola del navegador (F12) para más detalles.');
 			}
 		});
 	});
