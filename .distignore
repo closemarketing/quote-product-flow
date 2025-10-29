@@ -28,3 +28,9 @@ uni2cid_ag15.php
 cid0*.*
 freesans*.*
 freeserif*.*
+phpstan.neon.dist
+tests/
+bin/
+phpunit.xml.dist
+.phpunit.result.cache
+docs/

@@ -36,14 +36,14 @@ class PDF {
 		error_log( 'PBC PDF: Directory: ' . $dirname );
 		error_log( 'PBC PDF: Full path: ' . $filename_path );
 
-		$content = self::configurator_result_generate_pdf( $item );
+	$content = self::configurator_result_generate_pdf( $item );
 
-		if ( 'error' === $content['type'] ) {
-			error_log( 'PBC PDF: Content generation error - ' . $content['response'] );
-			return null;
-		}
+	if ( 'error' === $content['type'] ) {
+		error_log( 'PBC PDF: Content generation error - ' . $content['response'] );
+		return null;
+	}
 
-		try {
+	try {
 			$html2pdf = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
 			$html2pdf->setTestTdInOnePage( false );
 			$html2pdf->writeHTML( $content['response'] );
@@ -70,6 +70,8 @@ class PDF {
 			error_log( 'PBC PDF: File does not exist after generation attempt' );
 			return null;
 		}
+
+		return '';
 	}
 
 	/**
@@ -161,10 +163,10 @@ class PDF {
 
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
-        $user = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = $show_prices == 'yes' ? true : false;
-        $show_prices     = isset( $item['pbc_admin'] ) ? true : $show_prices;
+
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = CALC::get_show_prices_for_user( $user_role );
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';
@@ -235,7 +237,7 @@ class PDF {
 		$flipped                   = false;
 		$variations_images_flipped = get_option( 'variations_images_flipped' );
 		$variations_images_flipped = is_array( $variations_images_flipped ) ? array_filter( $variations_images_flipped ) : array();
-		if ( ! empty( $variations_images_flipped ) && file_exists( $variations_images_flipped ) ) {
+		if ( ! empty( $variations_images_flipped ) ) {
 			for ( $j = 1; $j <= $total_vars; $j++ ) {
 				if ( isset( $itemv[ $j ] ) && in_array( $itemv[ $j ]['var']['id'], $variations_images_flipped ) ) {
 					$flipped = true;
