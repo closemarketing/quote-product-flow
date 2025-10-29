@@ -25,7 +25,7 @@ class PDF {
 	 *
 	 * @param array  $item        Item of budget to generate.
 	 * @param string $type_return url/path for type to return.
-	 * @return file
+	 * @return string|null
 	 */
 	public static function generate_engine_pdf( $item = array(), $type_return = 'path' ) {
 		$filename      = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
@@ -34,23 +34,30 @@ class PDF {
 
 		$content = self::configurator_result_generate_pdf( $item );
 
-		if ( 'error' !== $content['type'] ) {
-			try {
-				$html2pdf  = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
-				$html2pdf->setTestTdInOnePage( false );
-				$html2pdf->writeHTML( $content['response'] );
-				$html2pdf->Output( $filename_path, 'F' );
-				// $html2pdf->close();
-			} catch ( \Spipu\Html2Pdf\Exception $e ) {
-				// error
-				// $formatter = new ExceptionFormatter($e);
-				// echo "Unexpected Error!<br>Can't load PDF this time!<br>".$formatter->getHtmlMessage();
-			}
+		if ( 'error' === $content['type'] ) {
+			return null;
 		}
-		if ( is_file( $filename_path ) && 'path' === $type_return ) {
-			return $filename_path;
-		} elseif ( is_file( $filename_path ) && 'url' === $type_return ) {
-			return self::get_budget_base_dir( 'url' ) . $filename;
+
+		try {
+			$html2pdf = new \Spipu\Html2Pdf\Html2Pdf( 'P', 'A4', 'en', true, 'UTF-8', array( 2.5, 2.5, 2.5, 2.5 ) );
+			$html2pdf->setTestTdInOnePage( false );
+			$html2pdf->writeHTML( $content['response'] );
+			$html2pdf->Output( $filename_path, 'F' );
+		} catch ( \Spipu\Html2Pdf\Exception\Html2PdfException $e ) {
+			return null;
+		} catch ( \Exception $e ) {
+			return null;
+		}
+
+		if ( is_file( $filename_path ) ) {
+			if ( 'path' === $type_return ) {
+				return $filename_path;
+			} elseif ( 'url' === $type_return ) {
+				$url = self::get_budget_base_dir( 'url' ) . $filename;
+				return $url;
+			}
+		} else {
+			return null;
 		}
 
 		return '';
@@ -59,6 +66,7 @@ class PDF {
 	/**
 	 * Returns the filename created in folder
 	 *
+	 * @param string $type Type of path to return.
 	 * @return string Filename and path
 	 */
 	public static function get_budget_base_dir( $type = 'path' ) {
@@ -76,6 +84,42 @@ class PDF {
 	}
 
 	/**
+	 * Convert URL to local file path for Html2Pdf
+	 *
+	 * @param string $url URL to convert.
+	 * @return string Local file path or original URL if conversion fails
+	 */
+	public static function url_to_local_path( $url ) {
+		if ( empty( $url ) ) {
+			return '';
+		}
+
+		// Get site URL and upload directory info.
+		$site_url   = site_url();
+		$upload_dir = wp_upload_dir();
+
+		// Replace site URL with absolute path.
+		$local_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+		$local_path = str_replace( $site_url, ABSPATH, $local_path );
+
+		// If it's now a valid local file, return it.
+		if ( file_exists( $local_path ) ) {
+			return $local_path;
+		}
+
+		// Try to get attachment ID from URL and get path from that.
+		$attachment_id = attachment_url_to_postid( $url );
+		if ( $attachment_id ) {
+			$local_path = get_attached_file( $attachment_id );
+			if ( $local_path && file_exists( $local_path ) ) {
+				return $local_path;
+			}
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Generates PDF from session
 	 *
 	 * @param array $item Item of budget to generate.
@@ -86,11 +130,12 @@ class PDF {
 		$session_key  = 'pbc_variation_' . $parent_phase;
 		$budget_date  = isset( $item['pbc_budget_date'] ) ? sanitize_text_field( $item['pbc_budget_date'] ) : gmdate( 'd-m-Y' );
 
-		if ( empty( $item[ $session_key ] ) && ! is_array( $item[ $session_key ] ) ) {
+		if ( empty( $item[ $session_key ] ) || ! is_array( $item[ $session_key ] ) ) {
 			$result = array(
 				'type'     => 'error',
 				'response' => __( 'Configurator not ready!', 'pbc' ),
 			);
+			return $result;
 		}
 		$total_vars       = count( $item[ $session_key ] );
 		$itemv            = $item[ $session_key ];
@@ -128,12 +173,16 @@ class PDF {
 		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 		$pdf_image_selected = ! empty( $pdf_image_selected ) ? trim( $pdf_image_selected ) : '';
 		if ( ! empty( $pdf_image_selected ) ) {
-			$output .= "<img src='" . esc_url( $pdf_image_selected ) . "' width='200'/>";
+			// Convert URL to local path for Html2Pdf.
+			$pdf_image_local = self::url_to_local_path( $pdf_image_selected );
+			$output         .= "<img src='" . esc_attr( $pdf_image_local ) . "' width='200'/>";
 		}
 		$header_image = get_option( 'pbc_pdf_image_header' );
 		$header_image = ! empty( $header_image ) ? trim( $header_image ) : '';
 		if ( ! empty( $header_image ) ) {
-			$output .= '<table class="header"><tr><td><img src="' . esc_url( $header_image ) . '" class="header_image"/></td></tr></table><br/>';
+			// Convert URL to local path for Html2Pdf.
+			$header_image_local = self::url_to_local_path( $header_image );
+			$output            .= '<table class="header"><tr><td><img src="' . esc_attr( $header_image_local ) . '" class="header_image"/></td></tr></table><br/>';
 		}
 		$output .= '<table class="product"><tr><td class="product-title">';
 		$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
@@ -196,7 +245,8 @@ class PDF {
 
 			$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
 			$variation_type = ! empty( $details['var']['id'] ) ? $details['var']['type'] : $variation_type;
-			$price          = (float) str_replace( ',', '.', $details['var']['price'] );
+			$var_price      = isset( $details['var']['price'] ) ? $details['var']['price'] : 0;
+			$price          = (float) str_replace( ',', '.', (string) $var_price );
 			if ( 'qty' === $variation_type ) {
 				$total_qty = $price;
 			} else {
@@ -274,7 +324,9 @@ class PDF {
 		$footer_image = get_option( 'pbc_pdf_image_footer' );
 		$footer_image = ! empty( $footer_image ) ? trim( $footer_image ) : '';
 		if ( ! empty( $footer_image ) ) {
-			$output .= '<table class="footer"><tr><td><img src="' . esc_url( $footer_image ) . '" class="footer_image"/></td></tr></table><br/>';
+			// Convert URL to local path for Html2Pdf.
+			$footer_image_local = self::url_to_local_path( $footer_image );
+			$output            .= '<table class="footer"><tr><td><img src="' . esc_attr( $footer_image_local ) . '" class="footer_image"/></td></tr></table><br/>';
 		}
 
 		$output .= '</page>';
@@ -313,7 +365,6 @@ class PDF {
         // Ensure the directory exists and is writable
         if (!is_dir($dirname)) {
             if (!mkdir($dirname, 0755, true)) {
-                error_log("Failed to create directory: " . $dirname);
                 return '<p style="color:red;">Error: Output directory not found or writable.</p>';
             }
         }
@@ -358,43 +409,47 @@ class PDF {
                     $imgprodurl = $imgprodurl_array[0] ?? '';
                 }
 
-                if (!empty($imgprodurl) && wp_remote_retrieve_response_code(wp_remote_head($imgprodurl)) === 200) {
-                    $extension = pathinfo($imgprodurl, PATHINFO_EXTENSION);
+                if (!empty($imgprodurl)) {
+                    // Convert URL to local path for better compatibility with GD library.
+                    $imgprodpath = self::url_to_local_path($imgprodurl);
+                    
+                    // Check if the file exists locally.
+                    if (!file_exists($imgprodpath)) {
+                        continue;
+                    }
+
+                    $extension = pathinfo($imgprodpath, PATHINFO_EXTENSION);
                     $img = false;
                     $width = 0;
                     $height = 0;
 
                     // Attempt to get image size first to avoid unnecessary image creation
-                    $image_size_info = @getimagesize($imgprodurl); 
+                    $image_size_info = @getimagesize($imgprodpath); 
                     if ($image_size_info) {
                         list($width, $height, $type) = $image_size_info;
 
                         switch (strtolower($extension)) {
                             case 'png':
-                                $img = imagecreatefrompng($imgprodurl);
+                                $img = imagecreatefrompng($imgprodpath);
                                 break;
                             case 'jpg':
                             case 'jpeg':
-                                $img = imagecreatefromjpeg($imgprodurl);
+                                $img = imagecreatefromjpeg($imgprodpath);
                                 break;
                             case 'gif':
-                                $img = imagecreatefromgif($imgprodurl);
+                                $img = imagecreatefromgif($imgprodpath);
                                 break;
                             case 'webp':
-                                $img = imagecreatefromwebp($imgprodurl);
+                                $img = imagecreatefromwebp($imgprodpath);
                                 break;
                             default:
-                                error_log("Unsupported image format: " . $extension . " for URL: " . $imgprodurl);
                                 continue 2;
                         }
                     } else {
-                        error_log("DEBUG: Failed to get image size for URL: " . $imgprodurl);
                         continue;
                     }
 
                     if ($img) {
-                        error_log("DEBUG: Image loaded for product ID: " . $imgprodid . " from URL: " . $imgprodurl);
-                        error_log("DEBUG: Source dimensions (width, height): " . $width . ", " . $height);
 
                         // If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
                         // and imagesavealpha is true if you were modifying it before copying.
@@ -420,9 +475,6 @@ class PDF {
                         $x_position = max(0, (int)(($output_width - $new_width) / 2));
                         $y_position = max(0, (int)(($output_height - $new_height) / 2));
 
-                        error_log("DEBUG: Calculated copy dimensions (new_width, new_height): " . (int)$new_width . ", " . (int)$new_height);
-                        error_log("DEBUG: Copy positions (x_position, y_position): " . $x_position . ", " . $y_position);
-
                         // --- Critical: Re-enable alpha blending on the output image just before copying ---
                         // This ensures that the alpha channels of the source images are correctly blended
                         // with the output image's transparent background.
@@ -431,11 +483,7 @@ class PDF {
                         // Copy and resample the image onto the output canvas
                         imagecopyresampled($output_image, $img, $x_position, $y_position, 0, 0, (int)$new_width, (int)$new_height, $width, $height);
                         imagedestroy($img); // Free memory for the source image
-                    } else {
-                        error_log("DEBUG: Failed to create image resource for URL: " . $imgprodurl);
                     }
-                } else {
-                    error_log("DEBUG: Image URL not found or inaccessible: " . $imgprodurl);
                 }
             }
         }
@@ -445,10 +493,10 @@ class PDF {
 
         // Save the final image. Check if saving was successful.
         if (!imagepng($output_image, $output_file_path)) {
-            error_log("Failed to save image to: " . $output_file_path);
             imagedestroy($output_image);
             return '<p style="color:red;">Error: Failed to save product image.</p>';
         }
+
         imagedestroy($output_image); // Free memory for the output image
 
         // Provide the direct file system path for Html2Pdf

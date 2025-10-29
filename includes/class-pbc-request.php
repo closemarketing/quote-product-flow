@@ -110,15 +110,22 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_submit_action_callback() {
+		// Verify nonce.
 		if ( ! check_ajax_referer( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce', false ) ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
+
+		// Start or resume session.
+		if ( empty( session_id() ) ) {
+			if ( ! session_start() ) {
+				wp_send_json_error( 'Session error' );
+			}
+		}
+
 		$submit = isset( $_POST['submit'] ) ? sanitize_text_field( wp_unslash( $_POST['submit'] ) ) : '';
 		$item   = [];
+
 		if ( 'email_send' === $submit || 'generate_pdf' === $submit ) {
-			if ( empty( session_id() ) ) {
-				session_start();
-			}
 			$email_field    = ! empty( $_POST['email_field'] ) ? sanitize_email( wp_unslash( $_POST['email_field'] ) ) : '';
 			$name_field     = ! empty( $_POST['name_field'] ) ? sanitize_text_field( wp_unslash( $_POST['name_field'] ) ) : '';
 			$phone_field    = ! empty( $_POST['phone_field'] ) ? sanitize_text_field( wp_unslash( $_POST['phone_field'] ) ) : '';
@@ -148,7 +155,8 @@ class PBC_Requests {
 			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $item );
 		} elseif ( 'generate_pdf' === $submit ) {
 			$item['pbc_enquiry']    = CALC::configurator_save_enquiry( $item );
-			$_SESSION['pbc_output'] = PDF::generate_engine_pdf( $item, 'url' );
+			$pdf_url                = PDF::generate_engine_pdf( $item, 'url' );
+			$_SESSION['pbc_output'] = $pdf_url;
 		}
 
 		ob_start();

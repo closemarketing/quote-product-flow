@@ -1,5 +1,4 @@
 jQuery(function($){
-
 	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
@@ -154,14 +153,20 @@ jQuery(function($){
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
 
+		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template');
+
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
-			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template'),
+			data: formData,
 			dataType: "html",
 			success: function(response) {
                 thisButton.prop('disabled', false);
-				$('.page-configurator').html(response);
+			
+			// Note: PDF opens automatically via script tag in response.
+			// No need to manually open it here as it would create duplicate tabs.
+			
+			$('.page-configurator').html(response);
 				if (
 					next_phase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && 
@@ -176,6 +181,15 @@ jQuery(function($){
 						$(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
 					}
 				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error('PBC: AJAX Error!');
+				console.error('PBC: Status:', textStatus);
+				console.error('PBC: Error:', errorThrown);
+				console.error('PBC: Status Code:', jqXHR.status);
+				console.error('PBC: Response Text:', jqXHR.responseText);
+				thisButton.prop('disabled', false);
+				alert('Error en la petición AJAX: ' + textStatus + '\nCódigo: ' + jqXHR.status + '\nPor favor, abre la consola del navegador (F12) para más detalles.');
 			}
 		});
 	});
