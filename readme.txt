@@ -15,6 +15,9 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+= 1.4.0.1 =
+*  Fixed: Pdfs generation and send emails correctly.
+
 = 1.4.0 =
 *  Added: You can add hierarchical in products, so you can have different products.
 *  Added: You can select quantity of each products.
