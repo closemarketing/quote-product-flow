@@ -383,10 +383,12 @@ class PDF {
         // Ensure the directory exists and is writable
         if (!is_dir($dirname)) {
             if (!mkdir($dirname, 0755, true)) {
-                error_log("Failed to create directory: " . $dirname);
+                error_log('PBC PDF: Failed to create directory: ' . $dirname);
                 return '<p style="color:red;">Error: Output directory not found or writable.</p>';
             }
         }
+
+        error_log('PBC PDF: Starting product image generation. Total vars: ' . $total_vars);
 
         for ($i = 0; $i <= $total_vars; $i++) {
             $imgprodid = '';
@@ -428,43 +430,52 @@ class PDF {
                     $imgprodurl = $imgprodurl_array[0] ?? '';
                 }
 
-                if (!empty($imgprodurl) && wp_remote_retrieve_response_code(wp_remote_head($imgprodurl)) === 200) {
-                    $extension = pathinfo($imgprodurl, PATHINFO_EXTENSION);
+                if (!empty($imgprodurl)) {
+                    // Convert URL to local path for better compatibility with GD library.
+                    $imgprodpath = self::url_to_local_path($imgprodurl);
+                    
+                    // Check if the file exists locally.
+                    if (!file_exists($imgprodpath)) {
+                        error_log('PBC PDF: Image file not found: ' . $imgprodpath);
+                        continue;
+                    }
+
+                    $extension = pathinfo($imgprodpath, PATHINFO_EXTENSION);
                     $img = false;
                     $width = 0;
                     $height = 0;
 
                     // Attempt to get image size first to avoid unnecessary image creation
-                    $image_size_info = @getimagesize($imgprodurl); 
+                    $image_size_info = @getimagesize($imgprodpath); 
                     if ($image_size_info) {
                         list($width, $height, $type) = $image_size_info;
 
                         switch (strtolower($extension)) {
                             case 'png':
-                                $img = imagecreatefrompng($imgprodurl);
+                                $img = imagecreatefrompng($imgprodpath);
                                 break;
                             case 'jpg':
                             case 'jpeg':
-                                $img = imagecreatefromjpeg($imgprodurl);
+                                $img = imagecreatefromjpeg($imgprodpath);
                                 break;
                             case 'gif':
-                                $img = imagecreatefromgif($imgprodurl);
+                                $img = imagecreatefromgif($imgprodpath);
                                 break;
                             case 'webp':
-                                $img = imagecreatefromwebp($imgprodurl);
+                                $img = imagecreatefromwebp($imgprodpath);
                                 break;
                             default:
-                                error_log("Unsupported image format: " . $extension . " for URL: " . $imgprodurl);
+                                error_log('PBC PDF: Unsupported image format: ' . $extension . ' for file: ' . $imgprodpath);
                                 continue 2;
                         }
                     } else {
-                        error_log("DEBUG: Failed to get image size for URL: " . $imgprodurl);
+                        error_log('PBC PDF: Failed to get image size for file: ' . $imgprodpath);
                         continue;
                     }
 
                     if ($img) {
-                        error_log("DEBUG: Image loaded for product ID: " . $imgprodid . " from URL: " . $imgprodurl);
-                        error_log("DEBUG: Source dimensions (width, height): " . $width . ", " . $height);
+                        error_log('PBC PDF: Image loaded for product ID: ' . $imgprodid . ' from path: ' . $imgprodpath);
+                        error_log('PBC PDF: Source dimensions (width, height): ' . $width . ', ' . $height);
 
                         // If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
                         // and imagesavealpha is true if you were modifying it before copying.
@@ -490,8 +501,8 @@ class PDF {
                         $x_position = max(0, (int)(($output_width - $new_width) / 2));
                         $y_position = max(0, (int)(($output_height - $new_height) / 2));
 
-                        error_log("DEBUG: Calculated copy dimensions (new_width, new_height): " . (int)$new_width . ", " . (int)$new_height);
-                        error_log("DEBUG: Copy positions (x_position, y_position): " . $x_position . ", " . $y_position);
+                        error_log('PBC PDF: Calculated copy dimensions (new_width, new_height): ' . (int)$new_width . ', ' . (int)$new_height);
+                        error_log('PBC PDF: Copy positions (x_position, y_position): ' . $x_position . ', ' . $y_position);
 
                         // --- Critical: Re-enable alpha blending on the output image just before copying ---
                         // This ensures that the alpha channels of the source images are correctly blended
@@ -502,10 +513,10 @@ class PDF {
                         imagecopyresampled($output_image, $img, $x_position, $y_position, 0, 0, (int)$new_width, (int)$new_height, $width, $height);
                         imagedestroy($img); // Free memory for the source image
                     } else {
-                        error_log("DEBUG: Failed to create image resource for URL: " . $imgprodurl);
+                        error_log('PBC PDF: Failed to create image resource for path: ' . $imgprodpath);
                     }
                 } else {
-                    error_log("DEBUG: Image URL not found or inaccessible: " . $imgprodurl);
+                    error_log('PBC PDF: Image URL not found: ' . $imgprodurl);
                 }
             }
         }
@@ -515,14 +526,17 @@ class PDF {
 
         // Save the final image. Check if saving was successful.
         if (!imagepng($output_image, $output_file_path)) {
-            error_log("Failed to save image to: " . $output_file_path);
+            error_log('PBC PDF: Failed to save image to: ' . $output_file_path);
             imagedestroy($output_image);
             return '<p style="color:red;">Error: Failed to save product image.</p>';
         }
+        
+        error_log('PBC PDF: Product image saved successfully to: ' . $output_file_path);
         imagedestroy($output_image); // Free memory for the output image
 
         // Provide the direct file system path for Html2Pdf
         $output = '<img phaseid="' . $i . '" src="' . $output_file_path . '" alt="product image" height="500px" width="auto" />';
+        error_log('PBC PDF: Returning image HTML tag with path: ' . $output_file_path);
         return $output;
     }
 }
