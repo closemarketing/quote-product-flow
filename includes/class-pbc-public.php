@@ -46,21 +46,18 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		// Use timestamp to force cache refresh during development.
-		$version = WPPBC_VERSION . '-' . filemtime( WPPBC_PLUGIN_PATH . 'includes/assets/pbc-configurator.js' );
-
 		wp_register_style(
 			'pbc-public',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.css',
 			array(),
-			$version
+			WPPBC_VERSION
 		);
 
 		wp_register_script(
 			'pbc-public',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.js',
 			array( 'jquery' ),
-			$version,
+			WPPBC_VERSION,
 			true
 		);
 
