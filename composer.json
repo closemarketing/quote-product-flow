@@ -11,12 +11,17 @@
 		{
 			"type": "composer",
 			"url": "https://packages.metabox.io/2e4180fda99b097f63bec435fd908cc4"
+		},
+		{
+			"type": "path",
+			"url": "../close-wp-plugin-updater"
 		}
 	],
 	"require": {
 		"wpackagist-plugin/meta-box": "^5.6.7",
 		"meta-box/meta-box-group": "dev-master",
-		"spipu/html2pdf": "^5.2"
+		"spipu/html2pdf": "^5.2",
+		"closemarketing/wp-plugin-license-manager": "@dev"
 	},
 	"config": {
 		"allow-plugins": {

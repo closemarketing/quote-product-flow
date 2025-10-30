@@ -48,6 +48,40 @@ if ( file_exists( WPPBC_PLUGIN_PATH . 'vendor/autoload.php' ) ) {
 	require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
 }
 
+// Initialize License Manager.
+add_action(
+	'plugins_loaded',
+	function () {
+		try {
+			// Make it global so it can be accessed in the metabox.
+			global $pbc_license_manager;
+
+			$pbc_license_manager = new \Closemarketing\WPLicenseManager\License(
+				array(
+					'api_url'     => WPPBC_URL_API,
+					'file'        => WPPBC_PLUGIN,
+					'version'     => WPPBC_VERSION,
+					'slug'        => 'pbc',
+					'name'        => WPPBC_ITEM_NAME,
+					'text_domain' => 'pbc',
+				)
+			);
+		} catch ( \Exception $e ) {
+			add_action(
+				'admin_notices',
+				function() use ( $e ) {
+					?>
+					<div class="notice notice-error">
+						<p><?php echo esc_html( $e->getMessage() ); ?></p>
+					</div>
+					<?php
+				}
+			);
+		}
+	},
+	20
+);
+
 // Helpers.
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-parts.php';

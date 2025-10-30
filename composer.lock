@@ -4,8 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3222bb3033265385f32cde9dc60c150e",
+    "content-hash": "d62bca75a038ebaf0358735065ee8eab",
     "packages": [
+        {
+            "name": "closemarketing/wp-plugin-license-manager",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../close-wp-plugin-updater",
+                "reference": "0c21addc8a829b2fac422baeec123f4aaaca356d"
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpcompatibility/phpcompatibility-wp": "*",
+                "phpstan/phpstan": "^1.10",
+                "wp-coding-standards/wpcs": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Closemarketing\\WPLicenseManager\\": "src/"
+                },
+                "files": []
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "David Perez",
+                    "email": "david@closemarketing.es",
+                    "homepage": "https://close.marketing",
+                    "role": "Developer"
+                }
+            ],
+            "description": "WordPress Plugin License Manager Library - A reusable library for managing WordPress plugin licenses with WooCommerce API Manager",
+            "keywords": [
+                "api-manager",
+                "license",
+                "plugin",
+                "updates",
+                "woocommerce",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/closemarketing/wp-plugin-license-manager/issues",
+                "source": "https://github.com/closemarketing/wp-plugin-license-manager"
+            },
+            "transport-options": {
+                "relative": true
+            }
+        },
         {
             "name": "composer/installers",
             "version": "v2.3.0",
@@ -2860,7 +2911,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "meta-box/meta-box-group": 20
+        "meta-box/meta-box-group": 20,
+        "closemarketing/wp-plugin-license-manager": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

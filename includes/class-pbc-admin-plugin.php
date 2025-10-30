@@ -40,15 +40,6 @@ class PBC_Admin_Plugin {
 		// On variation-lists admin screen.
 		add_filter( 'views_edit-variation', array( $this, 'pbc_add_print_pdf_button' ) );
 		add_action( 'admin_head-edit.php', array( $this, 'pbc_move_print_pdf_button' ) );
-
-		// Creates license activation.
-		register_activation_hook( WPPBC_PLUGIN, array( $this, 'license_instance_activation' ) );
-		// Check for external connection blocking.
-		add_action( 'admin_notices', array( $this, 'check_external_blocking' ) );
-
-		if ( 'Activated' !== get_site_option( 'pbc_license_activated' ) ) {
-			add_action( 'admin_notices', array( $this, 'inactive_notice' ) );
-		}
 	}
 
 	/**
@@ -328,15 +319,6 @@ class PBC_Admin_Plugin {
 				$show_prices = isset( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ) : '';
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
-		}
-
-		if ( isset( $_POST['submit_license'] ) ) {
-			$license_apikey     = isset( $_POST['pbc_license_apikey'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_license_apikey'] ) ) : '';
-			$license_product_id = isset( $_POST['pbc_license_product_id'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_license_product_id'] ) ) : '';
-
-			update_option( 'pbc_license_apikey', $license_apikey );
-			update_option( 'pbc_license_product_id', $license_product_id );
-			$this->validate_license( $_POST );
 		}
 
 		return $status;
@@ -629,46 +611,30 @@ class PBC_Admin_Plugin {
 		<?php
 	}
 	/**
-	 * General Settings Meta Box Callback
+	 * License Meta Box Callback
 	 *
-	 * Callback function for add_meta_box import section
+	 * Renders license settings using the License Manager library
 	 */
 	public function license_meta_box_callback() {
+		// Get the global license instance.
+		global $pbc_license_manager;
+
+		if ( ! $pbc_license_manager ) {
+			echo '<p>' . esc_html__( 'License manager not initialized.', 'pbc' ) . '</p>';
+			return;
+		}
 		?>
-		<form action="" method="post" enctype="multipart/form-data" id="pbc_license_form">
+		<form action="options.php" method="post" enctype="multipart/form-data" id="pbc_license_form">
 			<div class="content">
-				<fieldset>
-					<label class="block" for="pbc_license_apikey"><?php esc_html_e( 'License API Key', 'pbc' ); ?></label>
-					<?php
-					$license_apikey = get_option( 'pbc_license_apikey' );
-					?>
-					<input style="width:100%;" type="text" name="pbc_license_apikey" value="
-					<?php
-					if ( $license_apikey ) {
-						echo $license_apikey; }
-					?>
-					" placeholder="<?php esc_html_e( 'License API Key', 'pbc' ); ?>" />
-				</fieldset>
-				<fieldset>
-					<label class="block" for="pbc_license_product_id"><?php esc_html_e( 'License Product ID', 'pbc' ); ?></label>
-					<?php
-					$license_product_id = get_option( 'pbc_license_product_id' );
-					?>
-					<input style="width:100%;" type="text" name="pbc_license_product_id" value="
-					<?php
-					if ( $license_product_id ) {
-						echo $license_product_id; }
-					?>
-					" placeholder="<?php esc_html_e( 'License Product ID', 'pbc' ); ?>" />
-				</fieldset>
-				<fieldset>
-					<label class="block" for="pbc_license_status"><?php esc_html_e( 'Status:', 'pbc' ); ?></label>
-					<p><strong><?php $this->license_status_callback(); ?></strong></p>
-				</fieldset>
+				<?php
+				// Use the library's settings.
+				settings_fields( $pbc_license_manager->get_option_group() );
+				do_settings_sections( $pbc_license_manager->get_settings_section() );
+				?>
 			</div>
 
 			<div class="save_bar">
-				<input type="hidden" name="submit_license" value="true"/>
+				<?php wp_nonce_field( 'Update_License_Options', 'license_nonce' ); ?>
 				<input type="submit" value="<?php esc_html_e( 'Save license', 'pbc' ); ?>" class="button button-primary submit-button" />
 			</div>
 		</form>
@@ -689,7 +655,7 @@ class PBC_Admin_Plugin {
 			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
 		);
 		echo '</p>';
-		echo '<p style="color:#F0F0F1;">' . esc_html__( 'Instance:', 'pbc' ) . ' ' . get_option( 'pbc_license_instance' ) . '</p>';
+		echo '<p style="color:#F0F0F1;">' . esc_html__( 'Instance:', 'pbc' ) . ' ' . esc_html( $pbc_license_manager->get_option_value( 'instance' ) ) . '</p>';
 		echo '</div>';
 	}
 
@@ -732,7 +698,7 @@ class PBC_Admin_Plugin {
 				'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
 			],
 			'pbc_enquiry'      => $post_id,
-            'pbc_admin'        => true,
+			'pbc_admin'        => true,
 		];
 
 		$total_vars = get_post_meta( $post_id, 'pbc_total_var', true );
@@ -790,7 +756,7 @@ class PBC_Admin_Plugin {
 				// 	$('#print-message').html('Please select a post!').show().delay(3000).fadeOut(500);
 				// 	return false;
 				// }
-				$('#print-message').html('<img src="<?php echo WPPBC_PLUGIN_URL; ?>/assets/loading.gif"/>');
+				$('#print-message').html('<img src="<?php echo esc_url( WPPBC_PLUGIN_URL ); ?>/assets/loading.gif"/>');
 				$.ajax({
 					type: "POST",
 					url: '<?php echo admin_url( 'admin-ajax.php' ); ?>',
@@ -816,474 +782,6 @@ class PBC_Admin_Plugin {
 		</script>
 		<?php
 	}
-	/**
-	 * # LICENSE
-	 * ---------------------------------------------------------------------------------------------------- */
-
-	/**
-	 * Displays an inactive notice when the software is inactive.
-	 */
-	public function inactive_notice() {
-		/**
-		 * @since 2.5.1
-		 *
-		 * Filter wc_am_client_inactive_notice_override
-		 * If set to false inactive_notice() method will be disabled.
-		 */
-		if ( apply_filters( 'wpat_client_inactive_notice_override', true ) ) {
-			if ( ! current_user_can( 'manage_options' ) ) {
-				return;
-			}
-			if ( isset( $_GET['page'] ) && 'pbc' == $_GET['page'] ) {
-				return;
-			}
-			echo '<div class="notice notice-error">';
-			echo '<p>';
-			printf(
-				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
-				esc_attr( WPPBC_ITEM_NAME ),
-				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
-				'</a>'
-			);
-			echo '</p></div>';
-		}
-	}
-	/**
-	 * Callback for Setting license API key
-	 *
-	 * @return void
-	 */
-	public function license_status_callback() {
-		if ( $this->get_api_key_status( true ) ) {
-			$license_status_check = esc_html__( 'Activated', 'pbc' );
-			update_option( 'pbc_license_activated', 'Activated' );
-			update_option( 'pbc_license_deactivate_checkbox', 'off' );
-		} else {
-			$license_status_check = esc_html__( 'Deactivated', 'pbc' );
-		}
-
-		echo esc_attr( $license_status_check );
-	}
-	/**
-	 * Validates license option
-	 *
-	 * @param array $input Settings input option.
-	 * @return mixed|string
-	 */
-	public function validate_license( $input ) {
-		// Load existing options, validate, and update with changes from input before returning.
-		$api_key           = trim( $input['pbc_license_apikey'] );
-		$activation_status = get_option( 'pbc_license_activated' );
-		$checkbox_status   = get_option( 'pbc_license_deactivate_checkbox' );
-		$current_api_key   = ! empty( get_option( 'pbc_license_apikey' ) ) ? get_option( 'pbc_license_apikey' ) : '';
-
-		/**
-		* @since 2.3
-		*/
-		if ( isset( $input['pbc_license_product_id'] ) ) {
-			$new_product_id = absint( $input['pbc_license_product_id'] );
-
-			if ( ! empty( $new_product_id ) ) {
-				update_option( 'pbc_license_product_id', $new_product_id );
-			}
-		}
-
-		// Deactivates API Key key activation.
-		if ( isset( $input['pbc_license_deactivate_checkbox'] ) && 'on' === $input['pbc_license_deactivate_checkbox'] ) {
-			$args                = array(
-				'api_key' => ! empty( $api_key ) ? $api_key : '',
-			);
-			$deactivation_result = $this->license_deactivate( $args );
-
-			if ( ! empty( $deactivation_result ) ) {
-
-			if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
-				update_option( 'pbc_license_activated', 'Deactivated' );
-				update_option( 'pbc_license_apikey', '' );
-				update_option( 'pbc_license_product_id', '' );
-				add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
-
-				return;
-			}
-
-			if ( isset( $deactivation_result['data'] ) && isset( $deactivation_result['data']['error_code'] ) && ! empty( $deactivation_result['data']['error_code'] ) ) {
-				add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
-				update_option( 'pbc_license_activated', 'Deactivated' );
-			}
-			}
-			return;
-		}
-
-		// Should match the settings_fields() value.
-		if ( 'Deactivated' == $activation_status || '' == $activation_status || '' == $api_key || 'on' == $checkbox_status || $current_api_key != $api_key ) {
-
-			/**
-			* If this is a new key, and an existing key already exists in the database,
-			* try to deactivate the existing key before activating the new key.
-			*/
-			if ( ! empty( $current_api_key ) && $current_api_key != $api_key ) {
-				$this->replace_license_key( $current_api_key );
-			}
-
-			$activation_result = $this->license_activate( $api_key );
-
-			if ( ! empty( $activation_result ) ) {
-				$activate_results = json_decode( $activation_result, true );
-
-				if ( true === $activate_results['success'] && true === $activate_results['activated'] ) {
-					add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
-
-					update_option( 'pbc_license_apikey', $api_key );
-					update_option( 'pbc_license_activated', 'Activated' );
-					update_option( 'pbc_license_deactivate_checkbox', 'off' );
-				}
-
-				if ( false == $activate_results && ! empty( get_option( 'pbc_license_activated' ) ) ) {
-					add_settings_error( 'api_key_check_text', 'api_key_check_error', esc_html__( 'Connection failed to the License Key API server. Try again later. There may be a problem on your server preventing outgoing requests, or the store is blocking your request to activate the plugin/theme.', 'pbc' ), 'error' );
-					update_option( 'pbc_license_activated', 'Deactivated' );
-				}
-
-				if ( isset( $activate_results['data']['error_code'] ) && ! empty( get_option( 'pbc_license_activated' ) ) ) {
-					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$activate_results['data']['error']}" ), 'error' );
-					update_option( 'pbc_license_activated', 'Deactivated' );
-				}
-			} else {
-				add_settings_error( 'not_activated_empty_response_text', 'not_activated_empty_response_error', esc_html__( 'The API Key activation could not be commpleted due to an unknown error possibly on the store server The activation results were empty.', 'pbc' ), 'updated' );
-			}
-		} // End Plugin Activation
-	}
-	/**
-	 * Sends the request to activate to the API Manager.
-	 *
-	 * @param array $api_key API Key to activate.
-	 *
-	 * @return string
-	 */
-	public function license_activate( $api_key ) {
-		if ( empty( $api_key ) ) {
-			add_settings_error( 'not_activated_text', 'not_activated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'pbc' ), 'updated' );
-
-			return '';
-		}
-
-		$defaults            = $this->get_license_defaults( 'activate', true );
-		$defaults['api_key'] = $api_key;
-		$target_url          = esc_url_raw( $this->create_software_api_url( $defaults ) );
-		$request             = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
-
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
-			// Request failed.
-			return '';
-		}
-
-		return wp_remote_retrieve_body( $request );
-	}
-
-	/**
-	 * Sends the request to deactivate to the API Manager.
-	 *
-	 * @param array $args
-	 *
-	 * @return string
-	 */
-	public function license_deactivate( $args ) {
-		if ( empty( $args ) ) {
-			add_settings_error( 'not_deactivated_text', 'not_deactivated_error', esc_html__( 'The API Key is missing from the deactivation request.', 'pbc' ), 'updated' );
-
-			return '';
-		}
-
-		$defaults   = $this->get_license_defaults( 'deactivate' );
-		$args       = wp_parse_args( $defaults, $args );
-		$target_url = esc_url_raw( $this->create_software_api_url( $args ) );
-		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
-		$body_json  = wp_remote_retrieve_body( $request );
-		$result_api = json_decode( $body_json, true );
-
-		$error = ! empty( $result_api['error'] ) ? $result_api['error'] : '';
-
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 || $error ) {
-			// Request failed.
-			add_settings_error(
-				'not_deactivated_empty_response_text',
-				'not_deactivated_empty_response_error',
-				$error,
-				'error'
-			);
-			return;
-		}
-
-		return $result_api;
-	}
-	/**
-	 * Returns true if the API Key status is Activated.
-	 *
-	 * @since 2.1
-	 *
-	 * @param bool $live Do not set to true if using to activate software. True is for live status checks after activation.
-	 *
-	 * @return bool
-	 */
-	public function get_api_key_status( $live = false ) {
-		/**
-		 * Real-time result.
-		 *
-		 * @since 2.5.1
-		 */
-		if ( $live ) {
-			$license_status = $this->license_key_status();
-
-			return ! empty( $license_status ) && ! empty( $license_status['data']['activated'] ) && $license_status['data']['activated'];
-		}
-
-		/**
-		 * If $live === false.
-		 *
-		 * Stored result when first activating software.
-		 */
-		return 'Activated' === get_option( 'pbc_license_activated' );
-	}
-
-	/**
-	 * Returns the API Key status by querying the Status API function from the WooCommerce API Manager on the server.
-	 *
-	 * @return array|mixed|object
-	 */
-	public function license_key_status() {
-		$status = $this->status();
-
-		return ! empty( $status ) ? json_decode( $this->status(), true ) : $status;
-	}
-
-	/**
-	 * Sends the status check request to the API Manager.
-	 *
-	 * @return bool|string
-	 */
-	public function status() {
-		if ( empty( get_option( 'pbc_license_apikey' ) ) ) {
-			return '';
-		}
-
-		$defaults   = $this->get_license_defaults( 'status' );
-		$target_url = esc_url_raw( $this->create_software_api_url( $defaults ) );
-		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
-
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
-			// Request failed.
-			return '';
-		}
-
-		return wp_remote_retrieve_body( $request );
-	}
-
-	/**
-	 * Get license defaults
-	 *
-	 * @param [type] $action
-	 * @return array
-	 */
-	private function get_license_defaults( $action, $software_version = false ) {
-		$api_key    = get_option( 'pbc_license_apikey' );
-		$product_id = get_option( 'pbc_license_product_id' );
-
-		$defaults = array(
-			'wc_am_action' => $action,
-			'api_key'      => $api_key,
-			'product_id'   => $product_id,
-			'instance'     => get_option( 'pbc_license_instance' ),
-			'object'       => str_ireplace( array( 'http://', 'https://' ), '', home_url() ),
-		);
-
-		if ( $software_version ) {
-			$defaults['software_version'] = WPPBC_VERSION;
-		}
-
-		return $defaults;
-	}
-
-	/**
-	 * Builds the URL containing the API query string for activation, deactivation, and status requests.
-	 *
-	 * @param array $args
-	 *
-	 * @return string
-	 */
-	public function create_software_api_url( $args ) {
-		return add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args );
-	}
-
-	/**
-	 * Generate the default data.
-	 */
-	public function license_instance_activation() {
-		$instance_exists = get_option( 'pbc_license_instance' );
-
-		if ( false === $instance_exists ) {
-			update_option( 'pbc_license_instance', wp_generate_password( 12, false ) );
-		}
-	}
-
-	/**
-	 * Deactivate the current API Key before activating the new API Key
-	 *
-	 * @param string $current_api_key
-	 */
-	public function replace_license_key( $current_api_key ) {
-		$args = array(
-			'api_key' => $current_api_key,
-		);
-
-		$this->license_deactivate( $args );
-	}
-
-	/**
-	 * Sends and receives data to and from the server API
-	 *
-	 * @since  2.0
-	 *
-	 * @param array $args
-	 *
-	 * @return bool|string $response
-	 */
-	public function send_query( $args ) {
-		$target_url = esc_url_raw( add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args ) );
-		error_log( 'target_url:' . $target_url );
-		$request = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
-
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
-			return false;
-		}
-
-		$response = wp_remote_retrieve_body( $request );
-
-		return ! empty( $response ) ? $response : false;
-	}
-
-	/**
-	 * Check for updates against the remote server.
-	 *
-	 * @since  2.0
-	 *
-	 * @param object $transient Transient plugins.
-	 *
-	 * @return object
-	 */
-	public function update_check( $transient ) {
-		if ( empty( $transient->checked ) ) {
-			return $transient;
-		}
-
-		$args = array(
-			'wc_am_action' => 'update',
-			'slug'         => 'pbc',
-			'plugin_name'  => 'pbc',
-			'version'      => WPPBC_VERSION,
-			'product_id'   => get_option( 'pbc_license_product_id' ),
-			'api_key'      => get_option( 'pbc_license_apikey' ),
-			'instance'     => get_option( 'pbc_license_instance' ),
-		);
-
-		// Check for a plugin update.
-		$response = json_decode( $this->send_query( $args ), true );
-
-		if ( isset( $response['data']['error_code'] ) ) {
-			add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', "{$response['data']['error']}", 'error' );
-		}
-
-		if ( false !== $response && true === $response['success'] ) {
-			$new_version  = (string) $response['data']['package']['new_version'];
-			$curr_version = (string) WPPBC_VERSION;
-
-			$package = array(
-				'id'             => $response['data']['package']['id'],
-				'slug'           => $response['data']['package']['slug'],
-				'plugin'         => $response['data']['package']['plugin'],
-				'new_version'    => $response['data']['package']['new_version'],
-				'url'            => $response['data']['package']['url'],
-				'tested'         => $response['data']['package']['tested'],
-				'package'        => $response['data']['package']['package'],
-				'upgrade_notice' => $response['data']['package']['upgrade_notice'],
-			);
-
-			if ( version_compare( $new_version, $curr_version, '>' ) ) {
-				$transient->response['pbc'] = (object) $package;
-				unset( $transient->no_update['pbc'] );
-			}
-		}
-
-		return $transient;
-	}
-
-	/**
-	 * API request for informatin.
-	 *
-	 * If `$action` is 'query_plugins' or 'plugin_information', an object MUST be passed.
-	 * If `$action` is 'hot_tags` or 'hot_categories', an array should be passed.
-	 *
-	 * @param false|object|array $result The result object or array. Default false.
-	 * @param string             $action The type of information being requested from the Plugin Install API.
-	 * @param object             $args
-	 *
-	 * @return object
-	 */
-	public function information_request( $result, $action, $args ) {
-		// Check if this plugins API is about this plugin.
-		if ( isset( $args->slug ) ) {
-			if ( 'pbc' !== $args->slug ) {
-				return $result;
-			}
-		} else {
-			return $result;
-		}
-
-		$args = array(
-			'wc_am_action' => 'plugininformation',
-			'plugin_name'  => 'pbc',
-			'version'      => WPPBC_VERSION,
-			'product_id'   => get_option( 'pbc_license_product_id' ),
-			'api_key'      => get_option( 'pbc_license_apikey' ),
-			'instance'     => get_option( 'pbc_license_instance' ),
-			'object'       => str_ireplace( array( 'http://', 'https://' ), '', home_url() ),
-		);
-
-		$response = unserialize( $this->send_query( $args ) );
-
-		if ( isset( $response ) && is_object( $response ) && false !== $response ) {
-			return $response;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Check for external blocking contstant.
-	 */
-	public function check_external_blocking() {
-		// show notice if external requests are blocked through the WP_HTTP_BLOCK_EXTERNAL constant.
-		if ( defined( 'WP_HTTP_BLOCK_EXTERNAL' ) && true === WP_HTTP_BLOCK_EXTERNAL ) {
-			// check if our API endpoint is in the allowed hosts.
-			$host = parse_url( WPPBC_URL_API, PHP_URL_HOST );
-
-			if ( ! defined( 'WP_ACCESSIBLE_HOSTS' ) || stristr( WP_ACCESSIBLE_HOSTS, $host ) === false ) {
-				?>
-				<div class="notice notice-error">
-					<p>
-						<?php
-						printf(
-							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
-							'AutoTranslate',
-							'<strong>' . esc_html( $host ) . '</strong>',
-							'<code>WP_ACCESSIBLE_HOSTS</code>'
-						);
-						?>
-					</p>
-				</div>
-				<?php
-			}
-		}
-	}
-
 	/**
 	 * Get attachment ID from URL
 	 *
