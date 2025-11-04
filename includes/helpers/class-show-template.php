@@ -175,12 +175,14 @@ class PBC_Template {
 				<div class="configurator-<?php echo 'wizard' === $template ? 'left' : 'right'; ?>">
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
-						<?php
+					<?php
 						$prev_variations_ids = array();
 						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
-							foreach ( $_SESSION[ $pbc_session_key ] as $prev_var ) {
+							foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $prev_var ) {
 								if ( isset( $prev_var['var']['id'] ) ) {
-									$prev_variations_ids[] = (int) $prev_var['var']['id'];
+									$var_id = (int) $prev_var['var']['id'];
+									// Use step_key - 1 as index to match with 0-based dependency checking.
+									$prev_variations_ids[ $step_key - 1 ] = $var_id;
 								}
 							}
 						}
@@ -191,12 +193,12 @@ class PBC_Template {
 							foreach ( $variations as $variation_id ) {
 								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
 								if ( ! empty( $depends ) ) {
-									$variations_depends[$variation_id] = array();
+									$variations_depends[ $variation_id ] = array();
 									foreach ( $depends as $depend ) {
 										$arr = explode( '|', $depend['pbc_depvar'] );
 										if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-											$order = array_search( (int)$arr[0], $phases_order, true );
-											$variations_depends[$variation_id][$order][] = (int)$arr[1];
+											$order = array_search( (int) $arr[0], $phases_order, true );
+											$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
 										}
 									}
 								}
