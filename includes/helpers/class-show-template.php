@@ -211,7 +211,7 @@ class PBC_Template {
 										return true;
 									}
 									$depends_ids = $variations_depends[ $variation_id ];
-									for ( $i = 0; $i < $cstep; $i++ ) {
+									for ( $i = 0; $i < $cstep - 1; $i++ ) {
 										if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
 											if ( ! in_array( $prev_variations_ids[ $i ], $depends_ids[ $i ], true ) ) {
 												return false;

@@ -15,6 +15,9 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+= 1.4.2-beta.1 ==
+*  Configurator skip fixed panel.
+
 = 1.4.1 =
 *  Fixed: Pdfs generation and send emails correctly.
 *  Fixed: Problems with dependencies and phases.
