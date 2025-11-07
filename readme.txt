@@ -15,8 +15,8 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
-= 1.4.0.1 =
-*  Fixed: Pdfs generation and send emails correctly.
+= 1.4.2-beta.1 ==
+*  Configurator skip fixed panel.
 
 = 1.4.0 =
 *  Added: You can add hierarchical in products, so you can have different products.
