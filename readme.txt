@@ -18,6 +18,10 @@ WordPress installation and then activate the Plugin from Plugins page.
 = 1.4.2-beta.1 ==
 *  Configurator skip fixed panel.
 
+= 1.4.1 =
+*  Fixed: Pdfs generation and send emails correctly.
+*  Fixed: Problems with dependencies and phases.
+
 = 1.4.0 =
 *  Added: You can add hierarchical in products, so you can have different products.
 *  Added: You can select quantity of each products.
