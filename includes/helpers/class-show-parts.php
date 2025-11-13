@@ -291,12 +291,21 @@ class SHOW {
 				$next_step   = $cstep + 1;
 				$next_button = __( 'Next', 'pbc' );
 			}
+
+			// Check if there are recommended variations configured.
+			$variations_recommended = get_option( 'pbc_variations_recommended', array() );
+			$has_recommendations    = ! empty( $variations_recommended );
 			?>
 			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
 			<?php if ( $prev_step && $prev_button ) { ?>
 			<div class="prev">
 				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
 				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
+			</div>
+			<?php } ?>
+			<?php if ( 1 === $cstep && $has_recommendations ) { ?>
+			<div class="recommendation" style="display:none;">
+				<button type="button" id="pbc-load-recommendation" class="btn btn-recommendation"><?php esc_html_e( 'Recommendation', 'pbc' ); ?></button>
 			</div>
 			<?php } ?>
 			<div class="next">

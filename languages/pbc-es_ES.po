@@ -1197,6 +1197,93 @@ msgstr "https://close.technology"
 #~ msgid "Plugin activation failed."
 #~ msgstr "La activación del plugin ha fallado."
 
+msgid "Recommended Configuration"
+msgstr "Configuración Recomendada"
+
+msgid "Recommended Configurations"
+msgstr "Configuraciones Recomendadas"
+
+msgid "Recommendations"
+msgstr "Recomendaciones"
+
+msgid "Select recommended variation for each phase"
+msgstr "Selecciona la variación recomendada para cada fase"
+
+msgid "Select one variation per phase that will be used when the user clicks the \"Recommendation\" button."
+msgstr "Selecciona una variación por fase que se usará cuando el usuario haga clic en el botón \"Recomendación\"."
+
+msgid "-- No recommendation --"
+msgstr "-- Sin recomendación --"
+
+msgid "Recommendation"
+msgstr "Recomendación"
+
+msgid "Security check failed."
+msgstr "Error en la verificación de seguridad."
+
+msgid "No recommendations configured."
+msgstr "No hay recomendaciones configuradas."
+
+msgid "No recommendations found for this configuration."
+msgstr "No se encontraron recomendaciones para esta configuración."
+
+msgid "Recommendations loaded successfully."
+msgstr "Recomendaciones cargadas correctamente."
+
+#, php-format
+msgid "\"%1$s\" cannot use \"%2$s\" due to dependencies with previous selections."
+msgstr "\"%1$s\" no puede usar \"%2$s\" debido a dependencias con las selecciones previas."
+
+msgid "The configured recommendations have invalid dependencies:"
+msgstr "Las recomendaciones configuradas tienen dependencias inválidas:"
+
+msgid "Configure different recommendations for each option in the first phase. For example, different recommendations for \"Floor\" vs \"Ceiling\"."
+msgstr "Configura diferentes recomendaciones para cada opción de la primera fase. Por ejemplo, recomendaciones diferentes para \"Suelo\" vs \"Techo\"."
+
+#, php-format
+msgid "Recommendations for: %s"
+msgstr "Recomendaciones para: %s"
+
+msgid "Please add variations to the first phase to configure recommendations."
+msgstr "Por favor, añade variaciones a la primera fase para configurar recomendaciones."
+
+msgid "Please add more phases after the first one to configure recommendations."
+msgstr "Por favor, añade más fases después de la primera para configurar recomendaciones."
+
+msgid "Please select an option first before loading recommendations."
+msgstr "Por favor, selecciona una opción primero antes de cargar las recomendaciones."
+
+msgid "Add recommendation for:"
+msgstr "Añadir recomendación para:"
+
+msgid "-- Select option --"
+msgstr "-- Seleccionar opción --"
+
+msgid "Add Configuration"
+msgstr "Añadir Configuración"
+
+msgid "Remove this configuration"
+msgstr "Eliminar esta configuración"
+
+msgid "Remove"
+msgstr "Eliminar"
+
+#, php-format
+msgid "(%d variations hidden due to dependencies)"
+msgstr "(%d variaciones ocultas por dependencias)"
+
+msgid "Insufficient permissions."
+msgstr "Permisos insuficientes."
+
+msgid "Invalid variation ID."
+msgstr "ID de variación inválido."
+
+msgid "This option does not have a recommended configuration."
+msgstr "Esta opción no tiene configuración recomendada."
+
+msgid "No variation selected."
+msgstr "No hay ninguna variación seleccionada."
+
 #, php-format
 #~ msgid "Updating Plugin %1$s (%2$d/%3$d)"
 #~ msgstr "Actualizando plugin %1$s (%2$d/%3$d)"
