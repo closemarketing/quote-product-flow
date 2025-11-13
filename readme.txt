@@ -16,8 +16,18 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
 = 1.4.2-beta.1 ==
+*  Added: Recommended configurations system with one-click auto-fill
+*  Added: Multiple recommendations based on first-phase selection
+*  Added: Separate admin page for managing recommendations (PBC > Recommendations)
+*  Added: Dependency validation in recommendation admin interface
+*  Added: Collapsible recommendation panels in admin
+*  Added: Real-time dependency filtering in admin editor
+*  Added: Auto-progression through all phases when applying recommendations
+*  Added: Green "Recomendación" button in frontend (appears after first selection)
+*  Added: Automatic budget calculation after recommendation process
 *  Added: Restart button to clear configuration and start from step 1
-*  Configurator skip fixed panel.
+*  Added: Side-by-side layout for product preview and summary on calculation page
+*  Fixed: Configurator skip fixed panel.
 
 = 1.4.1 =
 *  Fixed: Pdfs generation and send emails correctly.
