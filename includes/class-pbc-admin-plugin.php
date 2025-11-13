@@ -37,6 +37,9 @@ class PBC_Admin_Plugin {
 		add_action( 'wp_ajax_price_updater', array( $this, 'price_updater_action_callback' ) );
 		add_action( 'wp_ajax_nopriv_price_updater', array( $this, 'price_updater_action_callback' ) );
 
+		add_action( 'wp_ajax_pbc_restart_process', array( $this, 'pbc_restart_process' ) );
+		add_action( 'wp_ajax_nopriv_pbc_restart_process', array( $this, 'pbc_restart_process' ) );
+
 		// On variation-lists admin screen.
 		add_filter( 'views_edit-variation', array( $this, 'pbc_add_print_pdf_button' ) );
 		add_action( 'admin_head-edit.php', array( $this, 'pbc_move_print_pdf_button' ) );
@@ -752,6 +755,44 @@ class PBC_Admin_Plugin {
 
 		$file_url = PDF::generate_engine_pdf( $item, 'url' );
 		wp_send_json_success( $file_url );
+	}
+
+	/**
+	 * Restart process - Clean session and start over
+	 *
+	 * @return void
+	 */
+	public function pbc_restart_process() {
+		// Verify nonce.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'pbc-nonce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+		}
+
+		// Get parent phase from session or POST.
+		$pbc_session_key = '';
+		if ( isset( $_SESSION['pbc_parent_phase'] ) ) {
+			$pbc_session_key = 'pbc_variation_' . (int) $_SESSION['pbc_parent_phase'];
+		}
+
+		// Clear all PBC session data.
+		if ( isset( $_SESSION ) ) {
+			// Remove specific PBC keys.
+			if ( ! empty( $pbc_session_key ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
+				unset( $_SESSION[ $pbc_session_key ] );
+			}
+			if ( isset( $_SESSION['pbc_parent_phase'] ) ) {
+				unset( $_SESSION['pbc_parent_phase'] );
+			}
+			if ( isset( $_SESSION['pbc_output'] ) ) {
+				unset( $_SESSION['pbc_output'] );
+			}
+		}
+
+		wp_send_json_success(
+			array(
+				'message' => __( 'Process restarted successfully.', 'pbc' ),
+			)
+		);
 	}
 
 	/**

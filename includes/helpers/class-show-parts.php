@@ -299,6 +299,11 @@ class SHOW {
 				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
 			</div>
 			<?php } ?>
+			<?php if ( $cstep > 1 ) { ?>
+			<div class="restart">
+				<button type="button" id="pbc-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'pbc' ); ?></button>
+			</div>
+			<?php } ?>
 			<div class="next">
 				<?php
 				if ( $next_step ) {

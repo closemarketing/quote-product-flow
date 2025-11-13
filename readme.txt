@@ -16,6 +16,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
 = 1.4.2-beta.1 ==
+*  Added: Restart button to clear configuration and start from step 1
 *  Configurator skip fixed panel.
 
 = 1.4.1 =
