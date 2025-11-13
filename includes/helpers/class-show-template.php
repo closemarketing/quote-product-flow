@@ -351,6 +351,9 @@ class PBC_Template {
 				<?php
 			}
 			?>
+			<?php if ( 'calculate' === $cstep ) { ?>
+			<div class="pbc-calculate-wrapper" style="display: flex; flex-direction: row; align-items: flex-start; gap: 20px;">
+			<?php } ?>
 			<div class="product_preview
 			<?php
 			if ( 'calculate' === $cstep ) {
@@ -443,6 +446,11 @@ class PBC_Template {
 			}
 			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
 				SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
+			}
+			if ( 'calculate' === $cstep ) {
+				?>
+				</div><!-- .pbc-calculate-wrapper -->
+				<?php
 			}
 			if ( 'calculate' === $cstep ) {
 				?>
