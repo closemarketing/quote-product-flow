@@ -406,6 +406,9 @@ class PBC_Template {
 				<?php
 			}
 			?>
+			<?php if ( 'calculate' === $cstep ) { ?>
+			<div class="pbc-calculate-container">
+			<?php } ?>
 			<div class="product_preview
 			<?php
 			if ( 'calculate' === $cstep ) {
@@ -502,6 +505,10 @@ class PBC_Template {
 				SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
 			}
 			if ( 'calculate' === $cstep ) {
+			?>
+			</div>
+			<?php } ?>
+			<?php if ( 'calculate' === $cstep ) {
 				?>
 				<div class="configurator_result_share">
 					<?php

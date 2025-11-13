@@ -66,6 +66,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Fixed: Configurator skip fixed panel
 *  Fixed: Nonce validation issues in AJAX requests
 *  Feature: Support buttons are sticky and always accessible during configuration process
+*  Fixed: Configurator skip fixed panel.
 
 = 1.4.1 =
 *  Fixed: Pdfs generation and send emails correctly.

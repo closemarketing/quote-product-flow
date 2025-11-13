@@ -2,6 +2,11 @@ jQuery(function($){
 	// Variation selected.
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
+		
+		// Show recommendation button if we're on step 1 and a variation is selected.
+		if (parseInt(cPhase, 10) === 1) {
+			$('.recommendation').show();
+		}
 		var show_prices = PBCAjaxAction.show_prices;
 		$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
 		$('.phase_descvar .descvar_' + $(this).val() ).addClass('actived').removeClass('hidden');
@@ -143,6 +148,305 @@ jQuery(function($){
 			}
 		});
 	});
+
+	// Load recommendation.
+	$(document).on('click', '#pbc-load-recommendation', function(e){
+		e.preventDefault();
+		var button = $(this);
+		var originalText = button.text();
+		
+		// Get selected first variation (if any).
+		var $firstVariationRadio = $('input[type=radio].pbc_variation:checked');
+		
+		// Check if first variation is selected.
+		if ($firstVariationRadio.length === 0) {
+			alert('Por favor, selecciona una opción en la primera fase antes de cargar la recomendación.');
+			return;
+		}
+		
+		var firstVariation = $firstVariationRadio.val();
+		
+		// Disable button and show loading state.
+		button.prop('disabled', true).text('Cargando...');
+		
+		// Get parent phase.
+		var parentPhase = $('input[name="pbc_parent_phase"]').val();
+		
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'pbc_get_recommendations',
+				parent_phase: parentPhase,
+				first_variation: firstVariation,
+				nonce: PBCAjaxAction.recommendation_nonce
+			},
+			dataType: 'json',
+			success: function(response) {
+				if (response.success && response.data.recommendations) {
+					var recommendations = response.data.recommendations;
+					
+					// Get current step from the form.
+					var currentStep = parseInt($('input[name="pbc_current_phase"]').val(), 10) || 1;
+					
+					// Start the process by clicking next and then applying recommendations.
+					startRecommendationProcess(recommendations, currentStep, button, originalText);
+					
+				} else {
+					// Show error message.
+					var errorMessage = response.data && response.data.message 
+						? response.data.message 
+						: 'Esta fase no tiene configuración recomendada.';
+					
+					// Replace \n with actual line breaks for better display.
+					errorMessage = errorMessage.replace(/\\n/g, '\n');
+					
+					alert(errorMessage);
+					
+					// Re-enable button.
+					button.prop('disabled', false).text(originalText);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error('PBC Recommendation AJAX Error:', {
+					status: jqXHR.status,
+					statusText: jqXHR.statusText,
+					responseText: jqXHR.responseText,
+					textStatus: textStatus,
+					errorThrown: errorThrown
+				});
+				
+				// Try to show more specific error.
+				var errorMsg = 'Error al cargar las recomendaciones.';
+				if (jqXHR.responseText) {
+					try {
+						var responseData = JSON.parse(jqXHR.responseText);
+						if (responseData.data && responseData.data.message) {
+							errorMsg = responseData.data.message;
+						}
+					} catch(e) {
+						// If it's not JSON, check if it's a PHP error.
+						if (jqXHR.responseText.indexOf('Fatal error') !== -1 || 
+						    jqXHR.responseText.indexOf('Warning') !== -1) {
+							errorMsg += '\n\nError de servidor. Por favor, revisa la consola del navegador para más detalles.';
+						}
+					}
+				}
+				
+				alert(errorMsg);
+				
+				// Re-enable button.
+				button.prop('disabled', false).text(originalText);
+			}
+		});
+	});
+	
+	// Start recommendation process by advancing to next step first.
+	function startRecommendationProcess(recommendations, currentStep, button, originalText) {
+		// Get all recommendation steps sorted.
+		var allSteps = Object.keys(recommendations).map(function(k) {
+			return parseInt(k, 10);
+		}).sort(function(a, b) {
+			return a - b;
+		});
+		
+		// Find the next step that has a recommendation.
+		var nextStep = null;
+		for (var i = 0; i < allSteps.length; i++) {
+			if (allSteps[i] > currentStep) {
+				nextStep = allSteps[i];
+				break;
+			}
+		}
+		
+		if (!nextStep) {
+			if (button && originalText) {
+				button.prop('disabled', false).text(originalText);
+			}
+			return;
+		}
+		
+		// Click next button to advance.
+		var $nextButton = $('button[name=submit][value=next]');
+		
+		if ($nextButton.length > 0) {
+			// Set up a listener for when the next step loads.
+			// We'll wait for the AJAX form submission to complete.
+			var checkInterval = setInterval(function() {
+				var newStep = parseInt($('input[name="pbc_current_phase"]').val(), 10);
+				
+				if (newStep === nextStep) {
+					// We reached the target step with recommendation.
+					clearInterval(checkInterval);
+					
+					// Now apply the recommendation for this step.
+					var recData = recommendations[nextStep];
+					applyRecommendationForCurrentStep(recData, recommendations, nextStep, allSteps, button, originalText);
+				} else if (newStep > currentStep && newStep < nextStep) {
+					// We advanced to an intermediate step without recommendation.
+					// Keep clicking next.
+					currentStep = newStep; // Update current step.
+					
+					var $nextBtn = $('button[name=submit][value=next]');
+					if ($nextBtn.length > 0) {
+						setTimeout(function() {
+							$nextBtn.trigger('click');
+						}, 400);
+					} else {
+						clearInterval(checkInterval);
+						if (button && originalText) {
+							button.prop('disabled', false).text(originalText);
+						}
+					}
+				} else if (newStep > nextStep) {
+					// We somehow skipped the target step.
+					clearInterval(checkInterval);
+					// Continue with next recommendation.
+					startRecommendationProcess(recommendations, newStep, button, originalText);
+				}
+			}, 200);
+			
+			// Click next button.
+			$nextButton.trigger('click');
+			
+			// Safety timeout: if step doesn't change properly in 10 seconds, stop.
+			setTimeout(function() {
+				clearInterval(checkInterval);
+				var finalStep = parseInt($('input[name="pbc_current_phase"]').val(), 10);
+				if (finalStep !== nextStep) {
+					if (button && originalText) {
+						button.prop('disabled', false).text(originalText);
+					}
+				}
+			}, 10000);
+		} else {
+			if (button && originalText) {
+				button.prop('disabled', false).text(originalText);
+			}
+		}
+	}
+	
+	// Apply recommendation for the current step and continue to next.
+	function applyRecommendationForCurrentStep(recData, recommendations, currentStep, allSteps, button, originalText) {
+		if (!recData) {
+			// Continue to next step anyway.
+			startRecommendationProcess(recommendations, currentStep, button, originalText);
+			return;
+		}
+		
+		var variationId = recData.variation_id;
+		var priceVar = recData.price_var;
+		
+		// Select the radio button.
+		var radioSelector = 'input[type=radio].pbc_variation[value="' + variationId + '"]';
+		var $radio = $(radioSelector);
+		
+		if ($radio.length > 0) {
+			$radio.prop('checked', true);
+			
+			// If there's a price variation, select it.
+			if (priceVar) {
+				var priceVarSelector = 'select.pbc_pricevar[name="pbc_pricevar_' + variationId + '"]';
+				$(priceVarSelector).val(priceVar);
+			}
+			
+			// Trigger click to update the preview.
+			$radio.trigger('click');
+			
+			// Check if this is the last recommendation step.
+			var isLastStep = (currentStep >= Math.max.apply(null, allSteps));
+			
+			if (isLastStep) {
+				// Re-enable button.
+				if (button && originalText) {
+					setTimeout(function() {
+						button.prop('disabled', false).text(originalText);
+					}, 500);
+				}
+			} else {
+				// Wait a bit for the UI to update, then continue to next step.
+				setTimeout(function() {
+					startRecommendationProcess(recommendations, currentStep, button, originalText);
+				}, 600);
+			}
+		} else {
+			// Continue to next step anyway.
+			setTimeout(function() {
+				startRecommendationProcess(recommendations, currentStep, button, originalText);
+			}, 300);
+		}
+	}
+	
+	// Recursive function to apply recommendations and advance through steps (OLD - NOT USED).
+	function applyRecommendationsRecursively(recommendations, currentStep, button, originalText) {
+		// Get recommendation for current step.
+		var recData = recommendations[currentStep];
+		
+		if (!recData) {
+			// No more recommendations, we're done.
+			// Re-enable button if provided.
+			if (button && originalText) {
+				button.prop('disabled', false).text(originalText);
+			}
+			return;
+		}
+		
+		var variationId = recData.variation_id;
+		var priceVar = recData.price_var;
+		
+		// Select the radio button.
+		var radioSelector = 'input[type=radio].pbc_variation[value="' + variationId + '"]';
+		var $radio = $(radioSelector);
+		
+		if ($radio.length > 0) {
+			$radio.prop('checked', true);
+			
+			// If there's a price variation, select it.
+			if (priceVar) {
+				var priceVarSelector = 'select.pbc_pricevar[name="pbc_pricevar_' + variationId + '"]';
+				$(priceVarSelector).val(priceVar);
+			}
+			
+			// Trigger click to update the preview.
+			$radio.trigger('click');
+			
+			// Check if there are more recommendations after this one.
+			var allSteps = Object.keys(recommendations).map(function(key) {
+				return parseInt(key, 10);
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			
+			var maxStep = Math.max.apply(null, allSteps);
+			var isLastStep = (currentStep >= maxStep);
+			
+			// Wait a bit for the UI to update, then click next button.
+			setTimeout(function() {
+				var $nextButton = $('button[name=submit][value=next]');
+				
+				if ($nextButton.length > 0 && !isLastStep) {
+					// Click next and continue with next recommendation.
+					$nextButton.trigger('click');
+					
+					// Wait for next step to load, then apply next recommendation.
+					setTimeout(function() {
+						applyRecommendationsRecursively(recommendations, currentStep + 1, button, originalText);
+					}, 400);
+				} else {
+					// Last step or no next button, we're done.
+					// Re-enable button.
+					if (button && originalText) {
+						button.prop('disabled', false).text(originalText);
+					}
+				}
+			}, 300);
+		} else {
+			// Try next recommendation anyway.
+			setTimeout(function() {
+				applyRecommendationsRecursively(recommendations, currentStep + 1, button, originalText);
+			}, 100);
+		}
+	}
 
 	// Submit form.
 	$(document).on('click', 'button[name=submit]', function(e){
