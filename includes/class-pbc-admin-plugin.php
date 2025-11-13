@@ -1625,7 +1625,6 @@ class PBC_Admin_Plugin {
 						echo '</td>';
 						echo '</tr>';
 					}
-					}
 					?>
 				</tbody>
 			</table>
