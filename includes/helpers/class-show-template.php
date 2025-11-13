@@ -506,7 +506,7 @@ class PBC_Template {
 			}
 			if ( 'calculate' === $cstep ) {
 			?>
-			</div>
+			</div><!-- .pbc-calculate-container -->
 			<?php } ?>
 			<?php if ( 'calculate' === $cstep ) {
 				?>

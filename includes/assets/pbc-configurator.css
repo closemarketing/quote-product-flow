@@ -216,6 +216,11 @@
   align-self: center;
 }
 
+.pbc-calculate-wrapper .product_preview {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
 .product_preview.wrap-left {
   margin-right: 20px;
 }
@@ -250,14 +255,25 @@
   align-self: flex-end;
 }
 
+.pbc-calculate-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .configurator_summary {
   clear: both;
   border: 1px solid #949697;
   padding: 10px;
-  margin: 0 auto;
+  margin: 0;
   max-width: 600px;
   min-width: 600px;
   display: inline-block;
+  flex: 1;
 }
 
 /* Contenedor flex para alinear product_preview y configurator_summary horizontalmente en la página de cálculo */
@@ -498,6 +514,20 @@ img.flipped {
 
   .configurator_steps_nav li.configurator_steps .step-arrow-button {
     display: none;
+  }
+
+  .pbc-calculate-wrapper {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .configurator_summary {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .product_preview {
+    max-width: 100%;
   }
 }
 

@@ -357,12 +357,20 @@ jQuery(function($){
 			var isLastStep = (currentStep >= Math.max.apply(null, allSteps));
 			
 			if (isLastStep) {
-				// Re-enable button.
-				if (button && originalText) {
-					setTimeout(function() {
-						button.prop('disabled', false).text(originalText);
-					}, 500);
-				}
+				// Last recommendation applied, now click "Calculate" button.
+				setTimeout(function() {
+					var $nextButton = $('button[name=submit][value=next]');
+					
+					if ($nextButton.length > 0) {
+						// Click next/calculate button to go to summary.
+						$nextButton.trigger('click');
+					} else {
+						// If no next button found, just re-enable recommendation button.
+						if (button && originalText) {
+							button.prop('disabled', false).text(originalText);
+						}
+					}
+				}, 500);
 			} else {
 				// Wait a bit for the UI to update, then continue to next step.
 				setTimeout(function() {
