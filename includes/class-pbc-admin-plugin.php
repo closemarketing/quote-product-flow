@@ -737,7 +737,11 @@ class PBC_Admin_Plugin {
 						}
 					}
 					
-					if ( ! empty( $first_phase_vars ) && ! empty( $other_phases ) ) {
+					if ( empty( $first_phase_vars ) ) {
+						echo '<p class="notice notice-warning"><strong>' . esc_html__( 'Note:', 'pbc' ) . '</strong> ' . esc_html__( 'Please add variations to the first phase to configure recommendations.', 'pbc' ) . '</p>';
+					} elseif ( count( $other_phases ) === 0 ) {
+						echo '<p class="notice notice-info"><strong>' . esc_html__( 'Note:', 'pbc' ) . '</strong> ' . esc_html__( 'Please add more phases after the first one to configure recommendations.', 'pbc' ) . '</p>';
+					} else {
 						?>
 						<div class="pbc-recommendations-manager">
 							<!-- Selector para añadir nueva recomendación -->
@@ -782,10 +786,6 @@ class PBC_Admin_Plugin {
 							</div>
 						</div>
 						<?php
-					} elseif ( empty( $first_phase_vars ) ) {
-						echo '<p class="notice notice-warning"><strong>' . esc_html__( 'Note:', 'pbc' ) . '</strong> ' . esc_html__( 'Please add variations to the first phase to configure recommendations.', 'pbc' ) . '</p>';
-					} elseif ( empty( $other_phases ) ) {
-						echo '<p class="notice notice-info"><strong>' . esc_html__( 'Note:', 'pbc' ) . '</strong> ' . esc_html__( 'Please add more phases after the first one to configure recommendations.', 'pbc' ) . '</p>';
 					}
 					?>
 				</div>
@@ -1594,37 +1594,37 @@ class PBC_Admin_Plugin {
 							}
 						);
 						
-						if ( ! empty( $all_variations ) ) {
-							$selected_var = isset( $variations_recommended[ $first_var_id ][ $phase->ID ] ) ? $variations_recommended[ $first_var_id ][ $phase->ID ] : '';
-							
-							// Store selected variation for next phase filtering.
-							if ( $selected_var ) {
-								$prev_variations_ids[ $step - 1 ] = $selected_var;
-							}
-							
-							echo '<tr>';
-							echo '<td style="padding:8px;"><strong>' . esc_html( $phase->menu_order . ' - ' . $phase->post_title ) . '</strong></td>';
-							echo '<td style="padding:8px;">';
-							echo '<select name="variations_recommended[' . (int) $first_var_id . '][' . (int) $phase->ID . ']" style="width:100%;" class="pbc-rec-select" data-phase-step="' . (int) $step . '" data-phase-id="' . (int) $phase->ID . '" data-first-var="' . (int) $first_var_id . '">';
-							echo '<option value="">' . esc_html__( '-- No recommendation --', 'pbc' ) . '</option>';
-							
-							// Include ALL variations with dependency data attributes.
-							foreach ( $all_variations as $var_id ) {
-								$var_title = get_the_title( $var_id );
-								$selected  = selected( $selected_var, $var_id, false );
-								
-								// Get dependencies for this variation.
-								$var_depends = isset( $variations_depends[ $var_id ] ) ? $variations_depends[ $var_id ] : array();
-								$depends_json = ! empty( $var_depends ) ? wp_json_encode( $var_depends ) : '{}';
-								
-								echo '<option value="' . (int) $var_id . '" ' . $selected . ' data-depends=\'' . esc_attr( $depends_json ) . '\'>' . esc_html( $var_title ) . '</option>';
-							}
-							echo '</select>';
-							echo '<br/><small class="pbc-filtered-info" style="color:#666;"></small>';
-							
-							echo '</td>';
-							echo '</tr>';
+						// At this point, $all_variations is guaranteed to not be empty due to check above.
+						$selected_var = isset( $variations_recommended[ $first_var_id ][ $phase->ID ] ) ? $variations_recommended[ $first_var_id ][ $phase->ID ] : '';
+						
+						// Store selected variation for next phase filtering.
+						if ( $selected_var ) {
+							$prev_variations_ids[ $step - 1 ] = $selected_var;
 						}
+						
+						echo '<tr>';
+						echo '<td style="padding:8px;"><strong>' . esc_html( $phase->menu_order . ' - ' . $phase->post_title ) . '</strong></td>';
+						echo '<td style="padding:8px;">';
+						echo '<select name="variations_recommended[' . (int) $first_var_id . '][' . (int) $phase->ID . ']" style="width:100%;" class="pbc-rec-select" data-phase-step="' . (int) $step . '" data-phase-id="' . (int) $phase->ID . '" data-first-var="' . (int) $first_var_id . '">';
+						echo '<option value="">' . esc_html__( '-- No recommendation --', 'pbc' ) . '</option>';
+						
+						// Include ALL variations with dependency data attributes.
+						foreach ( $all_variations as $var_id ) {
+							$var_title = get_the_title( $var_id );
+							$selected  = selected( $selected_var, $var_id, false );
+							
+							// Get dependencies for this variation.
+							$var_depends = isset( $variations_depends[ $var_id ] ) ? $variations_depends[ $var_id ] : array();
+							$depends_json = ! empty( $var_depends ) ? wp_json_encode( $var_depends ) : '{}';
+							
+							echo '<option value="' . (int) $var_id . '" ' . $selected . ' data-depends=\'' . esc_attr( $depends_json ) . '\'>' . esc_html( $var_title ) . '</option>';
+						}
+						echo '</select>';
+						echo '<br/><small class="pbc-filtered-info" style="color:#666;"></small>';
+						
+						echo '</td>';
+						echo '</tr>';
+					}
 					}
 					?>
 				</tbody>
