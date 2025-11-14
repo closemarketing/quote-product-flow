@@ -60,22 +60,6 @@ class PBC_Public {
 			true
 		);
 
-<<<<<<< HEAD
-		$current_user = wp_get_current_user();
-		$roles        = (array) $current_user->roles;
-		$show_prices  = get_option( 'pbc_show_prices_user_' . $roles[0] );
-
-		wp_localize_script(
-			'pbc-public',
-			'PBCAjaxAction',
-			array(
-				'ajax_url'       => admin_url( 'admin-ajax.php' ),
-				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
-				'show_prices'    => 'yes' === $show_prices ? 'yes' : 'no',
-				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
-			)
-		);
-=======
 	$current_user = wp_get_current_user();
 	$roles        = (array) $current_user->roles;
 	$user_role    = ! empty( $roles ) ? $roles[0] : '';
@@ -92,7 +76,6 @@ class PBC_Public {
 			'debug'          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 		)
 	);
->>>>>>> trunk
 	}
 
 	/**
