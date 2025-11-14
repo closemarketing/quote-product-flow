@@ -8,6 +8,7 @@ Creates a configurator with all variables.
 
 == Description ==
 
+Creates a configurator with all variables for product budgeting. Includes share buttons (WhatsApp and Email) to send configuration URLs.
 
 == Installation ==
 
@@ -15,6 +16,12 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+= 1.4.3 ==
+*  Added: Share configuration buttons (WhatsApp and Email).
+*  Added: Shareable URLs with complete configuration state.
+*  Improved: Shortened URL parameters (v1, v2 instead of pbc_v1, pbc_v2).
+*  Fixed: All configuration steps display correctly in shared URLs.
+
 = 1.4.2-beta.1 ==
 *  Configurator skip fixed panel.
 

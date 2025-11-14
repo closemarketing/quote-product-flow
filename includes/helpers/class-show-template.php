@@ -33,7 +33,128 @@ class PBC_Template {
 		$default_post_parent = CALC::get_default_parent_phase();
 		$is_multiple_prods   = CALC::is_multiple_products();
 		$phase_pid           = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
+		if ( isset( $_GET['pbc_parent'] ) ) {
+			$phase_pid = (int) $_GET['pbc_parent'];
+		}
 		$pbc_session_key     = 'pbc_variation_' . $phase_pid;
+
+		$shared_session_loaded = false;
+		
+		// Check if we have direct URL parameters (v1, v2, etc.).
+		$has_share_params = false;
+		foreach ( $_GET as $key => $value ) {
+			if ( preg_match( '/^v\d+$/', $key ) ) {
+				$has_share_params = true;
+				break;
+			}
+		}
+		
+		if ( $has_share_params ) {
+			// Reconstruct session from URL parameters.
+			$reconstructed_session = array();
+			
+			// Get role and discount.
+			$role_discount = CALC::get_user_discount_and_role();
+			$reconstructed_session['role_slug']     = $role_discount['role'] ?? '';
+			$reconstructed_session['role_discount'] = $role_discount['discount'] ?? '';
+			
+			// Check if prices should be shown - IMPORTANT: Set this first!
+			$force_show_prices = false;
+			if ( isset( $_GET['pbc_show_prices'] ) && '1' === $_GET['pbc_show_prices'] ) {
+				$force_show_prices = true;
+				$reconstructed_session['force_show_prices'] = 'yes';
+			}
+			
+			// Extract variations from URL.
+			$variations_data = array();
+			foreach ( $_GET as $key => $value ) {
+				if ( preg_match( '/^v(\d+)$/', $key, $matches ) ) {
+					$step                        = (int) $matches[1];
+					$variations_data[ $step ]    = array();
+					$variations_data[ $step ]['var_id'] = (int) $value;
+					
+					// Check for price variation.
+					$price_key = 'p' . $step;
+					if ( isset( $_GET[ $price_key ] ) ) {
+						$variations_data[ $step ]['price_var'] = sanitize_text_field( wp_unslash( $_GET[ $price_key ] ) );
+					}
+				}
+			}
+			
+			// Get phases to match step numbers.
+			$temp_args   = array(
+				'numberposts' => -1,
+				'post_type'   => 'phases',
+				'orderby'     => 'menu_order',
+				'order'       => 'ASC',
+				'post_parent' => $phase_pid,
+			);
+			$temp_phases = get_posts( $temp_args );
+			$phase_map   = array();
+			foreach ( $temp_phases as $index => $phase_post ) {
+				$phase_map[ $index + 1 ] = $phase_post->ID;
+			}
+			
+			// Build session from variations.
+			foreach ( $variations_data as $step => $var_data ) {
+				$variation_id = $var_data['var_id'];
+				$price_var    = isset( $var_data['price_var'] ) ? $var_data['price_var'] : '';
+				
+				// Get the phase from the variation's meta.
+				$phase_id_from_var = get_post_meta( $variation_id, 'pbc_phase', true );
+				$phase_id          = ! empty( $phase_id_from_var ) ? (int) $phase_id_from_var : ( isset( $phase_map[ $step ] ) ? $phase_map[ $step ] : 0 );
+				$phase_title       = $phase_id ? get_the_title( $phase_id ) : '';
+				
+				$variation_title = get_the_title( $variation_id );
+				if ( $price_var ) {
+					$variation_title .= ' [' . $price_var . ']';
+				}
+				
+				$price      = CALC::get_price_variation( $variation_id, $price_var );
+				$field_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+				
+				$var_data_array = array(
+					'id'    => $variation_id,
+					'name'  => $variation_title,
+					'type'  => $field_type ? $field_type : 'price',
+					'price' => $price,
+				);
+				
+				// Add price_var if it exists.
+				if ( $price_var ) {
+					$var_data_array['price_var'] = $price_var;
+				}
+				
+				$reconstructed_session[ $step ] = array(
+					'phase' => array(
+						'id'   => $phase_id,
+						'name' => $phase_title,
+					),
+					'var'   => $var_data_array,
+				);
+			}
+			
+			// Re-add force_show_prices after building session to ensure it's not lost.
+			if ( $force_show_prices ) {
+				$reconstructed_session['force_show_prices'] = 'yes';
+			}
+			
+			$_SESSION[ $pbc_session_key ] = $reconstructed_session;
+			$shared_session_loaded        = true;
+			
+			// Debug: Log what was reconstructed.
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'PBC: Reconstructed session with ' . count( $variations_data ) . ' variations' );
+				error_log( 'PBC: Force show prices: ' . ( $force_show_prices ? 'YES' : 'NO' ) );
+				error_log( 'PBC: Session key: ' . $pbc_session_key );
+				error_log( 'PBC: Session steps: ' . implode( ', ', array_keys( $_SESSION[ $pbc_session_key ] ) ) );
+			}
+			
+			// Add debug comment in HTML.
+			echo '<!-- PBC Debug: Loaded ' . count( $variations_data ) . ' variations from URL -->';
+			echo '<!-- PBC Debug: Show prices = ' . ( $force_show_prices ? 'YES' : 'NO' ) . ' -->';
+			echo '<!-- PBC Debug: Session steps: ' . implode( ', ', array_keys( $_SESSION[ $pbc_session_key ] ) ) . ' -->';
+		}
 
 		$args   = array(
 			'numberposts' => -1,
@@ -45,12 +166,46 @@ class PBC_Template {
 		$post_phases  = get_posts( $args );
 		$phases       = array();
 		$phases_order = array();
-		foreach ( $post_phases as $post_phase ) {
-			$phases[]       = $post_phase->ID;
-			$phases_order[] = $post_phase->menu_order;
+		
+		// If loading from shared session, build phases from session data.
+		if ( $shared_session_loaded && isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+			foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $session_details ) {
+				if ( ! is_numeric( $step_key ) ) {
+					continue;
+				}
+				if ( isset( $session_details['phase']['id'] ) ) {
+					$phase_id = (int) $session_details['phase']['id'];
+					if ( ! in_array( $phase_id, $phases, true ) ) {
+						$phases[]       = $phase_id;
+						$phases_order[] = (int) $step_key;
+					}
+				}
+			}
+		} else {
+			// Normal loading: use all phases from database.
+			foreach ( $post_phases as $post_phase ) {
+				$phases[]       = $post_phase->ID;
+				$phases_order[] = $post_phase->menu_order;
+			}
+		}
+		
+		// Fallback: if phases is still empty, try to rebuild from session.
+		if ( empty( $phases ) && isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+			foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $session_details ) {
+				if ( ! is_numeric( $step_key ) ) {
+					continue;
+				}
+				if ( isset( $session_details['phase']['id'] ) ) {
+					$phase_id = (int) $session_details['phase']['id'];
+					if ( ! in_array( $phase_id, $phases, true ) ) {
+						$phases[]       = $phase_id;
+						$phases_order[] = (int) $step_key;
+					}
+				}
+			}
 		}
 
-		if ( empty( $_POST ) ) {
+		if ( empty( $_POST ) && ! $shared_session_loaded ) {
 			$_SESSION[ $pbc_session_key ] = array();
 			// Get role and discount.
 			$role_discount = CALC::get_user_discount_and_role();
@@ -76,6 +231,11 @@ class PBC_Template {
 
 		// Output the inline style.
 		wp_add_inline_style( 'pbc-public', $custom_css );
+
+		// If shared session loaded, go directly to calculate.
+		if ( $shared_session_loaded && empty( $_POST ) ) {
+			$cstep = 'calculate';
+		}
 
 		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
@@ -137,11 +297,111 @@ class PBC_Template {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
+					if ( $price_var ) {
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['price_var'] = $price_var;
+					}
 				}
 				ksort( $_SESSION[ $pbc_session_key ], SORT_NUMERIC );
+			} elseif ( 'next' === $_POST['submit'] ) {
+				// If no variation was selected (empty form), check if there's only one option and save it automatically.
+				$current_phase_num = isset( $_POST['pbc_current_phase'] ) ? (int) $_POST['pbc_current_phase'] : 0;
+				if ( $current_phase_num > 0 && $current_phase_num <= count( $phases ) ) {
+					$phase_id = $phases[ $current_phase_num - 1 ];
+					
+					// Check if this step hasn't been saved yet.
+					if ( ! isset( $_SESSION[ $pbc_session_key ][ $current_phase_num ] ) || ! isset( $_SESSION[ $pbc_session_key ][ $current_phase_num ]['var']['id'] ) ) {
+						// Get available variations for this phase.
+						$prev_variations_ids = array();
+						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
+							foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $prev_var ) {
+								if ( isset( $prev_var['var']['id'] ) ) {
+									$var_id                              = (int) $prev_var['var']['id'];
+									$prev_variations_ids[ $step_key - 1 ] = $var_id;
+								}
+							}
+						}
+						
+						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
+						
+						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
+							$variations_depends = array();
+							foreach ( $variations as $variation_id ) {
+								$depends = get_post_meta( $variation_id, 'pbc_depends', true );
+								if ( ! empty( $depends ) ) {
+									$variations_depends[ $variation_id ] = array();
+									foreach ( $depends as $depend ) {
+										$arr = explode( '|', $depend['pbc_depvar'] );
+										if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
+											$order = array_search( (int) $arr[0], $phases_order, true );
+											$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
+										}
+									}
+								}
+							}
+							
+							$variations = array_filter(
+								$variations,
+								function ( $variation_id ) use ( $prev_variations_ids, $variations_depends, $current_phase_num ) {
+									if ( ! isset( $variations_depends[ $variation_id ] ) ) {
+										return true;
+									}
+									$depends_ids = $variations_depends[ $variation_id ];
+									for ( $i = 0; $i < $current_phase_num - 1; $i++ ) {
+										if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+											if ( ! in_array( $prev_variations_ids[ $i ], $depends_ids[ $i ], true ) ) {
+												return false;
+											}
+										}
+									}
+									return true;
+								}
+							);
+						}
+						
+						// If there's exactly one variation available, save it automatically.
+						// OR if there are 0 variations (phase should be skipped), mark it as skipped.
+						if ( ! empty( $variations ) && 1 === count( $variations ) ) {
+							$auto_variation_id = reset( $variations );
+							$auto_price        = CALC::get_price_variation( $auto_variation_id, '' );
+							$auto_field_type   = get_post_meta( $auto_variation_id, 'pbc_field_type', true );
+							
+							$phase_title     = get_the_title( $phase_id );
+							$variation_title = get_the_title( $auto_variation_id );
+							
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['phase']['id']   = $phase_id;
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['phase']['name'] = $phase_title;
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['var']['id']     = $auto_variation_id;
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['var']['name']   = $variation_title;
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['var']['type']   = $auto_field_type ? $auto_field_type : 'price';
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['var']['price']  = $auto_price;
+							
+							// Debug log.
+							if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+								error_log( 'PBC: Auto-saved step ' . $current_phase_num . ' with variation ' . $auto_variation_id );
+							}
+						} elseif ( empty( $variations ) ) {
+							// Mark as skipped - phase with no valid options.
+							$_SESSION[ $pbc_session_key ][ $current_phase_num ]['skipped'] = true;
+							
+							// Debug log.
+							if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+								error_log( 'PBC: Skipped step ' . $current_phase_num . ' - no valid variations' );
+							}
+						} else {
+							// Multiple variations available but none selected - this shouldn't happen with auto-select JS.
+							if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+								error_log( 'PBC: Step ' . $current_phase_num . ' has ' . count( $variations ) . ' variations but none selected' );
+							}
+						}
+					}
+				}
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
 			$cstep = (int) $_GET['phase'];
+		}
+
+		if ( $shared_session_loaded ) {
+			$cstep = 'calculate';
 		}
 
 		if ( ! defined( 'DOING_AJAX' ) ) {
@@ -302,11 +562,11 @@ class PBC_Template {
 						}
 						?>
 					</div>
-					<?php
-					if ( 'vertical' === $template ) {
-						SHOW::action_buttons( $phases, $cstep, $template );
-						SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
-					}
+				<?php
+				if ( 'vertical' === $template ) {
+					SHOW::action_buttons( $phases, $cstep, $template, $shared_session_loaded );
+					SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
+				}
 					?>
 				</div>
 				<div class="configurator-<?php echo 'wizard' === $template ? 'right' : 'left'; ?>">
@@ -437,11 +697,11 @@ class PBC_Template {
 				</div>
 				<div class="status_loader product_preview_status fixed hidden"></div>
 			</div>
-			<?php
-			if ( 'wizard' === $template ) {
-				SHOW::action_buttons( $phases, $cstep );
-			}
-			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
+		<?php
+		if ( 'wizard' === $template ) {
+			SHOW::action_buttons( $phases, $cstep, $template, $shared_session_loaded );
+		}
+		if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
 				SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
 			}
 			if ( 'calculate' === $cstep ) {
@@ -451,6 +711,21 @@ class PBC_Template {
 					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION['pbc_output']['type'] ) : '';
 					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
+						<h2><?php esc_html_e( 'Share Configuration', 'pbc' ); ?></h2>
+						<div class="share_buttons">
+							<button type="button" class="btn btn-share btn-whatsapp" id="pbc-share-whatsapp">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+									<path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+								</svg>
+								<?php esc_html_e( 'Share via WhatsApp', 'pbc' ); ?>
+							</button>
+							<button type="button" class="btn btn-share btn-email" id="pbc-share-email">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+									<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+								</svg>
+								<?php esc_html_e( 'Share via Email', 'pbc' ); ?>
+							</button>
+						</div>
 						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">

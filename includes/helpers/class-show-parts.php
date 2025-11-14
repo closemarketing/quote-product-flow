@@ -161,13 +161,33 @@ class SHOW {
 				$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
 
 				$show_prices = CALC::get_show_prices_for_user( $user_role );
-				$total_price = 0;
-				if ( 'calculate' === $cstep ) {
-					$count = count( $phases );
-				} else {
-					$count = $cstep;
+				$shared_force_show = isset( $_SESSION[ $pbc_session_key ]['force_show_prices'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ]['force_show_prices'] ) : '';
+				if ( $shared_force_show ) {
+					$show_prices = $shared_force_show;
 				}
-				for ( $i = 1; $i <= $count; $i++ ) {
+				$total_price = 0;
+				
+				// Get all numeric keys from session to know which steps to show.
+				$session_steps = array();
+				foreach ( $_SESSION[ $pbc_session_key ] as $key => $value ) {
+					if ( is_numeric( $key ) && is_array( $value ) && isset( $value['var']['id'] ) ) {
+						$session_steps[] = (int) $key;
+					}
+				}
+				sort( $session_steps );
+				
+				// Determine the range to iterate.
+				if ( 'calculate' === $cstep ) {
+					// Show all steps in session.
+					$steps_to_show = $session_steps;
+				} else {
+					// Show only steps up to current step.
+					$steps_to_show = array_filter( $session_steps, function( $step ) use ( $cstep ) {
+						return $step <= $cstep;
+					});
+				}
+				
+				foreach ( $steps_to_show as $i ) {
 					if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
 						continue;
 					}
@@ -264,9 +284,10 @@ class SHOW {
 	 * @param array  $phases Phases.
 	 * @param int    $cstep Current step.
 	 * @param string $template Template.
+	 * @param bool   $shared_session_loaded Whether this is a shared session.
 	 * @return void
 	 */
-	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) {
+	public static function action_buttons( $phases, $cstep, $template = 'wizard', $shared_session_loaded = false ) {
 		?>
 		<div class="configurator_form_action">
 			<?php
@@ -291,14 +312,14 @@ class SHOW {
 				$next_step   = $cstep + 1;
 				$next_button = __( 'Next', 'pbc' );
 			}
-			?>
-			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
-			<?php if ( $prev_step && $prev_button ) { ?>
-			<div class="prev">
-				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
-				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
-			</div>
-			<?php } ?>
+		?>
+		<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
+		<?php if ( $prev_step && $prev_button && ! $shared_session_loaded ) { ?>
+		<div class="prev">
+			<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
+			<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
+		</div>
+		<?php } ?>
 			<div class="next">
 				<?php
 				if ( $next_step ) {

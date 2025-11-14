@@ -499,4 +499,68 @@ class CALC {
 		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
 		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
+
+	/**
+	 * Generate shareable text from configuration.
+	 *
+	 * @param string $session_key Session key to get configuration data.
+	 * @return string Text to share
+	 */
+	public static function get_shareable_configuration_text( $session_key ) {
+		if ( ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
+			return '';
+		}
+
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = self::get_show_prices_for_user( $user_role );
+		$show_prices = 'yes' === $show_prices ? true : false;
+
+		$text        = __( 'Budget Configuration', 'pbc' ) . ' - ' . get_bloginfo( 'name' ) . "\n\n";
+		$text       .= __( 'Configuration details:', 'pbc' ) . "\n";
+		$text       .= "------------------------\n";
+		$total_price = 0;
+		$total_qty   = 1;
+
+		foreach ( $_SESSION[ $session_key ] as $key => $details ) {
+			if ( ! is_array( $details ) ) {
+				continue;
+			}
+			$phase_name     = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+			$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+			$variation_id   = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
+			$var_price      = isset( $details['var']['price'] ) ? $details['var']['price'] : 0;
+			$price          = (float) str_replace( ',', '.', (string) $var_price );
+			$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+			$variation_type = ! empty( $details['var']['type'] ) ? $details['var']['type'] : $variation_type;
+
+			if ( 'qty' === $variation_type ) {
+				$total_qty = $price;
+				$text     .= $key . '. ' . $variation_name . ': x' . $price . "\n";
+			} else {
+				$total_price += $price;
+				$text        .= $key . '. ' . $phase_name . ': ' . $variation_name;
+				if ( $price > 0 && $show_prices ) {
+					$text .= ' - ' . number_format( $price, 2, ',', '.' ) . ' €';
+				}
+				$text .= "\n";
+			}
+		}
+
+		if ( $show_prices && $total_price > 0 ) {
+			$tax            = ( $total_price * 0.21 ) * $total_qty;
+			$total_pricevat = ( $total_price + $total_price * 0.21 ) * $total_qty;
+
+			$text .= "\n" . __( 'Subtotal', 'pbc' ) . ': ' . number_format( $total_price, 2, ',', '.' ) . ' €' . "\n";
+			if ( $total_qty > 1 ) {
+				$text .= __( 'Quantity', 'pbc' ) . ': ' . number_format( $total_qty, 2, ',', '.' ) . "\n";
+			}
+			$text .= __( 'Taxes', 'pbc' ) . ': ' . number_format( $tax, 2, ',', '.' ) . ' €' . "\n";
+			$text .= __( 'Total', 'pbc' ) . ': ' . number_format( $total_pricevat, 2, ',', '.' ) . ' €' . "\n";
+		}
+
+		$text .= "\n" . get_bloginfo( 'url' );
+
+		return $text;
+	}
 }

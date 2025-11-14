@@ -846,6 +846,46 @@ msgstr "Closetechnology"
 msgid "https://close.technology"
 msgstr "https://close.technology"
 
+#: includes/helpers/class-show-template.php:454
+msgid "Share Configuration"
+msgstr "Compartir Configuración"
+
+#: includes/helpers/class-show-template.php:460
+msgid "Share via WhatsApp"
+msgstr "Compartir por WhatsApp"
+
+#: includes/helpers/class-show-template.php:466
+msgid "Share via Email"
+msgstr "Compartir por Email"
+
+#: includes/class-pbc-request.php:233
+msgid "Parent phase missing."
+msgstr "Falta la fase padre."
+
+#: includes/class-pbc-request.php:241
+msgid "Configuration not found."
+msgstr "Configuración no encontrada."
+
+#: includes/class-pbc-request.php:255
+msgid "Unable to generate share URL."
+msgstr "No se pudo generar la URL para compartir."
+
+#: includes/class-pbc-request.php:353
+msgid "Invalid email address."
+msgstr "Dirección de email inválida."
+
+#: includes/class-pbc-request.php:440
+msgid "You can view the configuration here:"
+msgstr "Puedes ver la configuración aquí:"
+
+#: includes/class-pbc-request.php:449
+msgid "Email sent successfully."
+msgstr "Email enviado correctamente."
+
+#: includes/class-pbc-request.php:455
+msgid "Failed to send email."
+msgstr "Error al enviar el email."
+
 #~ msgid "Perfil"
 #~ msgstr "Perfil"
 

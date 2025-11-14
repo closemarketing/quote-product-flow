@@ -273,6 +273,54 @@
   text-align: center;
 }
 
+.share_buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0 40px;
+}
+
+.btn-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-whatsapp {
+  background-color: #25D366;
+  color: white;
+}
+
+.btn-whatsapp:hover {
+  background-color: #1da851;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
+}
+
+.btn-email {
+  background-color: #0072C6;
+  color: white;
+}
+
+.btn-email:hover {
+  background-color: #005a9e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 114, 198, 0.3);
+}
+
+.btn-share svg {
+  flex-shrink: 0;
+}
+
 .email_submit_fields {
   display: flex;
   flex-direction: column;
