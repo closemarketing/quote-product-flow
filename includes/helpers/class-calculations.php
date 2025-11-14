@@ -340,9 +340,12 @@ class CALC {
 		$state_field     = $item['pbc_contact']['state'] ?? '';
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
-		$user            = wp_get_current_user();
-		$show_prices     = get_option( 'pbc_show_prices_user_' . $user->roles[0] );
-		$show_prices     = 'yes' === $show_prices ? true : false;
+
+
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = self::get_show_prices_for_user( $user_role );
+		$show_prices = 'yes' === $show_prices ? true : false;
 
 		if ( ! $email_field ) {
 			$result = array(
@@ -369,6 +372,7 @@ class CALC {
 			$emails = array_map( 'trim', $emails );
 			$emails = array_unique( $emails );
 			$emails = array_filter( $emails );
+
 			if ( ! isset( $_SESSION[ $pbc_session_key ] ) ) {
 				$result = array(
 					'type'     => 'error',
@@ -428,36 +432,71 @@ class CALC {
 					$message .= '</table>';
 				}
 
-				$message .= '<br>' . get_option( 'blogname' );
-				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
+			$message .= '<br>' . get_option( 'blogname' );
+			$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
-				// Insert_enquiry Post.
-				$post_id     = self::configurator_save_enquiry( $item );
-				$attachments = [];
-				if ( $post_id ) {
-					$item['pbc_enquiry'] = $post_id;
-					$attachments         = array( PDF::generate_engine_pdf( $item ) );
-				}
+			// Insert_enquiry Post.
+			$post_id     = self::configurator_save_enquiry( $item );
+			$attachments = array();
+			$pdf_path    = null;
 
-				if ( ! wp_mail( $emails, $subject, $message, $headers, $attachments ) ) {
-					$result = array(
-						'type'     => 'error',
-						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
-					);
-				} else {
-					$filename = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
-					$file_pdf = PDF::get_budget_base_dir() . $filename;
-					if ( ! empty( $attachments ) && file_exists( $file_pdf ) ) {
-						wp_delete_file( $file_pdf );
-					}
-					$result = array(
-						'type'     => 'success',
-						'response' => __( 'Mail sent!', 'pbc' ),
-					);
+			if ( $post_id ) {
+				$item['pbc_enquiry']     = $post_id;
+				$item['pbc_budget_date'] = gmdate( 'd-m-Y' );
+
+				// Generate PDF and get the file path.
+				$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
+
+				if ( $pdf_path && file_exists( $pdf_path ) ) {
+					$attachments = array( $pdf_path );
 				}
-				remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
+			}
+
+			// Send email.
+			$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
+
+			// Clean up PDF file after sending.
+			if ( $pdf_path && file_exists( $pdf_path ) ) {
+				unlink( $pdf_path );
+			}
+
+			if ( ! $mail_sent ) {
+				$result = array(
+					'type'     => 'error',
+					'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+				);
+			} else {
+				$result = array(
+					'type'     => 'success',
+					'response' => __( 'Mail sent!', 'pbc' ),
+				);
+			}
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Get show prices setting for user.
+	 *
+	 * Checks user role setting first, then falls back to global setting.
+	 *
+	 * @param string $user_role User role slug.
+	 * @return string 'yes' or 'no'
+	 */
+	public static function get_show_prices_for_user( $user_role = '' ) {
+		if ( ! empty( $user_role ) ) {
+			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
+
+			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
+				return 'yes';
+			}
+			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
+				return 'no';
+			}
+		}
+
+		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
+		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
 }

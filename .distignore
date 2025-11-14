@@ -31,3 +31,7 @@ freeserif*.*
 phpstan.neon.dist
 tests/
 .phplint.yml
+bin/
+phpunit.xml.dist
+.phpunit.result.cache
+docs/

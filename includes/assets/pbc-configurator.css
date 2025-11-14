@@ -92,6 +92,12 @@
   list-style: none;
 }
 
+.page-configurator ul,
+.page-configurator ol {
+  list-style: none;
+  padding-left: 0;
+}
+
 .configurator_steps_nav li.configurator_steps {
   padding: 0;
   margin: 0;
@@ -203,8 +209,7 @@
 .product_preview {
   position: relative;
   text-align: left;
-  max-width: <?php echo esc_html($preview_width);
-  ?>px;
+  max-width: 570px;
   overflow: hidden;
   display: inline-block;
   vertical-align: top;
@@ -412,4 +417,10 @@ div.site.grid-container:has(div.page-configurator) {
 
 div.site-content:has(div.page-configurator) {
   max-width: 1440px !important;
+}
+
+#left-area ul {
+  list-style-type: none;
+  padding: 0 0 0 0;
+  line-height: 26px;
 }
