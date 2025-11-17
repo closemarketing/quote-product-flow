@@ -887,15 +887,14 @@ class PBC_Admin_Plugin {
 	/**
 	 * Displays an inactive notice when the software is inactive.
 	 *
+	 * @since 2.5.1
+	 *
+	 * Filter wc_am_client_inactive_notice_override
+	 * If set to false inactive_notice() method will be disabled.
+	 *
 	 * @return void
 	 */
 	public function inactive_notice() {
-		/**
-		 * @since 2.5.1
-		 *
-		 * Filter wc_am_client_inactive_notice_override
-		 * If set to false inactive_notice() method will be disabled.
-		 */
 		if ( apply_filters( 'wpat_client_inactive_notice_override', true ) ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
@@ -907,12 +906,12 @@ class PBC_Admin_Plugin {
 			echo '<div class="notice notice-error">';
 			echo '<p>';
 			// translators: %1$s: plugin name, %2$s: opening anchor tag, %3$s: closing anchor tag.
-		echo wp_kses_post(
-			sprintf(
-				/* translators: %1$s: Plugin name, %2$s: Opening anchor tag, %3$s: Closing anchor tag. */
-				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
-				esc_attr( WPPBC_ITEM_NAME ),
-				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
+			echo wp_kses_post(
+				sprintf(
+					/* translators: %1$s: Plugin name, %2$s: Opening anchor tag, %3$s: Closing anchor tag. */
+					__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
+					esc_attr( WPPBC_ITEM_NAME ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
 					'</a>'
 				)
 			);
@@ -1346,12 +1345,12 @@ class PBC_Admin_Plugin {
 					<p>
 						<?php
 						// translators: %1$s: plugin name, %2$s: hostname, %3$s: constant name.
-					echo wp_kses_post(
-						sprintf(
-							/* translators: %1$s: Plugin name, %2$s: Host name, %3$s: Configuration file name. */
-							__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
-							'AutoTranslate',
-							'<strong>' . esc_html( $host ) . '</strong>',
+						echo wp_kses_post(
+							sprintf(
+								/* translators: %1$s: Plugin name, %2$s: Host name, %3$s: Configuration file name. */
+								__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
+								'AutoTranslate',
+								'<strong>' . esc_html( $host ) . '</strong>',
 								'<code>WP_ACCESSIBLE_HOSTS</code>'
 							)
 						);
