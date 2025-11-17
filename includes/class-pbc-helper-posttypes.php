@@ -716,7 +716,7 @@ class PBC_Helper_PostTypes {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 			if ( isset( $_GET['pbc_filter_phase'] ) && '' !== $_GET['pbc_filter_phase'] ) {
 				$query->query_vars['meta_key']   = 'pbc_phase';
-				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) );
+				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			}
 		}
 
