@@ -143,12 +143,13 @@ class PDF {
 		$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
 		$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1 ) ? trim( $pdf_color_odd ) : '#ffebcb';
 
-		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
-		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
+	$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
+	$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
 
-		$user        = wp_get_current_user();
-		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
-		$show_prices = CALC::get_show_prices_for_user( $user_role );
+	$user        = wp_get_current_user();
+	$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+	$show_prices = CALC::get_show_prices_for_user( $user_role );
+	$show_prices = 'yes' === $show_prices ? true : false;
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';
@@ -221,12 +222,12 @@ class PDF {
 		$variations_images_flipped = is_array( $variations_images_flipped ) ? array_filter( $variations_images_flipped ) : array();
 		if ( ! empty( $variations_images_flipped ) ) {
 			for ( $j = 1; $j <= $total_vars; $j++ ) {
-				if ( isset( $itemv[ $j ] ) && in_array( $itemv[ $j ]['var']['id'], $variations_images_flipped ) ) {
+				if ( isset( $itemv[ $j ]['var']['id'] ) && in_array( $itemv[ $j ]['var']['id'], $variations_images_flipped, true ) ) {
 					$flipped = true;
 				}
 			}
 		}
-		$output .= self::generateProductImage( $itemv, $total_vars, $flipped );
+		$output .= self::generate_product_image( $itemv, $total_vars, $flipped );
 		$output .= '</div></td></tr></table><br/><br/>';
 
 		$output     .= '<table class="summary">';
@@ -240,8 +241,8 @@ class PDF {
 			}
 			$variation_name  = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) . ': ' : '';
 			$variation_name .= isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-			$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
-			$bg              = ( $i % 2 ) == 0 ? 'background' : '';
+						$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
+			$bg              = ( 0 === ( $i % 2 ) ) ? 'background' : '';
 
 			$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
 			$variation_type = ! empty( $details['var']['id'] ) ? $details['var']['type'] : $variation_type;
@@ -337,15 +338,23 @@ class PDF {
 		return $result;
 	}
 
-	public static function generateProductImage( $itemv, $total_vars, $flipped ) {
-		// Define the output image dimensions
+	/**
+	 * Generate product image for PDF.
+	 *
+	 * @param array $itemv Product variations.
+	 * @param int   $total_vars Total variations.
+	 * @param bool  $flipped Whether to flip images.
+	 * @return string HTML for image tag.
+	 */
+	public static function generate_product_image( $itemv, $total_vars, $flipped ) {
+		// Define the output image dimensions.
 		$output_width  = 300;
 		$output_height = 243;
 
-		// Create the true color image for the output
+		// Create the true color image for the output.
 		$output_image = imagecreatetruecolor( $output_width, $output_height );
 
-		// --- Transparency Setup for Output Image ---
+		// --- Transparency Setup for Output Image ---.
 		// 1. Turn OFF alpha blending for the output image.
 		imagealphablending( $output_image, false );
 
@@ -353,45 +362,45 @@ class PDF {
 		// Ensures the transparency information is preserved when the image is saved.
 		imagesavealpha( $output_image, true );
 
-		// 3. Allocate a fully transparent color (alpha 127 = 100% transparent)
+		// 3. Allocate a fully transparent color (alpha 127 = 100% transparent).
 		$transparent_color = imagecolorallocatealpha( $output_image, 0, 0, 0, 127 );
 
-		// 4. Fill the entire output image with the fully transparent color
+		// 4. Fill the entire output image with the fully transparent color.
 		imagefill( $output_image, 0, 0, $transparent_color );
-		// --- End Transparency Setup ---
+		// --- End Transparency Setup ---.
 
-		$dirname = self::get_budget_base_dir();
+	$dirname = self::get_budget_base_dir();
 
-        // Ensure the directory exists and is writable
-        if (!is_dir($dirname)) {
-            if (!mkdir($dirname, 0755, true)) {
-                return '<p style="color:red;">Error: Output directory not found or writable.</p>';
-            }
-        }
+	// Ensure the directory exists and is writable.
+	if ( ! is_dir( $dirname ) ) {
+		if ( ! wp_mkdir_p( $dirname ) ) {
+			return '<p style="color:red;">Error: Output directory not found or writable.</p>';
+		}
+	}
 
 		for ( $i = 0; $i <= $total_vars; $i++ ) {
 			$imgprodid  = '';
 			$imgprodurl = '';
 
 			if ( ! empty( $itemv[ $i ]['var']['id'] ) ) {
-				$ssVar        = $itemv[ $i ]['var']['id'];
-				$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
+				$ss_var       = $itemv[ $i ]['var']['id'];
+				$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
 
 				if ( ! empty( $imgprodgroup ) ) {
 					foreach ( $imgprodgroup as $deps ) {
 						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
-							$prevVar = array();
+							$prev_var = array();
 							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
 								$arr = explode( '|', $depvarimgprod );
 								if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
-									$prevVar[ (int) $arr[0] ][] = $arr[1];
+									$prev_var[ (int) $arr[0] ][] = $arr[1];
 								}
 							}
 
 							if ( ! empty( $itemv ) ) {
-								foreach ( $itemv as $sPhaseKey => $svariations ) {
-									if ( isset( $prevVar[ $sPhaseKey ] ) &&
-										isset( $itemv[ $sPhaseKey ] ) && in_array( $itemv[ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+								foreach ( $itemv as $s_phase_key => $svariations ) {
+									if ( isset( $prev_var[ $s_phase_key ] ) &&
+										isset( $itemv[ $s_phase_key ]['var']['id'] ) && in_array( $itemv[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
 										$imgprodid = $deps['pbc_imgprod'][0];
 										break 2;
 									}
@@ -409,61 +418,61 @@ class PDF {
 					$imgprodurl       = $imgprodurl_array[0] ?? '';
 				}
 
-                if (!empty($imgprodurl)) {
-                    // Convert URL to local path for better compatibility with GD library.
-                    $imgprodpath = self::url_to_local_path($imgprodurl);
-                    
-                    // Check if the file exists locally.
-                    if (!file_exists($imgprodpath)) {
-                        continue;
-                    }
+				if ( ! empty( $imgprodurl ) ) {
+					// Convert URL to local path for better compatibility with GD library.
+					$imgprodpath = self::url_to_local_path( $imgprodurl );
 
-                    $extension = pathinfo($imgprodpath, PATHINFO_EXTENSION);
-                    $img = false;
-                    $width = 0;
-                    $height = 0;
+					// Check if the file exists locally.
+					if ( ! file_exists( $imgprodpath ) ) {
+						continue;
+					}
 
-                    // Attempt to get image size first to avoid unnecessary image creation
-                    $image_size_info = @getimagesize($imgprodpath); 
-                    if ($image_size_info) {
-                        list($width, $height, $type) = $image_size_info;
+					$extension = pathinfo( $imgprodpath, PATHINFO_EXTENSION );
+					$img       = false;
+					$width     = 0;
+					$height    = 0;
 
-                        switch (strtolower($extension)) {
-                            case 'png':
-                                $img = imagecreatefrompng($imgprodpath);
-                                break;
-                            case 'jpg':
-                            case 'jpeg':
-                                $img = imagecreatefromjpeg($imgprodpath);
-                                break;
-                            case 'gif':
-                                $img = imagecreatefromgif($imgprodpath);
-                                break;
-                            case 'webp':
-                                $img = imagecreatefromwebp($imgprodpath);
-                                break;
-                            default:
-                                continue 2;
-                        }
-                    } else {
-                        continue;
-                    }
+					// Attempt to get image size first to avoid unnecessary image creation.
+					$image_size_info = @getimagesize( $imgprodpath ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					if ( $image_size_info ) {
+						list( $width, $height, $type ) = $image_size_info;
 
-                    if ($img) {
+						switch ( strtolower( $extension ) ) {
+							case 'png':
+								$img = imagecreatefrompng( $imgprodpath );
+								break;
+							case 'jpg':
+							case 'jpeg':
+								$img = imagecreatefromjpeg( $imgprodpath );
+								break;
+							case 'gif':
+								$img = imagecreatefromgif( $imgprodpath );
+								break;
+							case 'webp':
+								$img = imagecreatefromwebp( $imgprodpath );
+								break;
+							default:
+								continue 2;
+						}
+					} else {
+						continue;
+					}
 
-						// If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it
+					if ( $img ) {
+
+						// If the source image supports alpha (PNG, WebP), ensure alpha blending is on for it.
 						// and imagesavealpha is true if you were modifying it before copying.
 						// For imagecopyresampled, the destination's alpha settings are primary.
-						if ( in_array( strtolower( $extension ), [ 'png', 'webp' ] ) ) {
+						if ( in_array( strtolower( $extension ), array( 'png', 'webp' ), true ) ) {
 							imagealphablending( $img, true );
 							imagesavealpha( $img, true );
 						}
-						// Flip it horizontally if $flipped is true
+						// Flip it horizontally if $flipped is true.
 						if ( $flipped ) {
 							imageflip( $img, IMG_FLIP_HORIZONTAL );
 						}
 
-						// Calculate proportional new dimensions
+						// Calculate proportional new dimensions.
 						$new_height = $output_height;
 						$new_width  = ( $height > 0 ) ? ( $width / $height ) * $new_height : $output_width;
 
@@ -472,35 +481,33 @@ class PDF {
 							$new_height = ( $width > 0 ) ? ( $height / $width ) * $new_width : $output_height;
 						}
 
-						$x_position = max( 0, (int) ( ( $output_width - $new_width ) / 2 ) );
-						$y_position = max( 0, (int) ( ( $output_height - $new_height ) / 2 ) );
+					$x_position = max( 0, (int) ( ( $output_width - $new_width ) / 2 ) );
+					$y_position = max( 0, (int) ( ( $output_height - $new_height ) / 2 ) );
 
-                        // --- Critical: Re-enable alpha blending on the output image just before copying ---
-                        // This ensures that the alpha channels of the source images are correctly blended
-                        // with the output image's transparent background.
-                        imagealphablending($output_image, true);
+					// --- Critical: Re-enable alpha blending on the output image just before copying ---.
+					// This ensures that the alpha channels of the source images are correctly blended.
+					// with the output image's transparent background.
+					imagealphablending( $output_image, true );
 
-                        // Copy and resample the image onto the output canvas
-                        imagecopyresampled($output_image, $img, $x_position, $y_position, 0, 0, (int)$new_width, (int)$new_height, $width, $height);
-                        imagedestroy($img); // Free memory for the source image
-                    }
-                }
-            }
-        }
+					// Copy and resample the image onto the output canvas.
+					imagecopyresampled( $output_image, $img, $x_position, $y_position, 0, 0, (int) $new_width, (int) $new_height, $width, $height );
+					imagedestroy( $img ); // Free memory for the source image.
+				}
+			}
+		}
 
-		$output_file_name = 'product-image-for-pdf.png';
-		$output_file_path = $dirname . $output_file_name;
+	$output_file_name = 'product-image-for-pdf.png';
+	$output_file_path = $dirname . $output_file_name;
 
-        // Save the final image. Check if saving was successful.
-        if (!imagepng($output_image, $output_file_path)) {
-            imagedestroy($output_image);
-            return '<p style="color:red;">Error: Failed to save product image.</p>';
-        }
+	// Save the final image. Check if saving was successful.
+	if ( ! imagepng( $output_image, $output_file_path ) ) {
+		imagedestroy( $output_image );
+		return '<p style="color:red;">Error: Failed to save product image.</p>';
+	}
+	imagedestroy( $output_image ); // Free memory for the output image.
 
-        imagedestroy($output_image); // Free memory for the output image
-
-		// Provide the direct file system path for Html2Pdf
-		$output = '<img phaseid="' . $i . '" src="' . $output_file_path . '" alt="product image" height="500px" width="auto" />';
+		// Provide the direct file system path for Html2Pdf.
+		$output = '<img phaseid="' . esc_attr( $i ) . '" src="' . esc_attr( $output_file_path ) . '" alt="product image" height="500px" width="auto" />';
 		return $output;
 	}
 }

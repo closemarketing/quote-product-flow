@@ -27,6 +27,7 @@ class PBC_Public {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_shortcode( 'pbc', array( $this, 'pbc_configurator' ) );
 	}
+
 	/**
 	 * Creates session
 	 *

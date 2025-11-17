@@ -263,7 +263,7 @@ class SHOW {
 	 *
 	 * @param array  $phases Phases.
 	 * @param int    $cstep Current step.
-	 * @param string $template Template.
+	 * @param string $template Template (unused parameter).
 	 * @return void
 	 */
 	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) {

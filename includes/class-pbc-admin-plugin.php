@@ -917,7 +917,7 @@ class PBC_Admin_Plugin {
 		}
 	}
 	/**
-	 * Callback for Setting license API key
+	 * Callback for Setting license API key.
 	 *
 	 * @return void
 	 */
@@ -967,12 +967,14 @@ class PBC_Admin_Plugin {
 					update_option( 'pbc_license_activated', 'Deactivated' );
 					update_option( 'pbc_license_apikey', '' );
 					update_option( 'pbc_license_product_id', '' );
+					// translators: %s: remaining activations count.
 					add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
 
 					return;
 			}
 
 			if ( isset( $deactivation_result['data'] ) && isset( $deactivation_result['data']['error_code'] ) && ! empty( $deactivation_result['data']['error_code'] ) ) {
+					// translators: %s: error message from deactivation.
 					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
 					update_option( 'pbc_license_activated', 'Deactivated' );
 			}
@@ -997,7 +999,8 @@ class PBC_Admin_Plugin {
 				$activate_results = json_decode( $activation_result, true );
 
 				if ( true === $activate_results['success'] && true === $activate_results['activated'] ) {
-					add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
+					// translators: %s: activation message.
+				add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
 
 					update_option( 'pbc_license_apikey', $api_key );
 					update_option( 'pbc_license_activated', 'Activated' );
@@ -1010,6 +1013,7 @@ class PBC_Admin_Plugin {
 				}
 
 				if ( isset( $activate_results['data']['error_code'] ) && ! empty( get_option( 'pbc_license_activated' ) ) ) {
+					// translators: %s: error message from activation.
 					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$activate_results['data']['error']}" ), 'error' );
 					update_option( 'pbc_license_activated', 'Deactivated' );
 				}
@@ -1216,7 +1220,6 @@ class PBC_Admin_Plugin {
 	 */
 	public function send_query( $args ) {
 		$target_url = esc_url_raw( add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args ) );
-		error_log( 'target_url:' . $target_url );
 		$request = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
 
 		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
@@ -1256,6 +1259,7 @@ class PBC_Admin_Plugin {
 		$response = json_decode( $this->send_query( $args ), true );
 
 		if ( isset( $response['data']['error_code'] ) ) {
+			// translators: %s: error message from update check.
 			add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', "{$response['data']['error']}", 'error' );
 		}
 
@@ -1315,7 +1319,7 @@ class PBC_Admin_Plugin {
 			'object'       => str_ireplace( array( 'http://', 'https://' ), '', home_url() ),
 		);
 
-		$response = unserialize( $this->send_query( $args ) );
+		$response = maybe_unserialize( $this->send_query( $args ) );
 
 		if ( isset( $response ) && is_object( $response ) && false !== $response ) {
 			return $response;

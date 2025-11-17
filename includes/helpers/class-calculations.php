@@ -369,68 +369,68 @@ class CALC {
 				$admin_emails = explode( ',', $admin_emails );
 				$emails       = array_merge( $emails, $admin_emails );
 			}
-			$emails = array_map( 'trim', $emails );
-			$emails = array_unique( $emails );
-			$emails = array_filter( $emails );
+		$emails = array_map( 'trim', $emails );
+		$emails = array_unique( $emails );
+		$emails = array_filter( $emails );
 
-			if ( ! isset( $_SESSION[ $pbc_session_key ] ) ) {
-				$result = array(
-					'type'     => 'error',
-					'response' => __( 'Configurator not ready!', 'pbc' ),
-				);
-			} else {
-				$subject        = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
-				$message        = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
-				$message       .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
-				$message       .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
-				$message       .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
-				$message       .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
-				$message       .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
-				$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
-				$message       .= '<br/></div>';
-				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4><br>';
-				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
-				$subtotal_price = 0;
+		if ( ! isset( $_SESSION[ $pbc_session_key ] ) ) {
+			$result = array(
+				'type'     => 'error',
+				'response' => __( 'Configurator not ready!', 'pbc' ),
+			);
+		} else {
+			$subject        = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
+			$message        = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
+			$message       .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
+			$message       .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
+			$message       .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
+			$message       .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
+			$message       .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
+			$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
+			$message       .= '<br/></div>';
+			$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4><br>';
+			$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
+			$subtotal_price = 0;
 
-				$i = 0;
-				foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
-					if ( ! is_array( $details ) ) {
-						continue;
-					}
-					$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
-					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-					$price           = (float) $details['var']['price'];
-					$subtotal_price += $price;
-					$message        .= '<tr>';
-					$message        .= '<td>' . $phase_name . '</td>';
-					$message        .= '<td>' . $variation_name . '</td>';
-					$message        .= '<td>';
-					if ( $price > 0 && $show_prices ) {
-						$message .= number_format( $price, 2, ',', '.' ) . ' €';
-					}
-					$message .= '</td>';
-					$message .= '</tr>';
-					++$i;
+			$i = 0;
+			foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
+				if ( ! is_array( $details ) ) {
+					continue;
 				}
-				$message .= '</table><br/>';
-				// Subtotal.
-				if ( $show_prices ) {
-					$message .= '<table>';
-					$message .= '<tr>';
-					$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
-					$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €</td>';
-					$message .= '</tr>';
-					$message .= '<tr>';
-					$message .= '<td>' . __( 'Tax:', 'pbc' ) . '</td>';
-					$vat      = $subtotal_price * 0.21;
-					$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
-					$message .= '</tr>';
-					$message .= '<tr>';
-					$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
-					$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
-					$message .= '</tr>';
-					$message .= '</table>';
+				$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+				$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+				$price           = (float) $details['var']['price'];
+				$subtotal_price += $price;
+				$message        .= '<tr>';
+				$message        .= '<td>' . $phase_name . '</td>';
+				$message        .= '<td>' . $variation_name . '</td>';
+				$message        .= '<td>';
+				if ( $price > 0 && $show_prices ) {
+					$message .= number_format( $price, 2, ',', '.' ) . ' €';
 				}
+				$message .= '</td>';
+				$message .= '</tr>';
+				++$i;
+			}
+			$message .= '</table><br/>';
+			// Subtotal.
+			if ( $show_prices ) {
+				$message .= '<table>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+				$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €</td>';
+				$message .= '</tr>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'Tax:', 'pbc' ) . '</td>';
+				$vat      = $subtotal_price * 0.21;
+				$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
+				$message .= '</tr>';
+				$message .= '<tr>';
+				$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+				$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
+				$message .= '</tr>';
+				$message .= '</table>';
+			}
 
 			$message .= '<br>' . get_option( 'blogname' );
 			$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
@@ -471,9 +471,8 @@ class CALC {
 					'response' => __( 'Mail sent!', 'pbc' ),
 				);
 			}
-			}
 		}
-		return $result;
+			return $result;
 	}
 
 	/**
