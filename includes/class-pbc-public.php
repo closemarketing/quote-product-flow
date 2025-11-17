@@ -53,6 +53,14 @@ class PBC_Public {
 			WPPBC_VERSION
 		);
 
+		// Support buttons styles.
+		wp_register_style(
+			'pbc-support-buttons',
+			WPPBC_PLUGIN_URL . 'includes/assets/support-buttons-sticky.css',
+			array( 'pbc-public' ),
+			WPPBC_VERSION
+		);
+
 		wp_register_script(
 			'pbc-public',
 			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.js',
@@ -95,9 +103,10 @@ class PBC_Public {
 				return;
 			}
 		}
-		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
-		wp_enqueue_style( 'pbc-public' );
-		wp_enqueue_script( 'pbc-public' );
+	$atts = array_change_key_case( (array) $atts, CASE_LOWER );
+	wp_enqueue_style( 'pbc-public' );
+	wp_enqueue_style( 'pbc-support-buttons' );
+	wp_enqueue_script( 'pbc-public' );
 
 		$pbc_atts = shortcode_atts(
 			array(

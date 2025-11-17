@@ -8,6 +8,29 @@ Creates a configurator with all variables.
 
 == Description ==
 
+Product Budget Configurator is a powerful WordPress plugin that allows you to create interactive product configurators with multiple phases, variations, and pricing options.
+
+= Key Features =
+
+* **Interactive Configurator**: Step-by-step wizard for product configuration
+* **Hierarchical Products**: Support for multiple products with parent-child relationships
+* **Dynamic Pricing**: Prices per role with discount support
+* **PDF Generation**: Generate and email professional budget PDFs
+* **Image Preview**: Real-time visual preview of selected options
+* **Support Buttons**: Always-visible contact buttons for technical support (phone & email)
+* **Price Visibility**: Control price display per user role
+* **Customizable**: Custom colors, headers, footers, and styling options
+* **Email Notifications**: Send configuration details to clients and administrators
+
+= Support Contact Feature =
+
+Enable sticky support buttons that remain visible throughout the configuration process. Users can quickly contact technical support via:
+* **Phone**: Direct call link (opens phone dialer or FaceTime)
+* **Email**: Opens email client with support address pre-filled
+* Visual notifications confirm when buttons are clicked
+
+Configure support options in the plugin settings under "Support Contact".
+
 
 == Installation ==
 
@@ -17,6 +40,10 @@ WordPress installation and then activate the Plugin from Plugins page.
 == Changelog ==
 = 1.4.2-beta.1 ==
 *  Configurator skip fixed panel.
+*  Added: Support contact buttons (phone and email) always visible in configurator.
+*  Added: Settings to enable/disable support buttons and configure phone/email.
+*  Added: Visual notification (fade-in) when clicking support buttons.
+*  Feature: Support buttons are sticky and always accessible during configuration process.
 
 = 1.4.1 =
 *  Fixed: Pdfs generation and send emails correctly.
