@@ -451,25 +451,25 @@ class CALC {
 					}
 				}
 
-			// Send email.
-			$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
+				// Send email.
+				$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
 
-			// Clean up PDF file after sending.
-			if ( $pdf_path && file_exists( $pdf_path ) ) {
-				wp_delete_file( $pdf_path );
-			}
+				// Clean up PDF file after sending.
+				if ( $pdf_path && file_exists( $pdf_path ) ) {
+					wp_delete_file( $pdf_path );
+				}
 
-			if ( ! $mail_sent ) {
-				$result = array(
-					'type'     => 'error',
-					'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
-				);
-			} else {
-				$result = array(
-					'type'     => 'success',
-					'response' => __( 'Mail sent!', 'pbc' ),
-				);
-			}
+				if ( ! $mail_sent ) {
+					$result = array(
+						'type'     => 'error',
+						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+					);
+				} else {
+					$result = array(
+						'type'     => 'success',
+						'response' => __( 'Mail sent!', 'pbc' ),
+					);
+				}
 			}
 		}
 		return $result;

@@ -1000,7 +1000,7 @@ class PBC_Admin_Plugin {
 
 				if ( true === $activate_results['success'] && true === $activate_results['activated'] ) {
 					// translators: %s: activation message.
-				add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
+					add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
 
 					update_option( 'pbc_license_apikey', $api_key );
 					update_option( 'pbc_license_activated', 'Activated' );
@@ -1220,7 +1220,7 @@ class PBC_Admin_Plugin {
 	 */
 	public function send_query( $args ) {
 		$target_url = esc_url_raw( add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args ) );
-		$request = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
 
 		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
 			return false;

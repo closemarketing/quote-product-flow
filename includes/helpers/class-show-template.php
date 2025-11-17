@@ -155,7 +155,7 @@ class PBC_Template {
 			?>
 			<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
 			<?php
-		} //defined('DOING_AJAX')
+		} // End if ! defined( 'DOING_AJAX' ).
 
 		if ( empty( $phases ) ) {
 			?>
