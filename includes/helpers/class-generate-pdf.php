@@ -143,13 +143,13 @@ class PDF {
 		$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
 		$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1 ) ? trim( $pdf_color_odd ) : '#ffebcb';
 
-	$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
-	$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
+		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
+		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
 
-	$user        = wp_get_current_user();
-	$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
-	$show_prices = CALC::get_show_prices_for_user( $user_role );
-	$show_prices = 'yes' === $show_prices ? true : false;
+		$user        = wp_get_current_user();
+		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+		$show_prices = CALC::get_show_prices_for_user( $user_role );
+		$show_prices = 'yes' === $show_prices ? true : false;
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';
@@ -241,7 +241,7 @@ class PDF {
 			}
 			$variation_name  = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) . ': ' : '';
 			$variation_name .= isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-						$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
+			$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
 			$bg              = ( 0 === ( $i % 2 ) ) ? 'background' : '';
 
 			$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );

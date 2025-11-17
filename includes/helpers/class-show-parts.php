@@ -284,7 +284,7 @@ class SHOW {
 			if ( 'calculate' === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = '';
-			} elseif ( $cstep === count( $phases ) ) {
+			} elseif ( count( $phases ) === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = __( 'Calculate', 'pbc' );
 			} else {

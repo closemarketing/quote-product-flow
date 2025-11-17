@@ -41,14 +41,14 @@ class PBC_Requests {
 		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? array_map( 'intval', (array) $_REQUEST['pbc_variation'] ) : array();
 		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$session_key   = 'pbc_variation_' . $parent_phase;
-	$option        = '';
+		$option        = '';
 
-	if ( '' === session_id() ) {
-		ob_start();
-		session_start();
-	}
-	if ( '' === session_id() ) {
-		echo ';;--;;' . json_encode(
+		if ( '' === session_id() ) {
+			ob_start();
+			session_start();
+		}
+		if ( '' === session_id() ) {
+			echo ';;--;;' . wp_json_encode(
 				array(
 					'type' => 'error',
 					'msg'  => 'Error: Unable to initialize Session!',
@@ -66,7 +66,8 @@ class PBC_Requests {
 			}
 			// Gets image variation with filter dependency.
 			if ( isset( $_SESSION[ $session_key ] ) && is_array( $_SESSION[ $session_key ] ) ) {
-				$imgprodurl = CALC::get_image_variation_url( $_SESSION[ $session_key ], $svar );
+				$session_data = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$imgprodurl   = CALC::get_image_variation_url( $session_data, $svar );
 			}
 			$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : null;
 			$price    = CALC::get_price_variation( $svar, $pricevar );

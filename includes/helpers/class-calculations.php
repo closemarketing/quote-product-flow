@@ -341,7 +341,6 @@ class CALC {
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
 
-
 		$user        = wp_get_current_user();
 		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
 		$show_prices = self::get_show_prices_for_user( $user_role );
@@ -452,25 +451,25 @@ class CALC {
 					}
 				}
 
-				// Send email.
-				$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
+			// Send email.
+			$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
 
-				// Clean up PDF file after sending.
-				if ( $pdf_path && file_exists( $pdf_path ) ) {
-					unlink( $pdf_path );
-				}
+			// Clean up PDF file after sending.
+			if ( $pdf_path && file_exists( $pdf_path ) ) {
+				wp_delete_file( $pdf_path );
+			}
 
-				if ( ! $mail_sent ) {
-					$result = array(
-						'type'     => 'error',
-						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
-					);
-				} else {
-					$result = array(
-						'type'     => 'success',
-						'response' => __( 'Mail sent!', 'pbc' ),
-					);
-				}
+			if ( ! $mail_sent ) {
+				$result = array(
+					'type'     => 'error',
+					'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+				);
+			} else {
+				$result = array(
+					'type'     => 'success',
+					'response' => __( 'Mail sent!', 'pbc' ),
+				);
+			}
 			}
 		}
 		return $result;

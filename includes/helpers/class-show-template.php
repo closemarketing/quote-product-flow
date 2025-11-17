@@ -142,7 +142,9 @@ class PBC_Template {
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
 				}
 				if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
-					ksort( $_SESSION[ $pbc_session_key ], SORT_NUMERIC );
+					$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					ksort( $session_data, SORT_NUMERIC );
+					$_SESSION[ $pbc_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				}
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
@@ -183,7 +185,8 @@ class PBC_Template {
 					<?php
 					$prev_variations_ids = array();
 					if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
-						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $prev_var ) {
+						$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						foreach ( $session_data as $step_key => $prev_var ) {
 							if ( isset( $prev_var['var']['id'] ) ) {
 								$var_id = (int) $prev_var['var']['id'];
 								// Use step_key - 1 as index to match with 0-based dependency checking.
@@ -259,8 +262,8 @@ class PBC_Template {
 							if (
 								isset( $_SESSION[ $pbc_session_key ] ) &&
 								is_array( $_SESSION[ $pbc_session_key ] ) &&
-								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
-								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true )
+								isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
+								in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 							) {
 								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
 							} else {
@@ -371,7 +374,8 @@ class PBC_Template {
 							$to = count( $_SESSION[ $pbc_session_key ] ) + 1;
 						}
 						for ( $i = 1; $i < $to; $i++ ) {
-							$imgprodid = $imgprodurl = '';
+							$imgprodid  = '';
+							$imgprodurl = '';
 							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) && isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ) {
 								$ss_var       = (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
 								$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
@@ -426,7 +430,7 @@ class PBC_Template {
 							}
 						}
 					}
-					$session_var_for_image = isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ? $_SESSION[ $pbc_session_key ] : array();
+					$session_var_for_image = isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ? $_SESSION[ $pbc_session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					$imgprodurl            = ! empty( $ss_var ) ? CALC::get_image_variation_url( $session_var_for_image, $ss_var ) : '';
 
 					if ( $imgprodurl ) {
