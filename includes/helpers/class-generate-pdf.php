@@ -369,14 +369,14 @@ class PDF {
 		imagefill( $output_image, 0, 0, $transparent_color );
 		// --- End Transparency Setup ---.
 
-	$dirname = self::get_budget_base_dir();
+		$dirname = self::get_budget_base_dir();
 
-	// Ensure the directory exists and is writable.
-	if ( ! is_dir( $dirname ) ) {
-		if ( ! wp_mkdir_p( $dirname ) ) {
-			return '<p style="color:red;">Error: Output directory not found or writable.</p>';
+		// Ensure the directory exists and is writable.
+		if ( ! is_dir( $dirname ) ) {
+			if ( ! wp_mkdir_p( $dirname ) ) {
+				return '<p style="color:red;">Error: Output directory not found or writable.</p>';
+			}
 		}
-	}
 
 		for ( $i = 0; $i <= $total_vars; $i++ ) {
 			$imgprodid  = '';
@@ -481,30 +481,31 @@ class PDF {
 							$new_height = ( $width > 0 ) ? ( $height / $width ) * $new_width : $output_height;
 						}
 
-					$x_position = max( 0, (int) ( ( $output_width - $new_width ) / 2 ) );
-					$y_position = max( 0, (int) ( ( $output_height - $new_height ) / 2 ) );
+						$x_position = max( 0, (int) ( ( $output_width - $new_width ) / 2 ) );
+						$y_position = max( 0, (int) ( ( $output_height - $new_height ) / 2 ) );
 
-					// --- Critical: Re-enable alpha blending on the output image just before copying ---.
-					// This ensures that the alpha channels of the source images are correctly blended.
-					// with the output image's transparent background.
-					imagealphablending( $output_image, true );
+						// --- Critical: Re-enable alpha blending on the output image just before copying ---.
+						// This ensures that the alpha channels of the source images are correctly blended.
+						// with the output image's transparent background.
+						imagealphablending( $output_image, true );
 
-					// Copy and resample the image onto the output canvas.
-					imagecopyresampled( $output_image, $img, $x_position, $y_position, 0, 0, (int) $new_width, (int) $new_height, $width, $height );
-					imagedestroy( $img ); // Free memory for the source image.
+						// Copy and resample the image onto the output canvas.
+						imagecopyresampled( $output_image, $img, $x_position, $y_position, 0, 0, (int) $new_width, (int) $new_height, $width, $height );
+						imagedestroy( $img ); // Free memory for the source image.
+					}
 				}
 			}
 		}
 
-	$output_file_name = 'product-image-for-pdf.png';
-	$output_file_path = $dirname . $output_file_name;
+		$output_file_name = 'product-image-for-pdf.png';
+		$output_file_path = $dirname . $output_file_name;
 
-	// Save the final image. Check if saving was successful.
-	if ( ! imagepng( $output_image, $output_file_path ) ) {
-		imagedestroy( $output_image );
-		return '<p style="color:red;">Error: Failed to save product image.</p>';
-	}
-	imagedestroy( $output_image ); // Free memory for the output image.
+		// Save the final image. Check if saving was successful.
+		if ( ! imagepng( $output_image, $output_file_path ) ) {
+			imagedestroy( $output_image );
+			return '<p style="color:red;">Error: Failed to save product image.</p>';
+		}
+		imagedestroy( $output_image ); // Free memory for the output image.
 
 		// Provide the direct file system path for Html2Pdf.
 		$output = '<img phaseid="' . esc_attr( $i ) . '" src="' . esc_attr( $output_file_path ) . '" alt="product image" height="500px" width="auto" />';
