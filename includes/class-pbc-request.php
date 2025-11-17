@@ -37,6 +37,11 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function variation_selected_action_callback() {
+		// Verify nonce for AJAX request if provided.
+		if ( isset( $_REQUEST['nonce'] ) ) {
+			check_ajax_referer( 'pbc-nonce', 'nonce', false );
+		}
+
 		$current_phase = isset( $_REQUEST['current_phase'] ) ? (int) $_REQUEST['current_phase'] : 0;
 		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? array_map( 'intval', (array) $_REQUEST['pbc_variation'] ) : array();
 		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
@@ -175,6 +180,11 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_login_action_callback() {
+		// Verify nonce for AJAX request if provided.
+		if ( isset( $_REQUEST['nonce'] ) ) {
+			check_ajax_referer( 'pbc-nonce', 'nonce', false );
+		}
+
 		$username = isset( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : '';
 		$password = isset( $_POST['password'] ) ? $_POST['password'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		$login    = wp_signon(

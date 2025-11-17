@@ -266,7 +266,9 @@ class SHOW {
 	 * @param string $template Template (unused parameter).
 	 * @return void
 	 */
-	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) {
+	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		// Template parameter kept for backward compatibility.
+		unset( $template );
 		?>
 		<div class="configurator_form_action">
 			<?php

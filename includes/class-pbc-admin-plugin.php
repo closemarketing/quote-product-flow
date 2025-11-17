@@ -435,8 +435,8 @@ class PBC_Admin_Plugin {
 					++$count;
 				}
 			}
-			// translators: %s: number of variations updated.
 			$html = sprintf(
+				/* translators: %s: number of variations updated. */
 				__( 'Changed %s variation prices', 'pbc' ),
 				$count
 			);
@@ -730,6 +730,7 @@ class PBC_Admin_Plugin {
 		// translators: %s: URL to the product page.
 		echo wp_kses_post(
 			sprintf(
+				/* translators: %s: URL to Product Budget Configurator page. */
 				__( 'With the <a href="%s" target="_blank">Product Budget Configurator</a> license, you\'ll have updates and automatic fixes to what\'s new or change in your system, so you\'ll always have automatic translations working.', 'pbc' ),
 				'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
 			)
@@ -741,6 +742,7 @@ class PBC_Admin_Plugin {
 		// translators: %s: URL to the product page.
 		echo wp_kses_post(
 			sprintf(
+				/* translators: %s: URL to Product Budget Configurator page. */
 				__( 'Visit the <a href="%s" target="_blank">Product Budget Configurator</a> page and purchase the licenses you need, depending on the number of WordPress MultiSites you\'re using.', 'pbc' ),
 				'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
 			)
@@ -905,11 +907,12 @@ class PBC_Admin_Plugin {
 			echo '<div class="notice notice-error">';
 			echo '<p>';
 			// translators: %1$s: plugin name, %2$s: opening anchor tag, %3$s: closing anchor tag.
-			echo wp_kses_post(
-				sprintf(
-					__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
-					esc_attr( WPPBC_ITEM_NAME ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
+		echo wp_kses_post(
+			sprintf(
+				/* translators: %1$s: Plugin name, %2$s: Opening anchor tag, %3$s: Closing anchor tag. */
+				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
+				esc_attr( WPPBC_ITEM_NAME ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
 					'</a>'
 				)
 			);
@@ -1343,11 +1346,12 @@ class PBC_Admin_Plugin {
 					<p>
 						<?php
 						// translators: %1$s: plugin name, %2$s: hostname, %3$s: constant name.
-						echo wp_kses_post(
-							sprintf(
-								__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
-								'AutoTranslate',
-								'<strong>' . esc_html( $host ) . '</strong>',
+					echo wp_kses_post(
+						sprintf(
+							/* translators: %1$s: Plugin name, %2$s: Host name, %3$s: Configuration file name. */
+							__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
+							'AutoTranslate',
+							'<strong>' . esc_html( $host ) . '</strong>',
 								'<code>WP_ACCESSIBLE_HOSTS</code>'
 							)
 						);
