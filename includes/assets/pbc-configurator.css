@@ -308,8 +308,47 @@
 }
 
 .configurator_form_action .prev,
-.configurator_form_action .next {
+.configurator_form_action .next,
+.configurator_form_action .restart {
   display: inline-block;
+}
+
+.configurator_form_action .restart {
+  margin: 0 10px;
+}
+
+.btn-restart {
+  position: relative;
+  margin: 0;
+  padding-left: 14px;
+  padding-right: 38px;
+  padding-top: 2.8px;
+  padding-bottom: 2.8px;
+  background: #dc3545;
+  color: white;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-restart::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -24px;
+  width: 0;
+  height: 0;
+  border-color: transparent transparent transparent #dc3545;
+  border-width: 12px;
+  border-style: solid;
+}
+
+.btn-restart:hover {
+  background: #c82333;
+}
+
+.btn-restart:hover::after {
+  border-left-color: #c82333;
 }
 
 .status_loader.fixed {
