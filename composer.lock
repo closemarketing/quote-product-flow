@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3222bb3033265385f32cde9dc60c150e",
+    "content-hash": "a16f1afe93f512bc76ad0080210a71b3",
     "packages": [
+        {
+            "name": "closemarketing/wp-plugin-license-manager",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/closemarketing/wp-plugin-license-manager.git",
+                "reference": "a7cee1e661e4313005eb5ade2d3f95bf9de2c278"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/closemarketing/wp-plugin-license-manager/zipball/a7cee1e661e4313005eb5ade2d3f95bf9de2c278",
+                "reference": "a7cee1e661e4313005eb5ade2d3f95bf9de2c278",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpcompatibility/phpcompatibility-wp": "*",
+                "phpstan/phpstan": "^1.10",
+                "wp-coding-standards/wpcs": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [],
+                "psr-4": {
+                    "Closemarketing\\WPLicenseManager\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "David Perez",
+                    "email": "david@closemarketing.es",
+                    "homepage": "https://close.marketing",
+                    "role": "Developer"
+                }
+            ],
+            "description": "WordPress Plugin License Manager Library - A reusable library for managing WordPress plugin licenses with WooCommerce API Manager",
+            "keywords": [
+                "api-manager",
+                "license",
+                "plugin",
+                "updates",
+                "woocommerce",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/closemarketing/wp-plugin-license-manager/issues",
+                "source": "https://github.com/closemarketing/wp-plugin-license-manager"
+            },
+            "time": "2025-10-31T11:05:09+00:00"
+        },
         {
             "name": "composer/installers",
             "version": "v2.3.0",
@@ -2864,10 +2920,10 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "7.4.33"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
