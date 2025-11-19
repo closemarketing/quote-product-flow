@@ -313,17 +313,17 @@ class PBC_Admin_Plugin {
 				'pdf_image_footer'               => 'pbc_pdf_image_footer',
 				'pdf_color_odd'                  => 'pbc_pdf_color_odd',
 				'pdf_color_total'                => 'pbc_pdf_color_total',
-			'admin_email_notification'       => 'pbc_admin_email_notification',
-			'preview_width'                  => 'pbc_preview_width',
-			'support_enabled'                => 'pbc_support_enabled',
-			'support_phone'                  => 'pbc_support_phone',
-			'support_email'                  => 'pbc_support_email',
-		);
-		foreach ( $fields as $field_key => $field ) {
-			if ( isset( $_POST[ $field_key ] ) ) {
-				update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
+				'admin_email_notification'       => 'pbc_admin_email_notification',
+				'preview_width'                  => 'pbc_preview_width',
+				'support_enabled'                => 'pbc_support_enabled',
+				'support_phone'                  => 'pbc_support_phone',
+				'support_email'                  => 'pbc_support_email',
+			);
+			foreach ( $fields as $field_key => $field ) {
+				if ( isset( $_POST[ $field_key ] ) ) {
+					update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
+				}
 			}
-		}
 
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['variations_images_flipped'] ) ) : array( '' );
 			$variations_images_flipped = array_map( 'intval', $variations_images_flipped );

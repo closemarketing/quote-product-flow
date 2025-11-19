@@ -92,10 +92,10 @@ class PBC_Export_Import {
 	 */
 	public function export_all_data() {
 		$export_data = array(
-			'version'    => WPPBC_VERSION,
+			'version'     => WPPBC_VERSION,
 			'export_date' => current_time( 'mysql' ),
-			'phases'     => array(),
-			'variations' => array(),
+			'phases'      => array(),
+			'variations'  => array(),
 		);
 
 		// Export Phases.
@@ -166,14 +166,14 @@ class PBC_Export_Import {
 			}
 
 			// Get meta data.
-			$sku                 = get_post_meta( $variation->ID, 'pbc_sku', true );
-			$field_type          = get_post_meta( $variation->ID, 'pbc_field_type', true );
-			$imgicon             = get_post_meta( $variation->ID, 'pbc_imgicon', true );
-			$depends             = get_post_meta( $variation->ID, 'pbc_depends', true );
-			$imgprodgroup        = get_post_meta( $variation->ID, 'pbc_imgprodgroup', true );
-			$pricegroup          = get_post_meta( $variation->ID, 'pbc_pricegroup', true );
-			$descopt             = get_post_meta( $variation->ID, 'pbc_descopt', true );
-			$descvar             = get_post_meta( $variation->ID, 'pbc_descvar', true );
+			$sku          = get_post_meta( $variation->ID, 'pbc_sku', true );
+			$field_type   = get_post_meta( $variation->ID, 'pbc_field_type', true );
+			$imgicon      = get_post_meta( $variation->ID, 'pbc_imgicon', true );
+			$depends      = get_post_meta( $variation->ID, 'pbc_depends', true );
+			$imgprodgroup = get_post_meta( $variation->ID, 'pbc_imgprodgroup', true );
+			$pricegroup   = get_post_meta( $variation->ID, 'pbc_pricegroup', true );
+			$descopt      = get_post_meta( $variation->ID, 'pbc_descopt', true );
+			$descvar      = get_post_meta( $variation->ID, 'pbc_descvar', true );
 
 			// Convert dependencies to slugs.
 			$depends_slugs = $this->convert_depends_to_slugs( $depends );
@@ -186,18 +186,18 @@ class PBC_Export_Import {
 			$term_slugs = is_array( $terms ) ? $terms : array();
 
 			$export_data['variations'][] = array(
-				'slug'           => $var_slug,
-				'title'          => $variation->post_title,
-				'phase_slug'     => $phase_slug,
-				'sku'            => $sku,
-				'field_type'     => $field_type,
-				'imgicon'        => $imgicon,
-				'depends'        => $depends_slugs,
-				'imgprodgroup'   => $imgprodgroup_slugs,
-				'pricegroup'     => $pricegroup,
-				'descopt'        => $descopt,
-				'descvar'        => $descvar,
-				'term_slugs'     => $term_slugs,
+				'slug'         => $var_slug,
+				'title'        => $variation->post_title,
+				'phase_slug'   => $phase_slug,
+				'sku'          => $sku,
+				'field_type'   => $field_type,
+				'imgicon'      => $imgicon,
+				'depends'      => $depends_slugs,
+				'imgprodgroup' => $imgprodgroup_slugs,
+				'pricegroup'   => $pricegroup,
+				'descopt'      => $descopt,
+				'descvar'      => $descvar,
+				'term_slugs'   => $term_slugs,
 			);
 		}
 
@@ -287,11 +287,11 @@ class PBC_Export_Import {
 	 */
 	public function import_data( $import_data ) {
 		$result = array(
-			'success'         => false,
-			'message'         => '',
-			'phases_created'  => 0,
+			'success'            => false,
+			'message'            => '',
+			'phases_created'     => 0,
 			'variations_created' => 0,
-			'errors'          => array(),
+			'errors'             => array(),
 		);
 
 		// Validate import data.
@@ -311,8 +311,9 @@ class PBC_Export_Import {
 
 				if ( $imported_phase_id ) {
 					$phase_map[ $phase_data['slug'] ] = $imported_phase_id;
-					$result['phases_created']++;
+					++$result['phases_created'];
 				} else {
+					// translators: %s is the phase title that failed to import.
 					$result['errors'][] = sprintf( __( 'Failed to import phase: %s', 'pbc' ), $phase_data['title'] );
 				}
 			}
@@ -337,16 +338,18 @@ class PBC_Export_Import {
 
 				if ( $imported_var_id ) {
 					$var_map[ $var_data['slug'] ] = $imported_var_id;
-					$result['variations_created']++;
+					++$result['variations_created'];
 				} else {
+					// translators: %s is the variation title that failed to import.
 					$result['errors'][] = sprintf( __( 'Failed to import variation: %s', 'pbc' ), $var_data['title'] );
 				}
 			}
 		}
 
 		$result['success'] = true;
+		// translators: %1$d is the number of phases created, %2$d is the number of variations created.
 		$result['message'] = sprintf(
-			__( 'Import completed. Phases: %d, Variations: %d', 'pbc' ),
+			__( 'Import completed. Phases: %1$d, Variations: %2$d', 'pbc' ),
 			$result['phases_created'],
 			$result['variations_created']
 		);
@@ -562,42 +565,42 @@ class PBC_Export_Import {
 	/**
 	 * Convert depends array to CSV format
 	 *
-	 * @param array $depends Depends array.
+	 * @param  array $depends Depends array.
 	 * @return string CSV formatted string.
 	 */
 	private function depends_to_csv( $depends ) {
 		if ( empty( $depends ) || ! is_array( $depends ) ) {
 			return '';
 		}
-		
+
 		$slugs = array();
 		foreach ( $depends as $depend ) {
 			if ( ! empty( $depend['pbc_depvar_slug'] ) ) {
 				$slugs[] = $depend['pbc_depvar_slug'];
 			}
 		}
-		
+
 		return implode( '|', $slugs );
 	}
 
 	/**
 	 * Convert imgprodgroup array to CSV format
 	 *
-	 * @param array $imgprodgroup Image product group array.
+	 * @param  array $imgprodgroup Image product group array.
 	 * @return string CSV formatted string.
 	 */
 	private function imgprodgroup_to_csv( $imgprodgroup ) {
 		if ( empty( $imgprodgroup ) || ! is_array( $imgprodgroup ) ) {
 			return '';
 		}
-		
+
 		$groups = array();
 		foreach ( $imgprodgroup as $group ) {
 			$dep_slugs = ! empty( $group['pbc_depvarimgprod_slugs'] ) ? implode( ',', $group['pbc_depvarimgprod_slugs'] ) : '';
 			$img_ids   = ! empty( $group['pbc_imgprod'] ) ? implode( ',', $group['pbc_imgprod'] ) : '';
 			$groups[]  = $dep_slugs . ':' . $img_ids;
 		}
-		
+
 		return implode( '|', $groups );
 	}
 
@@ -611,14 +614,14 @@ class PBC_Export_Import {
 		if ( empty( $pricegroup ) || ! is_array( $pricegroup ) ) {
 			return '';
 		}
-		
+
 		$prices = array();
 		foreach ( $pricegroup as $price ) {
 			$option_name = ! empty( $price['pbc_meaprice'] ) ? $price['pbc_meaprice'] : '';
 			$price_value = ! empty( $price['pbc_pricem'] ) ? $price['pbc_pricem'] : '';
 			$prices[]    = $option_name . ':' . $price_value;
 		}
-		
+
 		return implode( '|', $prices );
 	}
 
@@ -635,7 +638,7 @@ class PBC_Export_Import {
 
 		// CSV Header.
 		$csv_output .= "sep=,\n";
-		$csv_output .= "# PBC Phases Export - Version: " . $version . " - Date: " . $date . "\n";
+		$csv_output .= '# PBC Phases Export - Version: ' . $version . ' - Date: ' . $date . "\n";
 		$csv_output .= '"Slug","Title","Content","Menu Order","Parent Slug"' . "\n";
 
 		foreach ( $phases as $phase ) {
@@ -663,7 +666,7 @@ class PBC_Export_Import {
 
 		// CSV Header.
 		$csv_output .= "sep=,\n";
-		$csv_output .= "# PBC Variations Export - Version: " . $version . " - Date: " . $date . "\n";
+		$csv_output .= '# PBC Variations Export - Version: ' . $version . ' - Date: ' . $date . "\n";
 		$csv_output .= '"Slug","Title","Phase Slug","SKU","Field Type","Icon ID","Depends","Image Groups","Price Groups","Desc Option","Desc Variation","Terms"' . "\n";
 
 		foreach ( $variations as $variation ) {
@@ -710,17 +713,17 @@ class PBC_Export_Import {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'pbc' ) ) );
 		}
 
-		$export_data      = $this->export_all_data();
-		$timestamp        = date( 'Y-m-d-His' );
-		$csv_phases       = $this->phases_to_csv( $export_data['phases'], $export_data['version'], $export_data['export_date'] );
-		$csv_variations   = $this->variations_to_csv( $export_data['variations'], $export_data['version'], $export_data['export_date'] );
+		$export_data    = $this->export_all_data();
+		$timestamp      = gmdate( 'Y-m-d-His' );
+		$csv_phases     = $this->phases_to_csv( $export_data['phases'], $export_data['version'], $export_data['export_date'] );
+		$csv_variations = $this->variations_to_csv( $export_data['variations'], $export_data['version'], $export_data['export_date'] );
 
 		wp_send_json_success(
 			array(
-				'data'              => $export_data,
-				'csv_phases'        => $csv_phases,
-				'csv_variations'    => $csv_variations,
-				'filename_phases'   => 'pbc-phases-' . $timestamp . '.csv',
+				'data'                => $export_data,
+				'csv_phases'          => $csv_phases,
+				'csv_variations'      => $csv_variations,
+				'filename_phases'     => 'pbc-phases-' . $timestamp . '.csv',
 				'filename_variations' => 'pbc-variations-' . $timestamp . '.csv',
 			)
 		);
@@ -736,10 +739,10 @@ class PBC_Export_Import {
 		if ( empty( $csv_depends ) ) {
 			return array();
 		}
-		
+
 		$slugs   = explode( '|', $csv_depends );
 		$depends = array();
-		
+
 		foreach ( $slugs as $slug ) {
 			if ( ! empty( trim( $slug ) ) ) {
 				$depends[] = array(
@@ -747,7 +750,7 @@ class PBC_Export_Import {
 				);
 			}
 		}
-		
+
 		return $depends;
 	}
 
@@ -761,25 +764,25 @@ class PBC_Export_Import {
 		if ( empty( $csv_imgprodgroup ) ) {
 			return array();
 		}
-		
+
 		$groups       = explode( '|', $csv_imgprodgroup );
 		$imgprodgroup = array();
-		
+
 		foreach ( $groups as $group ) {
 			if ( empty( trim( $group ) ) ) {
 				continue;
 			}
-			
-			$parts = explode( ':', $group );
+
+			$parts     = explode( ':', $group );
 			$dep_slugs = ! empty( $parts[0] ) ? explode( ',', $parts[0] ) : array();
 			$img_ids   = ! empty( $parts[1] ) ? explode( ',', $parts[1] ) : array();
-			
+
 			$imgprodgroup[] = array(
 				'pbc_depvarimgprod_slugs' => array_map( 'trim', $dep_slugs ),
 				'pbc_imgprod'             => array_map( 'intval', $img_ids ),
 			);
 		}
-		
+
 		return $imgprodgroup;
 	}
 
@@ -793,28 +796,28 @@ class PBC_Export_Import {
 		if ( empty( $csv_pricegroup ) ) {
 			return array();
 		}
-		
+
 		$prices     = explode( '|', $csv_pricegroup );
 		$pricegroup = array();
-		
+
 		foreach ( $prices as $price ) {
 			if ( empty( trim( $price ) ) ) {
 				continue;
 			}
-			
+
 			$parts       = explode( ':', $price );
 			$option_name = ! empty( $parts[0] ) ? trim( $parts[0] ) : '';
 			$price_value = ! empty( $parts[1] ) ? trim( $parts[1] ) : '';
-			
+
 			$price_item = array();
 			if ( ! empty( $option_name ) ) {
 				$price_item['pbc_meaprice'] = $option_name;
 			}
 			$price_item['pbc_pricem'] = $price_value;
-			
+
 			$pricegroup[] = $price_item;
 		}
-		
+
 		return $pricegroup;
 	}
 
@@ -949,4 +952,3 @@ class PBC_Export_Import {
 }
 
 new PBC_Export_Import();
-
