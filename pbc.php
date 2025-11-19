@@ -69,6 +69,12 @@ add_action(
 				// Remove duplicate field registration from License class (Settings will handle it).
 				remove_action( 'admin_init', array( $license, 'page_init' ) );
 
+				// Set default Product ID if not already set.
+				$product_id_key = $license->get_option_key( 'product_id' );
+				if ( ! get_option( $product_id_key ) ) {
+					update_option( $product_id_key, '2635' );
+				}
+
 				// Create license settings page in PBC menu.
 				new \Closemarketing\WPLicenseManager\Settings(
 					$license,
