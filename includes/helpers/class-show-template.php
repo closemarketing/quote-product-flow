@@ -23,6 +23,7 @@ class PBC_Template {
 	 * Render for Wizard.
 	 *
 	 * @param integer $parent_phase Parent Phase.
+	 * @param string  $template      Template type (wizard or vertical).
 	 * @return void
 	 */
 	public static function render( $parent_phase, $template ) {
@@ -35,7 +36,7 @@ class PBC_Template {
 		$phase_pid           = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
 		$pbc_session_key     = 'pbc_variation_' . $phase_pid;
 
-		$args   = array(
+		$args         = array(
 			'numberposts' => -1,
 			'post_type'   => 'phases',
 			'orderby'     => 'menu_order',
@@ -50,8 +51,10 @@ class PBC_Template {
 			$phases_order[] = $post_phase->menu_order;
 		}
 
-		if ( empty( $_POST ) ) {
-			$_SESSION[ $pbc_session_key ] = array();
+			if ( empty( $_POST ) ) {
+			if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
+				$_SESSION[ $pbc_session_key ] = array();
+			}
 			// Get role and discount.
 			$role_discount = CALC::get_user_discount_and_role();
 
@@ -77,7 +80,22 @@ class PBC_Template {
 		// Output the inline style.
 		wp_add_inline_style( 'pbc-public', $custom_css );
 
-		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
+		// Verify nonce - check both possible nonce fields for AJAX compatibility.
+		$nonce_verified = false;
+		if ( isset( $_POST['pbc_template_wizard_nonce'] ) ) {
+			$nonce_verified = wp_verify_nonce( 
+				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 
+				'pbc_template_wizard_action' 
+			);
+		}
+		if ( ! $nonce_verified && isset( $_POST['nonce'] ) ) {
+			$nonce_verified = wp_verify_nonce( 
+				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 
+				'pbc-nonce' 
+			);
+		}
+
+		if ( isset( $_POST['submit'] ) && $nonce_verified ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
 				$cstep = (int) $_POST[ $submit . '_phase' ];
@@ -86,6 +104,11 @@ class PBC_Template {
 				$cstep = 'calculate';
 			} else {
 				$cstep = 'calculate';
+			}
+
+			// Debug logging for development.
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+				error_log( 'PBC Template: Submit=' . $submit . ', cstep=' . $cstep . ', nonce_verified=' . ( $nonce_verified ? 'yes' : 'no' ) );
 			}
 
 			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
@@ -138,17 +161,53 @@ class PBC_Template {
 					}
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
 				}
-				ksort( $_SESSION[ $pbc_session_key ], SORT_NUMERIC );
+				if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+					$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					ksort( $session_data, SORT_NUMERIC );
+					$_SESSION[ $pbc_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				}
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
 			$cstep = (int) $_GET['phase'];
 		}
 
-		if ( ! defined( 'DOING_AJAX' ) ) {
-			?>
-			<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
-			<?php
-		} //defined('DOING_AJAX')
+	// Support contact buttons - Always visible in all steps.
+	$support_enabled = get_option( 'pbc_support_enabled' );
+	$support_phone   = get_option( 'pbc_support_phone' );
+	$support_email   = get_option( 'pbc_support_email' );
+
+	if ( 'yes' === $support_enabled && ( $support_phone || $support_email ) ) {
+		?>
+		<div class="pbc-support-buttons pbc-support-sticky" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999;">
+			<div class="support-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
+				<?php if ( $support_phone ) { ?>
+					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $support_phone ) ); ?>" 
+					   class="pbc-support-link btn-phone" 
+					   title="<?php esc_attr_e( 'Call technical support', 'pbc' ); ?>"
+					   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
+						<span class="dashicons dashicons-phone" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
+						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Support', 'pbc' ); ?></span>
+					</a>
+				<?php } ?>
+				<?php if ( $support_email ) { ?>
+					<a href="mailto:<?php echo esc_attr( $support_email ); ?>" 
+					   class="pbc-support-link btn-email" 
+					   title="<?php esc_attr_e( 'Email technical support', 'pbc' ); ?>"
+					   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
+						<span class="dashicons dashicons-email" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
+						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Email', 'pbc' ); ?></span>
+					</a>
+				<?php } ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	if ( ! defined( 'DOING_AJAX' ) ) {
+		?>
+		<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
+		<?php
+	} // End if ! defined( 'DOING_AJAX' ).
 
 		if ( empty( $phases ) ) {
 			?>
@@ -176,18 +235,19 @@ class PBC_Template {
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 					<?php
-						$prev_variations_ids = array();
-						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
-							foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $prev_var ) {
-								if ( isset( $prev_var['var']['id'] ) ) {
-									$var_id = (int) $prev_var['var']['id'];
-									// Use step_key - 1 as index to match with 0-based dependency checking.
-									$prev_variations_ids[ $step_key - 1 ] = $var_id;
-								}
+					$prev_variations_ids = array();
+					if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+						$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						foreach ( $session_data as $step_key => $prev_var ) {
+							if ( isset( $prev_var['var']['id'] ) ) {
+								$var_id = (int) $prev_var['var']['id'];
+								// Use step_key - 1 as index to match with 0-based dependency checking.
+								$prev_variations_ids[ $step_key - 1 ] = $var_id;
 							}
 						}
+					}
 
-						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
+					$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
 						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
 							$variations_depends = array();
 							foreach ( $variations as $variation_id ) {
@@ -254,8 +314,8 @@ class PBC_Template {
 							if (
 								isset( $_SESSION[ $pbc_session_key ] ) &&
 								is_array( $_SESSION[ $pbc_session_key ] ) &&
-								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
-								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
+								isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
+								in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 							) {
 								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
 							} else {
@@ -286,7 +346,7 @@ class PBC_Template {
 									echo ' actived';
 								}
 								echo '">';
-								echo wpautop( $descvar );
+								echo wp_kses_post( wpautop( $descvar ) );
 								echo '</div>';
 							}
 							++$index_var;
@@ -298,7 +358,7 @@ class PBC_Template {
 						<?php
 						$phase_post = get_post( $phase_id );
 						if ( ! empty( $phase_post->post_content ) ) {
-							echo $phase_post->post_content;
+							echo wp_kses_post( $phase_post->post_content );
 						}
 						?>
 					</div>
@@ -359,17 +419,18 @@ class PBC_Template {
 			">
 				<div class="image-wrap">
 					<?php
-					$ssVar = '';
+					$ss_var = '';
 					if ( ! empty( $_SESSION[ $pbc_session_key ] ) ) {
 						$to = (int) $cstep;
 						if ( 'calculate' === $cstep ) {
 							$to = count( $_SESSION[ $pbc_session_key ] ) + 1;
 						}
 						for ( $i = 1; $i < $to; $i++ ) {
-							$imgprodid = $imgprodurl = '';
-							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
-								$ssVar        = $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
-								$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
+							$imgprodid  = '';
+							$imgprodurl = '';
+							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) && isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ) {
+								$ss_var       = (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
+								$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
 										if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
@@ -381,10 +442,10 @@ class PBC_Template {
 												}
 											}
 											if ( ! empty( $_SESSION[ $pbc_session_key ] ) && ! empty( $prev_var ) ) {
-												foreach ( $prev_var as $s_phase_key => $sVariations ) {
+												foreach ( $prev_var as $s_phase_key => $s_variations ) {
 													if ( isset( $prev_var[ $s_phase_key ] ) &&
-													isset( $_SESSION[ $pbc_session_key ][ $s_phase_key ] ) &&
-													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+													isset( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'] ) &&
+													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
 														$imgprodid = $deps['pbc_imgprod'][0];
 													} else {
 														$imgprodid = '';
@@ -409,7 +470,7 @@ class PBC_Template {
 									$variations_images_flipped = get_option( 'variations_images_flipped' );
 									if ( ! empty( $variations_images_flipped ) ) {
 										for ( $j = 1; $j <= $to; $j++ ) {
-											if ( isset( $_SESSION[ $pbc_session_key ][ $j ] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
+											if ( isset( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped, true ) ) {
 												$addclass = 'flipped';
 											}
 										}
@@ -421,12 +482,13 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $ssVar ) && ! empty( $ssVar ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $ssVar ) : '';
+					$session_var_for_image = isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ? $_SESSION[ $pbc_session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$imgprodurl            = ! empty( $ss_var ) ? CALC::get_image_variation_url( $session_var_for_image, $ss_var ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
 						$addclass                  = '';
-						if ( ! empty( $variations_images_flipped ) && in_array( $ssVar, $variations_images_flipped ) ) {
+						if ( ! empty( $variations_images_flipped ) && in_array( $ss_var, $variations_images_flipped, true ) ) {
 							$addclass = 'flipped';
 						}
 						?>
@@ -448,10 +510,25 @@ class PBC_Template {
 				?>
 				<div class="configurator_result_share">
 					<?php
-					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION['pbc_output']['type'] ) : '';
+					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION['pbc_output']['type'] ) ) : '';
 					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
-						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
+						<h2><?php esc_html_e( 'Share Configuration', 'pbc' ); ?></h2>
+						<div class="share_buttons">
+							<button type="button" class="btn btn-share btn-whatsapp" id="pbc-share-whatsapp">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+									<path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+								</svg>
+								<?php esc_html_e( 'Share via WhatsApp', 'pbc' ); ?>
+							</button>
+							<button type="button" class="btn btn-share btn-email" id="pbc-share-email">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+									<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+								</svg>
+								<?php esc_html_e( 'Share via Email', 'pbc' ); ?>
+							</button>
+						</div>
+						<h2 style="margin-top: 30px;"><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
 							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
@@ -480,7 +557,7 @@ class PBC_Template {
 						?>
 						<div class="result_submit_action <?php echo esc_html( $session_type ); ?>">
 							<?php
-							echo $_SESSION['pbc_output']['response'];
+							echo wp_kses_post( $_SESSION['pbc_output']['response'] );
 							?>
 						</div>
 						<?php

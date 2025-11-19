@@ -37,18 +37,18 @@ class CALC {
 		if ( ! empty( $imgprodgroup ) ) {
 			foreach ( $imgprodgroup as $deps ) {
 				if ( ! empty( $deps['pbc_depvarimgprod'] ) ) {
-					$prevVar = array();
+					$prev_var = array();
 					foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
 						$imgprod_arr = explode( '|', $depvarimgprod );
 						if ( ! empty( $imgprod_arr[0] ) && ! empty( $imgprod_arr[1] ) ) {
-							$prevVar[(int)$imgprod_arr[0]][] = $imgprod_arr[1];
+							$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
 						}
 					}
-					if ( ! empty( $session_variation ) && ! empty( $prevVar ) ) {
-						foreach ( $prevVar as $sPhaseKey => $sVariations ) {
-							if ( isset( $prevVar[ $sPhaseKey ]) &&
-							isset( $session_variation[ $sPhaseKey ] ) &&
-							in_array( $session_variation[ $sPhaseKey ]['var']['id'], $prevVar[ $sPhaseKey ] ) ) {
+					if ( ! empty( $session_variation ) && ! empty( $prev_var ) ) {
+						foreach ( $prev_var as $s_phase_key => $s_variations ) {
+							if ( isset( $prev_var[ $s_phase_key ] ) &&
+							isset( $session_variation[ $s_phase_key ] ) &&
+							in_array( $session_variation[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
 								$imgprod_id = $deps['pbc_imgprod'][0];
 							} else {
 								$imgprod_id = '';
@@ -56,7 +56,7 @@ class CALC {
 							}
 						}
 					}
-				} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty($deps['pbc_depvarimgprod'])) && isset($deps['pbc_imgprod']) ) {
+				} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
 						$imgprod_id = $deps['pbc_imgprod'][0];
 						break;
 				}
@@ -75,15 +75,15 @@ class CALC {
 	/**
 	 * Gets total price from enquiry
 	 *
-	 * @param integer $post_id
+	 * @param integer $post_id Post ID of the enquiry.
 	 * @return float
 	 */
 	public static function get_total_from_enquiry( $post_id ) {
-		$metas = get_post_meta( $post_id );
+		$metas       = get_post_meta( $post_id );
 		$total_price = 0;
 		foreach ( $metas as $key => $value ) {
 			if ( false !== strpos( $key, 'pbc_price_' ) ) {
-				$price = isset( $value[0] ) ? (double) str_replace( ',', '.', $value[0] ) : 0;
+				$price       = isset( $value[0] ) ? (float) str_replace( ',', '.', $value[0] ) : 0;
 				$total_price = $total_price + $price;
 			}
 		}
@@ -98,14 +98,14 @@ class CALC {
 	 * @return float
 	 */
 	public static function calculate_color_text( $background_hex ) {
-		list($r1, $g1, $b1) = sscanf( $background_hex, "#%02x%02x%02x" );
+		list($r1, $g1, $b1) = sscanf( $background_hex, '#%02x%02x%02x' );
 
 		// Black.
 		$r2 = 0;
 		$g2 = 0;
 		$b2 = 0;
 
-		$contrast = max( $r1, $r2) - min( $r1, $r2 ) + max( $g1, $g2 ) - min( $g1, $g2 ) + max( $b1, $b2) - min( $b1, $b2 );
+		$contrast = max( $r1, $r2 ) - min( $r1, $r2 ) + max( $g1, $g2 ) - min( $g1, $g2 ) + max( $b1, $b2 ) - min( $b1, $b2 );
 
 		return $contrast > 500 ? '#000000' : '#ffffff';
 	}
@@ -302,9 +302,9 @@ class CALC {
 			if ( ! is_array( $details ) ) {
 				continue;
 			}
-			$phase_name      = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
-			$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-			$price           = (float) $details['var']['price'];
+			$phase_name     = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+			$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+			$price          = (float) $details['var']['price'];
 
 			$meta[ 'pbc_phase_name_' . $i ] = $phase_name;
 			$meta[ 'pbc_phase_var_' . $i ]  = $variation_name;
@@ -340,7 +340,6 @@ class CALC {
 		$state_field     = $item['pbc_contact']['state'] ?? '';
 		$comments_field  = $item['pbc_contact']['comments'] ?? '';
 		$pbc_session_key = $item['pbc_session_key'] ?? '';
-
 
 		$user        = wp_get_current_user();
 		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
@@ -388,7 +387,7 @@ class CALC {
 				$message       .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
 				$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
 				$message       .= '<br/></div>';
-				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4>' . '<br>';
+				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4><br>';
 				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
 				$subtotal_price = 0;
 
@@ -418,7 +417,7 @@ class CALC {
 					$message .= '<table>';
 					$message .= '<tr>';
 					$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
-					$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €' . '</td>';
+					$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '<tr>';
 					$message .= '<td>' . __( 'Tax:', 'pbc' ) . '</td>';
@@ -432,45 +431,45 @@ class CALC {
 					$message .= '</table>';
 				}
 
-			$message .= '<br>' . get_option( 'blogname' );
-			$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
+				$message .= '<br>' . get_option( 'blogname' );
+				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
-			// Insert_enquiry Post.
-			$post_id     = self::configurator_save_enquiry( $item );
-			$attachments = array();
-			$pdf_path    = null;
+				// Insert_enquiry Post.
+				$post_id     = self::configurator_save_enquiry( $item );
+				$attachments = array();
+				$pdf_path    = null;
 
-			if ( $post_id ) {
-				$item['pbc_enquiry']     = $post_id;
-				$item['pbc_budget_date'] = gmdate( 'd-m-Y' );
+				if ( $post_id ) {
+					$item['pbc_enquiry']     = $post_id;
+					$item['pbc_budget_date'] = gmdate( 'd-m-Y' );
 
-				// Generate PDF and get the file path.
-				$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
+					// Generate PDF and get the file path.
+					$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
 
-				if ( $pdf_path && file_exists( $pdf_path ) ) {
-					$attachments = array( $pdf_path );
+					if ( $pdf_path && file_exists( $pdf_path ) ) {
+						$attachments = array( $pdf_path );
+					}
 				}
-			}
 
-			// Send email.
-			$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
+				// Send email.
+				$mail_sent = wp_mail( $emails, $subject, $message, $headers, $attachments );
 
-			// Clean up PDF file after sending.
-			if ( $pdf_path && file_exists( $pdf_path ) ) {
-				unlink( $pdf_path );
-			}
+				// Clean up PDF file after sending.
+				if ( $pdf_path && file_exists( $pdf_path ) ) {
+					wp_delete_file( $pdf_path );
+				}
 
-			if ( ! $mail_sent ) {
-				$result = array(
-					'type'     => 'error',
-					'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
-				);
-			} else {
-				$result = array(
-					'type'     => 'success',
-					'response' => __( 'Mail sent!', 'pbc' ),
-				);
-			}
+				if ( ! $mail_sent ) {
+					$result = array(
+						'type'     => 'error',
+						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+					);
+				} else {
+					$result = array(
+						'type'     => 'success',
+						'response' => __( 'Mail sent!', 'pbc' ),
+					);
+				}
 			}
 		}
 		return $result;

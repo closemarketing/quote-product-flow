@@ -16,7 +16,8 @@
 	"require": {
 		"wpackagist-plugin/meta-box": "^5.6.7",
 		"meta-box/meta-box-group": "dev-master",
-		"spipu/html2pdf": "^5.2"
+		"spipu/html2pdf": "^5.2",
+		"closemarketing/wp-plugin-license-manager": "^1.0"
 	},
 	"config": {
 		"allow-plugins": {
@@ -54,8 +55,8 @@
 		"wp-phpunit/wp-phpunit": "^5.9"
 	},
 	"scripts": {
-		"format": "phpcbf --standard=phpcs.xml.dist",
-		"lint": "phpcs --standard=phpcs.xml.dist",
+		"format": "phpcbf --standard=.phpcs.xml.dist",
+		"lint": "phpcs --standard=.phpcs.xml.dist",
 		"phpstan": "phpstan analyse --memory-limit=2048M",
 		"test": "phpunit",
 		"test-debug": "XDEBUG_MODE=debug XDEBUG_TRIGGER=1 phpunit",

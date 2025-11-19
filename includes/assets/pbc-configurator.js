@@ -153,7 +153,11 @@ jQuery(function($){
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
 
-		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template');
+		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template')+'&nonce='+PBCAjaxAction.nonce;
+
+		console.log('PBC Debug: Submit button clicked:', submit_val);
+		console.log('PBC Debug: Next phase:', next_phase);
+		console.log('PBC Debug: Current phase:', $('input[name=pbc_current_phase]').val());
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,  //server script to process data
@@ -163,24 +167,39 @@ jQuery(function($){
 			success: function(response) {
                 thisButton.prop('disabled', false);
 			
+			console.log('PBC Debug: Response length:', response.length);
+			console.log('PBC Debug: Response preview:', response.substring(0, 500));
+			
 			// Note: PDF opens automatically via script tag in response.
 			// No need to manually open it here as it would create duplicate tabs.
 			
 			$('.page-configurator').html(response);
+			
+			// Wait for DOM to be ready before checking for variations.
+			setTimeout(function() {
+				var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0 || 
+				                     $('.page-configurator').find('select.pbc_variation option').length > 0;
+				var newNextPhase = $('.page-configurator').find('input[name=next_phase]').val();
+				
+				console.log('PBC Debug: Has variations:', hasVariations);
+				console.log('PBC Debug: New next phase:', newNextPhase);
+				
 				if (
-					next_phase != 'calculate' &&
+					newNextPhase && 
+					newNextPhase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && 
-					( $(document).find('input.pbc_variation').length == 0 && $(document).find('select.pbc_variation option').length == 0 )
+					!hasVariations
 				)
 				{
-					$(document).find('button[name=submit][value='+submit_val+']').trigger('click');
-				}else{
-					$(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
-					//$('.page-configurator').html(response);
-					if($(document).find('.result_submit_action').length > 0){
-						$(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
+					console.log('PBC Debug: Auto-skipping empty step');
+					$('.page-configurator').find('button[name=submit][value='+submit_val+']').trigger('click');
+				} else {
+					$('.page-configurator').find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+					if($('.page-configurator').find('.result_submit_action').length > 0){
+						$('.page-configurator').find('.result_submit_action').show().delay(3000).fadeOut(400);
 					}
 				}
+			}, 100);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.error('PBC: AJAX Error!');
@@ -214,6 +233,151 @@ jQuery(function($){
 						$('.page-configurator').html(response);
 						$(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
 					}
+			}
+		});
+	});
+
+	// Share via WhatsApp.
+	$(document).on('click', '#pbc-share-whatsapp', function(e){
+		e.preventDefault();
+		var sessionKey = $('input[name=pbc_session_key]').val();
+		var parentPhase = $('input[name=pbc_parent_phase]').val();
+		var template = $('#configurator-form').data('template');
+		var currentUrl = window.location.href.split('#')[0];
+
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'get_shareable_config',
+				session_key: sessionKey,
+				parent_phase: parentPhase,
+				template: template,
+				current_url: currentUrl
+			},
+			success: function(response) {
+				if (response.success && response.data.url) {
+					console.log('PBC: Generated URL:', response.data.url);
+					if (response.data.variations_count) {
+						console.log('PBC: Variations in URL:', response.data.variations_count);
+					}
+					var message = 'Mira esta configuración: ' + response.data.url;
+					var text = encodeURIComponent(message);
+					var whatsappUrl = 'https://wa.me/?text=' + text;
+					window.open(whatsappUrl, '_blank');
+				} else {
+					var errMsg = (response.data && response.data.message) ? response.data.message : 'No se pudo generar el enlace de configuración.';
+					alert(errMsg);
+				}
+			},
+			error: function() {
+				alert('Error al procesar la solicitud');
+			}
+		});
+	});
+
+	// Share via Email.
+	$(document).on('click', '#pbc-share-email', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+
+		var $button = $(this);
+		if ($button.hasClass('processing')) {
+			return false;
+		}
+
+		// Ask for recipient email.
+		var recipientEmail = prompt('Introduce el email del destinatario:');
+
+		// Validate email.
+		if (!recipientEmail) {
+			return false; // User cancelled.
+		}
+
+		recipientEmail = recipientEmail.trim();
+		var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+		if (!emailPattern.test(recipientEmail)) {
+			alert('Por favor, introduce un email válido.');
+			return false;
+		}
+
+		$button.addClass('processing');
+
+		var sessionKey = $('input[name=pbc_session_key]').val();
+		var parentPhase = $('input[name=pbc_parent_phase]').val();
+		var template = $('#configurator-form').data('template');
+		var currentUrl = window.location.href.split('#')[0];
+
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'send_config_email',
+				session_key: sessionKey,
+				parent_phase: parentPhase,
+				template: template,
+				current_url: currentUrl,
+				recipient_email: recipientEmail
+			},
+			success: function(response) {
+				$button.removeClass('processing');
+				if (response.success) {
+					alert('✓ Email enviado correctamente a ' + recipientEmail);
+				} else {
+					var errMsg = (response.data && response.data.message) ? response.data.message : 'No se pudo enviar el email.';
+					alert(errMsg);
+				}
+			},
+			error: function() {
+				$button.removeClass('processing');
+				alert('Error al procesar la solicitud');
+			}
+		});
+
+		return false;
+	});
+
+	// Restart process button.
+	$(document).on('click', '#pbc-restart-process', function(e){
+		e.preventDefault();
+		
+		if (!confirm('¿Estás seguro de que quieres reiniciar el proceso? Se perderán todas las configuraciones actuales.')) {
+			return;
+		}
+		
+		var button = $(this);
+		var originalText = button.text();
+		
+		// Disable button.
+		button.prop('disabled', true).text('Reiniciando...');
+		
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'pbc_restart_process',
+				nonce: PBCAjaxAction.nonce
+			},
+			dataType: 'json',
+			success: function(response) {
+				if (response.success) {
+					// Reload the page to start from step 1.
+					window.location.reload();
+				} else {
+					alert(response.data.message || 'Error al reiniciar el proceso.');
+					button.prop('disabled', false).text(originalText);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error('PBC Restart Error:', {
+					status: jqXHR.status,
+					statusText: jqXHR.statusText,
+					textStatus: textStatus,
+					errorThrown: errorThrown
+				});
+				alert('Error al reiniciar el proceso.');
+				button.prop('disabled', false).text(originalText);
 			}
 		});
 	});

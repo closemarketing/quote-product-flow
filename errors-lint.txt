@@ -1,0 +1,517 @@
+DEPRECATED: Passing an array of values to a property using a comma-separated string
+was deprecated in PHP_CodeSniffer 3.3.0. Support will be removed in PHPCS 4.0.0.
+The deprecated syntax was used for property "text_domain"
+for sniff "WordPress.WP.I18n".
+Pass array values via <element [key="..." ]value="..."> nodes instead.
+
+..EWEEEEE 9 / 9 (100%)
+
+
+
+FILE: ...nt/plugins/product-budget-configurator/includes/class-pbc-admin-plugin.php
+--------------------------------------------------------------------------------
+FOUND 15 ERRORS AND 4 WARNINGS AFFECTING 18 LINES
+--------------------------------------------------------------------------------
+  439 | ERROR   | [ ] A function call to __() with texts containing
+      |         |     placeholders was found, but was not accompanied by a
+      |         |     "translators:" comment on the line above to clarify the
+      |         |     meaning of the placeholders.
+      |         |     (WordPress.WP.I18n.MissingTranslatorsComment)
+  721 | ERROR   | [ ] A function call to __() with texts containing
+      |         |     placeholders was found, but was not accompanied by a
+      |         |     "translators:" comment on the line above to clarify the
+      |         |     meaning of the placeholders.
+      |         |     (WordPress.WP.I18n.MissingTranslatorsComment)
+  732 | ERROR   | [ ] A function call to __() with texts containing
+      |         |     placeholders was found, but was not accompanied by a
+      |         |     "translators:" comment on the line above to clarify the
+      |         |     meaning of the placeholders.
+      |         |     (WordPress.WP.I18n.MissingTranslatorsComment)
+  881 | ERROR   | [ ] Missing short description in doc comment
+      |         |     (Generic.Commenting.DocComment.MissingShort)
+  899 | ERROR   | [ ] All output should be run through an escaping function
+      |         |     (see the Security sections in the WordPress Developer
+      |         |     Handbooks), found '__'.
+      |         |     (WordPress.Security.EscapeOutput.OutputNotEscaped)
+  899 | ERROR   | [ ] A function call to __() with texts containing
+      |         |     placeholders was found, but was not accompanied by a
+      |         |     "translators:" comment on the line above to clarify the
+      |         |     meaning of the placeholders.
+      |         |     (WordPress.WP.I18n.MissingTranslatorsComment)
+  936 | ERROR   | [ ] Missing short description in doc comment
+      |         |     (Generic.Commenting.DocComment.MissingShort)
+ 1041 | ERROR   | [ ] Missing parameter comment
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 1061 | WARNING | [x] Loose comparisons are not allowed. Expected: "!==";
+      |         |     Found: "!="
+      |         |     (Universal.Operators.StrictComparisons.LooseNotEqual)
+ 1136 | ERROR   | [ ] Doc comment for parameter "$software_version" missing
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
+ 1139 | ERROR   | [ ] Missing parameter comment
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 1164 | ERROR   | [ ] Missing parameter comment
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 1186 | ERROR   | [ ] Missing parameter comment
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 1201 | ERROR   | [ ] Missing parameter comment
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 1207 | WARNING | [ ] error_log() found. Debug code should not normally be used
+      |         |     in production.
+      |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 1282 | ERROR   | [ ] Missing parameter comment
+      |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 1306 | WARNING | [ ] unserialize() found. Serialized data has known
+      |         |     vulnerability problems with Object Injection. JSON is
+      |         |     generally a better approach for serializing data. See
+      |         |     https://www.owasp.org/index.php/PHP_Object_Injection
+      |         |     (WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize)
+ 1322 | WARNING | [ ] parse_url() is discouraged because of inconsistency in
+      |         |     the output across PHP versions; use wp_parse_url()
+      |         |     instead.
+      |         |     (WordPress.WP.AlternativeFunctions.parse_url_parse_url)
+ 1330 | ERROR   | [ ] A function call to esc_html__() with texts containing
+      |         |     placeholders was found, but was not accompanied by a
+      |         |     "translators:" comment on the line above to clarify the
+      |         |     meaning of the placeholders.
+      |         |     (WordPress.WP.I18n.MissingTranslatorsComment)
+--------------------------------------------------------------------------------
+PHPCBF CAN FIX THE 1 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+--------------------------------------------------------------------------------
+
+
+FILE: ...lugins/product-budget-configurator/includes/class-pbc-helper-posttypes.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 12 WARNINGS AFFECTING 8 LINES
+--------------------------------------------------------------------------------
+ 475 | WARNING | The method parameter $phases_columns is never used
+     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.Found)
+ 516 | WARNING | The method parameter $phases_columns is never used
+     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.Found)
+ 567 | WARNING | The method parameter $phases_columns is never used
+     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.Found)
+ 669 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 669 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 678 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 678 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 704 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 704 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 707 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 707 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+ 709 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+--------------------------------------------------------------------------------
+
+
+FILE: ...lugins/product-budget-configurator/includes/helpers/class-calculations.php
+--------------------------------------------------------------------------------
+FOUND 17 ERRORS AND 3 WARNINGS AFFECTING 13 LINES
+--------------------------------------------------------------------------------
+  40 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  44 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  47 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  48 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  48 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  48 | ERROR   | [ ] Variable "$sVariations" is not in valid snake_case format,
+     |         |     try "$s_variations"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  49 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  49 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  50 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  51 | WARNING | [ ] Not using strict comparison for in_array; supply true for
+     |         |     $strict argument.
+     |         |     (WordPress.PHP.StrictInArray.MissingTrueStrict)
+  51 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  51 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  51 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+  78 | ERROR   | [ ] Missing parameter comment
+     |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
+ 345 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 345 | ERROR   | [ ] Use Yoda Condition checks, you must.
+     |         |     (WordPress.PHP.YodaConditions.NotYoda)
+ 387 | ERROR   | [ ] String concat is not required here; use a single string
+     |         |     instead (Generic.Strings.UnnecessaryStringConcat.Found)
+ 417 | ERROR   | [ ] String concat is not required here; use a single string
+     |         |     instead (Generic.Strings.UnnecessaryStringConcat.Found)
+ 448 | ERROR   | [ ] date() is affected by runtime timezone changes which can
+     |         |     cause date/time to be incorrectly displayed. Use gmdate()
+     |         |     instead.
+     |         |     (WordPress.DateTime.RestrictedFunctions.date_date)
+ 451 | WARNING | [ ] unlink() is discouraged. Use wp_delete_file() to delete a
+     |         |     file. (WordPress.WP.AlternativeFunctions.unlink_unlink)
+--------------------------------------------------------------------------------
+PHPCBF CAN FIX THE 1 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+--------------------------------------------------------------------------------
+
+
+FILE: .../plugins/product-budget-configurator/includes/helpers/class-show-parts.php
+--------------------------------------------------------------------------------
+FOUND 6 ERRORS AND 5 WARNINGS AFFECTING 7 LINES
+--------------------------------------------------------------------------------
+  23 | ERROR   | [ ] Doc comment for parameter "$template" missing
+     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
+  96 | ERROR   | [ ] All output should be run through an escaping function (see
+     |         |     the Security sections in the WordPress Developer
+     |         |     Handbooks), found 'wpautop'.
+     |         |     (WordPress.Security.EscapeOutput.OutputNotEscaped)
+ 265 | WARNING | [ ] The method parameter $template is never used
+     |         |     (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
+ 269 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 269 | ERROR   | [ ] Use Yoda Condition checks, you must.
+     |         |     (WordPress.PHP.YodaConditions.NotYoda)
+ 272 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 272 | ERROR   | [ ] Use Yoda Condition checks, you must.
+     |         |     (WordPress.PHP.YodaConditions.NotYoda)
+ 280 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 280 | ERROR   | [ ] Use Yoda Condition checks, you must.
+     |         |     (WordPress.PHP.YodaConditions.NotYoda)
+ 283 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 283 | ERROR   | [ ] Use Yoda Condition checks, you must.
+     |         |     (WordPress.PHP.YodaConditions.NotYoda)
+--------------------------------------------------------------------------------
+PHPCBF CAN FIX THE 4 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+--------------------------------------------------------------------------------
+
+
+FILE: ...ugins/product-budget-configurator/includes/helpers/class-show-template.php
+--------------------------------------------------------------------------------
+FOUND 22 ERRORS AND 5 WARNINGS AFFECTING 17 LINES
+--------------------------------------------------------------------------------
+  22 | ERROR   | Doc comment for parameter "$template" missing
+     |         | (Squiz.Commenting.FunctionComment.MissingParamTag)
+ 141 | ERROR   | Detected usage of a non-sanitized input variable:
+     |         | $_SESSION[$pbc_session_key]
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+ 151 | WARNING | This comment is 75% valid code; is this commented out code?
+     |         | (Squiz.PHP.CommentedOutCode.Found)
+ 181 | ERROR   | Detected usage of a non-sanitized input variable:
+     |         | $_SESSION[$pbc_session_key]
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+ 257 | WARNING | Not using strict comparison for in_array; supply true for
+     |         | $strict argument.
+     |         | (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 257 | ERROR   | Detected usage of a possibly undefined superglobal array
+     |         | index: $_SESSION[$pbc_session_key][$cstep]['var']['id']. Use
+     |         | isset() or empty() to check the index exists before using it
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotValidated)
+ 288 | ERROR   | All output should be run through an escaping function (see the
+     |         | Security sections in the WordPress Developer Handbooks), found
+     |         | 'wpautop'. (WordPress.Security.EscapeOutput.OutputNotEscaped)
+ 300 | ERROR   | All output should be run through an escaping function (see the
+     |         | Security sections in the WordPress Developer Handbooks), found
+     |         | '$phase_post'.
+     |         | (WordPress.Security.EscapeOutput.OutputNotEscaped)
+ 361 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 368 | ERROR   | Assignments must be the first block of code on a line
+     |         | (Squiz.PHP.DisallowMultipleAssignments.Found)
+ 370 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 370 | ERROR   | Detected usage of a possibly undefined superglobal array
+     |         | index: $_SESSION[$pbc_session_key][$i]['var']['id']. Use
+     |         | isset() or empty() to check the index exists before using it
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotValidated)
+ 370 | ERROR   | Detected usage of a non-sanitized input variable:
+     |         | $_SESSION[$pbc_session_key][$i]['var']['id']
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+ 371 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 383 | ERROR   | Variable "$sVariations" is not in valid snake_case format, try
+     |         | "$s_variations"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 386 | WARNING | Not using strict comparison for in_array; supply true for
+     |         | $strict argument.
+     |         | (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 386 | ERROR   | Detected usage of a possibly undefined superglobal array
+     |         | index: $_SESSION[$pbc_session_key][$s_phase_key]['var']['id'].
+     |         | Use isset() or empty() to check the index exists before using
+     |         | it
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotValidated)
+ 411 | WARNING | Not using strict comparison for in_array; supply true for
+     |         | $strict argument.
+     |         | (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 411 | ERROR   | Detected usage of a possibly undefined superglobal array
+     |         | index: $_SESSION[$pbc_session_key][$j]['var']['id']. Use
+     |         | isset() or empty() to check the index exists before using it
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotValidated)
+ 423 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 423 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 423 | ERROR   | Detected usage of a non-sanitized input variable:
+     |         | $_SESSION[$pbc_session_key]
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+ 423 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 428 | WARNING | Not using strict comparison for in_array; supply true for
+     |         | $strict argument.
+     |         | (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 428 | ERROR   | Variable "$ssVar" is not in valid snake_case format, try
+     |         | "$ss_var"
+     |         | (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 482 | ERROR   | All output should be run through an escaping function (see the
+     |         | Security sections in the WordPress Developer Handbooks), found
+     |         | '$_SESSION['pbc_output']['response']'.
+     |         | (WordPress.Security.EscapeOutput.OutputNotEscaped)
+ 482 | ERROR   | Detected usage of a non-sanitized input variable:
+     |         | $_SESSION['pbc_output']['response']
+     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+--------------------------------------------------------------------------------
+
+
+FILE: ...lugins/product-budget-configurator/includes/helpers/class-generate-pdf.php
+--------------------------------------------------------------------------------
+FOUND 26 ERRORS AND 19 WARNINGS AFFECTING 39 LINES
+--------------------------------------------------------------------------------
+  43 | WARNING | [ ] This comment is 84% valid code; is this commented out
+     |         |     code? (Squiz.PHP.CommentedOutCode.Found)
+  44 | ERROR   | [ ] Empty CATCH statement detected
+     |         |     (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+  45 | WARNING | [ ] This comment is 54% valid code; is this commented out
+     |         |     code? (Squiz.PHP.CommentedOutCode.Found)
+  47 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+  59 | ERROR   | [ ] Doc comment for parameter "$type" missing
+     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
+ 105 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 105 | ERROR   | [ ] Use Yoda Condition checks, you must.
+     |         |     (WordPress.PHP.YodaConditions.NotYoda)
+ 175 | WARNING | [ ] Not using strict comparison for in_array; supply true for
+     |         |     $strict argument.
+     |         |     (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 195 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+ 288 | ERROR   | [ ] Missing doc comment for function generateProductImage()
+     |         |     (Squiz.Commenting.FunctionComment.Missing)
+ 289 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 293 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 313 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 315 | WARNING | [ ] File operations should use WP_Filesystem methods instead
+     |         |     of direct PHP filesystem calls. Found: mkdir().
+     |         |     (WordPress.WP.AlternativeFunctions.file_system_operations_mkdir)
+ 316 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 326 | ERROR   | [ ] Variable "$ssVar" is not in valid snake_case format, try
+     |         |     "$ss_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 327 | ERROR   | [ ] Variable "$ssVar" is not in valid snake_case format, try
+     |         |     "$ss_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 332 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 336 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 341 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 342 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 342 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 343 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 343 | WARNING | [ ] Not using strict comparison for in_array; supply true for
+     |         |     $strict argument.
+     |         |     (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 343 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 343 | ERROR   | [ ] Variable "$prevVar" is not in valid snake_case format, try
+     |         |     "$prev_var"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 343 | ERROR   | [ ] Variable "$sPhaseKey" is not in valid snake_case format,
+     |         |     try "$s_phase_key"
+     |         |     (WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase)
+ 367 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 368 | WARNING | [ ] Silencing errors is strongly discouraged. Use proper error
+     |         |     checking instead. Found: @getimagesize( $imgprodurl ...
+     |         |     (WordPress.PHP.NoSilencedErrors.Discouraged)
+ 387 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 391 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 396 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 397 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 402 | WARNING | [ ] Not using strict comparison for in_array; supply true for
+     |         |     $strict argument.
+     |         |     (WordPress.PHP.StrictInArray.MissingTrueStrict)
+ 406 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 411 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 423 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 424 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 431 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 433 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 435 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 438 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 448 | WARNING | [ ] error_log() found. Debug code should not normally be used
+     |         |     in production.
+     |         |     (WordPress.PHP.DevelopmentFunctions.error_log_error_log)
+ 452 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+ 454 | ERROR   | [ ] Inline comments must end in full-stops, exclamation marks,
+     |         |     or question marks
+     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
+--------------------------------------------------------------------------------
+PHPCBF CAN FIX THE 2 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+--------------------------------------------------------------------------------
+
+
+FILE: ...content/plugins/product-budget-configurator/includes/class-pbc-request.php
+--------------------------------------------------------------------------------
+FOUND 12 ERRORS AND 14 WARNINGS AFFECTING 15 LINES
+--------------------------------------------------------------------------------
+  40 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  40 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  41 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  41 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  41 | ERROR   | [ ] $_REQUEST['pbc_variation'] not unslashed before
+     |         |     sanitization. Use wp_unslash() or similar
+     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
+  41 | ERROR   | [ ] Detected usage of a non-sanitized input variable:
+     |         |     $_REQUEST['pbc_variation']
+     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+  42 | ERROR   | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Missing)
+  42 | ERROR   | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Missing)
+  46 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+  50 | WARNING | [x] Loose comparisons are not allowed. Expected: "==="; Found:
+     |         |     "==" (Universal.Operators.StrictComparisons.LooseEqual)
+  51 | WARNING | [ ] json_encode() is discouraged. Use wp_json_encode()
+     |         |     instead.
+     |         |     (WordPress.WP.AlternativeFunctions.json_encode_json_encode)
+  64 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  64 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  64 | ERROR   | [ ] $_REQUEST["pbc_pricevar_$svar"] not unslashed before
+     |         |     sanitization. Use wp_unslash() or similar
+     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
+  64 | ERROR   | [ ] Detected usage of a non-sanitized input variable:
+     |         |     $_REQUEST["pbc_pricevar_$svar"]
+     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+  71 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  71 | WARNING | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Recommended)
+  82 | WARNING | [ ] Not using strict comparison for in_array; supply true for
+     |         |     $strict argument.
+     |         |     (WordPress.PHP.StrictInArray.MissingTrueStrict)
+  82 | ERROR   | [ ] Detected usage of a possibly undefined superglobal array
+     |         |     index: $_SESSION[$session_key][$j]['var']['id']. Use
+     |         |     isset() or empty() to check the index exists before using
+     |         |     it
+     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotValidated)
+  86 | WARNING | [ ] Not using strict comparison for in_array; supply true for
+     |         |     $strict argument.
+     |         |     (WordPress.PHP.StrictInArray.MissingTrueStrict)
+  95 | WARNING | [ ] json_encode() is discouraged. Use wp_json_encode()
+     |         |     instead.
+     |         |     (WordPress.WP.AlternativeFunctions.json_encode_json_encode)
+ 160 | ERROR   | [ ] All output should be run through an escaping function (see
+     |         |     the Security sections in the WordPress Developer
+     |         |     Handbooks), found '$all_details'.
+     |         |     (WordPress.Security.EscapeOutput.OutputNotEscaped)
+ 170 | ERROR   | [ ] extract() usage is highly discouraged, due to the
+     |         |     complexity and unintended issues it might cause.
+     |         |     (WordPress.PHP.DontExtract.extract_extract)
+ 170 | ERROR   | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Missing)
+ 186 | ERROR   | [ ] All output should be run through an escaping function (see
+     |         |     the Security sections in the WordPress Developer
+     |         |     Handbooks), found '$all_details'.
+     |         |     (WordPress.Security.EscapeOutput.OutputNotEscaped)
+ 188 | ERROR   | [ ] All output should be run through an escaping function (see
+     |         |     the Security sections in the WordPress Developer
+     |         |     Handbooks), found '$login'.
+     |         |     (WordPress.Security.EscapeOutput.OutputNotEscaped)
+--------------------------------------------------------------------------------
+PHPCBF CAN FIX THE 2 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+--------------------------------------------------------------------------------
+
+Time: 670ms; Memory: 26MB
+
