@@ -200,8 +200,8 @@ class PBC_Template {
 				<?php } ?>
 			</div>
 		</div>
-		<?php
-		}
+			<?php
+			}
 
 		if ( ! defined( 'DOING_AJAX' ) ) {
 			?>
