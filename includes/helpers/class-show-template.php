@@ -496,7 +496,7 @@ class PBC_Template {
 								<?php esc_html_e( 'Share via Email', 'pbc' ); ?>
 							</button>
 						</div>
-						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
+						<h2 style="margin-top: 30px;"><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
 							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
