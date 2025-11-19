@@ -16,7 +16,8 @@
 	"require": {
 		"wpackagist-plugin/meta-box": "^5.6.7",
 		"meta-box/meta-box-group": "dev-master",
-		"spipu/html2pdf": "^5.2"
+		"spipu/html2pdf": "^5.2",
+		"closemarketing/wp-plugin-license-manager": "^1.0"
 	},
 	"config": {
 		"allow-plugins": {
