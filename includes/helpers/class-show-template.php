@@ -578,11 +578,11 @@ class PBC_Template {
 				<div class="status_loader product_preview_status fixed hidden"></div>
 			</div>
 			<?php
-			if ( 'wizard' === $template ) {
-				SHOW::action_buttons( $phases, $cstep );
-			}
-			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
-				SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
+		if ( 'wizard' === $template ) {
+			SHOW::action_buttons( $phases, $cstep );
+		}
+		if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
+			SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
 		}
 		if ( 'calculate' === $cstep ) {
 			?>
@@ -645,7 +645,8 @@ class PBC_Template {
 				</div>
 				<?php
 			}
-			if ( 'calculate' !== $cstep ) {
+		}
+		if ( 'calculate' !== $cstep ) {
 				// Banner.
 				do_action( 'pbc_banner_after_setup' );
 				?>
