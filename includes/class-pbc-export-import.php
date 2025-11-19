@@ -347,7 +347,7 @@ class PBC_Export_Import {
 		}
 
 		$result['success'] = true;
-		/* translators: %1$d is the number of phases created, %2$d is the number of variations created. */
+		// translators: %1$d is the number of phases created, %2$d is the number of variations created.
 		$result['message'] = sprintf(
 			__( 'Import completed. Phases: %1$d, Variations: %2$d', 'pbc' ),
 			$result['phases_created'],

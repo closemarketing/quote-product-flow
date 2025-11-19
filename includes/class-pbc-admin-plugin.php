@@ -626,11 +626,13 @@ class PBC_Admin_Plugin {
 					<?php
 					$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 				?>
-				<input type="text" name="pdf_color_total" value="<?php
+				<input type="text" name="pdf_color_total" value="
+				<?php
 				if ( $pdf_color_total ) {
 					echo esc_url( $pdf_color_total );
 				}
-				?>" class="pbc_color_picker" />
+				?>
+				" class="pbc_color_picker" />
 			</fieldset>
 
 			<h2><?php esc_html_e( 'Support Contact', 'pbc' ); ?></h2>

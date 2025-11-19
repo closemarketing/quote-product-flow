@@ -291,7 +291,8 @@ class PBC_Requests {
 		}
 
 		// Add each variation to URL parameters - only numeric steps.
-		foreach ( $_SESSION[ $session_key ] as $step => $data ) {
+		$session_data = isset( $_SESSION[ $session_key ] ) ? $_SESSION[ $session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		foreach ( $session_data as $step => $data ) {
 			// Only process numeric step keys (1, 2, 3, etc.).
 			if ( ! is_numeric( $step ) ) {
 				continue;
@@ -423,7 +424,8 @@ class PBC_Requests {
 		}
 
 		// Add each variation to URL parameters - only numeric steps.
-		foreach ( $_SESSION[ $session_key ] as $step => $data ) {
+		$session_data = isset( $_SESSION[ $session_key ] ) ? $_SESSION[ $session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		foreach ( $session_data as $step => $data ) {
 			// Only process numeric step keys (1, 2, 3, etc.).
 			if ( ! is_numeric( $step ) ) {
 				continue;
