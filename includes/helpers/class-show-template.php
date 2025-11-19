@@ -23,6 +23,7 @@ class PBC_Template {
 	 * Render for Wizard.
 	 *
 	 * @param integer $parent_phase Parent Phase.
+	 * @param string  $template      Template type (wizard or vertical).
 	 * @return void
 	 */
 	public static function render( $parent_phase, $template ) {
@@ -35,7 +36,7 @@ class PBC_Template {
 		$phase_pid           = $is_multiple_prods && empty( $parent_phase ) ? (int) $default_post_parent : (int) $parent_phase;
 		$pbc_session_key     = 'pbc_variation_' . $phase_pid;
 
-		$args   = array(
+		$args         = array(
 			'numberposts' => -1,
 			'post_type'   => 'phases',
 			'orderby'     => 'menu_order',
@@ -50,8 +51,10 @@ class PBC_Template {
 			$phases_order[] = $post_phase->menu_order;
 		}
 
-		if ( empty( $_POST ) ) {
-			$_SESSION[ $pbc_session_key ] = array();
+			if ( empty( $_POST ) ) {
+			if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
+				$_SESSION[ $pbc_session_key ] = array();
+			}
 			// Get role and discount.
 			$role_discount = CALC::get_user_discount_and_role();
 
@@ -138,7 +141,11 @@ class PBC_Template {
 					}
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
 				}
-				ksort( $_SESSION[ $pbc_session_key ], SORT_NUMERIC );
+				if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+					$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					ksort( $session_data, SORT_NUMERIC );
+					$_SESSION[ $pbc_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				}
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
 			$cstep = (int) $_GET['phase'];
@@ -148,7 +155,7 @@ class PBC_Template {
 			?>
 			<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
 			<?php
-		} //defined('DOING_AJAX')
+		} // End if ! defined( 'DOING_AJAX' ).
 
 		if ( empty( $phases ) ) {
 			?>
@@ -176,18 +183,19 @@ class PBC_Template {
 					<div class="phase_title"><?php echo esc_html( $phase_title ); ?></div>
 					<div class="phase_variations phase-<?php echo esc_html( $phase_slug ); ?>">
 					<?php
-						$prev_variations_ids = array();
-						if ( isset( $_SESSION[ $pbc_session_key ] ) ) {
-							foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $prev_var ) {
-								if ( isset( $prev_var['var']['id'] ) ) {
-									$var_id = (int) $prev_var['var']['id'];
-									// Use step_key - 1 as index to match with 0-based dependency checking.
-									$prev_variations_ids[ $step_key - 1 ] = $var_id;
-								}
+					$prev_variations_ids = array();
+					if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+						$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						foreach ( $session_data as $step_key => $prev_var ) {
+							if ( isset( $prev_var['var']['id'] ) ) {
+								$var_id = (int) $prev_var['var']['id'];
+								// Use step_key - 1 as index to match with 0-based dependency checking.
+								$prev_variations_ids[ $step_key - 1 ] = $var_id;
 							}
 						}
+					}
 
-						$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
+					$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
 						if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
 							$variations_depends = array();
 							foreach ( $variations as $variation_id ) {
@@ -254,8 +262,8 @@ class PBC_Template {
 							if (
 								isset( $_SESSION[ $pbc_session_key ] ) &&
 								is_array( $_SESSION[ $pbc_session_key ] ) &&
-								isset( $_SESSION[ $pbc_session_key ][ $cstep ] ) &&
-								in_array( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations )
+								isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
+								in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 							) {
 								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
 							} else {
@@ -286,7 +294,7 @@ class PBC_Template {
 									echo ' actived';
 								}
 								echo '">';
-								echo wpautop( $descvar );
+								echo wp_kses_post( wpautop( $descvar ) );
 								echo '</div>';
 							}
 							++$index_var;
@@ -298,7 +306,7 @@ class PBC_Template {
 						<?php
 						$phase_post = get_post( $phase_id );
 						if ( ! empty( $phase_post->post_content ) ) {
-							echo $phase_post->post_content;
+							echo wp_kses_post( $phase_post->post_content );
 						}
 						?>
 					</div>
@@ -362,17 +370,18 @@ class PBC_Template {
 			">
 				<div class="image-wrap">
 					<?php
-					$ssVar = '';
+					$ss_var = '';
 					if ( ! empty( $_SESSION[ $pbc_session_key ] ) ) {
 						$to = (int) $cstep;
 						if ( 'calculate' === $cstep ) {
 							$to = count( $_SESSION[ $pbc_session_key ] ) + 1;
 						}
 						for ( $i = 1; $i < $to; $i++ ) {
-							$imgprodid = $imgprodurl = '';
-							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
-								$ssVar        = $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
-								$imgprodgroup = get_post_meta( $ssVar, 'pbc_imgprodgroup', true );
+							$imgprodid  = '';
+							$imgprodurl = '';
+							if ( isset( $_SESSION[ $pbc_session_key ][ $i ] ) && isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ) {
+								$ss_var       = (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'];
+								$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
 								if ( ! empty( $imgprodgroup ) ) {
 									foreach ( $imgprodgroup as $deps ) {
 										if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
@@ -384,10 +393,10 @@ class PBC_Template {
 												}
 											}
 											if ( ! empty( $_SESSION[ $pbc_session_key ] ) && ! empty( $prev_var ) ) {
-												foreach ( $prev_var as $s_phase_key => $sVariations ) {
+												foreach ( $prev_var as $s_phase_key => $s_variations ) {
 													if ( isset( $prev_var[ $s_phase_key ] ) &&
-													isset( $_SESSION[ $pbc_session_key ][ $s_phase_key ] ) &&
-													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ] ) ) {
+													isset( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'] ) &&
+													in_array( $_SESSION[ $pbc_session_key ][ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
 														$imgprodid = $deps['pbc_imgprod'][0];
 													} else {
 														$imgprodid = '';
@@ -412,7 +421,7 @@ class PBC_Template {
 									$variations_images_flipped = get_option( 'variations_images_flipped' );
 									if ( ! empty( $variations_images_flipped ) ) {
 										for ( $j = 1; $j <= $to; $j++ ) {
-											if ( isset( $_SESSION[ $pbc_session_key ][ $j ] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
+											if ( isset( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'] ) && in_array( $_SESSION[ $pbc_session_key ][ $j ]['var']['id'], $variations_images_flipped, true ) ) {
 												$addclass = 'flipped';
 											}
 										}
@@ -424,12 +433,13 @@ class PBC_Template {
 							}
 						}
 					}
-					$imgprodurl = isset( $ssVar ) && ! empty( $ssVar ) ? CALC::get_image_variation_url( $_SESSION[ $pbc_session_key ], $ssVar ) : '';
+					$session_var_for_image = isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ? $_SESSION[ $pbc_session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$imgprodurl            = ! empty( $ss_var ) ? CALC::get_image_variation_url( $session_var_for_image, $ss_var ) : '';
 
 					if ( $imgprodurl ) {
 						$variations_images_flipped = get_option( 'variations_images_flipped' );
 						$addclass                  = '';
-						if ( ! empty( $variations_images_flipped ) && in_array( $ssVar, $variations_images_flipped ) ) {
+						if ( ! empty( $variations_images_flipped ) && in_array( $ss_var, $variations_images_flipped, true ) ) {
 							$addclass = 'flipped';
 						}
 						?>
@@ -456,7 +466,7 @@ class PBC_Template {
 				?>
 				<div class="configurator_result_share">
 					<?php
-					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( $_SESSION['pbc_output']['type'] ) : '';
+					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION['pbc_output']['type'] ) ) : '';
 					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
 						<h2><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
@@ -488,7 +498,7 @@ class PBC_Template {
 						?>
 						<div class="result_submit_action <?php echo esc_html( $session_type ); ?>">
 							<?php
-							echo $_SESSION['pbc_output']['response'];
+							echo wp_kses_post( $_SESSION['pbc_output']['response'] );
 							?>
 						</div>
 						<?php

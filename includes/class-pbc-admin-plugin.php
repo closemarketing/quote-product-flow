@@ -79,8 +79,13 @@ class PBC_Admin_Plugin {
 		return null;
 	}
 
+	/**
+	 * Enqueue admin scripts and styles
+	 *
+	 * @return void
+	 */
 	public function enqueue_admin_scripts() {
-        wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_style( 'wp-color-picker' );
 
 		wp_register_script(
 			'pbc-media',
@@ -89,11 +94,11 @@ class PBC_Admin_Plugin {
 			WPPBC_VERSION,
 			true
 		);
-        wp_localize_script(
+		wp_localize_script(
 			'pbc-media',
 			'pbc_media_strings',
 			array(
-				'no_image_selected' => __('Please select an image file (jpeg, png) only', 'pbc'),
+				'no_image_selected' => __( 'Please select an image file (jpeg, png) only', 'pbc' ),
 			)
 		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
@@ -103,6 +108,7 @@ class PBC_Admin_Plugin {
 			WPPBC_PLUGIN_URL . 'includes/assets/admin-scripts.js',
 			array( 'jquery' ),
 			WPPBC_VERSION,
+			true
 		);
 
 		wp_localize_script(
@@ -268,7 +274,7 @@ class PBC_Admin_Plugin {
 						add_meta_box(
 							'price_updater_meta_box',
 							__( 'Price Updater', 'pbc' ),
-							array( $this, 'price_updater_meta_box_callback', ),
+							array( $this, 'price_updater_meta_box_callback' ),
 							'pbc_import_right'
 						);
 						// General Settings.
@@ -329,7 +335,7 @@ class PBC_Admin_Plugin {
 				}
 			}
 
-			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? $_POST['variations_images_flipped'] : array( '' );
+			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['variations_images_flipped'] ) ) : array( '' );
 			$variations_images_flipped = array_map( 'intval', $variations_images_flipped );
 			update_option( 'variations_images_flipped', $variations_images_flipped );
 
@@ -438,9 +444,8 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function price_updater_action_callback() {
-		$percentage = isset( $_POST['percentage'] ) ? (int) esc_attr( $_POST['percentage'] ) / 100 : '';
-
 		if ( check_ajax_referer( 'pbc_price_updater_nonce', 'nonce' ) ) {
+			$percentage = isset( $_POST['percentage'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['percentage'] ) ) / 100 : '';
 			$html       = '';
 			$count      = 0;
 			$variations = get_posts( 'posts_per_page=-1&post_type=variation&fields=ids' );
@@ -465,8 +470,9 @@ class PBC_Admin_Plugin {
 				}
 			}
 			$html = sprintf(
+				/* translators: %s: number of variations updated. */
 				__( 'Changed %s variation prices', 'pbc' ),
-				$count,
+				$count
 			);
 
 			wp_send_json_success( $html );
@@ -487,7 +493,7 @@ class PBC_Admin_Plugin {
 			<div class="content">
 				<fieldset>
 					<br/>
-					<label class="block" for="variations_images_flipped"><?php _e( 'Flip Images Horizontal', 'pbc' ); ?></label>
+					<label class="block" for="variations_images_flipped"><?php esc_html_e( 'Flip Images Horizontal', 'pbc' ); ?></label>
 					<?php
 					$variations_images_flipped = get_option( 'variations_images_flipped' );
 					$phases                    = get_posts(
@@ -513,12 +519,12 @@ class PBC_Admin_Plugin {
 							);
 							if ( ! empty( $variations ) ) {
 								foreach ( $variations as $var ) {
-									if ( ! empty( $variations_images_flipped ) && in_array( $var->ID, $variations_images_flipped ) ) {
+									if ( ! empty( $variations_images_flipped ) && in_array( $var->ID, $variations_images_flipped, true ) ) {
 										$selected = 'selected="selected"';
 									} else {
 										$selected = '';
 									}
-									echo '<option value="' . $var->ID . '" ' . $selected . '>' . str_pad( $phase->menu_order, 2, '0', STR_PAD_LEFT ) . ' - ' . $phase->post_title . ' - ' . $var->post_title . '</option>';
+									echo '<option value="' . esc_attr( $var->ID ) . '" ' . esc_attr( $selected ) . '>' . esc_html( str_pad( $phase->menu_order, 2, '0', STR_PAD_LEFT ) . ' - ' . $phase->post_title . ' - ' . $var->post_title ) . '</option>';
 								}
 							}
 						}
@@ -538,7 +544,12 @@ class PBC_Admin_Plugin {
 					<?php
 						$preview_width = get_option( 'pbc_preview_width' );
 					?>
-					<input class="pbc_field" type="text" name="preview_width" value="<?php if ( $preview_width ) { echo $preview_width; } ?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
+					<input class="pbc_field" type="text" name="preview_width" value="
+					<?php
+					if ( $preview_width ) {
+						echo esc_attr( $preview_width ); }
+?>
+" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show final button PDF?', 'pbc' ); ?></label>
@@ -583,9 +594,17 @@ class PBC_Admin_Plugin {
 					<?php
 						$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 					?>
-					<div class="pbc_field_preview"><?php if ( $pdf_image_selected ) { ?><img src="<?php echo esc_url( $pdf_image_selected ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div><input id="select_PDF_image" type="hidden" name="pdf_image_selected" value="<?php if ( $pdf_image_selected ) {
-									echo esc_url( $pdf_image_selected );
-								} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_selected ); ?>" />
+					<div class="pbc_field_preview">
+					<?php
+					if ( $pdf_image_selected ) {
+?>
+<img src="<?php echo esc_url( $pdf_image_selected ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div><input id="select_PDF_image" type="hidden" name="pdf_image_selected" value="
+		<?php
+					if ( $pdf_image_selected ) {
+			echo esc_url( $pdf_image_selected );
+								}
+								?>
+								" data-imageId="<?php echo esc_attr( $this->get_attachment_id( $pdf_image_selected ) ); ?>" />
 					<button class="select-image button select-image-selected" data-name="pdf_image_selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
@@ -593,33 +612,60 @@ class PBC_Admin_Plugin {
 					<?php
 						$pdf_image_header = get_option( 'pbc_pdf_image_header' );
 					?>
-					<div class="pbc_field_preview"><?php if ( $pdf_image_header ) { ?><img src="<?php echo esc_url( $pdf_image_header ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
-					<input id="select_pdf_image_header" type="hidden" name="pdf_image_header" value="<?php if ( $pdf_image_header ) {
+					<div class="pbc_field_preview">
+					<?php
+					if ( $pdf_image_header ) {
+?>
+<img src="<?php echo esc_url( $pdf_image_header ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
+					<input id="select_pdf_image_header" type="hidden" name="pdf_image_header" value="
+					<?php
+					if ( $pdf_image_header ) {
 						echo esc_url( $pdf_image_header );
-					} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_header ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_header"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					}
+					?>
+					" data-imageId="<?php echo esc_attr( $this->get_attachment_id( $pdf_image_header ) ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_header"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_image_footer"><?php esc_html_e( 'Set PDF Image Footer (1000px width) Height 75px optional', 'pbc' ); ?></label>
 					<?php
 						$pdf_image_footer = get_option( 'pbc_pdf_image_footer' );
 					?>
-					<div class="pbc_field_preview"><?php if ( $pdf_image_footer ) { ?><img src="<?php echo esc_url( $pdf_image_footer ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
-					<input id="select_pdf_image_footer" type="hidden" name="pdf_image_footer" value="<?php if ( $pdf_image_footer ) {
+					<div class="pbc_field_preview">
+					<?php
+					if ( $pdf_image_footer ) {
+?>
+<img src="<?php echo esc_url( $pdf_image_footer ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
+					<input id="select_pdf_image_footer" type="hidden" name="pdf_image_footer" value="
+					<?php
+					if ( $pdf_image_footer ) {
 						echo esc_url( $pdf_image_footer );
-					} ?>" data-imageId="<?php echo $this->get_attachment_id( $pdf_image_footer ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_footer"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
+					}
+					?>
+					" data-imageId="<?php echo esc_attr( $this->get_attachment_id( $pdf_image_footer ) ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_footer"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label><?php
+					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label>
+					<?php
 						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
 					?>
-					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" class="pbc_color_picker" />
+					<input type="text" name="pdf_color_odd" value="
+					<?php
+					if ( $pdf_color_odd ) {
+						echo esc_url( $pdf_color_odd ); }
+?>
+" class="pbc_color_picker" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 					?>
-					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
+					<input type="text" name="pdf_color_total" value="
+					<?php
+					if ( $pdf_color_total ) {
+						echo esc_url( $pdf_color_total ); }
+?>
+" class="pbc_color_picker" />
 				</fieldset>
 
 				<h2><?php esc_html_e( 'Set the role specific options', 'pbc' ); ?></h2>
@@ -817,7 +863,7 @@ class PBC_Admin_Plugin {
 					<input style="width:100%;" type="text" name="pbc_license_apikey" value="
 					<?php
 					if ( $license_apikey ) {
-						echo $license_apikey; }
+						echo esc_attr( $license_apikey ); }
 					?>
 					" placeholder="<?php esc_html_e( 'License API Key', 'pbc' ); ?>" />
 				</fieldset>
@@ -829,7 +875,7 @@ class PBC_Admin_Plugin {
 					<input style="width:100%;" type="text" name="pbc_license_product_id" value="
 					<?php
 					if ( $license_product_id ) {
-						echo $license_product_id; }
+						echo esc_attr( $license_product_id ); }
 					?>
 					" placeholder="<?php esc_html_e( 'License Product ID', 'pbc' ); ?>" />
 				</fieldset>
@@ -848,31 +894,43 @@ class PBC_Admin_Plugin {
 		echo '<div class="settings">';
 		echo '<h2>' . esc_html__( 'What is the license for?', 'pbc' ) . '</h2>';
 		echo '<p>';
-		printf(
-			__( 'With the <a href="%s" target="_blank">Product Budget Configurator</a> license, you\'ll have updates and automatic fixes to what\'s new or change in your system, so you\'ll always have automatic translations working.', 'pbc' ),
-			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
+		// translators: %s: URL to the product page.
+		echo wp_kses_post(
+			sprintf(
+				/* translators: %s: URL to Product Budget Configurator page. */
+				__( 'With the <a href="%s" target="_blank">Product Budget Configurator</a> license, you\'ll have updates and automatic fixes to what\'s new or change in your system, so you\'ll always have automatic translations working.', 'pbc' ),
+				'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
+			)
 		);
 		echo '</p>';
 		echo '</div><div class="help">';
 		echo '<h2>' . esc_html__( 'How do I get a license?', 'pbc' ) . '</h2>';
 		echo '<p>';
-		printf(
-			__( 'Visit the <a href="%s" target="_blank">Product Budget Configurator</a> page and purchase the licenses you need, depending on the number of WordPress MultiSites you\'re using.', 'pbc' ),
-			'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
+		// translators: %s: URL to the product page.
+		echo wp_kses_post(
+			sprintf(
+				/* translators: %s: URL to Product Budget Configurator page. */
+				__( 'Visit the <a href="%s" target="_blank">Product Budget Configurator</a> page and purchase the licenses you need, depending on the number of WordPress MultiSites you\'re using.', 'pbc' ),
+				'https://close.technology/wordpress-plugins/product-budget-configurator/?utm_source=WordPress-Settings'
+			)
 		);
 		echo '</p>';
-		echo '<p style="color:#F0F0F1;">' . esc_html__( 'Instance:', 'pbc' ) . ' ' . get_option( 'pbc_license_instance' ) . '</p>';
+		echo '<p style="color:#F0F0F1;">' . esc_html__( 'Instance:', 'pbc' ) . ' ' . esc_html( get_option( 'pbc_license_instance' ) ) . '</p>';
 		echo '</div>';
 	}
 
-	/*
+	/**
 	 * Disables dropdown dates
+	 *
+	 * @param bool   $disabled     Whether to disable the dropdown.
+	 * @param string $post_type    Post type.
+	 * @return bool
 	 */
-	public function disable_months_dropdown( $false, $post_type ) {
-		$disable_months_dropdown = $false;
+	public function disable_months_dropdown( $disabled, $post_type ) {
+		$disable_months_dropdown = $disabled;
 		$disable_post_types      = array( 'variation', 'phases' );
 
-		if ( in_array( $post_type, $disable_post_types ) ) {
+		if ( in_array( $post_type, $disable_post_types, true ) ) {
 			$disable_months_dropdown = true;
 		}
 
@@ -904,7 +962,7 @@ class PBC_Admin_Plugin {
 				'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
 			],
 			'pbc_enquiry'      => $post_id,
-            'pbc_admin'        => true,
+			'pbc_admin'        => true,
 		];
 
 		$total_vars = get_post_meta( $post_id, 'pbc_total_var', true );
@@ -944,8 +1002,8 @@ class PBC_Admin_Plugin {
 	 */
 	public function pbc_move_print_pdf_button() {
 		global $current_screen;
-		// only variation post type, exit earlier
-		if ( 'variation' != $current_screen->post_type ) {
+		// Only variation post type, exit earlier.
+		if ( 'variation' !== $current_screen->post_type ) {
 			return;
 		}
 		?>
@@ -962,10 +1020,10 @@ class PBC_Admin_Plugin {
 				// 	$('#print-message').html('Please select a post!').show().delay(3000).fadeOut(500);
 				// 	return false;
 				// }
-				$('#print-message').html('<img src="<?php echo WPPBC_PLUGIN_URL; ?>/assets/loading.gif"/>');
+				$('#print-message').html('<img src="<?php echo esc_url( WPPBC_PLUGIN_URL ); ?>/assets/loading.gif"/>');
 				$.ajax({
 					type: "POST",
-					url: '<?php echo admin_url( 'admin-ajax.php' ); ?>',
+					url: '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>',
 					data: 'action=print_pdf&ids='+ids,
 					dataType: "html",
 					success: function(result) {
@@ -988,40 +1046,47 @@ class PBC_Admin_Plugin {
 		</script>
 		<?php
 	}
+
 	/**
-	 * # LICENSE
-	 * ---------------------------------------------------------------------------------------------------- */
+	 * # LICENSE SECTION
+	 */
 
 	/**
 	 * Displays an inactive notice when the software is inactive.
+	 *
+	 * @since 2.5.1
+	 *
+	 * Filter wc_am_client_inactive_notice_override
+	 * If set to false inactive_notice() method will be disabled.
+	 *
+	 * @return void
 	 */
 	public function inactive_notice() {
-		/**
-		 * @since 2.5.1
-		 *
-		 * Filter wc_am_client_inactive_notice_override
-		 * If set to false inactive_notice() method will be disabled.
-		 */
 		if ( apply_filters( 'wpat_client_inactive_notice_override', true ) ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
-			if ( isset( $_GET['page'] ) && 'pbc' == $_GET['page'] ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['page'] ) && 'pbc' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
 				return;
 			}
 			echo '<div class="notice notice-error">';
 			echo '<p>';
-			printf(
-				__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
-				esc_attr( WPPBC_ITEM_NAME ),
-				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
-				'</a>'
+			// translators: %1$s: plugin name, %2$s: opening anchor tag, %3$s: closing anchor tag.
+			echo wp_kses_post(
+				sprintf(
+					/* translators: %1$s: Plugin name, %2$s: Opening anchor tag, %3$s: Closing anchor tag. */
+					__( 'The <strong>%1$s</strong> License has not been activated, so the plugin is inactive! %2$sClick here%3$s to activate it.', 'pbc' ),
+					esc_attr( WPPBC_ITEM_NAME ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">',
+					'</a>'
+				)
 			);
 			echo '</p></div>';
 		}
 	}
 	/**
-	 * Callback for Setting license API key
+	 * Callback for Setting license API key.
 	 *
 	 * @return void
 	 */
@@ -1049,9 +1114,7 @@ class PBC_Admin_Plugin {
 		$checkbox_status   = get_option( 'pbc_license_deactivate_checkbox' );
 		$current_api_key   = ! empty( get_option( 'pbc_license_apikey' ) ) ? get_option( 'pbc_license_apikey' ) : '';
 
-		/**
-		* @since 2.3
-		*/
+		// Updates product ID if provided.
 		if ( isset( $input['pbc_license_product_id'] ) ) {
 			$new_product_id = absint( $input['pbc_license_product_id'] );
 
@@ -1070,30 +1133,32 @@ class PBC_Admin_Plugin {
 			if ( ! empty( $deactivation_result ) ) {
 
 			if ( true === $deactivation_result['success'] && true === $deactivation_result['deactivated'] ) {
-				update_option( 'pbc_license_activated', 'Deactivated' );
-				update_option( 'pbc_license_apikey', '' );
-				update_option( 'pbc_license_product_id', '' );
-				add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
+					update_option( 'pbc_license_activated', 'Deactivated' );
+					update_option( 'pbc_license_apikey', '' );
+					update_option( 'pbc_license_product_id', '' );
+					// translators: %s: remaining activations count.
+					add_settings_error( 'wc_am_deactivate_text', 'deactivate_msg', esc_html__( 'License AutoTranslate deactivated. ', 'pbc' ) . esc_attr( "{$deactivation_result['activations_remaining']}." ), 'updated' );
 
-				return;
+					return;
 			}
 
 			if ( isset( $deactivation_result['data'] ) && isset( $deactivation_result['data']['error_code'] ) && ! empty( $deactivation_result['data']['error_code'] ) ) {
-				add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
-				update_option( 'pbc_license_activated', 'Deactivated' );
+					// translators: %s: error message from deactivation.
+					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$deactivation_result['data']['error']}" ), 'error' );
+					update_option( 'pbc_license_activated', 'Deactivated' );
 			}
 			}
 			return;
 		}
 
 		// Should match the settings_fields() value.
-		if ( 'Deactivated' == $activation_status || '' == $activation_status || '' == $api_key || 'on' == $checkbox_status || $current_api_key != $api_key ) {
+		if ( 'Deactivated' === $activation_status || '' === $activation_status || '' === $api_key || 'on' === $checkbox_status || $current_api_key !== $api_key ) {
 
 			/**
 			* If this is a new key, and an existing key already exists in the database,
 			* try to deactivate the existing key before activating the new key.
 			*/
-			if ( ! empty( $current_api_key ) && $current_api_key != $api_key ) {
+			if ( ! empty( $current_api_key ) && $current_api_key !== $api_key ) {
 				$this->replace_license_key( $current_api_key );
 			}
 
@@ -1103,6 +1168,7 @@ class PBC_Admin_Plugin {
 				$activate_results = json_decode( $activation_result, true );
 
 				if ( true === $activate_results['success'] && true === $activate_results['activated'] ) {
+					// translators: %s: activation message.
 					add_settings_error( 'activate_text', 'activate_msg', __( 'AutoTranslate activated. ', 'pbc' ) . esc_attr( "{$activate_results['message']}." ), 'updated' );
 
 					update_option( 'pbc_license_apikey', $api_key );
@@ -1110,12 +1176,13 @@ class PBC_Admin_Plugin {
 					update_option( 'pbc_license_deactivate_checkbox', 'off' );
 				}
 
-				if ( false == $activate_results && ! empty( get_option( 'pbc_license_activated' ) ) ) {
+				if ( false === $activate_results && ! empty( get_option( 'pbc_license_activated' ) ) ) {
 					add_settings_error( 'api_key_check_text', 'api_key_check_error', esc_html__( 'Connection failed to the License Key API server. Try again later. There may be a problem on your server preventing outgoing requests, or the store is blocking your request to activate the plugin/theme.', 'pbc' ), 'error' );
 					update_option( 'pbc_license_activated', 'Deactivated' );
 				}
 
 				if ( isset( $activate_results['data']['error_code'] ) && ! empty( get_option( 'pbc_license_activated' ) ) ) {
+					// translators: %s: error message from activation.
 					add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', esc_attr( "{$activate_results['data']['error']}" ), 'error' );
 					update_option( 'pbc_license_activated', 'Deactivated' );
 				}
@@ -1143,7 +1210,7 @@ class PBC_Admin_Plugin {
 		$target_url          = esc_url_raw( $this->create_software_api_url( $defaults ) );
 		$request             = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
 
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
 			// Request failed.
 			return '';
 		}
@@ -1154,9 +1221,9 @@ class PBC_Admin_Plugin {
 	/**
 	 * Sends the request to deactivate to the API Manager.
 	 *
-	 * @param array $args
+	 * @param array $args Arguments for deactivation request.
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	public function license_deactivate( $args ) {
 		if ( empty( $args ) ) {
@@ -1174,7 +1241,7 @@ class PBC_Admin_Plugin {
 
 		$error = ! empty( $result_api['error'] ) ? $result_api['error'] : '';
 
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 || $error ) {
+		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) || $error ) {
 			// Request failed.
 			add_settings_error(
 				'not_deactivated_empty_response_text',
@@ -1241,7 +1308,7 @@ class PBC_Admin_Plugin {
 		$target_url = esc_url_raw( $this->create_software_api_url( $defaults ) );
 		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
 
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
 			// Request failed.
 			return '';
 		}
@@ -1252,7 +1319,8 @@ class PBC_Admin_Plugin {
 	/**
 	 * Get license defaults
 	 *
-	 * @param [type] $action
+	 * @param string $action           Action type (activate, deactivate, status).
+	 * @param bool   $software_version Whether to include software version.
 	 * @return array
 	 */
 	private function get_license_defaults( $action, $software_version = false ) {
@@ -1277,7 +1345,7 @@ class PBC_Admin_Plugin {
 	/**
 	 * Builds the URL containing the API query string for activation, deactivation, and status requests.
 	 *
-	 * @param array $args
+	 * @param array $args Query arguments.
 	 *
 	 * @return string
 	 */
@@ -1299,7 +1367,8 @@ class PBC_Admin_Plugin {
 	/**
 	 * Deactivate the current API Key before activating the new API Key
 	 *
-	 * @param string $current_api_key
+	 * @param string $current_api_key Current API key to deactivate.
+	 * @return void
 	 */
 	public function replace_license_key( $current_api_key ) {
 		$args = array(
@@ -1314,16 +1383,15 @@ class PBC_Admin_Plugin {
 	 *
 	 * @since  2.0
 	 *
-	 * @param array $args
+	 * @param array $args Query arguments.
 	 *
 	 * @return bool|string $response
 	 */
 	public function send_query( $args ) {
 		$target_url = esc_url_raw( add_query_arg( 'wc-api', 'wc-am-api', WPPBC_URL_API ) . '&' . http_build_query( $args ) );
-		error_log( 'target_url:' . $target_url );
-		$request = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
+		$request    = wp_safe_remote_post( $target_url, array( 'timeout' => 15 ) );
 
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
 			return false;
 		}
 
@@ -1360,6 +1428,7 @@ class PBC_Admin_Plugin {
 		$response = json_decode( $this->send_query( $args ), true );
 
 		if ( isset( $response['data']['error_code'] ) ) {
+			// translators: %s: error message from update check.
 			add_settings_error( 'wc_am_client_error_text', 'wc_am_client_error', "{$response['data']['error']}", 'error' );
 		}
 
@@ -1395,7 +1464,7 @@ class PBC_Admin_Plugin {
 	 *
 	 * @param false|object|array $result The result object or array. Default false.
 	 * @param string             $action The type of information being requested from the Plugin Install API.
-	 * @param object             $args
+	 * @param object             $args   Request arguments.
 	 *
 	 * @return object
 	 */
@@ -1419,7 +1488,7 @@ class PBC_Admin_Plugin {
 			'object'       => str_ireplace( array( 'http://', 'https://' ), '', home_url() ),
 		);
 
-		$response = unserialize( $this->send_query( $args ) );
+		$response = maybe_unserialize( $this->send_query( $args ) );
 
 		if ( isset( $response ) && is_object( $response ) && false !== $response ) {
 			return $response;
@@ -1435,18 +1504,22 @@ class PBC_Admin_Plugin {
 		// show notice if external requests are blocked through the WP_HTTP_BLOCK_EXTERNAL constant.
 		if ( defined( 'WP_HTTP_BLOCK_EXTERNAL' ) && true === WP_HTTP_BLOCK_EXTERNAL ) {
 			// check if our API endpoint is in the allowed hosts.
-			$host = parse_url( WPPBC_URL_API, PHP_URL_HOST );
+			$host = wp_parse_url( WPPBC_URL_API, PHP_URL_HOST );
 
 			if ( ! defined( 'WP_ACCESSIBLE_HOSTS' ) || stristr( WP_ACCESSIBLE_HOSTS, $host ) === false ) {
 				?>
 				<div class="notice notice-error">
 					<p>
 						<?php
-						printf(
-							esc_html__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
-							'AutoTranslate',
-							'<strong>' . esc_html( $host ) . '</strong>',
-							'<code>WP_ACCESSIBLE_HOSTS</code>'
+						// translators: %1$s: plugin name, %2$s: hostname, %3$s: constant name.
+						echo wp_kses_post(
+							sprintf(
+								/* translators: %1$s: Plugin name, %2$s: Host name, %3$s: Configuration file name. */
+								__( '<b>Warning!</b> You\'re blocking external requests which means you won\'t be able to get %1$s updates. Please add %2$s to %3$s.', 'pbc' ),
+								'AutoTranslate',
+								'<strong>' . esc_html( $host ) . '</strong>',
+								'<code>WP_ACCESSIBLE_HOSTS</code>'
+							)
 						);
 						?>
 					</p>
