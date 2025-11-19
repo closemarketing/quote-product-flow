@@ -171,119 +171,41 @@ class PBC_Template {
 			$cstep = (int) $_GET['phase'];
 		}
 
+	// Support contact buttons - Always visible in all steps.
+	$support_enabled = get_option( 'pbc_support_enabled' );
+	$support_phone   = get_option( 'pbc_support_phone' );
+	$support_email   = get_option( 'pbc_support_email' );
+
+	if ( 'yes' === $support_enabled && ( $support_phone || $support_email ) ) {
+		?>
+		<div class="pbc-support-buttons pbc-support-sticky" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999;">
+			<div class="support-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
+				<?php if ( $support_phone ) { ?>
+					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $support_phone ) ); ?>" 
+					   class="pbc-support-link btn-phone" 
+					   title="<?php esc_attr_e( 'Call technical support', 'pbc' ); ?>"
+					   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
+						<span class="dashicons dashicons-phone" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
+						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Support', 'pbc' ); ?></span>
+					</a>
+				<?php } ?>
+				<?php if ( $support_email ) { ?>
+					<a href="mailto:<?php echo esc_attr( $support_email ); ?>" 
+					   class="pbc-support-link btn-email" 
+					   title="<?php esc_attr_e( 'Email technical support', 'pbc' ); ?>"
+					   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
+						<span class="dashicons dashicons-email" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
+						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Email', 'pbc' ); ?></span>
+					</a>
+				<?php } ?>
+			</div>
+		</div>
+		<?php
+	}
+
 	if ( ! defined( 'DOING_AJAX' ) ) {
 		?>
 		<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
-		<?php
-		// Support contact buttons - Always visible.
-		$support_enabled = get_option( 'pbc_support_enabled' );
-		$support_phone   = get_option( 'pbc_support_phone' );
-		$support_email   = get_option( 'pbc_support_email' );
-
-		if ( 'yes' === $support_enabled && ( $support_phone || $support_email ) ) {
-			?>
-			<div class="pbc-support-buttons pbc-support-sticky" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999;">
-				<div class="support-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
-					<?php if ( $support_phone ) { ?>
-						<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $support_phone ) ); ?>" 
-						   class="pbc-support-link btn-phone" 
-						   data-notification="<?php echo esc_attr( __( 'Opening phone...', 'pbc' ) ); ?>"
-						   title="<?php esc_attr_e( 'Call technical support', 'pbc' ); ?>"
-						   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
-							<span class="dashicons dashicons-phone" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
-							<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Support', 'pbc' ); ?></span>
-						</a>
-					<?php } ?>
-					<?php if ( $support_email ) { ?>
-						<a href="mailto:<?php echo esc_attr( $support_email ); ?>" 
-						   class="pbc-support-link btn-email" 
-						   data-notification="<?php echo esc_attr( __( 'Opening email client...', 'pbc' ) ); ?>"
-						   title="<?php esc_attr_e( 'Email technical support', 'pbc' ); ?>"
-						   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
-							<span class="dashicons dashicons-email" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
-							<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Email', 'pbc' ); ?></span>
-						</a>
-					<?php } ?>
-				</div>
-			</div>
-			<div id="pbc-support-notification" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999999; padding: 15px 30px; background: #323232; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 14px; font-weight: 500;"></div>
-			<style>
-				@keyframes pbcFadeIn {
-					from { opacity: 0; transform: translate(-50%, -20px); }
-					to { opacity: 1; transform: translate(-50%, 0); }
-				}
-				@keyframes pbcFadeOut {
-					from { opacity: 1; transform: translate(-50%, 0); }
-					to { opacity: 0; transform: translate(-50%, -20px); }
-				}
-				#pbc-support-notification.show {
-					display: block !important;
-					animation: pbcFadeIn 0.3s ease forwards;
-				}
-				#pbc-support-notification.hide {
-					animation: pbcFadeOut 0.3s ease forwards;
-				}
-			</style>
-			<script>
-				(function() {
-					function showNotification(message) {
-						var notification = document.getElementById('pbc-support-notification');
-						if (!notification) return;
-						
-						notification.textContent = message;
-						notification.className = 'show';
-						notification.style.display = 'block';
-						
-						setTimeout(function() {
-							notification.className = 'hide';
-							setTimeout(function() {
-								notification.style.display = 'none';
-								notification.className = '';
-							}, 300);
-						}, 2500);
-					}
-					
-					// Capturar con mousedown y forzar navegación
-					document.addEventListener('click', function(e) {
-						var target = e.target;
-						// Buscar el enlace padre si se hace click en un hijo (span, dashicon)
-						while (target && target.tagName !== 'A') {
-							target = target.parentElement;
-						}
-						
-						if (target && target.classList.contains('pbc-support-link')) {
-							e.preventDefault();
-							e.stopPropagation();
-							e.stopImmediatePropagation();
-							
-							var href = target.getAttribute('href');
-							var message = target.getAttribute('data-notification');
-							
-							if (message) {
-								showNotification(message);
-							}
-							
-							// Forzar navegación al href
-							if (href) {
-								// Para tel: y mailto: usar window.location funciona mejor
-								if (href.indexOf('tel:') === 0 || href.indexOf('mailto:') === 0) {
-									window.location.href = href;
-								} else {
-									// Para otros enlaces usar click programático
-									var tempLink = document.createElement('a');
-									tempLink.href = href;
-									tempLink.style.display = 'none';
-									document.body.appendChild(tempLink);
-									tempLink.click();
-									document.body.removeChild(tempLink);
-								}
-							}
-							
-							return false;
-						}
-					}, true); // useCapture = true para capturar ANTES que otros handlers
-			})();
-		</script>
 		<?php
 	} // End if ! defined( 'DOING_AJAX' ).
 
@@ -578,35 +500,35 @@ class PBC_Template {
 				<div class="status_loader product_preview_status fixed hidden"></div>
 			</div>
 			<?php
-		if ( 'wizard' === $template ) {
-			SHOW::action_buttons( $phases, $cstep );
-		}
-		if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
-			SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
-		}
-		if ( 'calculate' === $cstep ) {
-			?>
-			<div class="configurator_result_share">
-				<?php
-				$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION['pbc_output']['type'] ) ) : '';
-				if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
-					?>
-					<h2><?php esc_html_e( 'Share Configuration', 'pbc' ); ?></h2>
-					<div class="share_buttons">
-						<button type="button" class="btn btn-share btn-whatsapp" id="pbc-share-whatsapp">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
-								<path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-							</svg>
-							<?php esc_html_e( 'Share via WhatsApp', 'pbc' ); ?>
-						</button>
-						<button type="button" class="btn btn-share btn-email" id="pbc-share-email">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
-								<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
-							</svg>
-							<?php esc_html_e( 'Share via Email', 'pbc' ); ?>
-						</button>
-					</div>
-					<h2 style="margin-top: 30px;"><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
+			if ( 'wizard' === $template ) {
+				SHOW::action_buttons( $phases, $cstep );
+			}
+			if ( 'wizard' === $template || ( 'vertical' === $template && 'calculate' === $cstep ) ) {
+				SHOW::calculation_summary( $pbc_session_key, $cstep, $phases );
+			}
+			if ( 'calculate' === $cstep ) {
+				?>
+				<div class="configurator_result_share">
+					<?php
+					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION['pbc_output']['type'] ) ) : '';
+					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
+						?>
+						<h2><?php esc_html_e( 'Share Configuration', 'pbc' ); ?></h2>
+						<div class="share_buttons">
+							<button type="button" class="btn btn-share btn-whatsapp" id="pbc-share-whatsapp">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+									<path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+								</svg>
+								<?php esc_html_e( 'Share via WhatsApp', 'pbc' ); ?>
+							</button>
+							<button type="button" class="btn btn-share btn-email" id="pbc-share-email">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+									<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+								</svg>
+								<?php esc_html_e( 'Share via Email', 'pbc' ); ?>
+							</button>
+						</div>
+						<h2 style="margin-top: 30px;"><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
 							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
@@ -645,8 +567,7 @@ class PBC_Template {
 				</div>
 				<?php
 			}
-		}
-		if ( 'calculate' !== $cstep ) {
+			if ( 'calculate' !== $cstep ) {
 				// Banner.
 				do_action( 'pbc_banner_after_setup' );
 				?>

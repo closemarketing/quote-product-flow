@@ -199,7 +199,9 @@ class PBC_Requests {
 		
 		// Debug logging for development.
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'PBC Render: Parent Phase=' . $parent_phase . ', Template=' . $template . ', Submit=' . $submit );
+			error_log( 'PBC Render: Parent Phase=' . $parent_phase . ' (from POST: ' . ( isset( $_POST['pbc_parent_phase'] ) ? $_POST['pbc_parent_phase'] : 'NOT SET' ) . ')' );
+			error_log( 'PBC Render: Template=' . $template . ', Submit=' . $submit );
+			error_log( 'PBC Render: POST keys: ' . implode( ', ', array_keys( $_POST ) ) );
 		}
 		
 		PBC_Template::render( $parent_phase, $template );
