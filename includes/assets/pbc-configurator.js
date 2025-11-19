@@ -237,6 +237,107 @@ jQuery(function($){
 		});
 	});
 
+	// Share via WhatsApp.
+	$(document).on('click', '#pbc-share-whatsapp', function(e){
+		e.preventDefault();
+		var sessionKey = $('input[name=pbc_session_key]').val();
+		var parentPhase = $('input[name=pbc_parent_phase]').val();
+		var template = $('#configurator-form').data('template');
+		var currentUrl = window.location.href.split('#')[0];
+
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'get_shareable_config',
+				session_key: sessionKey,
+				parent_phase: parentPhase,
+				template: template,
+				current_url: currentUrl
+			},
+			success: function(response) {
+				if (response.success && response.data.url) {
+					console.log('PBC: Generated URL:', response.data.url);
+					if (response.data.variations_count) {
+						console.log('PBC: Variations in URL:', response.data.variations_count);
+					}
+					var message = 'Mira esta configuración: ' + response.data.url;
+					var text = encodeURIComponent(message);
+					var whatsappUrl = 'https://wa.me/?text=' + text;
+					window.open(whatsappUrl, '_blank');
+				} else {
+					var errMsg = (response.data && response.data.message) ? response.data.message : 'No se pudo generar el enlace de configuración.';
+					alert(errMsg);
+				}
+			},
+			error: function() {
+				alert('Error al procesar la solicitud');
+			}
+		});
+	});
+
+	// Share via Email.
+	$(document).on('click', '#pbc-share-email', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+
+		var $button = $(this);
+		if ($button.hasClass('processing')) {
+			return false;
+		}
+
+		// Ask for recipient email.
+		var recipientEmail = prompt('Introduce el email del destinatario:');
+
+		// Validate email.
+		if (!recipientEmail) {
+			return false; // User cancelled.
+		}
+
+		recipientEmail = recipientEmail.trim();
+		var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+		if (!emailPattern.test(recipientEmail)) {
+			alert('Por favor, introduce un email válido.');
+			return false;
+		}
+
+		$button.addClass('processing');
+
+		var sessionKey = $('input[name=pbc_session_key]').val();
+		var parentPhase = $('input[name=pbc_parent_phase]').val();
+		var template = $('#configurator-form').data('template');
+		var currentUrl = window.location.href.split('#')[0];
+
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'send_config_email',
+				session_key: sessionKey,
+				parent_phase: parentPhase,
+				template: template,
+				current_url: currentUrl,
+				recipient_email: recipientEmail
+			},
+			success: function(response) {
+				$button.removeClass('processing');
+				if (response.success) {
+					alert('✓ Email enviado correctamente a ' + recipientEmail);
+				} else {
+					var errMsg = (response.data && response.data.message) ? response.data.message : 'No se pudo enviar el email.';
+					alert(errMsg);
+				}
+			},
+			error: function() {
+				$button.removeClass('processing');
+				alert('Error al procesar la solicitud');
+			}
+		});
+
+		return false;
+	});
+
 	// Restart process button.
 	$(document).on('click', '#pbc-restart-process', function(e){
 		e.preventDefault();

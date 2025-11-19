@@ -29,6 +29,12 @@ class PBC_Requests {
 
 		add_action( 'wp_ajax_configurator_login', array( $this, 'configurator_login_action_callback' ) );
 		add_action( 'wp_ajax_nopriv_configurator_login', array( $this, 'configurator_login_action_callback' ) );
+
+		add_action( 'wp_ajax_get_shareable_config', array( $this, 'get_shareable_config_callback' ) );
+		add_action( 'wp_ajax_nopriv_get_shareable_config', array( $this, 'get_shareable_config_callback' ) );
+
+		add_action( 'wp_ajax_send_config_email', array( $this, 'send_config_email_callback' ) );
+		add_action( 'wp_ajax_nopriv_send_config_email', array( $this, 'send_config_email_callback' ) );
 	}
 
 	/**
@@ -210,6 +216,258 @@ class PBC_Requests {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $all_details;
 		die( 0 );
+	}
+
+	/**
+	 * AJAX Callback to get shareable configuration URL.
+	 *
+	 * @return void
+	 */
+	public function get_shareable_config_callback() {
+		// Start or resume session.
+		if ( empty( session_id() ) ) {
+			if ( ! session_start() ) {
+				wp_send_json_error( 'Session error' );
+			}
+		}
+
+		$session_key  = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
+		$parent_phase = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
+		$template     = isset( $_POST['template'] ) ? sanitize_text_field( wp_unslash( $_POST['template'] ) ) : 'wizard';
+		$current_url  = isset( $_POST['current_url'] ) ? esc_url_raw( wp_unslash( $_POST['current_url'] ) ) : '';
+
+		if ( empty( $session_key ) ) {
+			wp_send_json_error( 'Invalid session key' );
+		}
+
+		if ( empty( $current_url ) ) {
+			$current_url = home_url( add_query_arg( array() ) );
+		}
+
+		if ( empty( $parent_phase ) ) {
+			if ( preg_match( '/pbc_variation_(\d+)/', $session_key, $matches ) ) {
+				$parent_phase = isset( $matches[1] ) ? (int) $matches[1] : 0;
+			}
+		}
+
+		if ( empty( $parent_phase ) ) {
+			$parent_phase = CALC::get_default_parent_phase();
+		}
+
+		if ( empty( $parent_phase ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Parent phase missing.', 'pbc' ),
+				)
+			);
+		}
+
+		if ( ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Configuration not found.', 'pbc' ),
+				)
+			);
+		}
+
+		// Build URL parameters from session data.
+		$url_params = array(
+			'pbc_parent' => $parent_phase,
+		);
+
+		// Check if user can see prices.
+		$current_user = wp_get_current_user();
+		$roles        = (array) $current_user->roles;
+		$user_role    = ! empty( $roles ) ? $roles[0] : '';
+		$show_prices  = CALC::get_show_prices_for_user( $user_role );
+
+		if ( 'yes' === $show_prices ) {
+			$url_params['pbc_show_prices'] = '1';
+		}
+
+		// Add each variation to URL parameters - only numeric steps.
+		foreach ( $_SESSION[ $session_key ] as $step => $data ) {
+			// Only process numeric step keys (1, 2, 3, etc.).
+			if ( ! is_numeric( $step ) ) {
+				continue;
+			}
+			if ( ! is_array( $data ) || ! isset( $data['var']['id'] ) ) {
+				continue;
+			}
+			$url_params[ 'v' . $step ] = (int) $data['var']['id'];
+
+			// Add price variation name (dropdown value) if exists, not the calculated price.
+			if ( isset( $data['var']['price_var'] ) && ! empty( $data['var']['price_var'] ) ) {
+				$url_params[ 'p' . $step ] = sanitize_text_field( $data['var']['price_var'] );
+			}
+		}
+
+		$base_url = remove_query_arg( array( 'pbc_share', 'pbc_parent', 'pbc_show_prices' ), $current_url );
+		// Remove any existing v and p params (and old pbc_v/pbc_p for backwards compatibility).
+		$base_url = preg_replace( '/[&?]pbc_v\d+=[^&]*/', '', $base_url );
+		$base_url = preg_replace( '/[&?]pbc_p\d+=[^&]*/', '', $base_url );
+		$base_url = preg_replace( '/[&?]v\d+=[^&]*/', '', $base_url );
+		$base_url = preg_replace( '/[&?]p\d+=[^&]*/', '', $base_url );
+		$base_url = rtrim( $base_url, '?&' );
+
+		$share_url = add_query_arg( $url_params, $base_url );
+
+		if ( empty( $share_url ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Unable to generate share URL.', 'pbc' ),
+				)
+			);
+		}
+
+		// Debug: log params count.
+		$variation_count = 0;
+		foreach ( $url_params as $key => $value ) {
+			if ( preg_match( '/^v\d+$/', $key ) ) {
+				++$variation_count;
+			}
+		}
+
+		wp_send_json_success(
+			array(
+				'url'              => esc_url_raw( $share_url ),
+				'variations_count' => $variation_count,
+			)
+		);
+	}
+
+	/**
+	 * AJAX Callback to send configuration via email.
+	 *
+	 * @return void
+	 */
+	public function send_config_email_callback() {
+		// Start or resume session.
+		if ( empty( session_id() ) ) {
+			if ( ! session_start() ) {
+				wp_send_json_error( 'Session error' );
+			}
+		}
+
+		$session_key     = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
+		$parent_phase    = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
+		$template        = isset( $_POST['template'] ) ? sanitize_text_field( wp_unslash( $_POST['template'] ) ) : 'wizard';
+		$current_url     = isset( $_POST['current_url'] ) ? esc_url_raw( wp_unslash( $_POST['current_url'] ) ) : '';
+		$recipient_email = isset( $_POST['recipient_email'] ) ? sanitize_email( wp_unslash( $_POST['recipient_email'] ) ) : '';
+
+		if ( empty( $session_key ) ) {
+			wp_send_json_error( 'Invalid session key' );
+		}
+
+		if ( empty( $recipient_email ) || ! is_email( $recipient_email ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid email address.', 'pbc' ),
+				)
+			);
+		}
+
+		if ( empty( $current_url ) ) {
+			$current_url = home_url( add_query_arg( array() ) );
+		}
+
+		if ( empty( $parent_phase ) ) {
+			if ( preg_match( '/pbc_variation_(\d+)/', $session_key, $matches ) ) {
+				$parent_phase = isset( $matches[1] ) ? (int) $matches[1] : 0;
+			}
+		}
+
+		if ( empty( $parent_phase ) ) {
+			$parent_phase = CALC::get_default_parent_phase();
+		}
+
+		if ( empty( $parent_phase ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Parent phase missing.', 'pbc' ),
+				)
+			);
+		}
+
+		if ( ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Configuration not found.', 'pbc' ),
+				)
+			);
+		}
+
+		// Build URL parameters from session data.
+		$url_params = array(
+			'pbc_parent' => $parent_phase,
+		);
+
+		// Check if user can see prices.
+		$current_user = wp_get_current_user();
+		$roles        = (array) $current_user->roles;
+		$user_role    = ! empty( $roles ) ? $roles[0] : '';
+		$show_prices  = CALC::get_show_prices_for_user( $user_role );
+
+		if ( 'yes' === $show_prices ) {
+			$url_params['pbc_show_prices'] = '1';
+		}
+
+		// Add each variation to URL parameters - only numeric steps.
+		foreach ( $_SESSION[ $session_key ] as $step => $data ) {
+			// Only process numeric step keys (1, 2, 3, etc.).
+			if ( ! is_numeric( $step ) ) {
+				continue;
+			}
+			if ( ! is_array( $data ) || ! isset( $data['var']['id'] ) ) {
+				continue;
+			}
+			$url_params[ 'v' . $step ] = (int) $data['var']['id'];
+
+			// Add price variation name (dropdown value) if exists, not the calculated price.
+			if ( isset( $data['var']['price_var'] ) && ! empty( $data['var']['price_var'] ) ) {
+				$url_params[ 'p' . $step ] = sanitize_text_field( $data['var']['price_var'] );
+			}
+		}
+
+		$base_url = remove_query_arg( array( 'pbc_share', 'pbc_parent', 'pbc_show_prices' ), $current_url );
+		// Remove any existing v and p params (and old pbc_v/pbc_p for backwards compatibility).
+		$base_url = preg_replace( '/[&?]pbc_v\d+=[^&]*/', '', $base_url );
+		$base_url = preg_replace( '/[&?]pbc_p\d+=[^&]*/', '', $base_url );
+		$base_url = preg_replace( '/[&?]v\d+=[^&]*/', '', $base_url );
+		$base_url = preg_replace( '/[&?]p\d+=[^&]*/', '', $base_url );
+		$base_url = rtrim( $base_url, '?&' );
+
+		$share_url = add_query_arg( $url_params, $base_url );
+
+		if ( empty( $share_url ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Unable to generate share URL.', 'pbc' ),
+				)
+			);
+		}
+
+		// Prepare email.
+		$subject  = __( 'Budget Configuration', 'pbc' );
+		$message  = __( 'You can view the configuration here:', 'pbc' ) . "\n\n";
+		$message .= esc_url_raw( $share_url );
+
+		// Send email.
+		$sent = wp_mail( $recipient_email, $subject, $message );
+
+		if ( $sent ) {
+			wp_send_json_success(
+				array(
+					'message' => __( 'Email sent successfully.', 'pbc' ),
+				)
+			);
+		} else {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Failed to send email.', 'pbc' ),
+				)
+			);
+		}
 	}
 
 	/**
