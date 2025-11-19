@@ -141,10 +141,6 @@ class PBC_Requests {
 			);
 		}
 
-		// Debug logging for development.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'PBC Nonce Verification: ' . ( $nonce_verified ? 'SUCCESS' : 'FAILED' ) );
-		}
 		if ( ! $nonce_verified ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
@@ -195,22 +191,11 @@ class PBC_Requests {
 		ob_start();
 		$parent_phase = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$template     = isset( $_POST['pbc_template'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_template'] ) ) : 'wizard';
-		// Debug logging for development.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			$pbc_parent_phase_debug = isset( $_POST['pbc_parent_phase'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_parent_phase'] ) ) : 'NOT SET';
-			error_log( 'PBC Render: Parent Phase=' . $parent_phase . ' (from POST: ' . $pbc_parent_phase_debug . ')' );
-			error_log( 'PBC Render: Template=' . $template . ', Submit=' . $submit );
-			error_log( 'PBC Render: POST keys: ' . implode( ', ', array_keys( $_POST ) ) );
-		}
 
 		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();
 
-		// Debug logging for development.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'PBC Response length: ' . strlen( $all_details ) );
-		}
 		// Don't use wp_kses_post as it strips scripts needed for AJAX response.
 		// The content is already escaped in PBC_Template::render().
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

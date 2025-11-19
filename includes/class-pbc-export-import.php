@@ -35,7 +35,7 @@ class PBC_Export_Import {
 	 * @param bool    $update Whether this is an existing post being updated.
 	 * @return void
 	 */
-	public function generate_phase_slug( $post_id, $post, $update ) {
+	public function generate_phase_slug( $post_id, $post, $update ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		// Avoid autosave and revisions.
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
@@ -60,7 +60,7 @@ class PBC_Export_Import {
 	 * @param bool    $update Whether this is an existing post being updated.
 	 * @return void
 	 */
-	public function generate_variation_slug( $post_id, $post, $update ) {
+	public function generate_variation_slug( $post_id, $post, $update ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		// Avoid autosave and revisions.
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
@@ -347,8 +347,8 @@ class PBC_Export_Import {
 		}
 
 		$result['success'] = true;
-		// translators: %1$d is the number of phases created, %2$d is the number of variations created.
 		$result['message'] = sprintf(
+			// translators: %1$d is the number of phases created, %2$d is the number of variations created.
 			__( 'Import completed. Phases: %1$d, Variations: %2$d', 'pbc' ),
 			$result['phases_created'],
 			$result['variations_created']
@@ -364,7 +364,7 @@ class PBC_Export_Import {
 	 * @param array $phase_map Phase slug to ID map.
 	 * @return int|false New post ID or false on failure.
 	 */
-	private function import_phase( $phase_data, $phase_map ) {
+	private function import_phase( $phase_data, $phase_map ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		// Check if phase with this slug already exists.
 		$existing_phases = get_posts(
 			array(

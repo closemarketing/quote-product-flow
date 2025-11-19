@@ -106,11 +106,6 @@ class PBC_Template {
 				$cstep = 'calculate';
 			}
 
-			// Debug logging for development.
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-				error_log( 'PBC Template: Submit=' . $submit . ', cstep=' . $cstep . ', nonce_verified=' . ( $nonce_verified ? 'yes' : 'no' ) );
-			}
-
 			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
 				if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
 					$_SESSION[ $pbc_session_key ] = array();
