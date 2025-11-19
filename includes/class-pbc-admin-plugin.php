@@ -1330,28 +1330,29 @@ class PBC_Admin_Plugin {
 			<h1><?php esc_html_e( 'Import / Export', 'pbc' ); ?></h1>
 			<p><?php esc_html_e( 'Export phases and variations to separate CSV files, or import from previously exported files. The system uses unique slugs to maintain relationships between phases and variations, allowing you to move configurations between different WordPress installations.', 'pbc' ); ?></p>
 
-			<div class="pbc-export-import-container" style="max-width: 900px;">
+			<div class="pbc-export-import-container" style="max-width: 100%;">
+				<div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
 				
-				<!-- Export Section -->
-				<div class="pbc-export-section" style="background: #fff; padding: 20px; margin-bottom: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
-					<h2 style="margin-top: 0;">
-						<span class="dashicons dashicons-upload" style="font-size: 24px; width: 24px; height: 24px;"></span>
-						<?php esc_html_e( 'Export Data', 'pbc' ); ?>
-					</h2>
-					<p><?php esc_html_e( 'Export all your phases and variations to two separate CSV files (one for phases, one for variations). These files can be imported on another WordPress installation.', 'pbc' ); ?></p>
-					
-					<button id="pbc-export-button" class="button button-primary button-hero" style="display: inline-flex; align-items: center; gap: 8px;">
-						<span class="dashicons dashicons-download"></span>
-						<?php esc_html_e( 'Export All Data', 'pbc' ); ?>
-					</button>
-					<span id="pbc-export-spinner" class="spinner" style="float: none; margin: 5px 10px;"></span>
+					<!-- Export Section -->
+					<div class="pbc-export-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); flex: 1; min-width: 400px;">
+						<h2 style="margin-top: 0;">
+							<span class="dashicons dashicons-upload" style="font-size: 24px; width: 24px; height: 24px;"></span>
+							<?php esc_html_e( 'Export Data', 'pbc' ); ?>
+						</h2>
+						<p><?php esc_html_e( 'Export all your phases and variations to two separate CSV files (one for phases, one for variations). These files can be imported on another WordPress installation.', 'pbc' ); ?></p>
+						
+						<button id="pbc-export-button" class="button button-primary button-hero" style="display: inline-flex; align-items: center; gap: 8px;">
+							<span class="dashicons dashicons-download"></span>
+							<?php esc_html_e( 'Export All Data', 'pbc' ); ?>
+						</button>
+						<span id="pbc-export-spinner" class="spinner" style="float: none; margin: 5px 10px;"></span>
 
-					<div id="pbc-export-log" class="pbc-log-container" style="display: none; margin-top: 20px; background: #f0f0f1; padding: 15px; border-left: 4px solid #2271b1; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; line-height: 1.6;">
+						<div id="pbc-export-log" class="pbc-log-container" style="display: none; margin-top: 20px; background: #f0f0f1; padding: 15px; border-left: 4px solid #2271b1; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; line-height: 1.6;">
+						</div>
 					</div>
-				</div>
 
-				<!-- Import Section -->
-				<div class="pbc-import-section" style="background: #fff; padding: 20px; margin-bottom: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
+					<!-- Import Section -->
+					<div class="pbc-import-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); flex: 1; min-width: 400px;">
 					<h2 style="margin-top: 0;">
 						<span class="dashicons dashicons-download" style="font-size: 24px; width: 24px; height: 24px;"></span>
 						<?php esc_html_e( 'Import Data', 'pbc' ); ?>
@@ -1384,6 +1385,8 @@ class PBC_Admin_Plugin {
 
 					<div id="pbc-import-log" class="pbc-log-container" style="display: none; margin-top: 20px; background: #f0f0f1; padding: 15px; border-left: 4px solid #2271b1; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; line-height: 1.6;">
 					</div>
+				</div>
+
 				</div>
 
 				<!-- Info Section -->
