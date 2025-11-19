@@ -51,7 +51,7 @@ if ( file_exists( WPPBC_PLUGIN_PATH . 'vendor/autoload.php' ) ) {
 // Initialize License Manager.
 add_action(
 	'plugins_loaded',
-	function() {
+	function () {
 		if ( class_exists( 'Closemarketing\WPLicenseManager\License' ) && class_exists( 'Closemarketing\WPLicenseManager\Settings' ) ) {
 			try {
 				$license = new \Closemarketing\WPLicenseManager\License(
@@ -89,7 +89,7 @@ add_action(
 				// Hide sidebar on license page.
 				add_action(
 					'admin_head',
-					function() {
+					function () {
 						$screen = get_current_screen();
 						if ( $screen && 'pbc_page_pbc-license' === $screen->id ) {
 							echo '<style>
@@ -102,7 +102,7 @@ add_action(
 			} catch ( Exception $e ) {
 				add_action(
 					'admin_notices',
-					function() use ( $e ) {
+					function () use ( $e ) {
 						echo '<div class="notice notice-error"><p>' . esc_html( $e->getMessage() ) . '</p></div>';
 					}
 				);
@@ -112,16 +112,17 @@ add_action(
 	20
 );
 
-// Helpers.
-require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-parts.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php';
+	// Helpers.
+	require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
+	require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-parts.php';
+	require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php';
+	require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php';
 
-// Include files.
-require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-request.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php';
+	// Include files.
+	require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
+	require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-request.php';
+	require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php';
+	require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-export-import.php';
 
-// Public.
-require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-public.php';
+	// Public.
+	require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-public.php';

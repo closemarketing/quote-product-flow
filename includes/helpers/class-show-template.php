@@ -83,15 +83,15 @@ class PBC_Template {
 		// Verify nonce - check both possible nonce fields for AJAX compatibility.
 		$nonce_verified = false;
 		if ( isset( $_POST['pbc_template_wizard_nonce'] ) ) {
-			$nonce_verified = wp_verify_nonce( 
-				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 
-				'pbc_template_wizard_action' 
+			$nonce_verified = wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ),
+				'pbc_template_wizard_action'
 			);
 		}
 		if ( ! $nonce_verified && isset( $_POST['nonce'] ) ) {
-			$nonce_verified = wp_verify_nonce( 
-				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 
-				'pbc-nonce' 
+			$nonce_verified = wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ),
+				'pbc-nonce'
 			);
 		}
 
@@ -104,11 +104,6 @@ class PBC_Template {
 				$cstep = 'calculate';
 			} else {
 				$cstep = 'calculate';
-			}
-
-			// Debug logging for development.
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-				error_log( 'PBC Template: Submit=' . $submit . ', cstep=' . $cstep . ', nonce_verified=' . ( $nonce_verified ? 'yes' : 'no' ) );
 			}
 
 			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
@@ -132,7 +127,7 @@ class PBC_Template {
 						$variation_id     = (int) $_POST['pbc_variation_id'][ $key ];
 					}
 
-					if ( ! empty( $user_id ) ) {
+				if ( ! empty( $user_id ) ) {
 						$phase_param['var']      = $variation_id;
 						$phase_param['pricevar'] = $price_var ? $price_var : '';
 						update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
@@ -171,43 +166,43 @@ class PBC_Template {
 			$cstep = (int) $_GET['phase'];
 		}
 
-	// Support contact buttons - Always visible in all steps.
-	$support_enabled = get_option( 'pbc_support_enabled' );
-	$support_phone   = get_option( 'pbc_support_phone' );
-	$support_email   = get_option( 'pbc_support_email' );
+		// Support contact buttons - Always visible in all steps.
+		$support_enabled = get_option( 'pbc_support_enabled' );
+		$support_phone   = get_option( 'pbc_support_phone' );
+		$support_email   = get_option( 'pbc_support_email' );
 
 	if ( 'yes' === $support_enabled && ( $support_phone || $support_email ) ) {
 		?>
 		<div class="pbc-support-buttons pbc-support-sticky" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999;">
 			<div class="support-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
 				<?php if ( $support_phone ) { ?>
-					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $support_phone ) ); ?>" 
-					   class="pbc-support-link btn-phone" 
-					   title="<?php esc_attr_e( 'Call technical support', 'pbc' ); ?>"
-					   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
+					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $support_phone ) ); ?>"
+						class="pbc-support-link btn-phone"
+						title="<?php esc_attr_e( 'Call technical support', 'pbc' ); ?>"
+						style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
 						<span class="dashicons dashicons-phone" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
 						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Support', 'pbc' ); ?></span>
 					</a>
 				<?php } ?>
 				<?php if ( $support_email ) { ?>
-					<a href="mailto:<?php echo esc_attr( $support_email ); ?>" 
-					   class="pbc-support-link btn-email" 
-					   title="<?php esc_attr_e( 'Email technical support', 'pbc' ); ?>"
-					   style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
+					<a href="mailto:<?php echo esc_attr( $support_email ); ?>"
+						class="pbc-support-link btn-email"
+						title="<?php esc_attr_e( 'Email technical support', 'pbc' ); ?>"
+						style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
 						<span class="dashicons dashicons-email" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
 						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Email', 'pbc' ); ?></span>
 					</a>
 				<?php } ?>
 			</div>
 		</div>
-		<?php
-	}
+			<?php
+			}
 
-	if ( ! defined( 'DOING_AJAX' ) ) {
-		?>
-		<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
-		<?php
-	} // End if ! defined( 'DOING_AJAX' ).
+		if ( ! defined( 'DOING_AJAX' ) ) {
+			?>
+			<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
+			<?php
+		} // End if ! defined( 'DOING_AJAX' ).
 
 		if ( empty( $phases ) ) {
 			?>
@@ -261,8 +256,8 @@ class PBC_Template {
 											$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
 										}
 									}
-								}
 							}
+						}
 
 							$variations = array_filter(
 								$variations,

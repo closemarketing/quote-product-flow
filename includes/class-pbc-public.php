@@ -104,10 +104,10 @@ class PBC_Public {
 				return;
 			}
 		}
-	$atts = array_change_key_case( (array) $atts, CASE_LOWER );
-	wp_enqueue_style( 'pbc-public' );
-	wp_enqueue_style( 'pbc-support-buttons' );
-	wp_enqueue_script( 'pbc-public' );
+		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
+		wp_enqueue_style( 'pbc-public' );
+		wp_enqueue_style( 'pbc-support-buttons' );
+		wp_enqueue_script( 'pbc-public' );
 
 		$pbc_atts = shortcode_atts(
 			array(

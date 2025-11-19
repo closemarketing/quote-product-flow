@@ -117,6 +117,15 @@ class PBC_Admin_Plugin {
 				'nonce' => wp_create_nonce( 'pbc_price_updater_nonce' ),
 			)
 		);
+
+		wp_localize_script(
+			'pbc-admin-scripts',
+			'ajaxActionExportImport',
+			array(
+				'url'   => admin_url( 'admin-ajax.php' ),
+				'nonce' => wp_create_nonce( 'pbc_export_import_nonce' ),
+			)
+		);
 	}
 
 	/**
@@ -177,6 +186,14 @@ class PBC_Admin_Plugin {
 				'capability'  => 'manage_options',
 				'menu_slug'   => 'edit.php?post_type=enquiry',
 				'function'    => null, // Doesn't need a callback function.
+			),
+			array(
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __( 'Import / Export', 'pbc' ),
+				'menu_title'  => __( 'Import / Export', 'pbc' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'pbc_import_export',
+				'function'    => array( $this, 'pbc_display_import_export_page' ),
 			),
 
 		);
@@ -296,17 +313,17 @@ class PBC_Admin_Plugin {
 				'pdf_image_footer'               => 'pbc_pdf_image_footer',
 				'pdf_color_odd'                  => 'pbc_pdf_color_odd',
 				'pdf_color_total'                => 'pbc_pdf_color_total',
-			'admin_email_notification'       => 'pbc_admin_email_notification',
-			'preview_width'                  => 'pbc_preview_width',
-			'support_enabled'                => 'pbc_support_enabled',
-			'support_phone'                  => 'pbc_support_phone',
-			'support_email'                  => 'pbc_support_email',
-		);
-		foreach ( $fields as $field_key => $field ) {
-			if ( isset( $_POST[ $field_key ] ) ) {
-				update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
+				'admin_email_notification'       => 'pbc_admin_email_notification',
+				'preview_width'                  => 'pbc_preview_width',
+				'support_enabled'                => 'pbc_support_enabled',
+				'support_phone'                  => 'pbc_support_phone',
+				'support_email'                  => 'pbc_support_email',
+			);
+			foreach ( $fields as $field_key => $field ) {
+				if ( isset( $_POST[ $field_key ] ) ) {
+					update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
+				}
 			}
-		}
 
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['variations_images_flipped'] ) ) : array( '' );
 			$variations_images_flipped = array_map( 'intval', $variations_images_flipped );
@@ -609,7 +626,13 @@ class PBC_Admin_Plugin {
 					<?php
 					$pdf_color_total = get_option( 'pbc_pdf_color_total' );
 				?>
-				<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
+				<input type="text" name="pdf_color_total" value="
+				<?php
+				if ( $pdf_color_total ) {
+					echo esc_url( $pdf_color_total );
+				}
+				?>
+				" class="pbc_color_picker" />
 			</fieldset>
 
 			<h2><?php esc_html_e( 'Support Contact', 'pbc' ); ?></h2>
@@ -855,6 +878,97 @@ class PBC_Admin_Plugin {
 		);
 
 		return (int) $attachment_id;
+	}
+
+	/**
+	 * Display Import/Export admin page
+	 *
+	 * @return void
+	 */
+	public function pbc_display_import_export_page() {
+		?>
+		<div class='wrap'>
+			<h1><?php esc_html_e( 'Import / Export', 'pbc' ); ?></h1>
+			<p><?php esc_html_e( 'Export phases and variations to separate CSV files, or import from previously exported files. The system uses unique slugs to maintain relationships between phases and variations, allowing you to move configurations between different WordPress installations.', 'pbc' ); ?></p>
+
+			<div class="pbc-export-import-container" style="max-width: 100%;">
+				<div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+				
+					<!-- Export Section -->
+					<div class="pbc-export-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); flex: 1; min-width: 400px;">
+						<h2 style="margin-top: 0;">
+							<span class="dashicons dashicons-upload" style="font-size: 24px; width: 24px; height: 24px;"></span>
+							<?php esc_html_e( 'Export Data', 'pbc' ); ?>
+						</h2>
+						<p><?php esc_html_e( 'Export all your phases and variations to two separate CSV files (one for phases, one for variations). These files can be imported on another WordPress installation.', 'pbc' ); ?></p>
+						
+						<button id="pbc-export-button" class="button button-primary button-hero" style="display: inline-flex; align-items: center; gap: 8px;">
+							<span class="dashicons dashicons-download"></span>
+							<?php esc_html_e( 'Export All Data', 'pbc' ); ?>
+						</button>
+						<span id="pbc-export-spinner" class="spinner" style="float: none; margin: 5px 10px;"></span>
+
+						<div id="pbc-export-log" class="pbc-log-container" style="display: none; margin-top: 20px; background: #f0f0f1; padding: 15px; border-left: 4px solid #2271b1; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; line-height: 1.6;">
+						</div>
+					</div>
+
+					<!-- Import Section -->
+					<div class="pbc-import-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); flex: 1; min-width: 400px;">
+					<h2 style="margin-top: 0;">
+						<span class="dashicons dashicons-download" style="font-size: 24px; width: 24px; height: 24px;"></span>
+						<?php esc_html_e( 'Import Data', 'pbc' ); ?>
+					</h2>
+					<p><?php esc_html_e( 'Import phases and variations from previously exported CSV files. You can import both files together or one at a time.', 'pbc' ); ?></p>
+					
+					<div style="margin-bottom: 15px;">
+						<label for="pbc-import-file-phases" class="button button-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+							<span class="dashicons dashicons-media-default"></span>
+							<?php esc_html_e( 'Choose Phases CSV', 'pbc' ); ?>
+						</label>
+						<input type="file" id="pbc-import-file-phases" accept=".csv" style="display: none;" />
+						<span id="pbc-import-filename-phases" style="margin-left: 10px; font-weight: 600;"></span>
+					</div>
+
+					<div style="margin-bottom: 15px;">
+						<label for="pbc-import-file-variations" class="button button-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+							<span class="dashicons dashicons-media-default"></span>
+							<?php esc_html_e( 'Choose Variations CSV', 'pbc' ); ?>
+						</label>
+						<input type="file" id="pbc-import-file-variations" accept=".csv" style="display: none;" />
+						<span id="pbc-import-filename-variations" style="margin-left: 10px; font-weight: 600;"></span>
+					</div>
+
+					<button id="pbc-import-button" class="button button-primary button-hero" style="display: inline-flex; align-items: center; gap: 8px;" disabled>
+						<span class="dashicons dashicons-upload"></span>
+						<?php esc_html_e( 'Import Data', 'pbc' ); ?>
+					</button>
+					<span id="pbc-import-spinner" class="spinner" style="float: none; margin: 5px 10px;"></span>
+
+					<div id="pbc-import-log" class="pbc-log-container" style="display: none; margin-top: 20px; background: #f0f0f1; padding: 15px; border-left: 4px solid #2271b1; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; line-height: 1.6;">
+					</div>
+				</div>
+
+				</div>
+
+				<!-- Info Section -->
+				<div class="pbc-info-section" style="background: #e7f5fe; padding: 15px; border-left: 4px solid #00a0d2;">
+					<h3 style="margin-top: 0;">
+						<span class="dashicons dashicons-info" style="color: #00a0d2;"></span>
+						<?php esc_html_e( 'Important Information', 'pbc' ); ?>
+					</h3>
+					<ul style="margin: 0;">
+						<li><?php esc_html_e( 'Export generates two CSV files: one for phases and one for variations.', 'pbc' ); ?></li>
+						<li><?php esc_html_e( 'Complex fields (dependencies, prices, image groups) are separated by pipes (|) and colons (:) instead of JSON.', 'pbc' ); ?></li>
+						<li><?php esc_html_e( 'Items are identified by unique slugs, not post IDs, so they work across different installations.', 'pbc' ); ?></li>
+						<li><?php esc_html_e( 'If an item with the same slug already exists, it will be skipped (no duplicates).', 'pbc' ); ?></li>
+						<li><?php esc_html_e( 'You can import phases and variations independently or together.', 'pbc' ); ?></li>
+						<li><?php esc_html_e( 'Image attachments are referenced by ID - you may need to migrate media files separately.', 'pbc' ); ?></li>
+					</ul>
+				</div>
+
+			</div>
+		</div>
+		<?php
 	}
 }
 

@@ -124,28 +124,23 @@ class PBC_Requests {
 	public function configurator_submit_action_callback() {
 		// Verify nonce - check both possible nonce fields.
 		$nonce_verified = false;
-		
+
 		// Try to verify the form nonce first.
 		if ( isset( $_POST['pbc_template_wizard_nonce'] ) ) {
-			$nonce_verified = wp_verify_nonce( 
-				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 
-				'pbc_template_wizard_action' 
+			$nonce_verified = wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ),
+				'pbc_template_wizard_action'
 			);
 		}
-		
+
 		// If form nonce fails, try the AJAX nonce.
 		if ( ! $nonce_verified && isset( $_POST['nonce'] ) ) {
-			$nonce_verified = wp_verify_nonce( 
-				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 
-				'pbc-nonce' 
+			$nonce_verified = wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ),
+				'pbc-nonce'
 			);
 		}
-		
-		// Debug logging for development.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'PBC Nonce Verification: ' . ( $nonce_verified ? 'SUCCESS' : 'FAILED' ) );
-		}
-		
+
 		if ( ! $nonce_verified ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
@@ -196,23 +191,11 @@ class PBC_Requests {
 		ob_start();
 		$parent_phase = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$template     = isset( $_POST['pbc_template'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_template'] ) ) : 'wizard';
-		
-		// Debug logging for development.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'PBC Render: Parent Phase=' . $parent_phase . ' (from POST: ' . ( isset( $_POST['pbc_parent_phase'] ) ? $_POST['pbc_parent_phase'] : 'NOT SET' ) . ')' );
-			error_log( 'PBC Render: Template=' . $template . ', Submit=' . $submit );
-			error_log( 'PBC Render: POST keys: ' . implode( ', ', array_keys( $_POST ) ) );
-		}
-		
+
 		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();
-		
-		// Debug logging for development.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'PBC Response length: ' . strlen( $all_details ) );
-		}
-		
+
 		// Don't use wp_kses_post as it strips scripts needed for AJAX response.
 		// The content is already escaped in PBC_Template::render().
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -226,6 +209,11 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function get_shareable_config_callback() {
+		// Verify nonce.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'pbc-nonce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+		}
+
 		// Start or resume session.
 		if ( empty( session_id() ) ) {
 			if ( ! session_start() ) {
@@ -288,7 +276,8 @@ class PBC_Requests {
 		}
 
 		// Add each variation to URL parameters - only numeric steps.
-		foreach ( $_SESSION[ $session_key ] as $step => $data ) {
+		$session_data = isset( $_SESSION[ $session_key ] ) ? $_SESSION[ $session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		foreach ( $session_data as $step => $data ) {
 			// Only process numeric step keys (1, 2, 3, etc.).
 			if ( ! is_numeric( $step ) ) {
 				continue;
@@ -344,6 +333,11 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function send_config_email_callback() {
+		// Verify nonce.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'pbc-nonce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+		}
+
 		// Start or resume session.
 		if ( empty( session_id() ) ) {
 			if ( ! session_start() ) {
@@ -415,7 +409,8 @@ class PBC_Requests {
 		}
 
 		// Add each variation to URL parameters - only numeric steps.
-		foreach ( $_SESSION[ $session_key ] as $step => $data ) {
+		$session_data = isset( $_SESSION[ $session_key ] ) ? $_SESSION[ $session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		foreach ( $session_data as $step => $data ) {
 			// Only process numeric step keys (1, 2, 3, etc.).
 			if ( ! is_numeric( $step ) ) {
 				continue;

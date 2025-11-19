@@ -39,6 +39,15 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
 = 1.4.2-beta.1 ==
+*  Configurator skip fixed panel.
+*  Added: Export/Import page with real-time logging.
+*  Added: Export/Import functionality for phases and variations with slug-based references.
+*  Added: Automatic slug generation for phases and variations.
+*  Added: Export to two separate CSV files (phases and variations).
+*  Added: CSV format with comma-separated complex fields (dependencies, prices, image groups).
+*  Added: Import from separate CSV files with automatic ID mapping.
+*  Added: Real-time log display showing progress during export/import operations.
+*  Added: Support for importing phases and variations independently.
 *  Added: Recommended configurations system with one-click auto-fill
 *  Added: Multiple recommendations based on first-phase selection
 *  Added: Separate admin page for managing recommendations (PBC > Recommendations)
