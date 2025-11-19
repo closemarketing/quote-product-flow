@@ -95,7 +95,7 @@ class SHOW {
 					$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
 					if ( $pbc_descopt ) {
 						?>
-						<p class="pbc_descopt"><?php echo wpautop( $pbc_descopt ); ?></p>
+						<p class="pbc_descopt"><?php echo wp_kses_post( wpautop( $pbc_descopt ) ); ?></p>
 						<?php
 					}
 					?>
@@ -157,8 +157,8 @@ class SHOW {
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 		<table>
 			<?php
-				$user        = wp_get_current_user();
-				$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+				$user      = wp_get_current_user();
+				$user_role = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
 
 				$show_prices = CALC::get_show_prices_for_user( $user_role );
 				$total_price = 0;
@@ -263,10 +263,12 @@ class SHOW {
 	 *
 	 * @param array  $phases Phases.
 	 * @param int    $cstep Current step.
-	 * @param string $template Template.
+	 * @param string $template Template (unused parameter).
 	 * @return void
 	 */
-	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) {
+	public static function action_buttons( $phases, $cstep, $template = 'wizard' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		// Template parameter kept for backward compatibility.
+		unset( $template );
 		?>
 		<div class="configurator_form_action">
 			<?php
@@ -284,7 +286,7 @@ class SHOW {
 			if ( 'calculate' === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = '';
-			} elseif ( $cstep === count( $phases ) ) {
+			} elseif ( count( $phases ) === $cstep ) {
 				$next_step   = 'calculate';
 				$next_button = __( 'Calculate', 'pbc' );
 			} else {
@@ -297,6 +299,11 @@ class SHOW {
 			<div class="prev">
 				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
 				<button type="submit" name="submit" value="prev" class="btn btn-prev"><?php echo esc_attr( $prev_button ); ?></button>
+			</div>
+			<?php } ?>
+			<?php if ( $cstep > 1 ) { ?>
+			<div class="restart">
+				<button type="button" id="pbc-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'pbc' ); ?></button>
 			</div>
 			<?php } ?>
 			<div class="next">

@@ -37,18 +37,23 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function variation_selected_action_callback() {
+		// Verify nonce for AJAX request if provided.
+		if ( isset( $_REQUEST['nonce'] ) ) {
+			check_ajax_referer( 'pbc-nonce', 'nonce', false );
+		}
+
 		$current_phase = isset( $_REQUEST['current_phase'] ) ? (int) $_REQUEST['current_phase'] : 0;
-		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? $_REQUEST['pbc_variation'] : [];
+		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? array_map( 'intval', (array) $_REQUEST['pbc_variation'] ) : array();
 		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$session_key   = 'pbc_variation_' . $parent_phase;
 		$option        = '';
 
-		if ( PHP_SESSION_NONE === session_status() ) {
+		if ( '' === session_id() ) {
 			ob_start();
 			session_start();
 		}
-		if ( PHP_SESSION_NONE === session_status() ) {
-			echo ';;--;;' . json_encode(
+		if ( '' === session_id() ) {
+			echo ';;--;;' . wp_json_encode(
 				array(
 					'type' => 'error',
 					'msg'  => 'Error: Unable to initialize Session!',
@@ -56,19 +61,20 @@ class PBC_Requests {
 			);
 			die( 0 );
 		}
-		if ( ! empty( $pbc_variation ) && $current_phase && $pbc_variation[ $current_phase ] ) {
-			$svar = $pbc_variation[ $current_phase ];
+		if ( ! empty( $pbc_variation ) && $current_phase && isset( $pbc_variation[ $current_phase ] ) ) {
+			$svar = (int) $pbc_variation[ $current_phase ];
 			if ( is_user_logged_in() ) {
 				$user_id                 = get_current_user_id();
 				$phase_param['var']      = $svar;
-				$phase_param['pricevar'] = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? ( $_REQUEST[ "pbc_pricevar_$svar" ] ) : '';
+				$phase_param['pricevar'] = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : '';
 				update_user_meta( $user_id, 'pbc_phase_' . $current_phase, $phase_param );
 			}
 			// Gets image variation with filter dependency.
-			if ( isset( $_SESSION[ $session_key ] ) ) {
-				$imgprodurl = CALC::get_image_variation_url( sanitize_text_field( wp_unslash( $_SESSION[ $session_key ] ) ), $svar );
+			if ( isset( $_SESSION[ $session_key ] ) && is_array( $_SESSION[ $session_key ] ) ) {
+				$session_data = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$imgprodurl   = CALC::get_image_variation_url( $session_data, $svar );
 			}
-			$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? (float) $_REQUEST[ "pbc_pricevar_$svar" ] : null;
+			$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : null;
 			$price    = CALC::get_price_variation( $svar, $pricevar );
 
 			$option_name = get_the_title( $svar );
@@ -79,11 +85,11 @@ class PBC_Requests {
 			$variations_images_flipped = get_option( 'variations_images_flipped' );
 			if ( ! empty( $variations_images_flipped ) ) {
 				for ( $j = 1; $j < (int) $current_phase; $j++ ) {
-					if ( isset( $_SESSION[ $session_key ][ $j ] ) && in_array( $_SESSION[ $session_key ][ $j ]['var']['id'], $variations_images_flipped ) ) {
+					if ( isset( $_SESSION[ $session_key ][ $j ]['var']['id'] ) && in_array( $_SESSION[ $session_key ][ $j ]['var']['id'], $variations_images_flipped, true ) ) {
 						$flipped = true;
 					}
 				}
-				if ( in_array( $svar, $variations_images_flipped ) ) {
+				if ( in_array( $svar, $variations_images_flipped, true ) ) {
 					$flipped = true;
 				}
 			}
@@ -92,7 +98,7 @@ class PBC_Requests {
 		$price   = empty( $price ) ? '-' : number_format( $price, 2, ',', '.' ) . ' €';
 		$option  = empty( $option ) ? '-' : $option;
 		$flipped = empty( $flipped ) ? false : $flipped;
-		echo ';;--;;' . json_encode(
+		echo ';;--;;' . wp_json_encode(
 			array(
 				'type'    => 'success',
 				'url'     => $imgprodurl ?? '',
@@ -123,8 +129,7 @@ class PBC_Requests {
 		}
 
 		$submit = isset( $_POST['submit'] ) ? sanitize_text_field( wp_unslash( $_POST['submit'] ) ) : '';
-		$item   = [];
-
+		$item   = array();
 		if ( 'email_send' === $submit || 'generate_pdf' === $submit ) {
 			$email_field    = ! empty( $_POST['email_field'] ) ? sanitize_email( wp_unslash( $_POST['email_field'] ) ) : '';
 			$name_field     = ! empty( $_POST['name_field'] ) ? sanitize_text_field( wp_unslash( $_POST['name_field'] ) ) : '';
@@ -165,7 +170,7 @@ class PBC_Requests {
 		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();
-		echo $all_details;
+		echo wp_kses_post( $all_details );
 		die( 0 );
 	}
 
@@ -175,10 +180,14 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_login_action_callback() {
-		$username = isset( $_POST['username'] ) ? sanitize_text_field( wp_unslash( $_POST['username'] ) ) : '';
-		$password = isset( $_POST['password'] ) ? sanitize_text_field( wp_unslash( $_POST['password'] ) ) : '';
-		
-		$login = wp_signon(
+		// Verify nonce for AJAX request if provided.
+		if ( isset( $_REQUEST['nonce'] ) ) {
+			check_ajax_referer( 'pbc-nonce', 'nonce', false );
+		}
+
+		$username = isset( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : '';
+		$password = isset( $_POST['password'] ) ? $_POST['password'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$login    = wp_signon(
 			array(
 				'user_login'    => $username,
 				'user_password' => $password,
@@ -186,16 +195,16 @@ class PBC_Requests {
 			),
 			false
 		);
-		if ( $login->ID ) {
+		if ( isset( $login->ID ) && $login->ID ) {
 			ob_start();
 			if ( \locate_template( 'template-budget-configurator.php' ) ) {
 				\locate_template( 'template-budget-configurator.php', true );
 			}
 			$all_details = ob_get_contents();
 			ob_end_clean();
-			echo $all_details;
+			echo wp_kses_post( $all_details );
 		} elseif ( is_wp_error( $login ) ) {
-			echo ';;-;;error;;-;;' . $login->get_error_message();
+			echo ';;-;;error;;-;;' . esc_html( $login->get_error_message() );
 		}
 		die( 0 );
 	}

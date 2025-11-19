@@ -472,7 +472,9 @@ class PBC_Helper_PostTypes {
 	 * @param array $phases_columns Columns.
 	 * @return array
 	 */
-	public function add_new_phases_columns( $phases_columns ) {
+	public function add_new_phases_columns( $phases_columns ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		// Parameter required by WordPress filter hook.
+		unset( $phases_columns );
 		$new_columns['cb']         = '<input type="checkbox" />';
 		$new_columns['title']      = __( 'Phase', 'pbc' );
 		$new_columns['menu_order'] = __( 'Order', 'pbc' );
@@ -513,7 +515,9 @@ class PBC_Helper_PostTypes {
 	 * @param array $phases_columns Columns.
 	 * @return array
 	 */
-	public function add_new_budgets_columns( $phases_columns ) {
+	public function add_new_budgets_columns( $phases_columns ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		// Parameter required by WordPress filter hook.
+		unset( $phases_columns );
 		$new_columns['cb']              = '<input type = "checkbox" />';
 		$new_columns['enquiry_name']    = __( 'Budget', 'pbc' );
 		$new_columns['enquiry_details'] = __( 'Details', 'pbc' );
@@ -564,7 +568,9 @@ class PBC_Helper_PostTypes {
 	 * @param array $phases_columns Columns.
 	 * @return array
 	 */
-	public function add_new_var_columns( $phases_columns ) {
+	public function add_new_var_columns( $phases_columns ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		// Parameter required by WordPress filter hook.
+		unset( $phases_columns );
 		$new_columns['cb']      = '<input type="checkbox" />';
 		$new_columns['title']   = __( 'Variation', 'pbc' );
 		$new_columns['phase']   = __( 'Phase and section', 'pbc' );
@@ -666,6 +672,7 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function admin_posts_filter() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'variation';
 
 		// Only add filter to post type you want.
@@ -675,12 +682,13 @@ class PBC_Helper_PostTypes {
 			<select name="pbc_filter_phase">
 			<option value=""><?php esc_html_e( 'All Phases', 'pbc' ); ?></option>
 			<?php
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 			$current_v = isset( $_GET['pbc_filter_phase'] ) ? sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ) : '';
 			foreach ( $phase_options as $value => $label ) {
 				printf(
 					'<option value="%s"%s>%s</option>',
 					esc_html( $value ),
-					$value == $current_v ? ' selected="selected"' : '',
+					$value === $current_v ? ' selected="selected"' : '',
 					esc_html( $label )
 				);
 			}
@@ -701,12 +709,14 @@ class PBC_Helper_PostTypes {
 	 */
 	public function pbc_posts_filter( $query ) {
 		global $pagenow;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
 
-		if ( 'variation' == $type && is_admin() && 'edit.php' === $pagenow ) {
+		if ( 'variation' === $type && is_admin() && 'edit.php' === $pagenow ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 			if ( isset( $_GET['pbc_filter_phase'] ) && '' !== $_GET['pbc_filter_phase'] ) {
 				$query->query_vars['meta_key']   = 'pbc_phase';
-				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) );
+				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			}
 		}
 

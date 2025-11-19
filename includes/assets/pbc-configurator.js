@@ -217,4 +217,48 @@ jQuery(function($){
 			}
 		});
 	});
+
+	// Restart process button.
+	$(document).on('click', '#pbc-restart-process', function(e){
+		e.preventDefault();
+		
+		if (!confirm('¿Estás seguro de que quieres reiniciar el proceso? Se perderán todas las configuraciones actuales.')) {
+			return;
+		}
+		
+		var button = $(this);
+		var originalText = button.text();
+		
+		// Disable button.
+		button.prop('disabled', true).text('Reiniciando...');
+		
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'pbc_restart_process',
+				nonce: PBCAjaxAction.nonce
+			},
+			dataType: 'json',
+			success: function(response) {
+				if (response.success) {
+					// Reload the page to start from step 1.
+					window.location.reload();
+				} else {
+					alert(response.data.message || 'Error al reiniciar el proceso.');
+					button.prop('disabled', false).text(originalText);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error('PBC Restart Error:', {
+					status: jqXHR.status,
+					statusText: jqXHR.statusText,
+					textStatus: textStatus,
+					errorThrown: errorThrown
+				});
+				alert('Error al reiniciar el proceso.');
+				button.prop('disabled', false).text(originalText);
+			}
+		});
+	});
 });
