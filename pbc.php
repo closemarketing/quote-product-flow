@@ -49,9 +49,9 @@ if ( file_exists( WPPBC_PLUGIN_PATH . 'vendor/autoload.php' ) ) {
 }
 
 // Initialize License Manager.
-add_action(
+	add_action(
 	'plugins_loaded',
-	function() {
+	function () {
 		if ( class_exists( 'Closemarketing\WPLicenseManager\License' ) && class_exists( 'Closemarketing\WPLicenseManager\Settings' ) ) {
 			try {
 				$license = new \Closemarketing\WPLicenseManager\License(
@@ -87,9 +87,9 @@ add_action(
 				);
 
 				// Hide sidebar on license page.
-				add_action(
-					'admin_head',
-					function() {
+			add_action(
+				'admin_head',
+				function () {
 						$screen = get_current_screen();
 						if ( $screen && 'pbc_page_pbc-license' === $screen->id ) {
 							echo '<style>
@@ -100,9 +100,9 @@ add_action(
 					}
 				);
 			} catch ( Exception $e ) {
-				add_action(
-					'admin_notices',
-					function() use ( $e ) {
+			add_action(
+				'admin_notices',
+				function () use ( $e ) {
 						echo '<div class="notice notice-error"><p>' . esc_html( $e->getMessage() ) . '</p></div>';
 					}
 				);

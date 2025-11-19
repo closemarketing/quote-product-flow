@@ -347,7 +347,7 @@ class PBC_Export_Import {
 		}
 
 		$result['success'] = true;
-		// translators: %1$d is the number of phases created, %2$d is the number of variations created.
+		/* translators: %1$d is the number of phases created, %2$d is the number of variations created. */
 		$result['message'] = sprintf(
 			__( 'Import completed. Phases: %1$d, Variations: %2$d', 'pbc' ),
 			$result['phases_created'],
@@ -628,7 +628,7 @@ class PBC_Export_Import {
 	/**
 	 * Convert phases to CSV format
 	 *
-	 * @param array $phases Phases array.
+	 * @param array  $phases  Phases array.
 	 * @param string $version Version string.
 	 * @param string $date Export date.
 	 * @return string CSV content.
@@ -656,8 +656,8 @@ class PBC_Export_Import {
 	/**
 	 * Convert variations to CSV format
 	 *
-	 * @param array $variations Variations array.
-	 * @param string $version Version string.
+	 * @param array  $variations Variations array.
+	 * @param string $version    Version string.
 	 * @param string $date Export date.
 	 * @return string CSV content.
 	 */
@@ -916,8 +916,8 @@ class PBC_Export_Import {
 		}
 
 		// Get import data from request.
-		$import_phases_csv     = isset( $_POST['import_phases'] ) ? wp_unslash( $_POST['import_phases'] ) : '';
-		$import_variations_csv = isset( $_POST['import_variations'] ) ? wp_unslash( $_POST['import_variations'] ) : '';
+		$import_phases_csv     = isset( $_POST['import_phases'] ) ? sanitize_textarea_field( wp_unslash( $_POST['import_phases'] ) ) : '';
+		$import_variations_csv = isset( $_POST['import_variations'] ) ? sanitize_textarea_field( wp_unslash( $_POST['import_variations'] ) ) : '';
 
 		if ( empty( $import_phases_csv ) && empty( $import_variations_csv ) ) {
 			wp_send_json_error( array( 'message' => __( 'No import data provided.', 'pbc' ) ) );
