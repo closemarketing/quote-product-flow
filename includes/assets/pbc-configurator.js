@@ -153,7 +153,11 @@ jQuery(function($){
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
 
-		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template');
+		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template')+'&nonce='+PBCAjaxAction.nonce;
+
+		console.log('PBC Debug: Submit button clicked:', submit_val);
+		console.log('PBC Debug: Next phase:', next_phase);
+		console.log('PBC Debug: Current phase:', $('input[name=pbc_current_phase]').val());
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,  //server script to process data
@@ -163,24 +167,39 @@ jQuery(function($){
 			success: function(response) {
                 thisButton.prop('disabled', false);
 			
+			console.log('PBC Debug: Response length:', response.length);
+			console.log('PBC Debug: Response preview:', response.substring(0, 500));
+			
 			// Note: PDF opens automatically via script tag in response.
 			// No need to manually open it here as it would create duplicate tabs.
 			
 			$('.page-configurator').html(response);
+			
+			// Wait for DOM to be ready before checking for variations.
+			setTimeout(function() {
+				var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0 || 
+				                     $('.page-configurator').find('select.pbc_variation option').length > 0;
+				var newNextPhase = $('.page-configurator').find('input[name=next_phase]').val();
+				
+				console.log('PBC Debug: Has variations:', hasVariations);
+				console.log('PBC Debug: New next phase:', newNextPhase);
+				
 				if (
-					next_phase != 'calculate' &&
+					newNextPhase && 
+					newNextPhase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && 
-					( $(document).find('input.pbc_variation').length == 0 && $(document).find('select.pbc_variation option').length == 0 )
+					!hasVariations
 				)
 				{
-					$(document).find('button[name=submit][value='+submit_val+']').trigger('click');
-				}else{
-					$(document).find('.status_loader.phase_detail_loader').html('').addClass('hidden');
-					//$('.page-configurator').html(response);
-					if($(document).find('.result_submit_action').length > 0){
-						$(document).find('.result_submit_action').show().delay(3000).fadeOut(400);
+					console.log('PBC Debug: Auto-skipping empty step');
+					$('.page-configurator').find('button[name=submit][value='+submit_val+']').trigger('click');
+				} else {
+					$('.page-configurator').find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+					if($('.page-configurator').find('.result_submit_action').length > 0){
+						$('.page-configurator').find('.result_submit_action').show().delay(3000).fadeOut(400);
 					}
 				}
+			}, 100);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.error('PBC: AJAX Error!');

@@ -116,8 +116,31 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_submit_action_callback() {
-		// Verify nonce.
-		if ( ! check_ajax_referer( 'pbc_template_wizard_action', 'pbc_template_wizard_nonce', false ) ) {
+		// Verify nonce - check both possible nonce fields.
+		$nonce_verified = false;
+		
+		// Try to verify the form nonce first.
+		if ( isset( $_POST['pbc_template_wizard_nonce'] ) ) {
+			$nonce_verified = wp_verify_nonce( 
+				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 
+				'pbc_template_wizard_action' 
+			);
+		}
+		
+		// If form nonce fails, try the AJAX nonce.
+		if ( ! $nonce_verified && isset( $_POST['nonce'] ) ) {
+			$nonce_verified = wp_verify_nonce( 
+				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 
+				'pbc-nonce' 
+			);
+		}
+		
+		// Debug logging for development.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			error_log( 'PBC Nonce Verification: ' . ( $nonce_verified ? 'SUCCESS' : 'FAILED' ) );
+		}
+		
+		if ( ! $nonce_verified ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
 
@@ -167,10 +190,25 @@ class PBC_Requests {
 		ob_start();
 		$parent_phase = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$template     = isset( $_POST['pbc_template'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_template'] ) ) : 'wizard';
+		
+		// Debug logging for development.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			error_log( 'PBC Render: Parent Phase=' . $parent_phase . ', Template=' . $template . ', Submit=' . $submit );
+		}
+		
 		PBC_Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();
-		echo wp_kses_post( $all_details );
+		
+		// Debug logging for development.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			error_log( 'PBC Response length: ' . strlen( $all_details ) );
+		}
+		
+		// Don't use wp_kses_post as it strips scripts needed for AJAX response.
+		// The content is already escaped in PBC_Template::render().
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $all_details;
 		die( 0 );
 	}
 

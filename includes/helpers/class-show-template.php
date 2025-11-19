@@ -80,7 +80,22 @@ class PBC_Template {
 		// Output the inline style.
 		wp_add_inline_style( 'pbc-public', $custom_css );
 
-		if ( isset( $_POST['submit'] ) && isset( $_POST['pbc_template_wizard_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 'pbc_template_wizard_action' ) ) {
+		// Verify nonce - check both possible nonce fields for AJAX compatibility.
+		$nonce_verified = false;
+		if ( isset( $_POST['pbc_template_wizard_nonce'] ) ) {
+			$nonce_verified = wp_verify_nonce( 
+				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ), 
+				'pbc_template_wizard_action' 
+			);
+		}
+		if ( ! $nonce_verified && isset( $_POST['nonce'] ) ) {
+			$nonce_verified = wp_verify_nonce( 
+				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 
+				'pbc-nonce' 
+			);
+		}
+
+		if ( isset( $_POST['submit'] ) && $nonce_verified ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
 			if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
 				$cstep = (int) $_POST[ $submit . '_phase' ];
@@ -89,6 +104,11 @@ class PBC_Template {
 				$cstep = 'calculate';
 			} else {
 				$cstep = 'calculate';
+			}
+
+			// Debug logging for development.
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+				error_log( 'PBC Template: Submit=' . $submit . ', cstep=' . $cstep . ', nonce_verified=' . ( $nonce_verified ? 'yes' : 'no' ) );
 			}
 
 			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
