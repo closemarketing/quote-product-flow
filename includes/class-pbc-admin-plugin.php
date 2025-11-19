@@ -296,14 +296,17 @@ class PBC_Admin_Plugin {
 				'pdf_image_footer'               => 'pbc_pdf_image_footer',
 				'pdf_color_odd'                  => 'pbc_pdf_color_odd',
 				'pdf_color_total'                => 'pbc_pdf_color_total',
-				'admin_email_notification'       => 'pbc_admin_email_notification',
-				'preview_width'                  => 'pbc_preview_width',
-			);
-			foreach ( $fields as $field_key => $field ) {
-				if ( isset( $_POST[ $field_key ] ) ) {
-					update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
-				}
+			'admin_email_notification'       => 'pbc_admin_email_notification',
+			'preview_width'                  => 'pbc_preview_width',
+			'support_enabled'                => 'pbc_support_enabled',
+			'support_phone'                  => 'pbc_support_phone',
+			'support_email'                  => 'pbc_support_email',
+		);
+		foreach ( $fields as $field_key => $field ) {
+			if ( isset( $_POST[ $field_key ] ) ) {
+				update_option( $field, trim( sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) ) );
 			}
+		}
 
 			$variations_images_flipped = isset( $_POST['variations_images_flipped'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['variations_images_flipped'] ) ) : array( '' );
 			$variations_images_flipped = array_map( 'intval', $variations_images_flipped );
@@ -604,17 +607,33 @@ class PBC_Admin_Plugin {
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
-						$pdf_color_total = get_option( 'pbc_pdf_color_total' );
-					?>
-					<input type="text" name="pdf_color_total" value="
-					<?php
-					if ( $pdf_color_total ) {
-						echo esc_url( $pdf_color_total ); }
-?>
-" class="pbc_color_picker" />
-				</fieldset>
+					$pdf_color_total = get_option( 'pbc_pdf_color_total' );
+				?>
+				<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
+			</fieldset>
 
-				<h2><?php esc_html_e( 'Set the role specific options', 'pbc' ); ?></h2>
+			<h2><?php esc_html_e( 'Support Contact', 'pbc' ); ?></h2>
+			<fieldset>
+				<label class="block">
+					<input type="checkbox" name="support_enabled" value="yes" <?php checked( get_option( 'pbc_support_enabled' ), 'yes' ); ?> />
+					<?php esc_html_e( 'Enable support contact buttons in configurator', 'pbc' ); ?>
+				</label>
+				<p class="description"><?php esc_html_e( 'When enabled, displays contact buttons for technical support.', 'pbc' ); ?></p>
+			</fieldset>
+			<fieldset>
+				<label class="block" for="support_phone"><?php esc_html_e( 'Support Phone Number', 'pbc' ); ?></label>
+				<?php $support_phone = get_option( 'pbc_support_phone' ); ?>
+				<input style="width:100%;" type="text" name="support_phone" value="<?php echo esc_attr( $support_phone ); ?>" placeholder="<?php esc_attr_e( '+34 123 456 789', 'pbc' ); ?>" />
+				<p class="description"><?php esc_html_e( 'Phone number for technical support.', 'pbc' ); ?></p>
+			</fieldset>
+			<fieldset>
+				<label class="block" for="support_email"><?php esc_html_e( 'Support Email Address', 'pbc' ); ?></label>
+				<?php $support_email = get_option( 'pbc_support_email' ); ?>
+				<input style="width:100%;" type="email" name="support_email" value="<?php echo esc_attr( $support_email ); ?>" placeholder="<?php esc_attr_e( 'support@example.com', 'pbc' ); ?>" />
+				<p class="description"><?php esc_html_e( 'Email address for technical support.', 'pbc' ); ?></p>
+			</fieldset>
+
+			<h2><?php esc_html_e( 'Set the role specific options', 'pbc' ); ?></h2>
 				<fieldset>
 					<?php
 					$roles = wp_roles()->roles;
