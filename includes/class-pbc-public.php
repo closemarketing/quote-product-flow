@@ -74,27 +74,16 @@ class PBC_Public {
 		$user_role    = ! empty( $roles ) ? $roles[0] : '';
 		$show_prices  = CALC::get_show_prices_for_user( $user_role );
 
-	wp_localize_script(
-		'pbc-public',
-		'PBCAjaxAction',
-		array(
-			'ajax_url'              => admin_url( 'admin-ajax.php' ),
-			'assets_loading'        => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
-			'show_prices'           => $show_prices,
-			'nonce'                 => wp_create_nonce( 'pbc-nonce' ),
-			'recommendation_nonce'  => wp_create_nonce( 'pbc_recommendation_nonce' ),
-			'debug'                 => defined( 'WP_DEBUG' ) && WP_DEBUG,
-		)
-	);
 		wp_localize_script(
 			'pbc-public',
 			'PBCAjaxAction',
 			array(
-				'ajax_url'       => admin_url( 'admin-ajax.php' ),
-				'assets_loading' => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
-				'show_prices'    => $show_prices,
-				'nonce'          => wp_create_nonce( 'pbc-nonce' ),
-				'debug'          => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'ajax_url'              => admin_url( 'admin-ajax.php' ),
+				'assets_loading'        => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
+				'show_prices'           => $show_prices,
+				'nonce'                 => wp_create_nonce( 'pbc-nonce' ),
+				'recommendation_nonce'  => wp_create_nonce( 'pbc_recommendation_nonce' ),
+				'debug'                 => defined( 'WP_DEBUG' ) && WP_DEBUG,
 			)
 		);
 	}
