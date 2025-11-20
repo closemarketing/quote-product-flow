@@ -800,9 +800,10 @@ class PBC_Helper_PostTypes {
 			return $query;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 		if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			$phase_id = (int) $_GET['pbc_filter_phase'];
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			if ( $phase_id > 0 ) {
 				$query->set( 'meta_key', 'pbc_phase' );
