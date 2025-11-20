@@ -227,39 +227,39 @@ msgstr "Color para el total (código hexadecimal)"
 
 #: includes/class-pbc-admin-plugin.php:667
 msgid "Support Contact"
-msgstr ""
+msgstr "Contacto soporte"
 
 #: includes/class-pbc-admin-plugin.php:671
 msgid "Enable support contact buttons in configurator"
-msgstr ""
+msgstr "Activar botones de soporte en el configurador"
 
 #: includes/class-pbc-admin-plugin.php:673
 msgid "When enabled, displays contact buttons for technical support."
-msgstr ""
+msgstr "Cuando está activa, se muestra botones de contacto para soporte técnico."
 
 #: includes/class-pbc-admin-plugin.php:676
 msgid "Support Phone Number"
-msgstr ""
+msgstr "Número de teléfono de soporte"
 
 #: includes/class-pbc-admin-plugin.php:678
 msgid "+34 123 456 789"
-msgstr ""
+msgstr "+34 123 456 789"
 
 #: includes/class-pbc-admin-plugin.php:679
 msgid "Phone number for technical support."
-msgstr ""
+msgstr "Número de teléfono para soporte técnico."
 
 #: includes/class-pbc-admin-plugin.php:682
 msgid "Support Email Address"
-msgstr ""
+msgstr "Correo electrónico de soporte"
 
 #: includes/class-pbc-admin-plugin.php:684
 msgid "support@example.com"
-msgstr ""
+msgstr "soporte@dominio.com"
 
 #: includes/class-pbc-admin-plugin.php:685
 msgid "Email address for technical support."
-msgstr ""
+msgstr "Correo electrónico para soporte técnico"
 
 #: includes/class-pbc-admin-plugin.php:688
 msgid "Set the role specific options"
@@ -293,7 +293,7 @@ msgstr "Configura diferentes recomendaciones para cada opción de la primera fas
 #: includes/class-pbc-admin-plugin.php:804
 #: includes/class-pbc-admin-plugin.php:806
 msgid "Note:"
-msgstr ""
+msgstr "Nota"
 
 #: includes/class-pbc-admin-plugin.php:804
 msgid "Please add variations to the first phase to configure recommendations."
@@ -334,64 +334,64 @@ msgstr "Crear Tarifa Precios"
 
 #: includes/class-pbc-admin-plugin.php:1059
 msgid "Export phases and variations to separate CSV files, or import from previously exported files. The system uses unique slugs to maintain relationships between phases and variations, allowing you to move configurations between different WordPress installations."
-msgstr ""
+msgstr "Exporta las fases y variaciones a archivos CSV separados o impórtalas desde archivos exportados previamente. El sistema utiliza identificadores únicos para mantener las relaciones entre las fases y variaciones, lo que te permite transferir configuraciones entre diferentes instalaciones de WordPress."
 
 #: includes/class-pbc-admin-plugin.php:1068
 msgid "Export Data"
-msgstr ""
+msgstr "Exportar datos"
 
 #: includes/class-pbc-admin-plugin.php:1070
 msgid "Export all your phases and variations to two separate CSV files (one for phases, one for variations). These files can be imported on another WordPress installation."
-msgstr ""
+msgstr "Exporta todas tus fases y variaciones a dos archivos CSV separados (uno para las fases y otro para las variaciones). Estos archivos se pueden importar en otra instalación de WordPress."
 
 #: includes/class-pbc-admin-plugin.php:1074
 msgid "Export All Data"
-msgstr ""
+msgstr "Exportar todos los datos"
 
 #: includes/class-pbc-admin-plugin.php:1086
 #: includes/class-pbc-admin-plugin.php:1110
 msgid "Import Data"
-msgstr ""
+msgstr "Importar datos"
 
 #: includes/class-pbc-admin-plugin.php:1088
 msgid "Import phases and variations from previously exported CSV files. You can import both files together or one at a time."
-msgstr ""
+msgstr "Importe las fases y variaciones de los archivos CSV exportados previamente. Puede importar ambos archivos juntos o uno a la vez."
 
 #: includes/class-pbc-admin-plugin.php:1093
 msgid "Choose Phases CSV"
-msgstr ""
+msgstr "Seleccionar fases CSV"
 
 #: includes/class-pbc-admin-plugin.php:1102
 msgid "Choose Variations CSV"
-msgstr ""
+msgstr "Seleccionar variaciones CSV"
 
 #: includes/class-pbc-admin-plugin.php:1124
 msgid "Important Information"
-msgstr ""
+msgstr "Importar información"
 
 #: includes/class-pbc-admin-plugin.php:1126
 msgid "Export generates two CSV files: one for phases and one for variations."
-msgstr ""
+msgstr "La exportación genera dos archivos CSV: uno para las fases y otro para las variaciones."
 
 #: includes/class-pbc-admin-plugin.php:1127
 msgid "Complex fields (dependencies, prices, image groups) are separated by pipes (|) and colons (:) instead of JSON."
-msgstr ""
+msgstr "Los campos complejos (dependencias, precios, grupos de imágenes) se separan mediante barras verticales (|) y dos puntos (:) en lugar de JSON."
 
 #: includes/class-pbc-admin-plugin.php:1128
 msgid "Items are identified by unique slugs, not post IDs, so they work across different installations."
-msgstr ""
+msgstr "Los elementos se identifican mediante slugs únicos, no mediante ID de publicación, por lo que funcionan en diferentes instalaciones."
 
 #: includes/class-pbc-admin-plugin.php:1129
 msgid "If an item with the same slug already exists, it will be skipped (no duplicates)."
-msgstr ""
+msgstr "Si ya existe un elemento con el mismo slug, se omitirá (sin duplicados)."
 
 #: includes/class-pbc-admin-plugin.php:1130
 msgid "You can import phases and variations independently or together."
-msgstr ""
+msgstr "Puede importar fases y variaciones de forma independiente o conjunta."
 
 #: includes/class-pbc-admin-plugin.php:1131
 msgid "Image attachments are referenced by ID - you may need to migrate media files separately."
-msgstr ""
+msgstr "Los archivos adjuntos de imagen se referencian por ID; es posible que deba migrar los archivos multimedia por separado."
 
 #: includes/class-pbc-admin-plugin.php:1183
 msgid "Remove this configuration"
@@ -415,7 +415,7 @@ msgstr "Fase"
 
 #: includes/class-pbc-admin-plugin.php:1195
 msgid "Recommended Variation"
-msgstr ""
+msgstr "Variación recomendada"
 
 #: includes/class-pbc-admin-plugin.php:1272
 msgid "-- No recommendation --"
@@ -462,30 +462,30 @@ msgstr "Recomendaciones cargadas correctamente."
 
 #: includes/class-pbc-export-import.php:299
 msgid "No data to import."
-msgstr ""
+msgstr "No hay datos para importar."
 
 #. translators: %s is the phase title that failed to import.
 #: includes/class-pbc-export-import.php:317
 msgid "Failed to import phase: %s"
-msgstr ""
+msgstr "Error al importar la fase: %s"
 
 #. translators: %s is the variation title that failed to import.
 #: includes/class-pbc-export-import.php:344
 msgid "Failed to import variation: %s"
-msgstr ""
+msgstr "Error al importar la variación: %s"
 
 #. translators: %1$d is the number of phases created, %2$d is the number of variations created.
 #: includes/class-pbc-export-import.php:352
 msgid "Import completed. Phases: %1$d, Variations: %2$d"
-msgstr ""
+msgstr "Importación completada. Fases: %1$d, Variaciones: %2$d"
 
 #: includes/class-pbc-export-import.php:923
 msgid "No import data provided."
-msgstr ""
+msgstr "No se proporcionaron datos de importación."
 
 #: includes/class-pbc-export-import.php:941
 msgid "Invalid CSV format or no data found."
-msgstr ""
+msgstr "Formato CSV no válido o no se encontraron datos."
 
 #: includes/class-pbc-helper-posttypes.php:54
 msgid "Add Phase"
@@ -794,31 +794,31 @@ msgstr "Todas las Fases"
 
 #: includes/class-pbc-request.php:250 includes/class-pbc-request.php:383
 msgid "Parent phase missing."
-msgstr ""
+msgstr "Falta la fase principal."
 
 #: includes/class-pbc-request.php:258 includes/class-pbc-request.php:391
 msgid "Configuration not found."
-msgstr ""
+msgstr "Configuración no encontrada."
 
 #: includes/class-pbc-request.php:309 includes/class-pbc-request.php:442
 msgid "Unable to generate share URL."
-msgstr ""
+msgstr "Incapaz de generar URL compartida."
 
 #: includes/class-pbc-request.php:361
 msgid "Invalid email address."
-msgstr ""
+msgstr "Dirección de correo electrónico no válida."
 
 #: includes/class-pbc-request.php:449
 msgid "You can view the configuration here:"
-msgstr ""
+msgstr "Aquí puede ver la configuración:"
 
 #: includes/class-pbc-request.php:458
 msgid "Email sent successfully."
-msgstr ""
+msgstr "Correo electrónico enviado correctamente."
 
 #: includes/class-pbc-request.php:464
 msgid "Failed to send email."
-msgstr ""
+msgstr "Error al enviar el email."
 
 #: includes/helpers/class-calculations.php:352
 msgid "Email field empty!"
@@ -951,15 +951,15 @@ msgstr "Recomendación"
 
 #: includes/helpers/class-show-template.php:181
 msgid "Call technical support"
-msgstr ""
+msgstr "Llama al soporte técnico"
 
 #: includes/helpers/class-show-template.php:184
 msgid "Support"
-msgstr ""
+msgstr "Soporte"
 
 #: includes/helpers/class-show-template.php:190
 msgid "Email technical support"
-msgstr ""
+msgstr "Correo electrónico técnico"
 
 #: includes/helpers/class-show-template.php:209
 msgid "No Phases Available"
@@ -971,15 +971,15 @@ msgstr "No hay variaciones disponibles"
 
 #: includes/helpers/class-show-template.php:518
 msgid "Share Configuration"
-msgstr ""
+msgstr "Compartir configuración"
 
 #: includes/helpers/class-show-template.php:524
 msgid "Share via WhatsApp"
-msgstr ""
+msgstr "Compartir vía WhatsApp"
 
 #: includes/helpers/class-show-template.php:530
 msgid "Share via Email"
-msgstr ""
+msgstr "Compartir vía correo electrónico"
 
 #: includes/helpers/class-show-template.php:533
 msgid "Client Details"
