@@ -510,7 +510,7 @@ class PBC_Helper_PostTypes {
 						'fields'         => 'ids',
 					)
 				);
-				$count = ! empty( $variations ) ? count( $variations ) : 0;
+				$count      = ! empty( $variations ) ? count( $variations ) : 0;
 
 				// Create link to variations filtered by this phase.
 				$url = add_query_arg(
@@ -711,7 +711,7 @@ class PBC_Helper_PostTypes {
 	 */
 	public function admin_posts_filter() {
 		global $typenow;
-		
+
 		if ( 'variation' !== $typenow ) {
 			return;
 		}
@@ -801,8 +801,7 @@ class PBC_Helper_PostTypes {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
-		if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			$phase_id = (int) $_GET['pbc_filter_phase'];
 
 			if ( $phase_id > 0 ) {
