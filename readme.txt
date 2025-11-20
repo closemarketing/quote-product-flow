@@ -38,7 +38,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
-= 1.4.2-beta.1 ==
+= 1.5.0 ==
 *  Configurator skip fixed panel.
 *  Added: Export/Import page with real-time logging.
 *  Added: Export/Import functionality for phases and variations with slug-based references.
