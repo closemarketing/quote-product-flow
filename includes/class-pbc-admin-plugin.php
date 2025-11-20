@@ -1455,11 +1455,10 @@ class PBC_Admin_Plugin {
 	} else {
 		// Multiple configurations but no selection specified.
 		wp_send_json_error( array( 'message' => __( 'Please select an option first before loading recommendations.', 'pbc' ) ) );
-			}
-		}
+	}
 
-		// Get all phases for this parent phase.
-		$args   = array(
+	// Get all phases for this parent phase.
+	$args   = array(
 			'numberposts' => -1,
 			'post_type'   => 'phases',
 			'orderby'     => 'menu_order',
