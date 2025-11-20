@@ -511,7 +511,7 @@ class PBC_Helper_PostTypes {
 					)
 				);
 				$count = ! empty( $variations ) ? count( $variations ) : 0;
-				
+
 				// Create link to variations filtered by this phase.
 				$url = add_query_arg(
 					array(
@@ -520,7 +520,7 @@ class PBC_Helper_PostTypes {
 					),
 					admin_url( 'edit.php' )
 				);
-				
+
 				if ( $count > 0 ) {
 					echo '<a href="' . esc_url( $url ) . '" title="' . esc_attr__( 'View variations of this phase', 'pbc' ) . '">';
 					echo esc_html( $count );
@@ -751,32 +751,32 @@ class PBC_Helper_PostTypes {
 				);
 
 				$name = CALC::adds_zero( $phase->menu_order ) . ' - ' . $phase->post_title;
-				
+
 				if ( $phase->post_parent > 0 ) {
 					$parent = get_post( $phase->post_parent );
 					if ( $parent ) {
 						$name = $parent->post_title . ' → ' . $name;
 					}
 				}
-				
+
 				$name .= ' (' . $count . ')';
 
 				printf(
 					'<option value="%d"%s>%s</option>',
-					$phase->ID,
+					(int) $phase->ID,
 					selected( $selected, $phase->ID, false ),
 					esc_html( $name )
 				);
 			}
 			?>
 		</select>
-		
+
 		<script type="text/javascript">
 		jQuery(document).ready(function($) {
 			$('#pbc_phase_select').on('change', function() {
 				$(this).closest('form').submit();
 			});
-			
+
 			// Hide the filter button.
 			$('#post-query-submit').hide();
 		});
@@ -802,14 +802,15 @@ class PBC_Helper_PostTypes {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
 		if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] ) {
-			$phase_id = (int) $_GET['pbc_filter_phase']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$phase_id = (int) $_GET['pbc_filter_phase'];
+
 			if ( $phase_id > 0 ) {
 				$query->set( 'meta_key', 'pbc_phase' );
 				$query->set( 'meta_value', $phase_id );
 			}
 		}
-		
+
 		return $query;
 	}
 }
