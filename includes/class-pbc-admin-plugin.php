@@ -109,9 +109,9 @@ class PBC_Admin_Plugin {
 			'pbc-admin-scripts',
 			'ajaxAction',
 			array(
-				'url'        => admin_url( 'admin-ajax.php' ),
-				'nonce'      => wp_create_nonce( 'pbc_admin_nonce' ),
-				'pdf_nonce'  => wp_create_nonce( 'pbc_enquiry_pdf_nonce' ),
+				'url'       => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'pbc_admin_nonce' ),
+				'pdf_nonce' => wp_create_nonce( 'pbc_enquiry_pdf_nonce' ),
 			)
 		);
 
@@ -344,8 +344,8 @@ class PBC_Admin_Plugin {
 			update_option( 'variations_images_flipped', $variations_images_flipped );
 
 			// Save recommended variations (now supports multiple groups).
-			$variations_recommended = isset( $_POST['variations_recommended'] ) ? $_POST['variations_recommended'] : array();
-			
+			$variations_recommended = isset( $_POST['variations_recommended'] ) ? map_deep( wp_unslash( $_POST['variations_recommended'] ), 'sanitize_text_field' ) : array();
+
 			// Sanitize the nested array structure.
 			$sanitized_recommendations = array();
 			foreach ( $variations_recommended as $first_var_id => $phases_config ) {
@@ -532,7 +532,12 @@ class PBC_Admin_Plugin {
 				<?php
 					$admin_email_notification = get_option( 'pbc_admin_email_notification' );
 				?>
-				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if ( $admin_email_notification ) { echo esc_html( $admin_email_notification ); } ?>" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+				<input style="width:100%;" type="text" name="admin_email_notification" value="
+				<?php
+				if ( $admin_email_notification ) {
+					echo esc_html( $admin_email_notification ); }
+				?>
+				" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
 			</fieldset>
 				<fieldset>
 					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' ); ?></label>
@@ -543,7 +548,7 @@ class PBC_Admin_Plugin {
 					<?php
 					if ( $preview_width ) {
 						echo esc_attr( $preview_width ); }
-?>
+					?>
 " placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
 				</fieldset>
 				<fieldset>
@@ -592,13 +597,13 @@ class PBC_Admin_Plugin {
 					<div class="pbc_field_preview">
 					<?php
 					if ( $pdf_image_selected ) {
-?>
+						?>
 <img src="<?php echo esc_url( $pdf_image_selected ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div><input id="select_PDF_image" type="hidden" name="pdf_image_selected" value="
 		<?php
-					if ( $pdf_image_selected ) {
+		if ( $pdf_image_selected ) {
 			echo esc_url( $pdf_image_selected );
-								}
-								?>
+		}
+		?>
 								" data-imageId="<?php echo esc_attr( $this->get_attachment_id( $pdf_image_selected ) ); ?>" />
 					<button class="select-image button select-image-selected" data-name="pdf_image_selected"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
@@ -610,7 +615,7 @@ class PBC_Admin_Plugin {
 					<div class="pbc_field_preview">
 					<?php
 					if ( $pdf_image_header ) {
-?>
+						?>
 <img src="<?php echo esc_url( $pdf_image_header ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
 					<input id="select_pdf_image_header" type="hidden" name="pdf_image_header" value="
 					<?php
@@ -628,7 +633,7 @@ class PBC_Admin_Plugin {
 					<div class="pbc_field_preview">
 					<?php
 					if ( $pdf_image_footer ) {
-?>
+						?>
 <img src="<?php echo esc_url( $pdf_image_footer ); ?>" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span><?php } ?></div>
 					<input id="select_pdf_image_footer" type="hidden" name="pdf_image_footer" value="
 					<?php
@@ -647,14 +652,14 @@ class PBC_Admin_Plugin {
 					<?php
 					if ( $pdf_color_odd ) {
 						echo esc_url( $pdf_color_odd ); }
-?>
+					?>
 " class="pbc_color_picker" />
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
 					<?php
 					$pdf_color_total = get_option( 'pbc_pdf_color_total' );
-				?>
+					?>
 				<input type="text" name="pdf_color_total" value="
 				<?php
 				if ( $pdf_color_total ) {
@@ -762,12 +767,12 @@ class PBC_Admin_Plugin {
 							'order'          => 'ASC',
 						)
 					);
-					
+
 					// Get first phase to show its variations as recommendation groups.
 					$first_phase      = null;
 					$first_phase_vars = array();
 					$other_phases     = array();
-					
+
 					foreach ( $phases as $phase ) {
 						// Skip parent phases if they have children.
 						$child_phases = get_posts(
@@ -781,7 +786,7 @@ class PBC_Admin_Plugin {
 						if ( ! empty( $child_phases ) ) {
 							continue;
 						}
-						
+
 						if ( null === $first_phase ) {
 							$first_phase = $phase;
 							// Get variations of first phase.
@@ -799,7 +804,7 @@ class PBC_Admin_Plugin {
 							$other_phases[] = $phase;
 						}
 					}
-					
+
 					if ( empty( $first_phase_vars ) ) {
 						echo '<p class="notice notice-warning"><strong>' . esc_html__( 'Note:', 'pbc' ) . '</strong> ' . esc_html__( 'Please add variations to the first phase to configure recommendations.', 'pbc' ) . '</p>';
 					} elseif ( count( $other_phases ) === 0 ) {
@@ -837,12 +842,12 @@ class PBC_Admin_Plugin {
 								foreach ( $first_phase_vars as $first_var ) {
 									$first_var_id   = $first_var->ID;
 									$first_var_name = $first_var->post_title;
-									
+
 									// Solo mostrar si tiene configuración.
 									if ( ! isset( $variations_recommended[ $first_var_id ] ) || empty( $variations_recommended[ $first_var_id ] ) ) {
 										continue;
 									}
-									
+
 									$this->render_recommendation_group( $first_var_id, $first_var_name, $other_phases, $variations_recommended );
 								}
 								?>
@@ -894,20 +899,20 @@ class PBC_Admin_Plugin {
 		$parent_phase = (int) get_post_meta( $post_id, 'pbc_parent_phase', true );
 		$item_key     = 'pbc_variation_' . $parent_phase;
 
-		$item = [
+		$item = array(
 			'pbc_date'         => get_the_date( 'd-m-Y', $post_id ),
 			'pbc_parent_phase' => $parent_phase,
-			'pbc_contact'      => [
+			'pbc_contact'      => array(
 				'name'     => get_post_meta( $post_id, 'pbc_enquiry_name', true ),
 				'phone'    => get_post_meta( $post_id, 'pbc_enquiry_phone', true ),
 				'email'    => get_post_meta( $post_id, 'pbc_enquiry_email', true ),
 				'city'     => get_post_meta( $post_id, 'pbc_enquiry_city', true ),
 				'state'    => get_post_meta( $post_id, 'pbc_enquiry_state', true ),
 				'comments' => get_post_meta( $post_id, 'pbc_enquiry_comments', true ),
-			],
+			),
 			'pbc_enquiry'      => $post_id,
 			'pbc_admin'        => true,
-		];
+		);
 
 		$total_vars = get_post_meta( $post_id, 'pbc_total_var', true );
 		$total_vars = (int) $total_vars;
@@ -1156,10 +1161,10 @@ class PBC_Admin_Plugin {
 				'order'          => 'ASC',
 			)
 		);
-		
-		$phases_order         = array();
-		$prev_variations_ids  = array();
-		
+
+		$phases_order        = array();
+		$prev_variations_ids = array();
+
 		foreach ( $all_phases as $ph ) {
 			// Skip parent phases.
 			$child_phases = get_posts(
@@ -1174,19 +1179,22 @@ class PBC_Admin_Plugin {
 				$phases_order[] = $ph->menu_order;
 			}
 		}
-		
+
 		// Start with the first variation selected.
 		$prev_variations_ids[0] = $first_var_id;
-		
+
 		?>
 		<div class="recommendation-group" data-var-id="<?php echo (int) $first_var_id; ?>" style="margin-bottom:30px; border:1px solid #ddd; padding:15px; background:#f9f9f9; position:relative;">
 			<button type="button" class="pbc-remove-recommendation button-link-delete" style="position:absolute; top:10px; right:10px; color:#a00; text-decoration:none;" title="<?php esc_attr_e( 'Remove this configuration', 'pbc' ); ?>">
 				<span class="dashicons dashicons-trash"></span> <?php esc_html_e( 'Remove', 'pbc' ); ?>
 			</button>
-			<h3 style="margin-top:0; padding-right:100px; cursor:pointer; user-select:none;" class="pbc-recommendation-toggle">
-				<span class="dashicons dashicons-arrow-down-alt2" style="transition: transform 0.3s;"></span>
-				<?php echo esc_html( sprintf( __( 'Recommendations for: %s', 'pbc' ), $first_var_name ) ); ?>
-			</h3>
+		<h3 style="margin-top:0; padding-right:100px; cursor:pointer; user-select:none;" class="pbc-recommendation-toggle">
+			<span class="dashicons dashicons-arrow-down-alt2" style="transition: transform 0.3s;"></span>
+			<?php
+			/* translators: %s: First variation name */
+			echo esc_html( sprintf( __( 'Recommendations for: %s', 'pbc' ), $first_var_name ) );
+			?>
+		</h3>
 			<div class="pbc-recommendation-content" style="display:none;">
 			<table class="recommended-variations-table" style="width:100%; margin-top:10px; background:white;">
 				<thead>
@@ -1200,7 +1208,7 @@ class PBC_Admin_Plugin {
 					$step = 1; // Step 0 is the first variation.
 					foreach ( $other_phases as $phase ) {
 						++$step;
-						
+
 						// Get all variations for this phase.
 						$all_variations = get_posts(
 							array(
@@ -1213,11 +1221,11 @@ class PBC_Admin_Plugin {
 								'fields'         => 'ids',
 							)
 						);
-						
+
 						if ( empty( $all_variations ) ) {
 							continue;
 						}
-						
+
 						// Build dependencies map.
 						$variations_depends = array();
 						foreach ( $all_variations as $variation_id ) {
@@ -1237,7 +1245,7 @@ class PBC_Admin_Plugin {
 								}
 							}
 						}
-						
+
 						// Filter variations based on dependencies.
 						$filtered_variations = array_filter(
 							$all_variations,
@@ -1256,35 +1264,36 @@ class PBC_Admin_Plugin {
 								return true;
 							}
 						);
-						
+
 						// At this point, $all_variations is guaranteed to not be empty due to check above.
 						$selected_var = isset( $variations_recommended[ $first_var_id ][ $phase->ID ] ) ? $variations_recommended[ $first_var_id ][ $phase->ID ] : '';
-						
+
 						// Store selected variation for next phase filtering.
 						if ( $selected_var ) {
 							$prev_variations_ids[ $step - 1 ] = $selected_var;
 						}
-						
+
 						echo '<tr>';
 						echo '<td style="padding:8px;"><strong>' . esc_html( $phase->menu_order . ' - ' . $phase->post_title ) . '</strong></td>';
 						echo '<td style="padding:8px;">';
 						echo '<select name="variations_recommended[' . (int) $first_var_id . '][' . (int) $phase->ID . ']" style="width:100%;" class="pbc-rec-select" data-phase-step="' . (int) $step . '" data-phase-id="' . (int) $phase->ID . '" data-first-var="' . (int) $first_var_id . '">';
 						echo '<option value="">' . esc_html__( '-- No recommendation --', 'pbc' ) . '</option>';
-						
+
 						// Include ALL variations with dependency data attributes.
 						foreach ( $all_variations as $var_id ) {
 							$var_title = get_the_title( $var_id );
 							$selected  = selected( $selected_var, $var_id, false );
-							
+
 							// Get dependencies for this variation.
-							$var_depends = isset( $variations_depends[ $var_id ] ) ? $variations_depends[ $var_id ] : array();
+							$var_depends  = isset( $variations_depends[ $var_id ] ) ? $variations_depends[ $var_id ] : array();
 							$depends_json = ! empty( $var_depends ) ? wp_json_encode( $var_depends ) : '{}';
-							
+
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $selected is safely generated by selected() function.
 							echo '<option value="' . (int) $var_id . '" ' . $selected . ' data-depends=\'' . esc_attr( $depends_json ) . '\'>' . esc_html( $var_title ) . '</option>';
 						}
 						echo '</select>';
 						echo '<br/><small class="pbc-filtered-info" style="color:#666;"></small>';
-						
+
 						echo '</td>';
 						echo '</tr>';
 					}
@@ -1387,7 +1396,7 @@ class PBC_Admin_Plugin {
 			}
 			$arr = explode( '|', $depend['pbc_depvar'] );
 			if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-				$order                           = array_search( (int) $arr[0], $phases_order, true );
+				$order                          = array_search( (int) $arr[0], $phases_order, true );
 				$variations_depends[ $order ][] = (int) $arr[1];
 			}
 		}
@@ -1412,25 +1421,14 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function pbc_get_recommendations() {
-		// Debug logging.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'PBC Recommendations - POST data: ' . print_r( $_POST, true ) );
-		}
-
 		// Verify nonce.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in the next line.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'pbc_recommendation_nonce' ) ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'PBC Recommendations - Nonce verification failed' );
-			}
 			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
 		}
 
-		$parent_phase          = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
-		$first_variation_id    = isset( $_POST['first_variation'] ) ? (int) $_POST['first_variation'] : 0;
-
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'PBC Recommendations - parent_phase: ' . $parent_phase . ', first_variation_id: ' . $first_variation_id );
-		}
+		$parent_phase       = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
+		$first_variation_id = isset( $_POST['first_variation'] ) ? (int) $_POST['first_variation'] : 0;
 
 		// Validate required data.
 		if ( ! $first_variation_id ) {
@@ -1439,10 +1437,6 @@ class PBC_Admin_Plugin {
 
 		// Get all recommended variations configurations.
 		$variations_recommended = get_option( 'pbc_variations_recommended', array() );
-
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'PBC Recommendations - configurations found: ' . count( $variations_recommended ) );
-		}
 
 		if ( empty( $variations_recommended ) ) {
 			wp_send_json_error( array( 'message' => __( 'No recommendations configured.', 'pbc' ) ) );
@@ -1455,14 +1449,12 @@ class PBC_Admin_Plugin {
 		} elseif ( $first_variation_id && ! isset( $variations_recommended[ $first_variation_id ] ) ) {
 			// First variation selected but no configuration exists for it.
 			wp_send_json_error( array( 'message' => __( 'This option does not have a recommended configuration.', 'pbc' ) ) );
-		} else {
+		} elseif ( 1 === count( $variations_recommended ) ) {
 			// If no first variation specified, check if there's only one configuration.
-			if ( 1 === count( $variations_recommended ) ) {
-				$selected_config = reset( $variations_recommended );
-			} else {
-				// Multiple configurations but no selection specified.
-				wp_send_json_error( array( 'message' => __( 'Please select an option first before loading recommendations.', 'pbc' ) ) );
-			}
+			$selected_config = reset( $variations_recommended );
+		} else {
+			// Multiple configurations but no selection specified.
+			wp_send_json_error( array( 'message' => __( 'Please select an option first before loading recommendations.', 'pbc' ) ) );
 		}
 
 		// Get all phases for this parent phase.
@@ -1523,8 +1515,8 @@ class PBC_Admin_Plugin {
 
 				// Validate dependencies BEFORE adding to recommendations.
 				if ( ! $this->validate_variation_dependencies( $variation_id, $phases_order, $selected_variations, $step ) ) {
-					$phase_name     = get_the_title( $phase_id );
-					$variation_name = get_the_title( $variation_id );
+					$phase_name             = get_the_title( $phase_id );
+					$variation_name         = get_the_title( $variation_id );
 					$invalid_dependencies[] = sprintf(
 						/* translators: %1$s: Phase name, %2$s: Variation name */
 						__( '"%1$s" cannot use "%2$s" due to dependencies with previous selections.', 'pbc' ),
@@ -1533,56 +1525,50 @@ class PBC_Admin_Plugin {
 					);
 					// Don't add this to recommendations, skip it.
 					++$step;
-				continue;
-			}
-
-			// Get price.
-			$price_group = get_post_meta( $variation_id, 'pbc_pricegroup', true );
-			$price       = 0;
-			$price_var   = '';
-
-			if ( ! empty( $price_group ) && is_array( $price_group ) ) {
-				// Use first price if available.
-				$first_price = reset( $price_group );
-				if ( isset( $first_price['pbc_pricem'] ) ) {
-					$price = floatval( $first_price['pbc_pricem'] );
+					continue;
 				}
-				if ( isset( $first_price['pbc_meaprice'] ) ) {
-					$price_var = $first_price['pbc_meaprice'];
+
+				// Get price.
+				$price_group = get_post_meta( $variation_id, 'pbc_pricegroup', true );
+				$price       = 0;
+				$price_var   = '';
+
+				if ( ! empty( $price_group ) && is_array( $price_group ) ) {
+					// Use first price if available.
+					$first_price = reset( $price_group );
+					if ( isset( $first_price['pbc_pricem'] ) ) {
+						$price = floatval( $first_price['pbc_pricem'] );
+					}
+					if ( isset( $first_price['pbc_meaprice'] ) ) {
+						$price_var = $first_price['pbc_meaprice'];
+					}
 				}
+
+				$recommendations[ $step ] = array(
+					'phase_id'     => $phase_id,
+					'variation_id' => $variation_id,
+					'price'        => $price,
+					'price_var'    => $price_var,
+				);
+
+				// Store this variation for dependency checking of next phases.
+				$selected_variations[ $step ] = $variation_id;
 			}
-
-			$recommendations[ $step ] = array(
-				'phase_id'     => $phase_id,
-				'variation_id' => $variation_id,
-				'price'        => $price,
-				'price_var'    => $price_var,
-			);
-
-			// Store this variation for dependency checking of next phases.
-			$selected_variations[ $step ] = $variation_id;
-		}
-		++$step;
+			++$step;
 		}
 
-		// If there are invalid dependencies, log warning but continue with valid ones.
-		if ( ! empty( $invalid_dependencies ) ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'PBC Recommendations - Invalid dependencies found: ' . implode( ', ', $invalid_dependencies ) );
-			}
-			// Don't return error, just skip invalid ones and continue with valid recommendations.
-		}
+		// If there are invalid dependencies, skip them and continue with valid recommendations.
 
 		if ( empty( $recommendations ) ) {
 			wp_send_json_error( array( 'message' => __( 'No recommendations found for this configuration.', 'pbc' ) ) );
 		}
 
 			wp_send_json_success(
-			array(
-				'recommendations' => $recommendations,
-				'message'         => __( 'Recommendations loaded successfully.', 'pbc' ),
-			)
-		);
+				array(
+					'recommendations' => $recommendations,
+					'message'         => __( 'Recommendations loaded successfully.', 'pbc' ),
+				)
+			);
 	}
 }
 
