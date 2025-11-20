@@ -797,7 +797,7 @@ class PBC_Helper_PostTypes {
 		global $pagenow, $typenow;
 
 		if ( ! is_admin() || 'edit.php' !== $pagenow || 'variation' !== $typenow || ! $query->is_main_query() ) {
-			return;
+			return $query;
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
@@ -809,6 +809,8 @@ class PBC_Helper_PostTypes {
 				$query->set( 'meta_value', $phase_id );
 			}
 		}
+		
+		return $query;
 	}
 }
 
