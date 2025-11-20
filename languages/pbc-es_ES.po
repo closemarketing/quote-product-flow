@@ -788,6 +788,18 @@ msgstr "Calcular"
 msgid "Next"
 msgstr "Siguiente"
 
+#: includes/helpers/class-show-parts.php:304
+msgid "Restart"
+msgstr "Reiniciar"
+
+#: includes/class-pbc-admin-plugin.php:768
+msgid "Security check failed."
+msgstr "Verificación de seguridad falló."
+
+#: includes/class-pbc-admin-plugin.php:793
+msgid "Process restarted successfully."
+msgstr "Proceso reiniciado exitosamente."
+
 #: includes/helpers/class-show-template.php:155
 msgid "No Phases Available"
 msgstr "No hay fases disponibles"

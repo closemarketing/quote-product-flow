@@ -325,11 +325,16 @@
 
 .configurator_form_action .prev,
 .configurator_form_action .next,
-.configurator_form_action .recommendation {
+.configurator_form_action .recommendation,
+.configurator_form_action .restart {
   display: inline-block;
 }
 
 .configurator_form_action .recommendation {
+  margin: 0 10px;
+}
+
+.configurator_form_action .restart {
   margin: 0 10px;
 }
 
@@ -375,6 +380,40 @@
 
 .btn-recommendation:disabled::after {
   border-left-color: #6c757d;
+}
+
+.btn-restart {
+  position: relative;
+  margin: 0;
+  padding-left: 14px;
+  padding-right: 38px;
+  padding-top: 2.8px;
+  padding-bottom: 2.8px;
+  background: #dc3545;
+  color: white;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-restart::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -24px;
+  width: 0;
+  height: 0;
+  border-color: transparent transparent transparent #dc3545;
+  border-width: 12px;
+  border-style: solid;
+}
+
+.btn-restart:hover {
+  background: #c82333;
+}
+
+.btn-restart:hover::after {
+  border-left-color: #c82333;
 }
 
 .status_loader.fixed {
@@ -502,4 +541,77 @@ div.site-content:has(div.page-configurator) {
   list-style-type: none;
   padding: 0 0 0 0;
   line-height: 26px;
+}
+
+/* Support Buttons */
+.pbc-support-buttons {
+	margin: 20px 0;
+	padding: 20px;
+	background: #f8f9fa;
+	border-radius: 8px;
+	text-align: center;
+}
+
+.pbc-support-buttons h3 {
+	margin: 0 0 15px 0;
+	font-size: 18px;
+	color: #333;
+}
+
+.support-buttons-container {
+	display: flex;
+	gap: 15px;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.btn-support {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 24px;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.3s ease;
+	border: 2px solid transparent;
+}
+
+.btn-support .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.btn-support.btn-phone {
+	background-color: #25d366;
+	color: #fff;
+}
+
+.btn-support.btn-phone:hover {
+	background-color: #20ba5a;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
+}
+
+.btn-support.btn-email {
+	background-color: #0073aa;
+	color: #fff;
+}
+
+.btn-support.btn-email:hover {
+	background-color: #005a87;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 115, 170, 0.3);
+}
+
+@media (max-width: 768px) {
+	.support-buttons-container {
+		flex-direction: column;
+	}
+	
+	.btn-support {
+		width: 100%;
+		justify-content: center;
+	}
 }

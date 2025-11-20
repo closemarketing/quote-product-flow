@@ -48,6 +48,70 @@ if ( file_exists( WPPBC_PLUGIN_PATH . 'vendor/autoload.php' ) ) {
 	require_once WPPBC_PLUGIN_PATH . 'vendor/autoload.php';
 }
 
+// Initialize License Manager.
+add_action(
+	'plugins_loaded',
+	function() {
+		if ( class_exists( 'Closemarketing\WPLicenseManager\License' ) && class_exists( 'Closemarketing\WPLicenseManager\Settings' ) ) {
+			try {
+				$license = new \Closemarketing\WPLicenseManager\License(
+					array(
+						'api_url'       => WPPBC_URL_API,
+						'file'          => WPPBC_PLUGIN,
+						'version'       => WPPBC_VERSION,
+						'slug'          => 'product-budget-configurator',
+						'name'          => WPPBC_ITEM_NAME,
+						'text_domain'   => 'pbc',
+						'option_prefix' => 'pbc_license_',
+					)
+				);
+
+				// Remove duplicate field registration from License class (Settings will handle it).
+				remove_action( 'admin_init', array( $license, 'page_init' ) );
+
+				// Set default Product ID if not already set.
+				$product_id_key = $license->get_option_key( 'product_id' );
+				if ( ! get_option( $product_id_key ) ) {
+					update_option( $product_id_key, '2635' );
+				}
+
+				// Create license settings page in PBC menu.
+				new \Closemarketing\WPLicenseManager\Settings(
+					$license,
+					array(
+						'page_title'  => __( 'License', 'pbc' ),
+						'menu_title'  => __( 'License', 'pbc' ),
+						'menu_slug'   => 'pbc-license',
+						'parent_slug' => 'pbc_menu', // Add to PBC menu.
+					)
+				);
+
+				// Hide sidebar on license page.
+				add_action(
+					'admin_head',
+					function() {
+						$screen = get_current_screen();
+						if ( $screen && 'pbc_page_pbc-license' === $screen->id ) {
+							echo '<style>
+								.license-settings-sidebar { display: none !important; }
+								.license-settings-main { max-width: 100% !important; }
+							</style>';
+						}
+					}
+				);
+			} catch ( Exception $e ) {
+				add_action(
+					'admin_notices',
+					function() use ( $e ) {
+						echo '<div class="notice notice-error"><p>' . esc_html( $e->getMessage() ) . '</p></div>';
+					}
+				);
+			}
+		}
+	},
+	20
+);
+
 // Helpers.
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-calculations.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-parts.php';
@@ -58,7 +122,6 @@ require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-request.php';
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php';
-require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
 
 // Public.
 require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-public.php';

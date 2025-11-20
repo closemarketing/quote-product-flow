@@ -310,6 +310,11 @@ class SHOW {
 				<button type="button" id="pbc-load-recommendation" class="btn btn-recommendation"><?php esc_html_e( 'Recommendation', 'pbc' ); ?></button>
 			</div>
 			<?php } ?>
+			<?php if ( $cstep > 1 ) { ?>
+			<div class="restart">
+				<button type="button" id="pbc-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'pbc' ); ?></button>
+			</div>
+			<?php } ?>
 			<div class="next">
 				<?php
 				if ( $next_step ) {
