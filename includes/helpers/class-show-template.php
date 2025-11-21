@@ -506,11 +506,12 @@ class PBC_Template {
 			}
 			if ( 'calculate' === $cstep ) {
 			?>
-			</div><!-- .pbc-calculate-container -->
-			<?php } ?>
-			<?php if ( 'calculate' === $cstep ) {
-				?>
-				<div class="configurator_result_share">
+		</div><!-- .pbc-calculate-container -->
+		<?php } ?>
+		<?php
+		if ( 'calculate' === $cstep ) {
+			?>
+			<div class="configurator_result_share">
 					<?php
 					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION['pbc_output']['type'] ) ) : '';
 					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {

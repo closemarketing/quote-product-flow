@@ -38,9 +38,9 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
-= 1.4.2-beta.1 ==
-*  Settings Page Redesign: Complete visual overhaul with modern card-based layout, purple gradient theme, and improved user experience. License management now integrated directly into settings.
+= 1.5.0 ==
 *  Configurator skip fixed panel.
+*  Settings Page Redesign: Complete visual overhaul with modern card-based layout, purple gradient theme, and improved user experience. License management now integrated directly into settings.
 *  Added: Export/Import page with real-time logging.
 *  Added: Export/Import functionality for phases and variations with slug-based references.
 *  Added: Automatic slug generation for phases and variations.
@@ -64,6 +64,9 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Added: Settings to enable/disable support buttons and configure phone/email
 *  Added: Visual notification (fade-in) when clicking support buttons
 *  Added: Share configuration via WhatsApp and Email
+*  Added: Variations count column in Phases admin list with clickable links to filter variations by phase
+*  Added: Phase filter dropdown in Variations admin list with auto-submit functionality
+*  Added: Clickable phase links in Variations list that navigate to Phases list with scroll positioning
 *  Fixed: Configurator skip fixed panel
 *  Fixed: Nonce validation issues in AJAX requests
 *  Feature: Support buttons are sticky and always accessible during configuration process

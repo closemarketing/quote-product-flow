@@ -478,6 +478,7 @@ class PBC_Helper_PostTypes {
 		$new_columns['cb']         = '<input type="checkbox" />';
 		$new_columns['title']      = __( 'Phase', 'pbc' );
 		$new_columns['menu_order'] = __( 'Order', 'pbc' );
+		$new_columns['variations'] = __( 'Variations', 'pbc' );
 		$new_columns['shortcode']  = __( 'Shortcode', 'pbc' );
 
 		return $new_columns;
@@ -497,6 +498,36 @@ class PBC_Helper_PostTypes {
 		switch ( $column_name ) {
 			case 'menu_order':
 				echo isset( $post->menu_order ) ? esc_html( $post->menu_order ) : '';
+				break;
+			case 'variations':
+				// Count variations for this phase.
+				$variations = get_posts(
+					array(
+						'post_type'      => 'variation',
+						'posts_per_page' => -1,
+						'meta_key'       => 'pbc_phase',
+						'meta_value'     => $id,
+						'fields'         => 'ids',
+					)
+				);
+				$count      = ! empty( $variations ) ? count( $variations ) : 0;
+
+				// Create link to variations filtered by this phase.
+				$url = add_query_arg(
+					array(
+						'post_type'        => 'variation',
+						'pbc_filter_phase' => $id,
+					),
+					admin_url( 'edit.php' )
+				);
+
+				if ( $count > 0 ) {
+					echo '<a href="' . esc_url( $url ) . '" title="' . esc_attr__( 'View variations of this phase', 'pbc' ) . '">';
+					echo esc_html( $count );
+					echo '</a>';
+				} else {
+					echo esc_html( $count );
+				}
 				break;
 			case 'shortcode':
 				$post_parent = $post->post_parent;
@@ -597,10 +628,17 @@ class PBC_Helper_PostTypes {
 				$phase_post = get_post( $phase_id );
 				// Phase parent.
 				if ( $phase_post->post_parent > 0 ) {
-					$phase_parent = get_post( $phase_post->post_parent );
-					echo esc_html( $phase_parent->post_title ) . ' <br/>';
+					$phase_parent      = get_post( $phase_post->post_parent );
+					$phase_parent_link = admin_url( 'edit.php?post_type=phases#post-' . $phase_parent->ID );
+					echo '<a href="' . esc_url( $phase_parent_link ) . '" title="' . esc_attr__( 'Go to phases list', 'pbc' ) . '">';
+					echo esc_html( $phase_parent->post_title );
+					echo '</a><br/>';
 				}
+				// Phase link - goes to phases list and scrolls to this phase.
+				$phase_list_link = admin_url( 'edit.php?post_type=phases#post-' . $phase_id );
+				echo '<a href="' . esc_url( $phase_list_link ) . '" title="' . esc_attr__( 'Go to phases list', 'pbc' ) . '">';
 				echo esc_html( CALC::adds_zero( $phase_post->menu_order ) . ' - ' . $phase_post->post_title );
+				echo '</a>';
 
 				// Shows taxonomy.
 				$term_list = wp_get_post_terms( $id, 'variation_tag', array( 'fields' => 'all' ) );
@@ -672,30 +710,78 @@ class PBC_Helper_PostTypes {
 	 * @return void
 	 */
 	public function admin_posts_filter() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
-		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'variation';
+		global $typenow;
 
-		// Only add filter to post type you want.
-		if ( 'variation' === $type ) {
-			$phase_options = CALC::get_phases_options();
-			?>
-			<select name="pbc_filter_phase">
-			<option value=""><?php esc_html_e( 'All Phases', 'pbc' ); ?></option>
+		if ( 'variation' !== $typenow ) {
+			return;
+		}
+
+		// Get current filter.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
+		$selected = isset( $_GET['pbc_filter_phase'] ) ? (int) $_GET['pbc_filter_phase'] : 0;
+
+		// Get ALL phases.
+		$phases = get_posts(
+			array(
+				'post_type'      => 'phases',
+				'posts_per_page' => -1,
+				'orderby'        => 'menu_order',
+				'order'          => 'ASC',
+			)
+		);
+
+		if ( empty( $phases ) ) {
+			return;
+		}
+		?>
+		<select name="pbc_filter_phase" id="pbc_phase_select">
+			<option value=""><?php esc_html_e( '📋 All Phases', 'pbc' ); ?></option>
 			<?php
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
-			$current_v = isset( $_GET['pbc_filter_phase'] ) ? sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ) : '';
-			foreach ( $phase_options as $value => $label ) {
+			foreach ( $phases as $phase ) {
+				$count = count(
+					get_posts(
+						array(
+							'post_type'      => 'variation',
+							'posts_per_page' => -1,
+							'meta_key'       => 'pbc_phase',
+							'meta_value'     => $phase->ID,
+							'fields'         => 'ids',
+						)
+					)
+				);
+
+				$name = CALC::adds_zero( $phase->menu_order ) . ' - ' . $phase->post_title;
+
+				if ( $phase->post_parent > 0 ) {
+					$parent = get_post( $phase->post_parent );
+					if ( $parent ) {
+						$name = $parent->post_title . ' → ' . $name;
+					}
+				}
+
+				$name .= ' (' . $count . ')';
+
 				printf(
-					'<option value="%s"%s>%s</option>',
-					esc_html( $value ),
-					$value === $current_v ? ' selected="selected"' : '',
-					esc_html( $label )
+					'<option value="%d"%s>%s</option>',
+					(int) $phase->ID,
+					selected( $selected, $phase->ID, false ),
+					esc_html( $name )
 				);
 			}
 			?>
-			</select>
-			<?php
-		} //variation type
+		</select>
+
+		<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			$('#pbc_phase_select').on('change', function() {
+				$(this).closest('form').submit();
+			});
+
+			// Hide the filter button.
+			$('#post-query-submit').hide();
+		});
+		</script>
+		<?php
 	}
 
 	/**
@@ -708,15 +794,20 @@ class PBC_Helper_PostTypes {
 	 * @return object Modified query object.
 	 */
 	public function pbc_posts_filter( $query ) {
-		global $pagenow;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
-		$type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
+		global $pagenow, $typenow;
 
-		if ( 'variation' === $type && is_admin() && 'edit.php' === $pagenow ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
-			if ( isset( $_GET['pbc_filter_phase'] ) && '' !== $_GET['pbc_filter_phase'] ) {
-				$query->query_vars['meta_key']   = 'pbc_phase';
-				$query->query_vars['meta_value'] = sanitize_text_field( wp_unslash( $_GET['pbc_filter_phase'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! is_admin() || 'edit.php' !== $pagenow || 'variation' !== $typenow || ! $query->is_main_query() ) {
+			return $query;
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- GET request for admin filter, no data modification.
+		if ( isset( $_GET['pbc_filter_phase'] ) && $_GET['pbc_filter_phase'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$phase_id = (int) $_GET['pbc_filter_phase'];
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+			if ( $phase_id > 0 ) {
+				$query->set( 'meta_key', 'pbc_phase' );
+				$query->set( 'meta_value', $phase_id );
 			}
 		}
 
