@@ -538,26 +538,14 @@ class PBC_Admin_Plugin {
 				</fieldset>
 				<fieldset>
 					<label class="block" for="admin_email_notification"><?php esc_html_e( 'Email Notification', 'pbc' ); ?></label>
-					<?php
-						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
-					?>
-					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php
-					if ( $admin_email_notification ) {
-						echo esc_html( $admin_email_notification );
-					}
-					?>" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+					<?php $admin_email_notification = get_option( 'pbc_admin_email_notification' ); ?>
+					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php echo $admin_email_notification ? esc_html( $admin_email_notification ) : ''; ?>" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
 					<p class="description"><?php esc_html_e( 'Email addresses to receive enquiry notifications', 'pbc' ); ?></p>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="preview_width"><?php esc_html_e( 'Preview Width', 'pbc' ); ?></label>
-					<?php
-						$preview_width = get_option( 'pbc_preview_width' );
-					?>
-					<input class="pbc_field" type="text" name="preview_width" value="<?php
-					if ( $preview_width ) {
-						echo esc_attr( $preview_width );
-					}
-					?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
+					<?php $preview_width = get_option( 'pbc_preview_width' ); ?>
+					<input class="pbc_field" type="text" name="preview_width" value="<?php echo $preview_width ? esc_attr( $preview_width ) : ''; ?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
 					<p class="description"><?php esc_html_e( 'Width in pixels for product preview images', 'pbc' ); ?></p>
 				</fieldset>
 				<fieldset>
@@ -674,26 +662,14 @@ class PBC_Admin_Plugin {
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for Odd Rows', 'pbc' ); ?></label>
-					<?php
-						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
-					?>
-					<input type="text" name="pdf_color_odd" value="<?php
-					if ( $pdf_color_odd ) {
-						echo esc_url( $pdf_color_odd );
-					}
-					?>" class="pbc_color_picker" />
+					<?php $pdf_color_odd = get_option( 'pbc_pdf_color_odd' ); ?>
+					<input type="text" name="pdf_color_odd" value="<?php echo $pdf_color_odd ? esc_url( $pdf_color_odd ) : ''; ?>" class="pbc_color_picker" />
 					<p class="description"><?php esc_html_e( 'Background color for odd rows in PDF tables', 'pbc' ); ?></p>
 				</fieldset>
 				<fieldset>
 					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for Total', 'pbc' ); ?></label>
-					<?php
-					$pdf_color_total = get_option( 'pbc_pdf_color_total' );
-					?>
-					<input type="text" name="pdf_color_total" value="<?php
-					if ( $pdf_color_total ) {
-						echo esc_url( $pdf_color_total );
-					}
-					?>" class="pbc_color_picker" />
+					<?php $pdf_color_total = get_option( 'pbc_pdf_color_total' ); ?>
+					<input type="text" name="pdf_color_total" value="<?php echo $pdf_color_total ? esc_url( $pdf_color_total ) : ''; ?>" class="pbc_color_picker" />
 					<p class="description"><?php esc_html_e( 'Background color for total row in PDF', 'pbc' ); ?></p>
 				</fieldset>
 			</div>
