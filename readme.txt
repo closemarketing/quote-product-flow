@@ -40,6 +40,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 == Changelog ==
 = 1.5.0 ==
 *  Configurator skip fixed panel.
+*  Settings Page Redesign: Complete visual overhaul with modern card-based layout, purple gradient theme, and improved user experience. License management now integrated directly into settings.
 *  Added: Export/Import page with real-time logging.
 *  Added: Export/Import functionality for phases and variations with slug-based references.
 *  Added: Automatic slug generation for phases and variations.

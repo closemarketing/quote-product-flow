@@ -75,30 +75,10 @@ add_action(
 					update_option( $product_id_key, '2635' );
 				}
 
-				// Create license settings page in PBC menu.
-				new \Closemarketing\WPLicenseManager\Settings(
-					$license,
-					array(
-						'page_title'  => __( 'License', 'pbc' ),
-						'menu_title'  => __( 'License', 'pbc' ),
-						'menu_slug'   => 'pbc-license',
-						'parent_slug' => 'pbc_menu', // Add to PBC menu.
-					)
-				);
-
-				// Hide sidebar on license page.
-				add_action(
-					'admin_head',
-					function () {
-						$screen = get_current_screen();
-						if ( $screen && 'pbc_page_pbc-license' === $screen->id ) {
-							echo '<style>
-								.license-settings-sidebar { display: none !important; }
-								.license-settings-main { max-width: 100% !important; }
-							</style>';
-						}
-					}
-				);
+				// License is now integrated into settings page, no separate menu needed.
+				// Store license instance globally for settings page access.
+				global $pbc_license_instance;
+				$pbc_license_instance = $license;
 			} catch ( Exception $e ) {
 				add_action(
 					'admin_notices',
