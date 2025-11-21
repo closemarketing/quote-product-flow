@@ -201,14 +201,6 @@ class PBC_Admin_Plugin {
 				'menu_slug'   => 'edit.php?post_type=enquiry',
 				'function'    => null, // Doesn't need a callback function.
 			),
-			array(
-				'parent_slug' => 'pbc_menu',
-				'page_title'  => __( 'Import / Export', 'pbc' ),
-				'menu_title'  => __( 'Import / Export', 'pbc' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => 'pbc_import_export',
-				'function'    => array( $this, 'pbc_display_import_export_page' ),
-			),
 
 		);
 
@@ -238,65 +230,55 @@ class PBC_Admin_Plugin {
 			$error = __( 'Error saving settings', 'pbc' );
 		}
 		?>
-		<div class='wrap'>
-			<h2><?php echo esc_html( $GLOBALS['title'] ); ?> - <?php esc_html_e( 'Global Settings', 'pbc' ); ?></h2>
+		<div class='wrap pbc-settings-wrap'>
+			<div class="pbc-settings-header">
+				<h1><span class="dashicons dashicons-admin-settings"></span> <?php echo esc_html( $GLOBALS['title'] ); ?></h1>
+				<p class="pbc-settings-subtitle"><?php esc_html_e( 'Configure your product budget configurator global settings', 'pbc' ); ?></p>
+			</div>
 
 			<?php if ( isset( $update ) ) { ?>
-				<div id="message" class="updated fade"><?php echo esc_html( $update ); ?></div>
+				<div id="message" class="notice notice-success is-dismissible"><p><?php echo esc_html( $update ); ?></p></div>
 			<?php } ?>
 			<?php if ( isset( $error ) ) { ?>
-				<div id="message" class="error"><?php echo esc_html( $error ); ?></div>
+				<div id="message" class="notice notice-error is-dismissible"><p><?php echo esc_html( $error ); ?></p></div>
 			<?php } ?>
 
-			<div id="poststuff">
-				<div id="post-body">
-					<div class="postcontent-left">
-						<?php
-						add_meta_box(
-							'phases_lists_meta_box',
-							__( 'All Phases Lists', 'pbc' ),
-							array(
-								$this,
-								'phases_lists_meta_box_callback',
-							),
-							'pbc_import_left'
-						);
-
-						do_meta_boxes(
-							'pbc_import_left',
-							'advanced',
-							null
-						);
-						?>
+			<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
+				<div class="pbc-settings-container pbc-two-columns">
+					<!-- Left Column -->
+					<div class="pbc-column-left">
+						<?php $this->render_general_configuration_section(); ?>
+						<?php $this->render_support_contact_section(); ?>
+						
+						<!-- Price Updater Section -->
+						<div class="pbc-settings-card">
+							<div class="pbc-card-header">
+								<h2><span class="dashicons dashicons-tag"></span> <?php esc_html_e( 'Bulk Price Updater', 'pbc' ); ?></h2>
+								<p class="description"><?php esc_html_e( 'Update all variation prices by percentage', 'pbc' ); ?></p>
+							</div>
+							<div class="pbc-card-body">
+								<?php $this->price_updater_meta_box_callback(); ?>
+							</div>
+						</div>
 					</div>
-					<div class="postcontent-right">
-						<?php
-						// Price Updater.
-						add_meta_box(
-							'price_updater_meta_box',
-							__( 'Price Updater', 'pbc' ),
-							array( $this, 'price_updater_meta_box_callback' ),
-							'pbc_import_right'
-						);
-						// General Settings.
-						add_meta_box(
-							'general_settings_meta_box',
-							__( 'General Settings', 'pbc' ),
-							array(
-								$this,
-								'general_settings_meta_box_callback',
-							),
-							'pbc_import_right'
-						);
-						do_meta_boxes(
-							'pbc_import_right',
-							'advanced',
-							null
-						);
-						?>
+
+					<!-- Right Column -->
+					<div class="pbc-column-right">
+						<?php $this->render_pdf_configuration_section(); ?>
+						<?php $this->render_user_roles_section(); ?>
+						<?php $this->render_license_section(); ?>
 					</div>
 				</div>
-			</div>
+
+				<!-- Save Button -->
+				<div class="pbc-settings-footer">
+					<input type="hidden" name="form_submit" value="true"/>
+					<input type="hidden" name="pbc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'pbc_nonce' ) ); ?>"/>
+					<button type="submit" class="button button-primary button-hero">
+						<span class="dashicons dashicons-saved"></span> <?php esc_html_e( 'Save All Settings', 'pbc' ); ?>
+					</button>
+				</div>
+			</form>
 		</div>
 		<?php
 	}
@@ -332,6 +314,7 @@ class PBC_Admin_Plugin {
 				'support_enabled'                => 'pbc_support_enabled',
 				'support_phone'                  => 'pbc_support_phone',
 				'support_email'                  => 'pbc_support_email',
+				'pbc_license_product_id'         => 'pbc_license_product_id',
 			);
 			foreach ( $fields as $field_key => $field ) {
 				if ( isset( $_POST[ $field_key ] ) ) {
@@ -371,6 +354,28 @@ class PBC_Admin_Plugin {
 				}
 				$show_prices = isset( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_show_prices_user_' . $slug ] ) ) : '';
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
+			}
+
+			// License management.
+			if ( isset( $_POST['pbc_license_license_key'] ) ) {
+				$license_key = sanitize_text_field( wp_unslash( $_POST['pbc_license_license_key'] ) );
+				update_option( 'pbc_license_license_key', $license_key );
+
+				// Check if deactivate was requested.
+				if ( isset( $_POST['pbc_license_deactivate'] ) && '1' === $_POST['pbc_license_deactivate'] ) {
+					update_option( 'pbc_license_license_status', '' );
+					// Call deactivate via license instance if available.
+					global $pbc_license_instance;
+					if ( $pbc_license_instance && is_object( $pbc_license_instance ) && method_exists( $pbc_license_instance, 'deactivate_license' ) ) {
+						$pbc_license_instance->deactivate_license();
+					}
+				} elseif ( ! empty( $license_key ) ) {
+					// Try to activate if key was provided and not deactivating.
+					global $pbc_license_instance;
+					if ( $pbc_license_instance && is_object( $pbc_license_instance ) && method_exists( $pbc_license_instance, 'activate_license' ) ) {
+						$pbc_license_instance->activate_license();
+					}
+				}
 			}
 		}
 
@@ -477,16 +482,20 @@ class PBC_Admin_Plugin {
 	}
 
 	/**
-	 * General Settings Meta Box Callback
+	 * Render General Configuration Section
 	 *
-	 * Callback function for add_meta_box import section
+	 * @return void
 	 */
-	public function general_settings_meta_box_callback() {
+	public function render_general_configuration_section() {
 		wp_enqueue_media();
 		?>
-		<form action="" method="post" enctype="multipart/form-data" id="pbc_general_settings_form">
-			<div class="content">
-				<fieldset>
+		<!-- General Configuration Card -->
+		<div class="pbc-settings-card">
+			<div class="pbc-card-header">
+				<h2><span class="dashicons dashicons-admin-generic"></span> <?php esc_html_e( 'General Configuration', 'pbc' ); ?></h2>
+			</div>
+			<div class="pbc-card-body pbc-form-grid">
+			<fieldset>
 					<br/>
 					<label class="block" for="variations_images_flipped"><?php esc_html_e( 'Flip Images Horizontal', 'pbc' ); ?></label>
 					<?php
@@ -527,63 +536,80 @@ class PBC_Admin_Plugin {
 					}
 					?>
 				</fieldset>
-			<fieldset>
-				<label class="block" for="admin_email_notification"><?php esc_html_e( 'Email Notification', 'pbc' ); ?></label>
-				<?php
-					$admin_email_notification = get_option( 'pbc_admin_email_notification' );
-				?>
-				<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if ( $admin_email_notification ) { echo esc_html( $admin_email_notification ); } ?>" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
-			</fieldset>
 				<fieldset>
-					<label class="block" for="preview_width"><?php esc_html_e( 'Preview width', 'pbc' ); ?></label>
+					<label class="block" for="admin_email_notification"><?php esc_html_e( 'Email Notification', 'pbc' ); ?></label>
+					<?php
+						$admin_email_notification = get_option( 'pbc_admin_email_notification' );
+					?>
+					<input style="width:100%;" type="text" name="admin_email_notification" value="<?php if ( $admin_email_notification ) { echo esc_html( $admin_email_notification ); } ?>" placeholder="<?php esc_attr_e( 'separate multiple emails by comma', 'pbc' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Email addresses to receive enquiry notifications', 'pbc' ); ?></p>
+				</fieldset>
+				<fieldset>
+					<label class="block" for="preview_width"><?php esc_html_e( 'Preview Width', 'pbc' ); ?></label>
 					<?php
 						$preview_width = get_option( 'pbc_preview_width' );
 					?>
-					<input class="pbc_field" type="text" name="preview_width" value="
-					<?php
-					if ( $preview_width ) {
-						echo esc_attr( $preview_width ); }
-?>
-" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
+					<input class="pbc_field" type="text" name="preview_width" value="<?php if ( $preview_width ) { echo esc_attr( $preview_width ); } ?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Width in pixels for product preview images', 'pbc' ); ?></p>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show final button PDF?', 'pbc' ); ?></label>
+					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show PDF Download Button', 'pbc' ); ?></label>
 					<?php
 					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 					$pages           = get_pages();
 					if ( ! empty( $pages ) ) {
-						echo '<select name="option_show_final_button_pdf">';
+						echo '<select name="option_show_final_button_pdf" class="pbc-select">';
 						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
 						echo '<option value="no" ' . selected( $show_button_pdf, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
 						echo '</select>';
 					}
 					?>
+					<p class="description"><?php esc_html_e( 'Display PDF download button on final step', 'pbc' ); ?></p>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="option_show_final_button_email"><?php esc_html_e( 'Show final button Email?', 'pbc' ); ?></label>
+					<label class="block" for="option_show_final_button_email"><?php esc_html_e( 'Show Email Enquiry Button', 'pbc' ); ?></label>
 					<?php
 					$show_button_email = get_option( 'pbc_budget_show_button_email' );
 					$pages             = get_pages();
 					if ( ! empty( $pages ) ) {
-						echo '<select name="option_show_final_button_email">';
+						echo '<select name="option_show_final_button_email" class="pbc-select">';
 						echo '<option value="yes" ' . selected( $show_button_email, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
 						echo '<option value="no" ' . selected( $show_button_email, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
 						echo '</select>';
 					}
 					?>
+					<p class="description"><?php esc_html_e( 'Display email enquiry button on final step', 'pbc' ); ?></p>
 				</fieldset>
-			<fieldset>
-				<label class="block" for="option_show_prices_global"><?php esc_html_e( 'Show prices (Global)?', 'pbc' ); ?></label>
-				<?php
-				$show_prices_global = get_option( 'pbc_show_prices_global', 'yes' );
-				?>
-				<select name="option_show_prices_global">
-					<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Yes', 'pbc' ); ?></option>
-					<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'pbc' ); ?></option>
-				</select>
-				<p class="description"><?php esc_html_e( 'Global configuration to show prices. Can be customized by user role below.', 'pbc' ); ?></p>
-			</fieldset>
-				<h2><?php esc_html_e( 'Budget Options', 'pbc' ); ?></h2>
+				<fieldset>
+					<label class="block" for="option_show_prices_global"><?php esc_html_e( 'Show Prices (Global)', 'pbc' ); ?></label>
+					<?php
+					$show_prices_global = get_option( 'pbc_show_prices_global', 'yes' );
+					?>
+					<select name="option_show_prices_global" class="pbc-select">
+						<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Yes', 'pbc' ); ?></option>
+						<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'pbc' ); ?></option>
+					</select>
+					<p class="description"><?php esc_html_e( 'Global configuration to show prices. Can be customized by user role below.', 'pbc' ); ?></p>
+				</fieldset>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render PDF Configuration Section
+	 *
+	 * @return void
+	 */
+	public function render_pdf_configuration_section() {
+		?>
+		<!-- PDF Configuration Card -->
+			<div class="pbc-settings-card">
+				<div class="pbc-card-header">
+					<h2><span class="dashicons dashicons-media-document"></span> <?php esc_html_e( 'PDF Configuration', 'pbc' ); ?></h2>
+					<p class="description"><?php esc_html_e( 'Customize PDF export appearance and branding', 'pbc' ); ?></p>
+				</div>
+				<div class="pbc-card-body pbc-form-grid">
 				<fieldset>
 					<label class="block" for="select_PDF_image"><?php esc_html_e( 'Set PDF Image Logo (200px width)', 'pbc' ); ?></label>
 					<?php
@@ -639,33 +665,41 @@ class PBC_Admin_Plugin {
 					" data-imageId="<?php echo esc_attr( $this->get_attachment_id( $pdf_image_footer ) ); ?>" /><button class="select-image button select-image-selected" data-name="pdf_image_footer"><?php esc_html_e( 'Select image', 'pbc' ); ?></button>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for odd entries (hex code)', 'pbc' ); ?></label>
+					<label class="block" for="select_pdf_color_odd"><?php esc_html_e( 'Color for Odd Rows', 'pbc' ); ?></label>
 					<?php
 						$pdf_color_odd = get_option( 'pbc_pdf_color_odd' );
 					?>
-					<input type="text" name="pdf_color_odd" value="
-					<?php
-					if ( $pdf_color_odd ) {
-						echo esc_url( $pdf_color_odd ); }
-?>
-" class="pbc_color_picker" />
+					<input type="text" name="pdf_color_odd" value="<?php if ( $pdf_color_odd ) { echo esc_url( $pdf_color_odd ); } ?>" class="pbc_color_picker" />
+					<p class="description"><?php esc_html_e( 'Background color for odd rows in PDF tables', 'pbc' ); ?></p>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for total (hex code)', 'pbc' ); ?></label>
+					<label class="block" for="select_pdf_color_total"><?php esc_html_e( 'Color for Total', 'pbc' ); ?></label>
 					<?php
 					$pdf_color_total = get_option( 'pbc_pdf_color_total' );
-				?>
-				<input type="text" name="pdf_color_total" value="
-				<?php
-				if ( $pdf_color_total ) {
-					echo esc_url( $pdf_color_total );
-				}
-				?>
-				" class="pbc_color_picker" />
-			</fieldset>
+					?>
+					<input type="text" name="pdf_color_total" value="<?php if ( $pdf_color_total ) { echo esc_url( $pdf_color_total ); } ?>" class="pbc_color_picker" />
+					<p class="description"><?php esc_html_e( 'Background color for total row in PDF', 'pbc' ); ?></p>
+				</fieldset>
+			</div>
+		</div>
+		<?php
+	}
 
-			<h2><?php esc_html_e( 'Support Contact', 'pbc' ); ?></h2>
-			<fieldset>
+	/**
+	 * Render Support Contact Section
+	 *
+	 * @return void
+	 */
+	public function render_support_contact_section() {
+		?>
+		<!-- Support Contact Card -->
+			<div class="pbc-settings-card">
+				<div class="pbc-card-header">
+					<h2><span class="dashicons dashicons-phone"></span> <?php esc_html_e( 'Support Contact', 'pbc' ); ?></h2>
+					<p class="description"><?php esc_html_e( 'Display support contact information in the configurator', 'pbc' ); ?></p>
+				</div>
+				<div class="pbc-card-body pbc-form-grid">
+				<fieldset>
 				<label class="block">
 					<input type="checkbox" name="support_enabled" value="yes" <?php checked( get_option( 'pbc_support_enabled' ), 'yes' ); ?> />
 					<?php esc_html_e( 'Enable support contact buttons in configurator', 'pbc' ); ?>
@@ -682,16 +716,31 @@ class PBC_Admin_Plugin {
 				<label class="block" for="support_email"><?php esc_html_e( 'Support Email Address', 'pbc' ); ?></label>
 				<?php $support_email = get_option( 'pbc_support_email' ); ?>
 				<input style="width:100%;" type="email" name="support_email" value="<?php echo esc_attr( $support_email ); ?>" placeholder="<?php esc_attr_e( 'support@example.com', 'pbc' ); ?>" />
-				<p class="description"><?php esc_html_e( 'Email address for technical support.', 'pbc' ); ?></p>
-			</fieldset>
+					<p class="description"><?php esc_html_e( 'Email address for technical support.', 'pbc' ); ?></p>
+				</fieldset>
+			</div>
+		</div>
+		<?php
+	}
 
-			<h2><?php esc_html_e( 'Set the role specific options', 'pbc' ); ?></h2>
-				<fieldset>
+	/**
+	 * Render User Roles Section
+	 *
+	 * @return void
+	 */
+	public function render_user_roles_section() {
+		?>
+		<!-- User Roles Configuration Card -->
+			<div class="pbc-settings-card">
+				<div class="pbc-card-header">
+					<h2><span class="dashicons dashicons-groups"></span> <?php esc_html_e( 'User Role Specific Options', 'pbc' ); ?></h2>
+					<p class="description"><?php esc_html_e( 'Configure discounts and price visibility for each user role', 'pbc' ); ?></p>
+				</div>
+				<div class="pbc-card-body">
 					<?php
 					$roles = wp_roles()->roles;
 					?>
-					<p></p>
-				<table class="roles-table">
+				<table class="roles-table pbc-roles-table">
 					<tr>
 						<th><?php esc_html_e( 'Profile', 'pbc' ); ?></th>
 						<th><?php esc_html_e( 'Discount', 'pbc' ); ?></th>
@@ -714,16 +763,120 @@ class PBC_Admin_Plugin {
 					}
 					?>
 					</table>
-				</fieldset>
+				</div>
 			</div>
-
-			<div class="save_bar">
-				<input type="hidden" name="form_submit" value="true"/>
-				<input type="hidden" name="pbc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'pbc_nonce' ) ); ?>"/>
-				<input type="submit" value="<?php esc_html_e( 'Save', 'pbc' ); ?>" class="button button-primary submit-button" />
-			</div>
-		</form>
 		<?php
+	}
+
+	/**
+	 * Render License Section
+	 *
+	 * @return void
+	 */
+	public function render_license_section() {
+		// Get license options directly from WordPress options.
+		$license_key    = get_option( 'pbc_license_license_key', '' );
+		$product_id     = get_option( 'pbc_license_product_id', '2635' );
+		$license_status = get_option( 'pbc_license_license_status', '' );
+		$is_active      = 'valid' === $license_status;
+		?>
+		<!-- License Card -->
+		<div class="pbc-settings-card pbc-license-card">
+			<div class="pbc-card-header">
+				<h2><span class="dashicons dashicons-admin-network"></span> <?php esc_html_e( 'License', 'pbc' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'Enter your license information to activate automatic updates and support', 'pbc' ); ?></p>
+			</div>
+			<div class="pbc-card-body">
+				<!-- License Grid: Status + API Key side by side -->
+				<div class="pbc-license-grid">
+					<!-- License Status -->
+					<fieldset class="pbc-license-status-field">
+						<label class="block"><?php esc_html_e( 'Current Status', 'pbc' ); ?></label>
+						<div class="pbc-license-status">
+							<?php if ( $is_active ) : ?>
+								<span class="pbc-status-badge pbc-status-active">
+									<span class="dashicons dashicons-yes-alt"></span>
+									<strong><?php esc_html_e( 'License Active', 'pbc' ); ?></strong>
+								</span>
+							<?php else : ?>
+								<span class="pbc-status-badge pbc-status-inactive">
+									<span class="dashicons dashicons-dismiss"></span>
+									<strong><?php esc_html_e( 'License Inactive', 'pbc' ); ?></strong>
+								</span>
+							<?php endif; ?>
+						</div>
+						<?php if ( $is_active ) : ?>
+							<p class="description" style="color: #155724; margin-top: 8px;">
+								<span class="dashicons dashicons-info" style="font-size: 14px;"></span>
+								<?php esc_html_e( 'Your license is active and you will receive automatic updates.', 'pbc' ); ?>
+							</p>
+						<?php else : ?>
+							<p class="description" style="color: #721c24; margin-top: 8px;">
+								<span class="dashicons dashicons-warning" style="font-size: 14px;"></span>
+								<?php esc_html_e( 'Please enter your license key to enable updates and support.', 'pbc' ); ?>
+							</p>
+						<?php endif; ?>
+					</fieldset>
+
+					<!-- License Key -->
+					<fieldset class="pbc-license-key-field">
+						<label class="block" for="pbc_license_license_key">
+							<span class="dashicons dashicons-admin-network" style="font-size: 14px; margin-right: 4px;"></span>
+							<?php esc_html_e( 'License API Key', 'pbc' ); ?>
+						</label>
+						<input 
+							type="text" 
+							id="pbc_license_license_key" 
+							name="pbc_license_license_key" 
+							value="<?php echo esc_attr( $license_key ); ?>" 
+							style="width:100%;"
+							placeholder="<?php esc_attr_e( 'Enter your license API key here...', 'pbc' ); ?>"
+						/>
+						<p class="description">
+							<span class="dashicons dashicons-info-outline" style="font-size: 12px;"></span>
+							<?php esc_html_e( 'You can find this in your account dashboard at', 'pbc' ); ?> <a href="<?php echo esc_url( defined( 'WPPBC_URL_API' ) ? WPPBC_URL_API : 'https://close.technology/' ); ?>" target="_blank" rel="noopener">close.technology</a>
+						</p>
+					</fieldset>
+				</div>
+
+				<!-- Product ID (Hidden field for saving) -->
+				<input type="hidden" name="pbc_license_product_id" value="<?php echo esc_attr( $product_id ? $product_id : '2635' ); ?>" />
+
+				<!-- Deactivate Option -->
+				<?php if ( $is_active ) : ?>
+				<fieldset class="pbc-deactivate-field">
+					<label class="block" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 6px;">
+						<input 
+							type="checkbox" 
+							name="pbc_license_deactivate" 
+							value="1"
+							style="margin: 0;"
+						/>
+						<span>
+							<strong><?php esc_html_e( 'Deactivate License', 'pbc' ); ?></strong>
+							<br>
+							<small style="color: #856404;"><?php esc_html_e( 'Check this box to deactivate the license on this site.', 'pbc' ); ?></small>
+						</span>
+					</label>
+					<p class="description" style="margin-top: 8px;">
+						<span class="dashicons dashicons-info" style="font-size: 12px;"></span>
+						<?php esc_html_e( 'Deactivating allows you to use the license on another site.', 'pbc' ); ?>
+					</p>
+				</fieldset>
+				<?php endif; ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * General Settings Meta Box Callback (deprecated, kept for compatibility)
+	 *
+	 * @return void
+	 */
+	public function general_settings_meta_box_callback() {
+		// This method is now deprecated but kept for compatibility.
+		// The rendering is now done through individual section methods.
 	}
 
 	/**
