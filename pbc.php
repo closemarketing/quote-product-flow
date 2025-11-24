@@ -3,7 +3,7 @@
  * Plugin Name: Product Budget Configurator
  * Plugin URI:  https://close.technology/wordpress-plugins/product-budget-configurator/
  * Description: Creates a configurator for complex products and makes a budget.
- * Version:     1.5.0-beta.1
+ * Version:     2.0.0
  * Author:      Closetechnology
  * Author URI:  https://close.technology
  * Text Domain: pbc
@@ -72,7 +72,7 @@ add_action(
 				// Set default Product ID if not already set.
 				$product_id_key = $license->get_option_key( 'product_id' );
 				if ( ! get_option( $product_id_key ) ) {
-					update_option( $product_id_key, '2635' );
+					update_option( $product_id_key, 2635 );
 				}
 
 				// License is now integrated into settings page, no separate menu needed.
