@@ -361,19 +361,103 @@ class PBC_Admin_Plugin {
 				$license_key = sanitize_text_field( wp_unslash( $_POST['pbc_license_license_key'] ) );
 				update_option( 'pbc_license_license_key', $license_key );
 
-				// Check if deactivate was requested.
-				if ( isset( $_POST['pbc_license_deactivate'] ) && '1' === $_POST['pbc_license_deactivate'] ) {
-					update_option( 'pbc_license_license_status', '' );
-					// Call deactivate via license instance if available.
-					global $pbc_license_instance;
-					if ( $pbc_license_instance && is_object( $pbc_license_instance ) && method_exists( $pbc_license_instance, 'deactivate_license' ) ) {
-						$pbc_license_instance->deactivate_license();
-					}
-				} elseif ( ! empty( $license_key ) ) {
-					// Try to activate if key was provided and not deactivating.
+				// Try to activate if key was provided.
+				if ( ! empty( $license_key ) ) {
 					global $pbc_license_instance;
 					if ( $pbc_license_instance && is_object( $pbc_license_instance ) && method_exists( $pbc_license_instance, 'activate_license' ) ) {
 						$pbc_license_instance->activate_license();
+					}
+				}
+			}
+		}
+
+		// License management.
+		if ( isset( $_POST['pbc_license_license_key'] ) ) {
+			$license_key = sanitize_text_field( wp_unslash( $_POST['pbc_license_license_key'] ) );
+			
+			global $pbc_license_instance;
+			if ( $pbc_license_instance && is_object( $pbc_license_instance ) ) {
+				// Ensure instance is created.
+				$instance_key = $pbc_license_instance->get_option_key( 'instance' );
+				if ( ! get_option( $instance_key ) ) {
+					$pbc_license_instance->license_instance_activation();
+				}
+				
+				$apikey_option = $pbc_license_instance->get_option_key( 'apikey' );
+				$product_id_key = $pbc_license_instance->get_option_key( 'product_id' );
+				
+				// Process license activation if key is provided.
+				if ( ! empty( $license_key ) ) {
+					// Get current key to check if it changed.
+					$current_key = get_option( $apikey_option, '' );
+					
+					// Save the API key and product_id first.
+					update_option( $apikey_option, $license_key );
+					update_option( $product_id_key, 2635 );
+					
+					// Check REAL status with API server first.
+					$license_status = $pbc_license_instance->license_key_status();
+					$is_really_active = ! empty( $license_status ) && 
+					                    isset( $license_status['status_check'] ) && 
+					                    'active' === $license_status['status_check'];
+					
+					// Log the raw result first.
+					error_log( 'PBC License Status Check Response: ' . print_r( $license_status, true ) );
+					error_log( 'PBC License Key Used: ' . substr( $license_key, 0, 10 ) . '...' );
+					error_log( 'PBC Product ID: ' . get_option( $product_id_key, 'NOT SET' ) );
+					error_log( 'PBC Instance: ' . get_option( $instance_key, 'NOT SET' ) );
+					
+					// If key changed or NOT really activated on server, attempt activation.
+					if ( $current_key !== $license_key || ! $is_really_active ) {
+						// Call license_activate directly.
+						$result = $pbc_license_instance->license_activate( $license_key );
+						
+						// Log the raw result.
+						error_log( 'PBC License Activation Raw Response: ' . $result );
+						
+						if ( ! empty( $result ) ) {
+							$activate_results = json_decode( $result, true );
+							
+							// Log for debugging.
+							error_log( 'PBC License Activation Parsed Response: ' . print_r( $activate_results, true ) );
+							
+							if ( true === $activate_results['success'] && true === $activate_results['activated'] ) {
+								// License activated successfully.
+								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Activated' );
+								update_option( 'pbc_license_license_status', 'valid' );
+								delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
+								$status = 'ok';
+								error_log( 'PBC License: Activation SUCCESSFUL' );
+							} else {
+								// Activation failed - show error message.
+								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
+								update_option( 'pbc_license_license_status', '' );
+								
+								if ( isset( $activate_results['data']['error'] ) ) {
+									$error = sprintf(
+										/* translators: %s: Error message from API */
+										__( 'License activation failed: %s', 'pbc' ),
+										$activate_results['data']['error']
+									);
+									error_log( 'PBC License: Activation FAILED - ' . $activate_results['data']['error'] );
+								} else {
+									$error = __( 'License activation failed. Please check your license key and try again.', 'pbc' );
+									error_log( 'PBC License: Activation FAILED - No error message from API. Response structure: ' . json_encode( $activate_results ) );
+								}
+								$status = 'error';
+							}
+						} else {
+							// No response from server.
+							update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
+							update_option( 'pbc_license_license_status', '' );
+							$error  = __( 'Could not connect to license server. Please check your internet connection and try again.', 'pbc' );
+							error_log( 'PBC License: No response from server' );
+							$status = 'error';
+						}
+					} else {
+						// License is already active on server.
+						error_log( 'PBC License: Already active on server' );
+						$status = 'ok';
 					}
 				}
 			}
@@ -832,29 +916,6 @@ class PBC_Admin_Plugin {
 
 				<!-- Product ID (Hidden field for saving) -->
 				<input type="hidden" name="pbc_license_product_id" value="<?php echo esc_attr( $product_id ? $product_id : '2635' ); ?>" />
-
-				<!-- Deactivate Option -->
-				<?php if ( $is_active ) : ?>
-				<fieldset class="pbc-deactivate-field">
-					<label class="block" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 6px;">
-						<input 
-							type="checkbox" 
-							name="pbc_license_deactivate" 
-							value="1"
-							style="margin: 0;"
-						/>
-						<span>
-							<strong><?php esc_html_e( 'Deactivate License', 'pbc' ); ?></strong>
-							<br>
-							<small style="color: #856404;"><?php esc_html_e( 'Check this box to deactivate the license on this site.', 'pbc' ); ?></small>
-						</span>
-					</label>
-					<p class="description" style="margin-top: 8px;">
-						<span class="dashicons dashicons-info" style="font-size: 12px;"></span>
-						<?php esc_html_e( 'Deactivating allows you to use the license on another site.', 'pbc' ); ?>
-					</p>
-				</fieldset>
-				<?php endif; ?>
 			</div>
 		</div>
 		<?php
@@ -1708,6 +1769,75 @@ class PBC_Admin_Plugin {
 					'message'         => __( 'Recommendations loaded successfully.', 'pbc' ),
 				)
 			);
+	}
+
+	/**
+	 * License Settings Meta Box Callback
+	 *
+	 * @return void
+	 */
+	public function license_settings_meta_box_callback() {
+		// Get license options from the license manager.
+		global $pbc_license_instance;
+		
+		$license_key    = '';
+		$product_id     = '2635';
+		$license_status = '';
+		$instance       = '';
+		$api_url        = '';
+		
+		if ( $pbc_license_instance && is_object( $pbc_license_instance ) ) {
+			$license_key    = get_option( $pbc_license_instance->get_option_key( 'apikey' ), '' );
+			$product_id     = get_option( $pbc_license_instance->get_option_key( 'product_id' ), '2635' );
+			$activated      = get_option( $pbc_license_instance->get_option_key( 'activated' ), '' );
+			$instance       = get_option( $pbc_license_instance->get_option_key( 'instance' ), '' );
+			$license_status = 'Activated' === $activated ? 'valid' : '';
+			$api_url        = $pbc_license_instance->get_api_url();
+		}
+		
+		$is_active = 'valid' === $license_status;
+		?>
+		<div class="content">
+			<h3><?php esc_html_e( 'License Activation', 'pbc' ); ?></h3>
+			
+			<!-- License Status -->
+			<fieldset>
+				<label class="block"><?php esc_html_e( 'Current Status', 'pbc' ); ?></label>
+				<div style="padding: 10px; border-radius: 4px; margin-bottom: 10px; <?php echo $is_active ? 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;' : 'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'; ?>">
+					<?php if ( $is_active ) : ?>
+						<strong>✓ <?php esc_html_e( 'License Active', 'pbc' ); ?></strong>
+						<p style="margin: 5px 0 0 0; font-size: 13px;"><?php esc_html_e( 'Your license is active and you will receive automatic updates.', 'pbc' ); ?></p>
+					<?php else : ?>
+						<strong>✗ <?php esc_html_e( 'License Inactive', 'pbc' ); ?></strong>
+						<p style="margin: 5px 0 0 0; font-size: 13px;"><?php esc_html_e( 'Please enter your license key to enable updates and support.', 'pbc' ); ?></p>
+					<?php endif; ?>
+				</div>
+			</fieldset>
+
+			<!-- License Key -->
+			<fieldset>
+				<label class="block" for="pbc_license_license_key">
+					<?php esc_html_e( 'License API Key', 'pbc' ); ?>
+				</label>
+				<input 
+					type="text" 
+					id="pbc_license_license_key" 
+					name="pbc_license_license_key" 
+					value="<?php echo esc_attr( $license_key ); ?>" 
+					style="width: 100%; font-family: monospace;"
+					placeholder="<?php esc_attr_e( 'Enter your license API key here...', 'pbc' ); ?>"
+				/>
+				<p class="description" style="margin-top: 5px;">
+					<?php esc_html_e( 'You can find this in your account dashboard at', 'pbc' ); ?> 
+					<a href="<?php echo esc_url( defined( 'WPPBC_URL_API' ) ? WPPBC_URL_API : 'https://close.technology/' ); ?>" target="_blank" rel="noopener">close.technology</a>
+				</p>
+			</fieldset>
+
+			<!-- Product ID (Hidden field for saving) -->
+			<input type="hidden" name="pbc_license_product_id" value="<?php echo esc_attr( $product_id ? $product_id : '2635' ); ?>" />
+
+		</div>
+		<?php
 	}
 }
 
