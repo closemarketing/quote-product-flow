@@ -231,7 +231,7 @@ class PBC_Admin_Plugin {
 	 */
 	public function pbc_display_admin_page() {
 		$this->license_error_message = ''; // Reset error message.
-		$return = $this->save_post_options();
+		$return                      = $this->save_post_options();
 		if ( 'ok' === $return ) {
 			$update = __( 'Successfully Saved!', 'pbc' );
 		} elseif ( 'error' === $return ) {
@@ -370,86 +370,69 @@ class PBC_Admin_Plugin {
 				$license_key = sanitize_text_field( wp_unslash( $_POST['pbc_license_license_key'] ) );
 				// Save to standard option for compatibility.
 				update_option( 'pbc_license_license_key', $license_key );
-				
+
 				global $pbc_license_instance;
-				
+
 				// Check if license instance is available.
 				if ( empty( $pbc_license_instance ) || ! is_object( $pbc_license_instance ) ) {
 					$this->license_error_message = __( 'License manager is not available. Please ensure the license manager plugin is installed and activated.', 'pbc' );
-					error_log( 'PBC License: License instance not available' );
-					$status = 'error';
+					$status                      = 'error';
 				} elseif ( ! empty( $license_key ) ) {
 					// Ensure instance is created.
 					$instance_key = $pbc_license_instance->get_option_key( 'instance' );
 					if ( ! get_option( $instance_key ) ) {
 						$pbc_license_instance->license_instance_activation();
 					}
-					
-					$apikey_option = $pbc_license_instance->get_option_key( 'apikey' );
+
+					$apikey_option  = $pbc_license_instance->get_option_key( 'apikey' );
 					$product_id_key = $pbc_license_instance->get_option_key( 'product_id' );
-					
+
 					// Get current key to check if it changed.
 					$current_key = get_option( $apikey_option, '' );
-					
+
 					// Save the API key and product_id first.
 					update_option( $apikey_option, $license_key );
 					update_option( $product_id_key, 2635 );
-					
+
 					// Check REAL status with API server first.
-					$license_status = $pbc_license_instance->license_key_status();
-					$is_really_active = ! empty( $license_status ) && 
-					                    isset( $license_status['status_check'] ) && 
-					                    'active' === $license_status['status_check'];
-					
-					// Log the raw result first.
-					error_log( 'PBC License Status Check Response: ' . print_r( $license_status, true ) );
-					error_log( 'PBC License Key Used: ' . substr( $license_key, 0, 10 ) . '...' );
-					error_log( 'PBC Product ID: ' . get_option( $product_id_key, 'NOT SET' ) );
-					error_log( 'PBC Instance: ' . get_option( $instance_key, 'NOT SET' ) );
-					
+					$license_status   = $pbc_license_instance->license_key_status();
+					$is_really_active = ! empty( $license_status ) &&
+										isset( $license_status['status_check'] ) &&
+										'active' === $license_status['status_check'];
+
 					// If key changed or NOT really activated on server, attempt activation.
 					if ( $current_key !== $license_key || ! $is_really_active ) {
 						// Call license_activate directly.
 						$result = $pbc_license_instance->license_activate( $license_key );
-						
-						// Log the raw result.
-						error_log( 'PBC License Activation Raw Response: ' . $result );
-						
+
 						if ( ! empty( $result ) ) {
 							$activate_results = json_decode( $result, true );
-							
-							// Log for debugging.
-							error_log( 'PBC License Activation Parsed Response: ' . print_r( $activate_results, true ) );
-							
+
 							if ( ! empty( $activate_results ) && true === $activate_results['success'] && true === $activate_results['activated'] ) {
 								// License activated successfully.
 								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Activated' );
 								update_option( 'pbc_license_license_status', 'valid' );
 								delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
 								$status = 'ok';
-								error_log( 'PBC License: Activation SUCCESSFUL' );
 							} else {
 								// Activation failed - show error message.
 								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
 								update_option( 'pbc_license_license_status', '' );
-								
+
 								if ( ! empty( $activate_results ) && isset( $activate_results['data']['error'] ) ) {
 									$this->license_error_message = sprintf(
 										/* translators: %s: Error message from API */
 										__( 'License activation failed: %s', 'pbc' ),
 										$activate_results['data']['error']
 									);
-									error_log( 'PBC License: Activation FAILED - ' . $activate_results['data']['error'] );
 								} elseif ( ! empty( $activate_results ) && isset( $activate_results['message'] ) ) {
 									$this->license_error_message = sprintf(
 										/* translators: %s: Error message from API */
 										__( 'License activation failed: %s', 'pbc' ),
 										$activate_results['message']
 									);
-									error_log( 'PBC License: Activation FAILED - ' . $activate_results['message'] );
 								} else {
 									$this->license_error_message = __( 'License activation failed. Please check your license key and try again.', 'pbc' );
-									error_log( 'PBC License: Activation FAILED - No error message from API. Response structure: ' . json_encode( $activate_results ) );
 								}
 								$status = 'error';
 							}
@@ -458,15 +441,13 @@ class PBC_Admin_Plugin {
 							update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
 							update_option( 'pbc_license_license_status', '' );
 							$this->license_error_message = __( 'Could not connect to license server. Please check your internet connection and try again.', 'pbc' );
-							error_log( 'PBC License: No response from server' );
-							$status = 'error';
+							$status                      = 'error';
 						}
 					} else {
 						// License is already active on server - update local status.
 						update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Activated' );
 						update_option( 'pbc_license_license_status', 'valid' );
 						delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
-						error_log( 'PBC License: Already active on server' );
 						$status = 'ok';
 					}
 				} else {
@@ -1796,13 +1777,13 @@ class PBC_Admin_Plugin {
 	public function license_settings_meta_box_callback() {
 		// Get license options from the license manager.
 		global $pbc_license_instance;
-		
+
 		$license_key    = '';
 		$product_id     = '2635';
 		$license_status = '';
 		$instance       = '';
 		$api_url        = '';
-		
+
 		if ( $pbc_license_instance && is_object( $pbc_license_instance ) ) {
 			$license_key    = get_option( $pbc_license_instance->get_option_key( 'apikey' ), '' );
 			$product_id     = get_option( $pbc_license_instance->get_option_key( 'product_id' ), '2635' );
@@ -1811,7 +1792,7 @@ class PBC_Admin_Plugin {
 			$license_status = 'Activated' === $activated ? 'valid' : '';
 			$api_url        = $pbc_license_instance->get_api_url();
 		}
-		
+
 		$is_active = 'valid' === $license_status;
 		?>
 		<div class="content">

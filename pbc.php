@@ -115,44 +115,42 @@ add_action(
  */
 function pbc_is_license_active() {
 	global $pbc_license_instance;
-	
+
 	// If license instance not available yet, return false.
 	if ( empty( $pbc_license_instance ) || ! is_object( $pbc_license_instance ) ) {
 		return false;
 	}
-	
+
 	// Use try-catch to prevent fatal errors.
 	try {
 		// Check local activation status.
 		$activated = get_option( $pbc_license_instance->get_option_key( 'activated' ), '' );
-		
+
 		// Must be locally activated.
 		if ( 'Activated' !== $activated ) {
 			return false;
 		}
-		
+
 		// Verify against server periodically (cache for 12 hours).
 		$last_check = get_transient( 'pbc_license_last_check' );
 		if ( false === $last_check ) {
-			$license_status = $pbc_license_instance->license_key_status();
-			$is_really_active = ! empty( $license_status ) && 
-			                    isset( $license_status['status_check'] ) && 
-			                    'active' === $license_status['status_check'];
-			
+			$license_status   = $pbc_license_instance->license_key_status();
+			$is_really_active = ! empty( $license_status ) &&
+								isset( $license_status['status_check'] ) &&
+								'active' === $license_status['status_check'];
+
 			if ( ! $is_really_active ) {
 				// Deactivate locally if server says it's not active.
 				update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
 				return false;
 			}
-			
+
 			// Cache the result for 12 hours.
 			set_transient( 'pbc_license_last_check', time(), 12 * HOUR_IN_SECONDS );
 		}
-		
+
 		return true;
 	} catch ( Exception $e ) {
-		// Log error and return false to be safe.
-		error_log( 'PBC License Check Error: ' . $e->getMessage() );
 		return false;
 	}
 }
@@ -166,20 +164,20 @@ add_action(
 		if ( empty( $pbc_license_instance ) ) {
 			return;
 		}
-		
+
 		// Only show on PBC pages and plugins page.
 		$screen = get_current_screen();
 		if ( empty( $screen ) ) {
 			return;
 		}
-		
+
 		$show_on_screens = array( 'plugins', 'phases', 'variations', 'options', 'pbc_menu' );
-		$is_pbc_screen = 'pbc_menu' === $screen->parent_base || in_array( $screen->id, $show_on_screens, true ) || in_array( $screen->post_type, array( 'phases', 'variations', 'options' ), true );
-		
+		$is_pbc_screen   = 'pbc_menu' === $screen->parent_base || in_array( $screen->id, $show_on_screens, true ) || in_array( $screen->post_type, array( 'phases', 'variations', 'options' ), true );
+
 		if ( ! $is_pbc_screen ) {
 			return;
 		}
-		
+
 		if ( ! pbc_is_license_active() ) {
 			?>
 			<div class="notice notice-error is-dismissible">
@@ -217,7 +215,7 @@ add_action(
 		if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php' ) ) {
 			require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php';
 		}
-		
+
 		// Always load admin in case user needs to activate license.
 		if ( is_admin() ) {
 			if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php' ) ) {
@@ -230,7 +228,7 @@ add_action(
 				require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-export-import.php';
 			}
 		}
-		
+
 		// Only load frontend and request functionality if license is active.
 		if ( pbc_is_license_active() ) {
 			// Include files.
