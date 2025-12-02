@@ -2,6 +2,16 @@
    PBC Settings - Modern Design
    =========================== */
 
+/* Notice con color negro */
+.notice,
+.notice p,
+.notice-success,
+.notice-error,
+.notice-warning,
+.notice-info {
+	color: black !important;
+}
+
 /* Main Container */
 .pbc-settings-wrap {
 	width: auto;
