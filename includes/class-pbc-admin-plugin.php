@@ -427,9 +427,9 @@ class PBC_Admin_Plugin {
 						if ( ! empty( $result ) ) {
 							$activate_results = json_decode( $result, true );
 
-						// Check if activation was successful OR if it says "already activated with this instance".
-						$is_success        = ! empty( $activate_results ) && true === $activate_results['success'] && true === $activate_results['activated'];
-						$is_already_active = ! empty( $activate_results ) &&
+							// Check if activation was successful OR if it says "already activated with this instance".
+							$is_success        = ! empty( $activate_results ) && true === $activate_results['success'] && true === $activate_results['activated'];
+							$is_already_active = ! empty( $activate_results ) &&
 												isset( $activate_results['code'] ) &&
 												'100' === $activate_results['code'] &&
 												isset( $activate_results['error'] ) &&
