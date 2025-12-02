@@ -66,15 +66,27 @@ class PBC_Template {
 		$color_main = get_option( 'pbc_pdf_color_total' );
 
 		$custom_css = '
-		.page-configurator .btn, .page-configurator button[type="submit"] {
-			background-color: ' . esc_attr( $color_main ) . ';
-			color: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ';);
+		.page-configurator .btn, 
+		.page-configurator button.btn,
+		.page-configurator button[type="submit"].btn,
+		.page-configurator .btn-next,
+		.page-configurator .btn-prev,
+		.page-configurator .btn-share,
+		.page-configurator .btn-pdf {
+			background-color: ' . esc_attr( $color_main ) . ' !important;
+			color: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ' !important;
 		}
-		.page-configurator .prev .btn {
-			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+		.page-configurator .prev .btn,
+		.page-configurator .prev button.btn {
+			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ' !important;
 		}
-		.page-configurator .btn:hover, .page-configurator .btn:focus, .page-configurator button[type="submit"]:hover, .page-configurator button[type="submit"]:focus {
-			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+		.page-configurator .btn:hover, 
+		.page-configurator .btn:focus, 
+		.page-configurator button.btn:hover,
+		.page-configurator button.btn:focus,
+		.page-configurator button[type="submit"].btn:hover, 
+		.page-configurator button[type="submit"].btn:focus {
+			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ' !important;
 		}';
 
 		// Output the inline style.
