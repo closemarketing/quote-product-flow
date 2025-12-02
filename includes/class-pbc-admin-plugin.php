@@ -199,6 +199,15 @@ class PBC_Admin_Plugin {
 				'menu_slug'   => 'pbc_recommendations',
 				'function'    => array( $this, 'pbc_display_recommendations_page' ),
 			),
+			// Import/Export.
+			array(
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __( 'Import / Export', 'pbc' ),
+				'menu_title'  => __( 'Import / Export', 'pbc' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'pbc_import_export',
+				'function'    => array( $this, 'pbc_display_import_export_page' ),
+			),
 			// Post Type :: View All Posts.
 			array(
 				'parent_slug' => 'pbc_menu',
@@ -400,22 +409,41 @@ class PBC_Admin_Plugin {
 										isset( $license_status['status_check'] ) &&
 										'active' === $license_status['status_check'];
 
-					// If key changed or NOT really activated on server, attempt activation.
-					if ( $current_key !== $license_key || ! $is_really_active ) {
-						// Call license_activate directly.
+					// Get current local activation status.
+					$activated_key   = $pbc_license_instance->get_option_key( 'activated' );
+					$local_activated = get_option( $activated_key, '' );
+
+					// If license is already active on server, just sync local status.
+					if ( $is_really_active ) {
+						// License is already active on server - update local status.
+						update_option( $activated_key, 'Activated' );
+						update_option( 'pbc_license_license_status', 'valid' );
+						delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
+						$status = 'ok';
+					} elseif ( $current_key !== $license_key ) {
+						// Key changed and not active on server, attempt activation.
 						$result = $pbc_license_instance->license_activate( $license_key );
 
 						if ( ! empty( $result ) ) {
 							$activate_results = json_decode( $result, true );
 
-							if ( ! empty( $activate_results ) && true === $activate_results['success'] && true === $activate_results['activated'] ) {
-								// License activated successfully.
+							// Check if activation was successful OR if it says "already activated with this instance".
+							$is_success          = ! empty( $activate_results ) && true === $activate_results['success'] && true === $activate_results['activated'];
+							$is_already_active   = ! empty( $activate_results ) && 
+													isset( $activate_results['code'] ) && 
+													'100' === $activate_results['code'] &&
+													isset( $activate_results['error'] ) &&
+													false !== strpos( $activate_results['error'], 'ya ha sido activada' );
+
+							if ( $is_success || $is_already_active ) {
+								// License activated successfully OR already active with this instance.
+								// Either way, sync local status.
 								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Activated' );
 								update_option( 'pbc_license_license_status', 'valid' );
 								delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
 								$status = 'ok';
 							} else {
-								// Activation failed - show error message.
+								// Real activation failure.
 								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
 								update_option( 'pbc_license_license_status', '' );
 
@@ -443,12 +471,6 @@ class PBC_Admin_Plugin {
 							$this->license_error_message = __( 'Could not connect to license server. Please check your internet connection and try again.', 'pbc' );
 							$status                      = 'error';
 						}
-					} else {
-						// License is already active on server - update local status.
-						update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Activated' );
-						update_option( 'pbc_license_license_status', 'valid' );
-						delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
-						$status = 'ok';
 					}
 				} else {
 					// Empty license key provided - clear license status.

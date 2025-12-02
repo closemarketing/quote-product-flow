@@ -34,8 +34,7 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function pbc_configurator_session() {
-		if ( PHP_SESSION_NONE === session_status() ) {
-			ob_start();
+		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			session_start();
 		}
 	}

@@ -54,11 +54,10 @@ class PBC_Requests {
 		$session_key   = 'pbc_variation_' . $parent_phase;
 		$option        = '';
 
-		if ( '' === session_id() ) {
-			ob_start();
+		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			session_start();
 		}
-		if ( '' === session_id() ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			echo ';;--;;' . wp_json_encode(
 				array(
 					'type' => 'error',
@@ -146,7 +145,7 @@ class PBC_Requests {
 		}
 
 		// Start or resume session.
-		if ( empty( session_id() ) ) {
+		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			if ( ! session_start() ) {
 				wp_send_json_error( 'Session error' );
 			}
@@ -215,7 +214,7 @@ class PBC_Requests {
 		}
 
 		// Start or resume session.
-		if ( empty( session_id() ) ) {
+		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			if ( ! session_start() ) {
 				wp_send_json_error( 'Session error' );
 			}
@@ -339,7 +338,7 @@ class PBC_Requests {
 		}
 
 		// Start or resume session.
-		if ( empty( session_id() ) ) {
+		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			if ( ! session_start() ) {
 				wp_send_json_error( 'Session error' );
 			}
