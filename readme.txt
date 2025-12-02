@@ -38,6 +38,20 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+= 2.0.1 ==
+*  Fixed: Restored Import/Export menu entry that was missing from admin menu
+*  Fixed: Phase breadcrumb navigation now adapts to long phase names with flexible height
+*  Fixed: Removed padding from phase steps for better visual balance
+*  Improved: All button styles now use high specificity to prevent theme conflicts
+*  Improved: Buttons maintain consistent styling across different WordPress themes
+*  Fixed: Removed arrow decorations (::after) from Back, Restart, and Recommendation buttons
+*  Fixed: Button layout now uses flexbox for proper alignment in a single row
+*  Fixed: Buttons correctly display in row for all states (navigation, calculation, etc.)
+*  Improved: Reduced button size with smaller padding (6px 14px) and font-size (13px)
+*  Fixed: Notice messages now display in black color for better readability
+*  Improved: Modern button styling with rounded corners, shadows, and hover effects
+*  Fixed: Button order maintained consistently: Back > Restart > Recommendation > Next/Calculate
+
 = 2.0.0 ==
 *  Configurator skip fixed panel.
 *  Settings Page Redesign: Complete visual overhaul with modern card-based layout, purple gradient theme, and improved user experience. License management now integrated directly into settings.
