@@ -312,10 +312,28 @@ jQuery(document).ready(function($) {
 				if (result.success) {
 					addImportLog('Server response received', 'success');
 					addImportLog('─────────────────────────────', 'info');
+					addImportLog('CSV DATA RECEIVED', 'info');
+					addImportLog('─────────────────────────────', 'info');
+					
+					// Show CSV parsing results.
+					if (result.data.total_phases_in_csv !== undefined) {
+						addImportLog('Phases found in CSV: ' + result.data.total_phases_in_csv, 'info');
+					}
+					if (result.data.total_variations_in_csv !== undefined) {
+						addImportLog('Variations found in CSV: ' + result.data.total_variations_in_csv, 'info');
+					}
+					
+					addImportLog('─────────────────────────────', 'info');
 					addImportLog('IMPORT RESULTS', 'info');
 					addImportLog('─────────────────────────────', 'info');
 					addImportLog('✓ Phases created: ' + result.data.phases_created, 'success');
+					if (result.data.phases_updated !== undefined) {
+						addImportLog('✓ Phases updated: ' + result.data.phases_updated, 'success');
+					}
 					addImportLog('✓ Variations created: ' + result.data.variations_created, 'success');
+					if (result.data.variations_updated !== undefined) {
+						addImportLog('✓ Variations updated: ' + result.data.variations_updated, 'success');
+					}
 					
 					if (result.data.errors && result.data.errors.length > 0) {
 						addImportLog('─────────────────────────────', 'warning');

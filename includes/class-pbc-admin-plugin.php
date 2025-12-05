@@ -1164,24 +1164,35 @@ class PBC_Admin_Plugin {
 			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
 		}
 
-		// Get parent phase from session or POST.
-		$pbc_session_key = '';
-		if ( isset( $_SESSION['pbc_parent_phase'] ) ) {
-			$pbc_session_key = 'pbc_variation_' . (int) $_SESSION['pbc_parent_phase'];
+		// Clear ALL PBC session data.
+		if ( isset( $_SESSION ) && is_array( $_SESSION ) ) {
+			$keys_to_remove = array();
+
+			// Find all PBC related session keys.
+			foreach ( $_SESSION as $key => $value ) {
+				if ( strpos( $key, 'pbc_' ) === 0 ) {
+					$keys_to_remove[] = $key;
+				}
+			}
+
+			// Remove all found keys.
+			foreach ( $keys_to_remove as $key ) {
+				unset( $_SESSION[ $key ] );
+			}
 		}
 
-		// Clear all PBC session data.
-		if ( isset( $_SESSION ) ) {
-			// Remove specific PBC keys.
-			if ( ! empty( $pbc_session_key ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
-				unset( $_SESSION[ $pbc_session_key ] );
-			}
-			if ( isset( $_SESSION['pbc_parent_phase'] ) ) {
-				unset( $_SESSION['pbc_parent_phase'] );
-			}
-			if ( isset( $_SESSION['pbc_output'] ) ) {
-				unset( $_SESSION['pbc_output'] );
-			}
+		// Clear user meta for logged in users.
+		$user_id = get_current_user_id();
+		if ( $user_id ) {
+			global $wpdb;
+			// Delete all pbc_phase_* user meta.
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->usermeta} WHERE user_id = %d AND meta_key LIKE %s",
+					$user_id,
+					'pbc_phase_%'
+				)
+			);
 		}
 
 		wp_send_json_success(

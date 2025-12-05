@@ -103,6 +103,7 @@ class PBC_Export_Import {
 			array(
 				'post_type'      => 'phases',
 				'posts_per_page' => -1,
+				'post_status'    => 'publish',
 				'orderby'        => 'menu_order',
 				'order'          => 'ASC',
 			)
@@ -136,6 +137,7 @@ class PBC_Export_Import {
 			array(
 				'post_type'      => 'variation',
 				'posts_per_page' => -1,
+				'post_status'    => 'publish',
 				'orderby'        => 'title',
 				'order'          => 'ASC',
 			)
@@ -290,7 +292,9 @@ class PBC_Export_Import {
 			'success'            => false,
 			'message'            => '',
 			'phases_created'     => 0,
+			'phases_updated'     => 0,
 			'variations_created' => 0,
+			'variations_updated' => 0,
 			'errors'             => array(),
 		);
 
@@ -304,14 +308,51 @@ class PBC_Export_Import {
 		$phase_map = array();
 		$var_map   = array();
 
+		// Pre-populate phase_map with ALL existing phases.
+		$existing_phases = get_posts(
+			array(
+				'post_type'      => 'phases',
+				'posts_per_page' => -1,
+				'post_status'    => 'any',
+			)
+		);
+
+		foreach ( $existing_phases as $phase ) {
+			$phase_slug = get_post_meta( $phase->ID, 'pbc_phase_slug', true );
+			if ( ! empty( $phase_slug ) ) {
+				$phase_map[ $phase_slug ] = $phase->ID;
+			}
+		}
+
+		// Pre-populate var_map with ALL existing variations.
+		$existing_vars = get_posts(
+			array(
+				'post_type'      => 'variation',
+				'posts_per_page' => -1,
+				'post_status'    => 'any',
+			)
+		);
+
+		foreach ( $existing_vars as $var ) {
+			$var_slug = get_post_meta( $var->ID, 'pbc_variation_slug', true );
+			if ( ! empty( $var_slug ) ) {
+				$var_map[ $var_slug ] = $var->ID;
+			}
+		}
+
 		// Import Phases.
 		if ( ! empty( $import_data['phases'] ) ) {
 			foreach ( $import_data['phases'] as $phase_data ) {
+				$is_update         = isset( $phase_map[ $phase_data['slug'] ] );
 				$imported_phase_id = $this->import_phase( $phase_data, $phase_map );
 
 				if ( $imported_phase_id ) {
 					$phase_map[ $phase_data['slug'] ] = $imported_phase_id;
-					++$result['phases_created'];
+					if ( $is_update ) {
+						++$result['phases_updated'];
+					} else {
+						++$result['phases_created'];
+					}
 				} else {
 					// translators: %s is the phase title that failed to import.
 					$result['errors'][] = sprintf( __( 'Failed to import phase: %s', 'pbc' ), $phase_data['title'] );
@@ -334,24 +375,52 @@ class PBC_Export_Import {
 		// Import Variations.
 		if ( ! empty( $import_data['variations'] ) ) {
 			foreach ( $import_data['variations'] as $var_data ) {
+				$is_update       = isset( $var_map[ $var_data['slug'] ] );
 				$imported_var_id = $this->import_variation( $var_data, $phase_map, $var_map );
 
 				if ( $imported_var_id ) {
 					$var_map[ $var_data['slug'] ] = $imported_var_id;
-					++$result['variations_created'];
+					if ( $is_update ) {
+						++$result['variations_updated'];
+					} else {
+						++$result['variations_created'];
+					}
 				} else {
 					// translators: %s is the variation title that failed to import.
 					$result['errors'][] = sprintf( __( 'Failed to import variation: %s', 'pbc' ), $var_data['title'] );
+				}
+			}
+
+			// Second pass to update dependencies now that all variations exist.
+			foreach ( $import_data['variations'] as $var_data ) {
+				if ( ! isset( $var_map[ $var_data['slug'] ] ) ) {
+					continue;
+				}
+
+				$post_id = $var_map[ $var_data['slug'] ];
+
+				// Update dependencies with complete var_map.
+				if ( ! empty( $var_data['depends'] ) ) {
+					$depends = $this->convert_depends_from_slugs( $var_data['depends'], $var_map );
+					update_post_meta( $post_id, 'pbc_depends', $depends );
+				}
+
+				// Update image product group with complete var_map.
+				if ( ! empty( $var_data['imgprodgroup'] ) ) {
+					$imgprodgroup = $this->convert_imgprodgroup_from_slugs( $var_data['imgprodgroup'], $var_map );
+					update_post_meta( $post_id, 'pbc_imgprodgroup', $imgprodgroup );
 				}
 			}
 		}
 
 		$result['success'] = true;
 		$result['message'] = sprintf(
-			// translators: %1$d is the number of phases created, %2$d is the number of variations created.
-			__( 'Import completed. Phases: %1$d, Variations: %2$d', 'pbc' ),
+			// translators: %1$d phases created, %2$d phases updated, %3$d variations created, %4$d variations updated.
+			__( 'Import completed. Phases: %1$d created, %2$d updated. Variations: %3$d created, %4$d updated.', 'pbc' ),
 			$result['phases_created'],
-			$result['variations_created']
+			$result['phases_updated'],
+			$result['variations_created'],
+			$result['variations_updated']
 		);
 
 		return $result;
@@ -421,8 +490,15 @@ class PBC_Export_Import {
 		);
 
 		if ( ! empty( $existing_vars ) ) {
-			// Variation already exists, return existing ID.
-			return $existing_vars[0]->ID;
+			// Variation already exists, update the phase relationship and return ID.
+			$post_id = $existing_vars[0]->ID;
+
+			// Update phase reference for existing variation.
+			if ( ! empty( $var_data['phase_slug'] ) && isset( $phase_map[ $var_data['phase_slug'] ] ) ) {
+				update_post_meta( $post_id, 'pbc_phase', $phase_map[ $var_data['phase_slug'] ] );
+			}
+
+			return $post_id;
 		}
 
 		// Create new variation.
@@ -725,6 +801,14 @@ class PBC_Export_Import {
 				'csv_variations'      => $csv_variations,
 				'filename_phases'     => 'pbc-phases-' . $timestamp . '.csv',
 				'filename_variations' => 'pbc-variations-' . $timestamp . '.csv',
+				'total_phases'        => count( $export_data['phases'] ),
+				'total_variations'    => count( $export_data['variations'] ),
+				'message'             => sprintf(
+					// translators: %1$d is phases count, %2$d is variations count.
+					__( 'Exported %1$d phases and %2$d variations.', 'pbc' ),
+					count( $export_data['phases'] ),
+					count( $export_data['variations'] )
+				),
 			)
 		);
 	}
@@ -829,31 +913,61 @@ class PBC_Export_Import {
 	 */
 	private function parse_phases_csv( $csv_content ) {
 		$phases = array();
-		$lines  = explode( "\n", $csv_content );
+		$rows   = $this->parse_csv_multiline( $csv_content );
 
-		foreach ( $lines as $line ) {
-			$line = trim( $line );
-
-			// Skip empty lines, comments, and headers.
-			if ( empty( $line ) || strpos( $line, '#' ) === 0 || strpos( $line, 'sep=' ) === 0 || strpos( $line, '"Slug"' ) === 0 ) {
+		foreach ( $rows as $data ) {
+			// Skip if not enough columns.
+			if ( ! is_array( $data ) || count( $data ) < 5 ) {
 				continue;
 			}
 
-			// Parse CSV line.
-			$data = str_getcsv( $line );
+			$first_field = isset( $data[0] ) ? trim( $data[0] ) : '';
 
-			if ( count( $data ) >= 5 ) {
-				$phases[] = array(
-					'slug'        => $data[0],
-					'title'       => $data[1],
-					'content'     => $data[2],
-					'menu_order'  => (int) $data[3],
-					'parent_slug' => $data[4],
-				);
+			// Skip empty lines, comments, headers, and sep declarations.
+			if ( empty( $first_field ) || strpos( $first_field, '#' ) === 0 || strpos( $first_field, 'sep=' ) === 0 || 'Slug' === $first_field ) {
+				continue;
 			}
+
+			$phases[] = array(
+				'slug'        => $data[0],
+				'title'       => $data[1],
+				'content'     => $data[2],
+				'menu_order'  => (int) $data[3],
+				'parent_slug' => $data[4],
+			);
 		}
 
 		return $phases;
+	}
+
+	/**
+	 * Parse CSV content handling multiline fields properly.
+	 *
+	 * @param string $csv_content CSV content.
+	 * @return array Array of rows, each row is an array of fields.
+	 */
+	private function parse_csv_multiline( $csv_content ) {
+		$rows = array();
+
+		// Create temp file for proper CSV parsing.
+		$temp_file = wp_tempnam( 'pbc_csv_' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		file_put_contents( $temp_file, $csv_content );
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$handle = fopen( $temp_file, 'r' );
+		if ( false !== $handle ) {
+			while ( ( $data = fgetcsv( $handle ) ) !== false ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+				$rows[] = $data;
+			}
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose( $handle );
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+		unlink( $temp_file );
+
+		return $rows;
 	}
 
 	/**
@@ -864,40 +978,70 @@ class PBC_Export_Import {
 	 */
 	private function parse_variations_csv( $csv_content ) {
 		$variations = array();
-		$lines      = explode( "\n", $csv_content );
+		$rows       = $this->parse_csv_multiline( $csv_content );
 
-		foreach ( $lines as $line ) {
-			$line = trim( $line );
-
-			// Skip empty lines, comments, and headers.
-			if ( empty( $line ) || strpos( $line, '#' ) === 0 || strpos( $line, 'sep=' ) === 0 || strpos( $line, '"Slug"' ) === 0 ) {
+		foreach ( $rows as $data ) {
+			// Skip if not enough columns.
+			if ( ! is_array( $data ) || count( $data ) < 12 ) {
 				continue;
 			}
 
-			// Parse CSV line.
-			$data = str_getcsv( $line );
+			$first_field = isset( $data[0] ) ? trim( $data[0] ) : '';
 
-			if ( count( $data ) >= 12 ) {
-				$terms = ! empty( $data[11] ) ? explode( '|', $data[11] ) : array();
-
-				$variations[] = array(
-					'slug'         => $data[0],
-					'title'        => $data[1],
-					'phase_slug'   => $data[2],
-					'sku'          => $data[3],
-					'field_type'   => $data[4],
-					'imgicon'      => (int) $data[5],
-					'depends'      => $this->csv_to_depends( $data[6] ),
-					'imgprodgroup' => $this->csv_to_imgprodgroup( $data[7] ),
-					'pricegroup'   => $this->csv_to_pricegroup( $data[8] ),
-					'descopt'      => $data[9],
-					'descvar'      => $data[10],
-					'term_slugs'   => array_map( 'trim', $terms ),
-				);
+			// Skip empty lines, comments, headers, and sep declarations.
+			if ( empty( $first_field ) || strpos( $first_field, '#' ) === 0 || strpos( $first_field, 'sep=' ) === 0 || 'Slug' === $first_field ) {
+				continue;
 			}
+
+			$terms = ! empty( $data[11] ) ? explode( '|', $data[11] ) : array();
+
+			$variations[] = array(
+				'slug'         => $data[0],
+				'title'        => $data[1],
+				'phase_slug'   => $data[2],
+				'sku'          => $data[3],
+				'field_type'   => $data[4],
+				'imgicon'      => (int) $data[5],
+				'depends'      => $this->csv_to_depends( $data[6] ),
+				'imgprodgroup' => $this->csv_to_imgprodgroup( $data[7] ),
+				'pricegroup'   => $this->csv_to_pricegroup( $data[8] ),
+				'descopt'      => $data[9],
+				'descvar'      => $data[10],
+				'term_slugs'   => array_map( 'trim', $terms ),
+			);
 		}
 
 		return $variations;
+	}
+
+	/**
+	 * Sanitize CSV content preserving structure.
+	 *
+	 * @param string $content CSV content to sanitize.
+	 * @return string Sanitized CSV content.
+	 */
+	private function sanitize_csv_content( $content ) {
+		// Remove null bytes and normalize line endings.
+		$content = str_replace( "\0", '', $content );
+		$content = str_replace( array( "\r\n", "\r" ), "\n", $content );
+
+		// Process line by line to preserve CSV structure.
+		$lines     = explode( "\n", $content );
+		$sanitized = array();
+
+		foreach ( $lines as $line ) {
+			// Skip completely empty lines.
+			if ( '' === trim( $line ) ) {
+				continue;
+			}
+
+			// Basic sanitization: remove potentially dangerous characters.
+			$line = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $line );
+
+			$sanitized[] = $line;
+		}
+
+		return implode( "\n", $sanitized );
 	}
 
 	/**
@@ -915,9 +1059,21 @@ class PBC_Export_Import {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'pbc' ) ) );
 		}
 
-		// Get import data from request.
-		$import_phases_csv     = isset( $_POST['import_phases'] ) ? sanitize_textarea_field( wp_unslash( $_POST['import_phases'] ) ) : '';
-		$import_variations_csv = isset( $_POST['import_variations'] ) ? sanitize_textarea_field( wp_unslash( $_POST['import_variations'] ) ) : '';
+		// Increase limits for large imports.
+		if ( function_exists( 'set_time_limit' ) ) {
+			set_time_limit( 300 );
+		}
+		wp_raise_memory_limit( 'admin' );
+
+		// Get import data from request - use custom sanitization to preserve CSV structure.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Custom sanitization applied below.
+		$import_phases_csv     = isset( $_POST['import_phases'] ) ? wp_unslash( $_POST['import_phases'] ) : '';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Custom sanitization applied below.
+		$import_variations_csv = isset( $_POST['import_variations'] ) ? wp_unslash( $_POST['import_variations'] ) : '';
+
+		// Apply custom CSV sanitization.
+		$import_phases_csv     = $this->sanitize_csv_content( $import_phases_csv );
+		$import_variations_csv = $this->sanitize_csv_content( $import_variations_csv );
 
 		if ( empty( $import_phases_csv ) && empty( $import_variations_csv ) ) {
 			wp_send_json_error( array( 'message' => __( 'No import data provided.', 'pbc' ) ) );
@@ -938,10 +1094,20 @@ class PBC_Export_Import {
 		}
 
 		if ( empty( $import_data['phases'] ) && empty( $import_data['variations'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid CSV format or no data found.', 'pbc' ) ) );
+			wp_send_json_error(
+				array(
+					'message'          => __( 'Invalid CSV format or no data found.', 'pbc' ),
+					'phases_lines'     => substr_count( $import_phases_csv, "\n" ),
+					'variations_lines' => substr_count( $import_variations_csv, "\n" ),
+				)
+			);
 		}
 
 		$result = $this->import_data( $import_data );
+
+		// Add debug info.
+		$result['total_phases_in_csv']     = count( $import_data['phases'] );
+		$result['total_variations_in_csv'] = count( $import_data['variations'] );
 
 		if ( $result['success'] ) {
 			wp_send_json_success( $result );

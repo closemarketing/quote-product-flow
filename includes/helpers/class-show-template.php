@@ -139,6 +139,21 @@ class PBC_Template {
 						$variation_id     = (int) $_POST['pbc_variation_id'][ $key ];
 					}
 
+					// Check if selection changed - if so, clear all subsequent steps.
+					$prev_var_id = isset( $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] : 0;
+					if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
+						// Selection changed, clear all subsequent steps from session.
+						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) {
+							if ( (int) $step_key > (int) $key ) {
+								unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
+								// Also clear user meta for logged in users.
+								if ( ! empty( $user_id ) ) {
+									delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
+								}
+							}
+						}
+					}
+
 				if ( ! empty( $user_id ) ) {
 						$phase_param['var']      = $variation_id;
 						$phase_param['pricevar'] = $price_var ? $price_var : '';
@@ -163,6 +178,7 @@ class PBC_Template {
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = $field_type;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['price_var'] = $price_var;
 					if ( $option_name ) {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
