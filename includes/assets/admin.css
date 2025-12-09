@@ -618,3 +618,54 @@ fieldset label.block .dashicons {
 	border-right: 1px solid #EEEEEE;
 	margin-right: 2%;
 }
+
+/* ============================================
+   FormsCRM License Integration Styles
+   Custom styles to match PBC purple gradient
+   ============================================ */
+
+/* License button with purple gradient - Multiple selectors for compatibility */
+.formscrm-license-form .formscrm-button-primary,
+.formscrm-license-form button[type="submit"],
+.formscrm-license-form .formscrm-button,
+.formscrm-form-actions button {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+	border: none !important;
+	color: white !important;
+	padding: 12px 24px !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	border-radius: 6px !important;
+	cursor: pointer !important;
+	transition: all 0.3s ease !important;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+	text-transform: none !important;
+	line-height: 1.4 !important;
+	height: auto !important;
+}
+
+.formscrm-license-form .formscrm-button-primary:hover,
+.formscrm-license-form button[type="submit"]:hover,
+.formscrm-license-form .formscrm-button:hover,
+.formscrm-form-actions button:hover {
+	transform: translateY(-2px) !important;
+	box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.formscrm-license-form .formscrm-button-primary:active,
+.formscrm-license-form button[type="submit"]:active,
+.formscrm-license-form .formscrm-button:active,
+.formscrm-form-actions button:active {
+	transform: translateY(0) !important;
+}
+
+/* Adjust card styling to match PBC */
+.formscrm-license-wrapper {
+	margin: 0 !important;
+}
+
+.formscrm-card {
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+	border-radius: 8px !important;
+}

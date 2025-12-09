@@ -103,10 +103,6 @@ class PBC_Admin_Plugin {
 			)
 		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
-		
-		// Register custom license styles.
-		wp_register_style( 'pbc-license-custom', WPPBC_PLUGIN_URL . 'includes/assets/license-custom.css', array( 'pbc-admin' ), WPPBC_VERSION );
-		wp_enqueue_style( 'pbc-license-custom' );
 
 		wp_enqueue_script(
 			'pbc-admin-scripts',
