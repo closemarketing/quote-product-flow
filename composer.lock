@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "closemarketing/wp-plugin-license-manager",
-            "version": "1.0.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/closemarketing/wp-plugin-license-manager.git",
-                "reference": "a7cee1e661e4313005eb5ade2d3f95bf9de2c278"
+                "reference": "a01e5893b56fcdd35542a518c8ba7fb4499a72a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/closemarketing/wp-plugin-license-manager/zipball/a7cee1e661e4313005eb5ade2d3f95bf9de2c278",
-                "reference": "a7cee1e661e4313005eb5ade2d3f95bf9de2c278",
+                "url": "https://api.github.com/repos/closemarketing/wp-plugin-license-manager/zipball/a01e5893b56fcdd35542a518c8ba7fb4499a72a9",
+                "reference": "a01e5893b56fcdd35542a518c8ba7fb4499a72a9",
                 "shasum": ""
             },
             "require": {
@@ -47,20 +47,20 @@
                     "role": "Developer"
                 }
             ],
-            "description": "WordPress Plugin License Manager Library - A reusable library for managing WordPress plugin licenses with WooCommerce API Manager",
+            "description": "WordPress Plugin License Manager Library - A reusable library for managing WordPress plugin licenses with Enwikuna License Manager",
             "keywords": [
-                "api-manager",
+                "enwikuna",
                 "license",
+                "license-manager",
                 "plugin",
                 "updates",
-                "woocommerce",
                 "wordpress"
             ],
             "support": {
                 "issues": "https://github.com/closemarketing/wp-plugin-license-manager/issues",
                 "source": "https://github.com/closemarketing/wp-plugin-license-manager"
             },
-            "time": "2025-10-31T11:05:09+00:00"
+            "time": "2025-12-09T08:35:54+00:00"
         },
         {
             "name": "composer/installers",
@@ -2920,8 +2920,8 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
+    "platform": [],
+    "platform-dev": [],
     "platform-overrides": {
         "php": "7.4.33"
     },

@@ -103,6 +103,10 @@ class PBC_Admin_Plugin {
 			)
 		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
+		
+		// Register custom license styles.
+		wp_register_style( 'pbc-license-custom', WPPBC_PLUGIN_URL . 'includes/assets/license-custom.css', array( 'pbc-admin' ), WPPBC_VERSION );
+		wp_enqueue_style( 'pbc-license-custom' );
 
 		wp_enqueue_script(
 			'pbc-admin-scripts',
@@ -267,8 +271,18 @@ class PBC_Admin_Plugin {
 					<div class="pbc-column-left">
 						<?php $this->render_general_configuration_section(); ?>
 						<?php $this->render_support_contact_section(); ?>
-						
-						<!-- Price Updater Section -->
+					</div>
+
+					<!-- Right Column -->
+					<div class="pbc-column-right">
+						<?php $this->render_pdf_configuration_section(); ?>
+						<?php $this->render_user_roles_section(); ?>
+					</div>
+				</div>
+
+				<!-- Bulk Price Updater Section -->
+				<div class="pbc-settings-container pbc-two-columns" style="margin-top: 20px;">
+					<div class="pbc-column-left">
 						<div class="pbc-settings-card">
 							<div class="pbc-card-header">
 								<h2><span class="dashicons dashicons-tag"></span> <?php esc_html_e( 'Bulk Price Updater', 'pbc' ); ?></h2>
@@ -279,12 +293,8 @@ class PBC_Admin_Plugin {
 							</div>
 						</div>
 					</div>
-
-					<!-- Right Column -->
 					<div class="pbc-column-right">
-						<?php $this->render_pdf_configuration_section(); ?>
-						<?php $this->render_user_roles_section(); ?>
-						<?php $this->render_license_section(); ?>
+						<!-- Placeholder for alignment -->
 					</div>
 				</div>
 
@@ -297,6 +307,11 @@ class PBC_Admin_Plugin {
 					</button>
 				</div>
 			</form>
+
+			<!-- License Section (separate form, after main form - full width) -->
+			<div style="margin-top: 20px;">
+				<?php $this->render_license_section(); ?>
+			</div>
 		</div>
 		<?php
 	}
@@ -332,7 +347,6 @@ class PBC_Admin_Plugin {
 				'support_enabled'                => 'pbc_support_enabled',
 				'support_phone'                  => 'pbc_support_phone',
 				'support_email'                  => 'pbc_support_email',
-				'pbc_license_product_id'         => 'pbc_license_product_id',
 			);
 			foreach ( $fields as $field_key => $field ) {
 				if ( isset( $_POST[ $field_key ] ) ) {
@@ -374,113 +388,8 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
 
-			// License management.
-			if ( isset( $_POST['pbc_license_license_key'] ) ) {
-				$license_key = sanitize_text_field( wp_unslash( $_POST['pbc_license_license_key'] ) );
-				// Save to standard option for compatibility.
-				update_option( 'pbc_license_license_key', $license_key );
-
-				global $pbc_license_instance;
-
-				// Check if license instance is available.
-				if ( empty( $pbc_license_instance ) || ! is_object( $pbc_license_instance ) ) {
-					$this->license_error_message = __( 'License manager is not available. Please ensure the license manager plugin is installed and activated.', 'pbc' );
-					$status                      = 'error';
-				} elseif ( ! empty( $license_key ) ) {
-					// Ensure instance is created.
-					$instance_key = $pbc_license_instance->get_option_key( 'instance' );
-					if ( ! get_option( $instance_key ) ) {
-						$pbc_license_instance->license_instance_activation();
-					}
-
-					$apikey_option  = $pbc_license_instance->get_option_key( 'apikey' );
-					$product_id_key = $pbc_license_instance->get_option_key( 'product_id' );
-
-					// Get current key to check if it changed.
-					$current_key = get_option( $apikey_option, '' );
-
-					// Save the API key and product_id first.
-					update_option( $apikey_option, $license_key );
-					update_option( $product_id_key, 2635 );
-
-					// Check REAL status with API server first.
-					$license_status   = $pbc_license_instance->license_key_status();
-					$is_really_active = ! empty( $license_status ) &&
-										isset( $license_status['status_check'] ) &&
-										'active' === $license_status['status_check'];
-
-					// Get current local activation status.
-					$activated_key   = $pbc_license_instance->get_option_key( 'activated' );
-					$local_activated = get_option( $activated_key, '' );
-
-					// If license is already active on server, just sync local status.
-					if ( $is_really_active ) {
-						// License is already active on server - update local status.
-						update_option( $activated_key, 'Activated' );
-						update_option( 'pbc_license_license_status', 'valid' );
-						delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
-						$status = 'ok';
-					} elseif ( $current_key !== $license_key ) {
-						// Key changed and not active on server, attempt activation.
-						$result = $pbc_license_instance->license_activate( $license_key );
-
-						if ( ! empty( $result ) ) {
-							$activate_results = json_decode( $result, true );
-
-							// Check if activation was successful OR if it says "already activated with this instance".
-							$is_success        = ! empty( $activate_results ) && true === $activate_results['success'] && true === $activate_results['activated'];
-							$is_already_active = ! empty( $activate_results ) &&
-												isset( $activate_results['code'] ) &&
-												'100' === $activate_results['code'] &&
-												isset( $activate_results['error'] ) &&
-												false !== strpos( $activate_results['error'], 'ya ha sido activada' );
-
-							if ( $is_success || $is_already_active ) {
-								// License activated successfully OR already active with this instance.
-								// Either way, sync local status.
-								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Activated' );
-								update_option( 'pbc_license_license_status', 'valid' );
-								delete_transient( 'pbc_license_last_check' ); // Force re-check next time.
-								$status = 'ok';
-							} else {
-								// Real activation failure.
-								update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
-								update_option( 'pbc_license_license_status', '' );
-
-								if ( ! empty( $activate_results ) && isset( $activate_results['data']['error'] ) ) {
-									$this->license_error_message = sprintf(
-										/* translators: %s: Error message from API */
-										__( 'License activation failed: %s', 'pbc' ),
-										$activate_results['data']['error']
-									);
-								} elseif ( ! empty( $activate_results ) && isset( $activate_results['message'] ) ) {
-									$this->license_error_message = sprintf(
-										/* translators: %s: Error message from API */
-										__( 'License activation failed: %s', 'pbc' ),
-										$activate_results['message']
-									);
-								} else {
-									$this->license_error_message = __( 'License activation failed. Please check your license key and try again.', 'pbc' );
-								}
-								$status = 'error';
-							}
-						} else {
-							// No response from server.
-							update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
-							update_option( 'pbc_license_license_status', '' );
-							$this->license_error_message = __( 'Could not connect to license server. Please check your internet connection and try again.', 'pbc' );
-							$status                      = 'error';
-						}
-					}
-				} else {
-					// Empty license key provided - clear license status.
-					global $pbc_license_instance;
-					if ( $pbc_license_instance && is_object( $pbc_license_instance ) ) {
-						update_option( $pbc_license_instance->get_option_key( 'activated' ), 'Deactivated' );
-					}
-					update_option( 'pbc_license_license_status', '' );
-				}
-			}
+			// License management is now handled by License Manager via options.php
+			// No manual handling needed here
 		}
 
 		return $status;
@@ -869,76 +778,44 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function render_license_section() {
-		// Get license options directly from WordPress options.
-		$license_key    = get_option( 'pbc_license_license_key', '' );
-		$product_id     = get_option( 'pbc_license_product_id', '2635' );
-		$license_status = get_option( 'pbc_license_license_status', '' );
-		$is_active      = 'valid' === $license_status;
-		?>
-		<!-- License Card -->
-		<div class="pbc-settings-card pbc-license-card">
-			<div class="pbc-card-header">
-				<h2><span class="dashicons dashicons-admin-network"></span> <?php esc_html_e( 'License', 'pbc' ); ?></h2>
-				<p class="description"><?php esc_html_e( 'Enter your license information to activate automatic updates and support', 'pbc' ); ?></p>
-			</div>
-			<div class="pbc-card-body">
-				<!-- License Grid: Status + API Key side by side -->
-				<div class="pbc-license-grid">
-					<!-- License Status -->
-					<fieldset class="pbc-license-status-field">
-						<label class="block"><?php esc_html_e( 'Current Status', 'pbc' ); ?></label>
-						<div class="pbc-license-status">
-							<?php if ( $is_active ) : ?>
-								<span class="pbc-status-badge pbc-status-active">
-									<span class="dashicons dashicons-yes-alt"></span>
-									<strong><?php esc_html_e( 'License Active', 'pbc' ); ?></strong>
-								</span>
-							<?php else : ?>
-								<span class="pbc-status-badge pbc-status-inactive">
-									<span class="dashicons dashicons-dismiss"></span>
-									<strong><?php esc_html_e( 'License Inactive', 'pbc' ); ?></strong>
-								</span>
-							<?php endif; ?>
-						</div>
-						<?php if ( $is_active ) : ?>
-							<p class="description" style="color: #155724; margin-top: 8px;">
-								<span class="dashicons dashicons-info" style="font-size: 14px;"></span>
-								<?php esc_html_e( 'Your license is active and you will receive automatic updates.', 'pbc' ); ?>
-							</p>
-						<?php else : ?>
-							<p class="description" style="color: #721c24; margin-top: 8px;">
-								<span class="dashicons dashicons-warning" style="font-size: 14px;"></span>
-								<?php esc_html_e( 'Please enter your license key to enable updates and support.', 'pbc' ); ?>
-							</p>
-						<?php endif; ?>
-					</fieldset>
+		global $pbc_license_instance;
 
-					<!-- License Key -->
-					<fieldset class="pbc-license-key-field">
-						<label class="block" for="pbc_license_license_key">
-							<span class="dashicons dashicons-admin-network" style="font-size: 14px; margin-right: 4px;"></span>
-							<?php esc_html_e( 'License API Key', 'pbc' ); ?>
-						</label>
-						<input 
-							type="text" 
-							id="pbc_license_license_key" 
-							name="pbc_license_license_key" 
-							value="<?php echo esc_attr( $license_key ); ?>" 
-							style="width:100%;"
-							placeholder="<?php esc_attr_e( 'Enter your license API key here...', 'pbc' ); ?>"
-						/>
-						<p class="description">
-							<span class="dashicons dashicons-info-outline" style="font-size: 12px;"></span>
-							<?php esc_html_e( 'You can find this in your account dashboard at', 'pbc' ); ?> <a href="<?php echo esc_url( defined( 'WPPBC_URL_API' ) ? WPPBC_URL_API : 'https://close.technology/' ); ?>" target="_blank" rel="noopener">close.technology</a>
-						</p>
-					</fieldset>
+		// Check if license instance exists.
+		if ( empty( $pbc_license_instance ) || ! is_object( $pbc_license_instance ) ) {
+			?>
+			<div class="pbc-settings-card pbc-license-card">
+				<div class="pbc-card-header">
+					<h2><span class="dashicons dashicons-admin-network"></span> <?php esc_html_e( 'License', 'pbc' ); ?></h2>
 				</div>
-
-				<!-- Product ID (Hidden field for saving) -->
-				<input type="hidden" name="pbc_license_product_id" value="<?php echo esc_attr( $product_id ? $product_id : '2635' ); ?>" />
+				<div class="pbc-card-body">
+					<div class="notice notice-error inline">
+						<p><?php esc_html_e( 'License Manager is not available. Please ensure wp-plugin-license-manager is installed.', 'pbc' ); ?></p>
+					</div>
+				</div>
 			</div>
-		</div>
-		<?php
+			<?php
+			return;
+		}
+
+		// Use FormsCRM Settings renderer (same as formscrm-inmovilla).
+		$settings = new \Closemarketing\WPLicenseManager\FormsCRMSettings(
+			$pbc_license_instance,
+			array(
+				'title'        => __( 'Product Budget Configurator License', 'pbc' ),
+				'description'  => __( 'Manage your license to receive automatic updates and support.', 'pbc' ),
+				'plugin_name'  => 'Product Budget Configurator',
+				'purchase_url' => 'https://close.technology/wordpress-plugins/product-budget-configurator/',
+				'renew_url'    => 'https://close.technology/my-account/',
+				'benefits'     => array(
+					__( 'Automatic plugin updates', 'pbc' ),
+					__( 'Access to new features', 'pbc' ),
+					__( 'Priority support', 'pbc' ),
+					__( 'Security patches', 'pbc' ),
+				),
+			)
+		);
+
+		$settings->render();
 	}
 
 	/**
