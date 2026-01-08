@@ -13,6 +13,7 @@ Product Budget Configurator is a powerful WordPress plugin that allows you to cr
 = Key Features =
 
 * **Interactive Configurator**: Step-by-step wizard for product configuration
+* **Multiple Selection**: Allow users to select multiple variations per phase with checkboxes
 * **Hierarchical Products**: Support for multiple products with parent-child relationships
 * **Dynamic Pricing**: Prices per role with discount support
 * **PDF Generation**: Generate and email professional budget PDFs
@@ -21,6 +22,17 @@ Product Budget Configurator is a powerful WordPress plugin that allows you to cr
 * **Price Visibility**: Control price display per user role
 * **Customizable**: Custom colors, headers, footers, and styling options
 * **Email Notifications**: Send configuration details to clients and administrators
+
+= Multiple Selection Feature =
+
+Enable multiple variations selection per phase, allowing users to select multiple options at once:
+* **Checkbox Mode**: Users can select multiple variations in a single phase
+* **Real-time Updates**: Selected variations appear instantly in the configuration summary
+* **Combined Display**: Multiple selections are displayed as comma-separated names (e.g., "Albañil, Electricista, Otro")
+* **Price Calculation**: Prices from all selected variations are automatically summed
+* **Easy Configuration**: Enable multiple selection mode per phase via the phase settings
+
+To enable: Edit a phase and check the "Allow Multiple Selections" option.
 
 = Support Contact Feature =
 
@@ -39,6 +51,12 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
 = 2.0.1 ==
+*  Added: Multiple selection support per phase with checkboxes
+*  Added: Real-time AJAX updates for multiple checkbox selections
+*  Added: Comma-separated display of multiple selected variations
+*  Added: Automatic price summing for multiple selections
+*  Added: Helper function check_phases_options() for advanced phase validation
+*  Fixed: Variation name display in real-time when selecting multiple options
 *  Fixed: Restored Import/Export menu entry that was missing from admin menu
 *  Fixed: Phase breadcrumb navigation now adapts to long phase names with flexible height
 *  Fixed: Removed padding from phase steps for better visual balance
