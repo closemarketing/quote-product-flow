@@ -30,13 +30,27 @@ class SHOW {
 	 *
 	 * @return void
 	 */
-	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard' ) {
+	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard', $allow_multiple = false ) {
 		$actual_variation_tag = '';
+
+		// Get selected variations for multiple selection mode.
+		$selected_vars = array();
+		if ( $allow_multiple ) {
+			if ( is_array( $s_var ) ) {
+				$selected_vars = $s_var;
+			} elseif ( ! empty( $s_var ) ) {
+				$selected_vars = array( $s_var );
+			}
+		}
 
 		if ( 'wizard' === $template ) {
 			echo '<ul>';
 		} else {
-			echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
+			if ( $allow_multiple ) {
+				echo '<div class="pbc-multiple-selections">';
+			} else {
+				echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
+			}
 		}
 
 		foreach ( $variations_section as $variation_data ) {
@@ -59,9 +73,15 @@ class SHOW {
 							echo '</div>';
 						}
 						if ( empty( $field_type ) ) {
-							?>
-							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
-							<?php
+							if ( $allow_multiple ) {
+								?>
+								<input type="checkbox" class="pbc_variation pbc_variation_multiple" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+								<?php
+							} else {
+								?>
+								<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+								<?php
+							}
 							echo esc_html( $variation_data['title'] );
 						} elseif ( 'qty' === $field_type ) {
 							$s_var = $s_var === $variation_id ? 1 : $s_var;
@@ -103,15 +123,24 @@ class SHOW {
 				<?php
 			} elseif ( 'vertical' === $template ) {
 				if ( empty( $field_type ) ) {
-					if ( $actual_variation_tag !== $variation_data['section'] ) {
+					if ( $allow_multiple ) {
 						?>
-						<optgroup label="<?php echo esc_html( $variation_data['section'] ); ?>">
+						<label class="pbc-checkbox-option">
+							<input type="checkbox" class="pbc_variation pbc_variation_multiple" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+							<?php echo esc_html( $variation_data['title'] ); ?>
+						</label>
 						<?php
-						$actual_variation_tag = $variation_data['section'];
+					} else {
+						if ( $actual_variation_tag !== $variation_data['section'] ) {
+							?>
+							<optgroup label="<?php echo esc_html( $variation_data['section'] ); ?>">
+							<?php
+							$actual_variation_tag = $variation_data['section'];
+						}
+						?>
+						<option value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?>><?php echo esc_html( $variation_data['title'] ); ?></option>
+						<?php
 					}
-					?>
-					<option value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?>><?php echo esc_html( $variation_data['title'] ); ?></option>
-					<?php
 				} elseif ( 'qty' === $field_type ) {
 					$s_var = $s_var === $variation_id ? 1 : $s_var;
 					?>
@@ -125,7 +154,11 @@ class SHOW {
 		if ( 'wizard' === $template ) {
 			echo '</ul>';
 		} else {
-			echo '</select>';
+			if ( $allow_multiple ) {
+				echo '</div>';
+			} else {
+				echo '</select>';
+			}
 		}
 	}
 

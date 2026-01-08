@@ -27,6 +27,7 @@ class PBC_Helper_PostTypes {
 	public function __construct() {
 		add_action( 'init', array( $this, 'pbc_register_cpt' ) );
 		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation' ) );
+		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_phase' ) );
 		add_action( 'add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry' ) );
 
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
@@ -356,6 +357,38 @@ class PBC_Helper_PostTypes {
 						'textarea_rows' => 8,
 						'teeny'         => true,
 					),
+				),
+			),
+		);
+
+		return $meta_boxes;
+	}
+
+	/**
+	 * Metabox phases
+	 *
+	 * @param array $meta_boxes Metaboxes.
+	 * @return array
+	 */
+	public function pbc_metabox_phase( $meta_boxes ) {
+		$prefix = 'pbc_';
+
+		// Meta box for phases.
+		$meta_boxes[] = array(
+			'id'         => 'phase_options',
+			'title'      => __( 'Phase Options', 'pbc' ),
+			'post_types' => array( 'phases' ),
+			'context'    => 'normal',
+			'priority'   => 'high',
+			'autosave'   => true,
+			'fields'     => array(
+				// CHECKBOX FOR MULTIPLE SELECTIONS.
+				array(
+					'name' => __( 'Allow multiple selections', 'pbc' ),
+					'id'   => "{$prefix}allow_multiple_selections",
+					'type' => 'checkbox',
+					'desc' => __( 'If checked, users can select multiple variations instead of just one', 'pbc' ),
+					'std'  => false,
 				),
 			),
 		);

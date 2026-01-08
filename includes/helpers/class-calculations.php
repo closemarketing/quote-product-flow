@@ -220,6 +220,120 @@ class CALC {
 	}
 
 	/**
+	 * Validates multiple phase options
+	 *
+	 * This function allows checking if phases meet specified conditions.
+	 * Useful for validating phase availability, dependencies, and status.
+	 *
+	 * @param array $phase_ids Array of phase IDs to check.
+	 * @param array $options {
+	 *     Optional. Array of options to check.
+	 *
+	 *     @type bool   $published       Check if phases are published. Default true.
+	 *     @type int    $parent          Check if phases have specific parent. Default null.
+	 *     @type array  $meta_conditions Array of meta key => value conditions. Default empty.
+	 *     @type bool   $all_must_pass   If true, all phases must pass. If false, at least one. Default true.
+	 * }
+	 * @return array {
+	 *     Results of validation.
+	 *
+	 *     @type bool  $valid       True if validation passes according to all_must_pass option.
+	 *     @type array $passed_ids  Array of phase IDs that passed validation.
+	 *     @type array $failed_ids  Array of phase IDs that failed validation.
+	 *     @type array $details     Detailed results per phase ID.
+	 * }
+	 */
+	public static function check_phases_options( $phase_ids, $options = array() ) {
+		// Default options.
+		$defaults = array(
+			'published'       => true,
+			'parent'          => null,
+			'meta_conditions' => array(),
+			'all_must_pass'   => true,
+		);
+
+		$options = wp_parse_args( $options, $defaults );
+
+		$results = array(
+			'valid'      => false,
+			'passed_ids' => array(),
+			'failed_ids' => array(),
+			'details'    => array(),
+		);
+
+		// Ensure phase_ids is an array.
+		if ( ! is_array( $phase_ids ) ) {
+			$phase_ids = array( $phase_ids );
+		}
+
+		foreach ( $phase_ids as $phase_id ) {
+			$phase_id = (int) $phase_id;
+			$passed   = true;
+			$reasons  = array();
+
+			// Check if phase exists and is published.
+			if ( $options['published'] ) {
+				$phase = get_post( $phase_id );
+				if ( ! $phase || 'publish' !== $phase->post_status || 'phases' !== $phase->post_type ) {
+					$passed    = false;
+					$reasons[] = 'not_published';
+				}
+			}
+
+			// Check parent if specified.
+			if ( $passed && null !== $options['parent'] ) {
+				$phase = isset( $phase ) ? $phase : get_post( $phase_id );
+				if ( $phase && (int) $phase->post_parent !== (int) $options['parent'] ) {
+					$passed    = false;
+					$reasons[] = 'parent_mismatch';
+				}
+			}
+
+			// Check meta conditions.
+			if ( $passed && ! empty( $options['meta_conditions'] ) ) {
+				foreach ( $options['meta_conditions'] as $meta_key => $expected_value ) {
+					$meta_value = get_post_meta( $phase_id, $meta_key, true );
+
+					// Support for array of possible values.
+					if ( is_array( $expected_value ) ) {
+						if ( ! in_array( $meta_value, $expected_value, true ) ) {
+							$passed    = false;
+							$reasons[] = "meta_{$meta_key}_not_in_expected";
+						}
+					} else {
+						// Direct comparison.
+						if ( $meta_value !== $expected_value ) {
+							$passed    = false;
+							$reasons[] = "meta_{$meta_key}_mismatch";
+						}
+					}
+				}
+			}
+
+			// Store results.
+			if ( $passed ) {
+				$results['passed_ids'][] = $phase_id;
+			} else {
+				$results['failed_ids'][] = $phase_id;
+			}
+
+			$results['details'][ $phase_id ] = array(
+				'passed'  => $passed,
+				'reasons' => $reasons,
+			);
+		}
+
+		// Determine overall validity.
+		if ( $options['all_must_pass'] ) {
+			$results['valid'] = empty( $results['failed_ids'] );
+		} else {
+			$results['valid'] = ! empty( $results['passed_ids'] );
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Gets the user discount and role
 	 *
 	 * @return array
