@@ -82,10 +82,10 @@ add_action(
 					'product_uuid'    => WPPBC_LICENSE_PRODUCT_UUID,
 					'file'            => WPPBC_PLUGIN,
 					'version'         => WPPBC_VERSION,
-					'slug'            => 'product-budget-configurator',
-					'name'            => WPPBC_ITEM_NAME,
-					'text_domain'     => 'pbc',
-				)
+				'slug'            => 'product-budget-configurator',
+				'name'            => WPPBC_ITEM_NAME,
+				'text_domain'     => 'pbc',
+			)
 			);
 	} catch ( \Exception $e ) {
 			add_action(
@@ -244,9 +244,9 @@ add_action(
 			$type    = 'warning';
 
 			if ( 'expired' === $license_status ) {
-				$message = sprintf(
-					/* translators: %s: Settings page URL */
-					esc_html__( 'Your license has expired. Please renew your license to continue receiving updates and support. %s', 'pbc' ),
+			$message = sprintf(
+				/* translators: %s: Settings page URL */
+				esc_html__( 'Your license has expired. Please renew your license to continue receiving updates and support. %s', 'pbc' ),
 				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Renew License', 'pbc' ) . '</a>'
 			);
 			$type = 'error';
