@@ -148,7 +148,7 @@ class PBC_Template {
 							// Gets variation ID in quantity input.
 							if ( isset( $_POST['pbc_variation_id'][ $key ] ) && is_array( $_POST['pbc_variation_id'][ $key ] ) ) {
 								$qty_key = array_search( $variation_id, array_map( 'intval', $_POST['pbc_variation_id'][ $key ] ), true );
-								if ( false !== $qty_key ) {
+								if ( false !== $qty_key && isset( $_POST['pbc_variation_id'][ $key ][ $qty_key ] ) ) {
 									$option_qty_value = (int) $_POST['pbc_variation_id'][ $key ][ $qty_key ];
 									$variation_id     = (int) $_POST['pbc_variation_id'][ $key ][ $qty_key ];
 								}

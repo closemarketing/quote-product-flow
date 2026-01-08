@@ -49,7 +49,7 @@ class PBC_Requests {
 		}
 
 		$current_phase = isset( $_REQUEST['current_phase'] ) ? (int) $_REQUEST['current_phase'] : 0;
-		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? $_REQUEST['pbc_variation'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? wp_unslash( $_REQUEST['pbc_variation'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
 		$session_key   = 'pbc_variation_' . $parent_phase;
 		$option        = '';
@@ -69,54 +69,53 @@ class PBC_Requests {
 		if ( ! empty( $pbc_variation ) && $current_phase && isset( $pbc_variation[ $current_phase ] ) ) {
 			$variation_data = $pbc_variation[ $current_phase ];
 			$svar           = 0; // Initialize default value.
-			
+
 			// Check if it's multiple selection (array) or single selection.
 			if ( is_array( $variation_data ) ) {
 				// Multiple selection (checkboxes).
 				$selected_variations = array_map( 'intval', $variation_data );
 				$option_names        = array();
 				$total_price         = 0;
-				
+
 				// Filter out empty values.
 				$selected_variations = array_filter( $selected_variations );
-				
+
 				if ( ! empty( $selected_variations ) ) {
 					foreach ( $selected_variations as $var_id ) {
-						$pricevar      = isset( $_REQUEST[ "pbc_pricevar_$var_id" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$var_id" ] ) ) : null;
-						$var_price     = CALC::get_price_variation( $var_id, $pricevar );
-						$total_price  += (float) $var_price;
-						
+						$pricevar     = isset( $_REQUEST[ "pbc_pricevar_$var_id" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$var_id" ] ) ) : null;
+						$var_price    = CALC::get_price_variation( $var_id, $pricevar );
+						$total_price += (float) $var_price;
+
 						$var_title = get_the_title( $var_id );
 						if ( $var_title && 'Auto Draft' !== $var_title ) {
 							$option_names[] = $var_title;
 						}
 					}
-					
+
 					$option = implode( ', ', $option_names );
 					$price  = $total_price;
 					$svar   = $selected_variations[0]; // Use first for image reference.
 				}
-				
-			} else {
+} else {
 				// Single selection (radio button or dropdown).
 				$svar = (int) $variation_data;
-				
+
 				if ( is_user_logged_in() ) {
 					$user_id                 = get_current_user_id();
 					$phase_param['var']      = $svar;
 					$phase_param['pricevar'] = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : '';
 					update_user_meta( $user_id, 'pbc_phase_' . $current_phase, $phase_param );
-				}
-				
+							}
+
 				$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : null;
 				$price    = CALC::get_price_variation( $svar, $pricevar );
-				
+
 				$option_name = get_the_title( $svar );
 				if ( ! empty( $option_name ) ) {
 					$option = $option_name;
-				}
+							}
 			}
-			
+
 			// Gets image variation with filter dependency.
 			if ( $svar > 0 && isset( $_SESSION[ $session_key ] ) && is_array( $_SESSION[ $session_key ] ) ) {
 				$session_data = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized

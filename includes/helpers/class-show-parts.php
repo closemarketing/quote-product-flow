@@ -27,6 +27,7 @@ class SHOW {
 	 * @param int    $s_var Selected variation.
 	 * @param int    $cstep Current step.
 	 * @param string $template Template.
+	 * @param bool   $allow_multiple Allow multiple selections.
 	 *
 	 * @return void
 	 */
@@ -45,12 +46,10 @@ class SHOW {
 
 		if ( 'wizard' === $template ) {
 			echo '<ul>';
-		} else {
-			if ( $allow_multiple ) {
+		} elseif ( $allow_multiple ) {
 				echo '<div class="pbc-multiple-selections">';
 			} else {
-				echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
-			}
+			echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
 		}
 
 		foreach ( $variations_section as $variation_data ) {
@@ -153,12 +152,10 @@ class SHOW {
 		}
 		if ( 'wizard' === $template ) {
 			echo '</ul>';
-		} else {
-			if ( $allow_multiple ) {
+		} elseif ( $allow_multiple ) {
 				echo '</div>';
 			} else {
-				echo '</select>';
-			}
+			echo '</select>';
 		}
 	}
 
@@ -196,59 +193,59 @@ class SHOW {
 				$show_prices = CALC::get_show_prices_for_user( $user_role );
 				$total_price = 0;
 				if ( 'calculate' === $cstep ) {
-					$count = count( $phases );
+				$count = count( $phases );
 				} else {
-					$count = $cstep;
+				$count = $cstep;
 				}
 				for ( $i = 1; $i <= $count; $i++ ) {
-					if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
-						continue;
+				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+					continue;
 					}
-					$phase_key    = $i;
-					$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) : '';
-					$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
-					$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) : '';
-					$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
-					$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
+				$phase_key    = $i;
+				$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) : '';
+				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
+				$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) : '';
+				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
+				$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
 
-					if ( 'calculate' === $cstep && empty( $field_type ) ) {
-						$total_price += (float) $var_price;
+				if ( 'calculate' === $cstep && empty( $field_type ) ) {
+					$total_price += (float) $var_price;
 					} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
-						$total_price = (float) $var_price * $total_price;
+					$total_price = (float) $var_price * $total_price;
 					}
 
-					?>
+				?>
 					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
 						<td class="name">
-							<?php
-							if ( 'qty' === $field_type ) {
-								echo esc_html( $phase_key . '. ' . $var_name . ' x ' . $var_price );
-							} else {
-								echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
-							}
-							?>
+				<?php
+				if ( 'qty' === $field_type ) {
+					echo esc_html( $phase_key . '. ' . $var_name . ' x ' . $var_price );
+					} else {
+					echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
+					}
+				?>
 						</td>
 						<td class="price">
-							<?php
-							if ( $var_price && 'no' !== $show_prices ) {
-								echo esc_html( $var_price );
-								echo 'qty' === $field_type ? '' : ' €';
-							}
-							?>
+				<?php
+				if ( $var_price && 'no' !== $show_prices ) {
+					echo esc_html( $var_price );
+					echo 'qty' === $field_type ? '' : ' €';
+					}
+				?>
 						</td>
 					</tr>
-					<?php
+				<?php
 				}
 				if ( 'calculate' === $cstep && 'no' !== $show_prices ) {
-					?>
+				?>
 					<tr class="variation_selected phase-total_price">
 						<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
 						<td class="price">
-							<?php
-							if ( $total_price ) {
-								echo number_format( $total_price, 2, ',', '.' ) . ' €';
-							}
-							?>
+				<?php
+				if ( $total_price ) {
+					echo number_format( $total_price, 2, ',', '.' ) . ' €';
+					}
+				?>
 						</td>
 					</tr>
 					<tr class="variation_selected phase-total_price">

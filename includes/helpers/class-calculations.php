@@ -295,18 +295,16 @@ class CALC {
 					$meta_value = get_post_meta( $phase_id, $meta_key, true );
 
 					// Support for array of possible values.
-					if ( is_array( $expected_value ) ) {
+				if ( is_array( $expected_value ) ) {
 						if ( ! in_array( $meta_value, $expected_value, true ) ) {
 							$passed    = false;
 							$reasons[] = "meta_{$meta_key}_not_in_expected";
-						}
-					} else {
+							}
+				} elseif ( $meta_value !== $expected_value ) {
 						// Direct comparison.
-						if ( $meta_value !== $expected_value ) {
-							$passed    = false;
-							$reasons[] = "meta_{$meta_key}_mismatch";
-						}
-					}
+						$passed    = false;
+						$reasons[] = "meta_{$meta_key}_mismatch";
+				}
 				}
 			}
 

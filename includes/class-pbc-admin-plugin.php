@@ -384,8 +384,8 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
 
-			// License management is now handled by License Manager via options.php
-			// No manual handling needed here
+			// License management is now handled by License Manager via options.php.
+			// No manual handling needed here.
 		}
 
 		return $status;
@@ -798,7 +798,7 @@ class PBC_Admin_Plugin {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'License Manager FormsCRMSettings class not found. Please check Composer dependencies.', 'pbc' ) . '</p></div>';
 			return;
 		}
-		
+
 		$settings = new \Closemarketing\WPLicenseManager\FormsCRMSettings(
 			$pbc_license_instance,
 			array(
