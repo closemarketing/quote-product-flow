@@ -122,6 +122,42 @@ class PBC_Template {
 				if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
 					$_SESSION[ $pbc_session_key ] = array();
 				}
+				
+				// Save direct input values if they exist (for phases without variations).
+				if ( isset( $_POST['pbc_direct_input'] ) && is_array( $_POST['pbc_direct_input'] ) ) {
+					foreach ( $_POST['pbc_direct_input'] as $key => $direct_input_value ) {
+						// Get phase info to determine input type.
+						$phase_id    = isset( $phases[ ( (int) $key - 1 ) ] ) ? $phases[ ( (int) $key - 1 ) ] : 0;
+						$input_type  = get_post_meta( $phase_id, 'pbc_direct_input_type', true );
+						if ( empty( $input_type ) ) {
+							$input_type = 'textarea';
+						}
+						
+						// Sanitize based on input type.
+						if ( 'number' === $input_type ) {
+							$direct_input_value = sanitize_text_field( wp_unslash( $direct_input_value ) );
+						} else {
+							$direct_input_value = sanitize_textarea_field( wp_unslash( $direct_input_value ) );
+						}
+						
+						if ( ! empty( $direct_input_value ) ) {
+							$phase_title = get_the_title( $phase_id );
+							
+							if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ] ) ) {
+								$_SESSION[ $pbc_session_key ][ $key ] = array();
+							}
+							
+							$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
+							$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
+							$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = 0; // No variation ID for direct input.
+							$_SESSION[ $pbc_session_key ][ $key ]['var']['name']    = $direct_input_value;
+							$_SESSION[ $pbc_session_key ][ $key ]['var']['type']    = 'direct_input';
+							$_SESSION[ $pbc_session_key ][ $key ]['var']['price']   = 0;
+							$_SESSION[ $pbc_session_key ][ $key ]['direct_input']   = $direct_input_value;
+						}
+					}
+				}
+				
 				foreach ( $_POST['pbc_variation'] as $key => $variation_id ) { // phpcs:ignore
 					if ( empty( $phases ) ) {
 						break;
@@ -183,7 +219,65 @@ class PBC_Template {
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
 					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
+					
+					// Save custom input value if exists.
+					if ( isset( $_POST['pbc_custom_input'][ $key ][ $variation_id ] ) ) {
+						$custom_input_value = sanitize_textarea_field( wp_unslash( $_POST['pbc_custom_input'][ $key ][ $variation_id ] ) );
+						if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ]['custom_input'] ) ) {
+							$_SESSION[ $pbc_session_key ][ $key ]['custom_input'] = array();
+						}
+						$_SESSION[ $pbc_session_key ][ $key ]['custom_input'][ $variation_id ] = $custom_input_value;
+						// Also append custom input to variation name if not empty.
+						if ( ! empty( $custom_input_value ) ) {
+							$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' (' . $custom_input_value . ')';
+						}
+					}
 				}
+				if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+					$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					ksort( $session_data, SORT_NUMERIC );
+					$_SESSION[ $pbc_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				}
+			} elseif ( isset( $_POST['pbc_direct_input'] ) && 'next' === $_POST['submit'] ) {
+				// Handle direct input when there are no variations.
+				if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
+					$_SESSION[ $pbc_session_key ] = array();
+				}
+				
+				// Save direct input values.
+				foreach ( $_POST['pbc_direct_input'] as $key => $direct_input_value ) {
+					// Get phase info to determine input type.
+					$phase_id    = isset( $phases[ ( (int) $key - 1 ) ] ) ? $phases[ ( (int) $key - 1 ) ] : 0;
+					$input_type  = get_post_meta( $phase_id, 'pbc_direct_input_type', true );
+					if ( empty( $input_type ) ) {
+						$input_type = 'textarea';
+					}
+					
+					// Sanitize based on input type.
+					if ( 'number' === $input_type ) {
+						$direct_input_value = sanitize_text_field( wp_unslash( $direct_input_value ) );
+					} else {
+						$direct_input_value = sanitize_textarea_field( wp_unslash( $direct_input_value ) );
+					}
+					
+					if ( ! empty( $direct_input_value ) ) {
+						$phase_title = get_the_title( $phase_id );
+						
+						if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ] ) ) {
+							$_SESSION[ $pbc_session_key ][ $key ] = array();
+						}
+						
+						$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
+						$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = 0;
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['name']    = $direct_input_value;
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = 'direct_input';
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['price']  = 0;
+						$_SESSION[ $pbc_session_key ][ $key ]['direct_input']   = $direct_input_value;
+					}
+				}
+				
+				// Sort session data.
 				if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
 					$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					ksort( $session_data, SORT_NUMERIC );
@@ -373,9 +467,71 @@ class PBC_Template {
 								SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
 							}
 						} else {
-							?>
-							<div class="error"><?php esc_html_e( 'No Variations Available', 'pbc' ); ?></div>
-							<?php
+							// Check if phase has direct input enabled.
+							$show_direct_input = get_post_meta( $phase_id, 'pbc_show_direct_input', true );
+							if ( $show_direct_input ) {
+								// Get input type (textarea, text, or number).
+								$input_type = get_post_meta( $phase_id, 'pbc_direct_input_type', true );
+								if ( empty( $input_type ) ) {
+									$input_type = 'textarea'; // Default to textarea.
+								}
+								
+								// Show direct input field.
+								$saved_value = '';
+								if ( isset( $_SESSION[ $pbc_session_key ][ $cstep ]['direct_input'] ) ) {
+									if ( 'number' === $input_type ) {
+										$saved_value = sanitize_text_field( $_SESSION[ $pbc_session_key ][ $cstep ]['direct_input'] );
+									} else {
+										$saved_value = sanitize_textarea_field( $_SESSION[ $pbc_session_key ][ $cstep ]['direct_input'] );
+									}
+								}
+								// Default value for number input is 0.
+								if ( 'number' === $input_type && empty( $saved_value ) ) {
+									$saved_value = '0';
+								}
+								?>
+								<div class="pbc-direct-input-wrapper">
+									<?php if ( 'textarea' === $input_type ) { ?>
+										<textarea 
+											class="pbc-direct-input pbc-direct-input-textarea" 
+											name="pbc_direct_input[<?php echo esc_attr( $cstep ); ?>]" 
+											rows="5"
+											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+										><?php echo esc_textarea( $saved_value ); ?></textarea>
+									<?php } elseif ( 'number' === $input_type ) { ?>
+										<div class="pbc-number-input-wrapper">
+											<button type="button" class="pbc-number-btn pbc-number-decrease" data-step="<?php echo esc_attr( $cstep ); ?>" aria-label="<?php echo esc_attr__( 'Decrease', 'pbc' ); ?>">
+												<span class="pbc-number-arrow">←</span>
+											</button>
+											<input 
+												type="number" 
+												class="pbc-direct-input pbc-direct-input-number" 
+												name="pbc_direct_input[<?php echo esc_attr( $cstep ); ?>]" 
+												value="<?php echo esc_attr( $saved_value ? $saved_value : '0' ); ?>"
+												min="0"
+												step="1"
+												data-step="<?php echo esc_attr( $cstep ); ?>"
+											/>
+											<button type="button" class="pbc-number-btn pbc-number-increase" data-step="<?php echo esc_attr( $cstep ); ?>" aria-label="<?php echo esc_attr__( 'Increase', 'pbc' ); ?>">
+												<span class="pbc-number-arrow">→</span>
+											</button>
+										</div>
+									<?php } else { // text ?>
+										<input 
+											type="text" 
+											class="pbc-direct-input pbc-direct-input-text" 
+											name="pbc_direct_input[<?php echo esc_attr( $cstep ); ?>]" 
+											value="<?php echo esc_attr( $saved_value ); ?>"
+											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+										/>
+									<?php } ?>
+								</div>
+								<?php
+							} else {
+								?>
+								<div class="error"><?php esc_html_e( 'No Variations Available', 'pbc' ); ?></div>
+								<?php
+							}
 						}
 						?>
 					</div>

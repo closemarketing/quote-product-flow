@@ -27,6 +27,7 @@ class PBC_Helper_PostTypes {
 	public function __construct() {
 		add_action( 'init', array( $this, 'pbc_register_cpt' ) );
 		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation' ) );
+		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_phase' ) );
 		add_action( 'add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry' ) );
 
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
@@ -254,6 +255,14 @@ class PBC_Helper_PostTypes {
 					'std'         => '',
 					'placeholder' => __( 'Select a phase', 'pbc' ),
 				),
+				// CHECKBOX FOR CUSTOM INPUT.
+				array(
+					'name' => __( 'Show custom input field', 'pbc' ),
+					'id'   => "{$prefix}show_custom_input",
+					'type' => 'checkbox',
+					'desc' => __( 'If checked, an input field will appear below this variation when selected', 'pbc' ),
+					'std'  => false,
+				),
 				// IMAGE ADVANCED (WP 3.5+).
 				array(
 					'name'             => __( 'Icon image', 'pbc' ),
@@ -355,6 +364,56 @@ class PBC_Helper_PostTypes {
 					'options' => array(
 						'textarea_rows' => 8,
 						'teeny'         => true,
+					),
+				),
+			),
+		);
+
+		return $meta_boxes;
+	}
+
+	/**
+	 * Metabox phases
+	 *
+	 * @param array $meta_boxes Metaboxes.
+	 * @return array
+	 */
+	public function pbc_metabox_phase( $meta_boxes ) {
+		$prefix = 'pbc_';
+		
+		// Meta box for phases.
+		$meta_boxes[] = array(
+			'id'         => 'phase_options',
+			'title'      => __( 'Phase Options', 'pbc' ),
+			'post_types' => array( 'phases' ),
+			'context'    => 'normal',
+			'priority'   => 'high',
+			'autosave'   => true,
+			'fields'     => array(
+				// CHECKBOX FOR DIRECT INPUT.
+				array(
+					'name' => __( 'Show direct input field', 'pbc' ),
+					'id'   => "{$prefix}show_direct_input",
+					'type' => 'checkbox',
+					'desc' => __( 'If checked, an input field will appear directly without needing to select a variation. Useful for open-ended questions like "What is your hobby?"', 'pbc' ),
+					'std'  => false,
+				),
+				// SELECT FOR INPUT TYPE.
+				array(
+					'name'        => __( 'Input field type', 'pbc' ),
+					'id'          => "{$prefix}direct_input_type",
+					'type'        => 'select',
+					'options'     => array(
+						'textarea' => __( 'Textarea (Large text box)', 'pbc' ),
+						'text'     => __( 'Text (Single line)', 'pbc' ),
+						'number'   => __( 'Number (With arrows)', 'pbc' ),
+					),
+					'multiple'    => false,
+					'std'         => 'textarea',
+					'placeholder' => __( 'Select input type', 'pbc' ),
+					'visible'     => array(
+						'when'     => array( array( "{$prefix}show_direct_input", '=', true ) ),
+						'relation' => 'and',
 					),
 				),
 			),
