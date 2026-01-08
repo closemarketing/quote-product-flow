@@ -21,6 +21,8 @@ Product Budget Configurator is a powerful WordPress plugin that allows you to cr
 * **Price Visibility**: Control price display per user role
 * **Customizable**: Custom colors, headers, footers, and styling options
 * **Email Notifications**: Send configuration details to clients and administrators
+* **Custom Input Fields**: Add custom input fields to variations and phases
+* **Direct Input Fields**: Add input fields directly to phases without variations (textarea, text, or number with increment/decrement buttons)
 
 = Support Contact Feature =
 
@@ -31,6 +33,21 @@ Enable sticky support buttons that remain visible throughout the configuration p
 
 Configure support options in the plugin settings under "Support Contact".
 
+= Custom Input Fields =
+
+The plugin supports two types of custom input fields:
+
+**1. Variation Custom Input (Conditional)**
+When editing a variation, you can enable "Show custom input field" checkbox. This will display a textarea field below all variations when that specific variation is selected. Perfect for options like "Other" where users need to specify additional details.
+
+**2. Phase Direct Input (Always Visible)**
+When editing a phase, you can enable "Show direct input field" checkbox. This displays an input field directly without needing variations. You can choose from three input types:
+* **Textarea**: Large multi-line text box (default)
+* **Text**: Single-line text input
+* **Number**: Numeric input with increment/decrement buttons (← and →) that change the value by 1
+
+The number input has a default value of 0 and includes custom styled buttons for easy value adjustment. All input values are saved in the session and included in the final configuration summary.
+
 
 == Installation ==
 
@@ -38,6 +55,16 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+= 2.0.2 ==
+*  Added: Custom input fields for variations - show textarea when specific variation is selected
+*  Added: Direct input fields for phases - show input directly without variations
+*  Added: Three input types for phases: Textarea (large), Text (single line), and Number (with increment/decrement buttons)
+*  Added: Number input with custom styled buttons (← decrease, → increase) that change value by 1
+*  Added: Default value of 0 for number inputs
+*  Improved: Custom input fields appear below all variations (not inside each variation)
+*  Improved: Input values are saved in session and displayed in configuration summary
+*  Fixed: Form no longer auto-skips steps when direct input fields are present
+
 = 2.0.1 ==
 *  Fixed: Restored Import/Export menu entry that was missing from admin menu
 *  Fixed: Phase breadcrumb navigation now adapts to long phase names with flexible height
