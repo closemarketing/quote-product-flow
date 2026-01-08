@@ -127,23 +127,23 @@ class PBC_Template {
 						break;
 					}
 
-					$phase_id    = $phases[ (int) $key - 1 ];
-					$phase_title = get_the_title( $phase_id );
-					$allow_multiple = get_post_meta( $phase_id, 'pbc_allow_multiple_selections', true );
+				$phase_id       = $phases[ (int) $key - 1 ];
+				$phase_title    = get_the_title( $phase_id );
+				$allow_multiple = get_post_meta( $phase_id, 'pbc_allow_multiple_selections', true );
 
-					if ( $allow_multiple && is_array( $variation_data ) ) {
-						// Multiple selection mode.
-						$selected_variation_ids = array_map( 'intval', $variation_data );
-						$total_price = 0;
-						$variation_names = array();
+				if ( $allow_multiple && is_array( $variation_data ) ) {
+					// Multiple selection mode.
+					$selected_variation_ids = array_map( 'intval', $variation_data );
+					$total_price            = 0;
+					$variation_names        = array();
 
-						foreach ( $selected_variation_ids as $variation_id ) {
-							// Save original variation ID for getting title.
-							$original_variation_id = $variation_id;
-							
-							$price_var    = isset( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ) : '';
-							$field_type   = 'price';
-							$option_qty_value = 0;
+					foreach ( $selected_variation_ids as $variation_id ) {
+						// Save original variation ID for getting title.
+						$original_variation_id = $variation_id;
+
+						$price_var        = isset( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pbc_pricevar_' . $variation_id ] ) ) : '';
+						$field_type       = 'price';
+						$option_qty_value = 0;
 
 							// Gets variation ID in quantity input.
 							if ( isset( $_POST['pbc_variation_id'][ $key ] ) && is_array( $_POST['pbc_variation_id'][ $key ] ) ) {
@@ -170,17 +170,17 @@ class PBC_Template {
 							$total_price += (float) $price;
 						}
 
-						// Check if selection changed - if so, clear all subsequent steps.
-						$prev_vars = isset( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) && is_array( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) ? $_SESSION[ $pbc_session_key ][ $key ]['vars'] : array();
-						$prev_vars_sorted = $prev_vars;
-						sort( $prev_vars_sorted );
-						$selected_vars_sorted = $selected_variation_ids;
-						sort( $selected_vars_sorted );
-						if ( $prev_vars_sorted !== $selected_vars_sorted ) {
-							// Selection changed, clear all subsequent steps from session.
-							foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) {
-								if ( (int) $step_key > (int) $key ) {
-									unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
+					// Check if selection changed - if so, clear all subsequent steps.
+					$prev_vars            = isset( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) && is_array( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) ? $_SESSION[ $pbc_session_key ][ $key ]['vars'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$prev_vars_sorted     = $prev_vars;
+					sort( $prev_vars_sorted );
+					$selected_vars_sorted = $selected_variation_ids;
+					sort( $selected_vars_sorted );
+					if ( $prev_vars_sorted !== $selected_vars_sorted ) {
+						// Selection changed, clear all subsequent steps from session.
+						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+							if ( (int) $step_key > (int) $key ) {
+								unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
 									// Also clear user meta for logged in users.
 									if ( ! empty( $user_id ) ) {
 										delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
@@ -189,12 +189,12 @@ class PBC_Template {
 							}
 						}
 
-						$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
-						$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
-						$_SESSION[ $pbc_session_key ][ $key ]['vars'] = $selected_variation_ids;
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] = implode( ', ', $variation_names );
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['type'] = 'multiple';
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $total_price;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['vars']          = $selected_variation_ids;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = implode( ', ', $variation_names );
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = 'multiple';
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['price']  = $total_price;
 					} else {
 						// Single selection mode (existing code).
 						$variation_id = is_array( $variation_data ) ? (int) $variation_data[0] : (int) $variation_data;
@@ -212,11 +212,11 @@ class PBC_Template {
 
 						// Check if selection changed - if so, clear all subsequent steps.
 						$prev_var_id = isset( $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] : 0;
-						if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
-							// Selection changed, clear all subsequent steps from session.
-							foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) {
-								if ( (int) $step_key > (int) $key ) {
-									unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
+					if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
+						// Selection changed, clear all subsequent steps from session.
+						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+							if ( (int) $step_key > (int) $key ) {
+								unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
 									// Also clear user meta for logged in users.
 									if ( ! empty( $user_id ) ) {
 										delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
@@ -242,11 +242,11 @@ class PBC_Template {
 							$variation_title .= ' [' . $price_var . ']';
 						}
 
-						$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
-						$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = $field_type;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = $field_type;
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['price_var'] = $price_var;
 						if ( $option_name ) {
 							$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
@@ -302,10 +302,10 @@ class PBC_Template {
 			<?php
 			// Show license notice if not active (only for logged-in admins).
 			// Don't show if bypass is active.
-			$show_notice = ! pbc_is_license_active() && is_user_logged_in() && current_user_can( 'manage_options' );
-			$is_bypassed = defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE;
-			
-			if ( $show_notice && ! $is_bypassed ) {
+		$show_notice = ! pbc_is_license_active() && is_user_logged_in() && current_user_can( 'manage_options' );
+		$is_bypassed = defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE;
+
+		if ( $show_notice && ! $is_bypassed ) {
 				?>
 				<div class="pbc-license-notice" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-left: 4px solid #5a67d8; padding: 12px 20px; margin: 0 0 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
 					<p style="margin: 0; color: #ffffff; font-size: 13px; display: flex; align-items: center; gap: 8px;">
@@ -430,9 +430,9 @@ class PBC_Template {
 							// Check if phase allows multiple selections.
 							$allow_multiple = get_post_meta( $phase_id, 'pbc_allow_multiple_selections', true );
 
-							// Show public.
-							$selected_var = 0;
-							$selected_vars = array();
+						// Show public.
+						$selected_var  = 0;
+						$selected_vars = array();
 							if ( $allow_multiple ) {
 								// Multiple selection mode.
 								if (
@@ -442,22 +442,20 @@ class PBC_Template {
 									is_array( $_SESSION[ $pbc_session_key ][ $cstep ]['vars'] )
 								) {
 									$selected_vars = array_map( 'intval', $_SESSION[ $pbc_session_key ][ $cstep ]['vars'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-									// Filter to only include valid variations.
-									$selected_vars = array_intersect( $selected_vars, $variations );
-								}
-							} else {
-								// Single selection mode.
-								if (
-									isset( $_SESSION[ $pbc_session_key ] ) &&
-									is_array( $_SESSION[ $pbc_session_key ] ) &&
-									isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
-									in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-								) {
-									$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
-								} else {
-									$selected_var = $variations[ current( array_keys( $variations ) ) ];
-								}
+								// Filter to only include valid variations.
+								$selected_vars = array_intersect( $selected_vars, $variations );
 							}
+						} elseif (
+							// Single selection mode.
+							isset( $_SESSION[ $pbc_session_key ] ) &&
+							is_array( $_SESSION[ $pbc_session_key ] ) &&
+							isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
+							in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						) {
+							$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
+						} else {
+							$selected_var = $variations[ current( array_keys( $variations ) ) ];
+						}
 							if ( ! empty( $variations_section ) ) {
 								if ( $allow_multiple ) {
 									SHOW::variations_content( $variations_section, $selected_vars, $cstep, $template, true );
