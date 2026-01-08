@@ -137,11 +137,15 @@ class PBC_Template {
 						// Sanitize based on input type.
 						if ( 'number' === $input_type ) {
 							$direct_input_value = sanitize_text_field( wp_unslash( $direct_input_value ) );
+							// For number inputs, allow 0 as valid value.
+							$is_valid = ( '' !== $direct_input_value && null !== $direct_input_value );
 						} else {
 							$direct_input_value = sanitize_textarea_field( wp_unslash( $direct_input_value ) );
+							// For text/textarea, empty string is not valid.
+							$is_valid = ! empty( $direct_input_value );
 						}
 
-						if ( ! empty( $direct_input_value ) ) {
+						if ( $is_valid ) {
 							$phase_title = get_the_title( $phase_id );
 
 							if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ] ) ) {
@@ -259,11 +263,15 @@ class PBC_Template {
 					// Sanitize based on input type.
 					if ( 'number' === $input_type ) {
 						$direct_input_value = sanitize_text_field( wp_unslash( $direct_input_value ) );
+						// For number inputs, allow 0 as valid value.
+						$is_valid = ( '' !== $direct_input_value && null !== $direct_input_value );
 					} else {
 						$direct_input_value = sanitize_textarea_field( wp_unslash( $direct_input_value ) );
+						// For text/textarea, empty string is not valid.
+						$is_valid = ! empty( $direct_input_value );
 					}
 
-					if ( ! empty( $direct_input_value ) ) {
+					if ( $is_valid ) {
 						$phase_title = get_the_title( $phase_id );
 
 						if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ] ) ) {
