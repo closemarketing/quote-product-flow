@@ -313,13 +313,13 @@ class PBC_Template {
 							<?php esc_html_e( 'Demo Mode', 'pbc' ); ?>
 						</span>
 						<span>
-							<?php
-							printf(
+					<?php
+						printf(
 							/* translators: %s: Link to activate license */
 							esc_html__( 'Activate your license to remove this notice and unlock full features. %s', 'pbc' ),
 							'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '" style="color: #ffffff; text-decoration: underline; font-weight: 500;">' . esc_html__( 'Go to Settings', 'pbc' ) . '</a>'
 						);
-							?>
+						?>
 						</span>
 					</p>
 				</div>

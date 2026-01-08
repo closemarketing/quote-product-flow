@@ -70,33 +70,32 @@ add_action(
 		global $pbc_license_instance;
 
 		if ( ! class_exists( '\Closemarketing\WPLicenseManager\License' ) ) {
-			return;
+				return;
 		}
 
-	try {
-			$pbc_license_instance = new \Closemarketing\WPLicenseManager\License(
-				array(
-					'api_url'         => WPPBC_LICENSE_API_URL,
-					'rest_api_key'    => WPPBC_LICENSE_API_KEY,
-					'rest_api_secret' => WPPBC_LICENSE_API_SECRET,
-					'product_uuid'    => WPPBC_LICENSE_PRODUCT_UUID,
-					'file'            => WPPBC_PLUGIN,
-					'version'         => WPPBC_VERSION,
-				'slug'            => 'product-budget-configurator',
-				'name'            => WPPBC_ITEM_NAME,
-				'text_domain'     => 'pbc',
-			)
-		);
-	} catch ( \Exception $e ) {
-			add_action(
-				'admin_notices',
-				function () use ( $e ) {
-					echo '<div class="notice notice-error"><p>Product Budget Configurator: ' . esc_html( $e->getMessage() ) . '</p></div>';
-				}
-			);
-	}
-	},
-	5
+		try {
+				$pbc_license_instance = new \Closemarketing\WPLicenseManager\License(
+					array(
+						'api_url'         => WPPBC_LICENSE_API_URL,
+						'rest_api_key'    => WPPBC_LICENSE_API_KEY,
+						'rest_api_secret' => WPPBC_LICENSE_API_SECRET,
+						'product_uuid'    => WPPBC_LICENSE_PRODUCT_UUID,
+						'file'            => WPPBC_PLUGIN,
+						'version'         => WPPBC_VERSION,
+						'slug'            => 'product-budget-configurator',
+						'name'            => WPPBC_ITEM_NAME,
+						'text_domain'     => 'pbc',
+					)
+				);
+		} catch ( \Exception $e ) {
+				add_action(
+					'admin_notices',
+					function () use ( $e ) {
+						echo '<div class="notice notice-error"><p>Product Budget Configurator: ' . esc_html( $e->getMessage() ) . '</p></div>';
+					}
+				);
+		}
+		},
 );
 
 
