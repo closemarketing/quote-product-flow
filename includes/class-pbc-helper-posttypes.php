@@ -380,7 +380,7 @@ class PBC_Helper_PostTypes {
 	 */
 	public function pbc_metabox_phase( $meta_boxes ) {
 		$prefix = 'pbc_';
-		
+
 		// Meta box for phases.
 		$meta_boxes[] = array(
 			'id'         => 'phase_options',

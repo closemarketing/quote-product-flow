@@ -384,8 +384,8 @@ class PBC_Admin_Plugin {
 				update_option( 'pbc_show_prices_user_' . $slug, $show_prices );
 			}
 
-			// License management is now handled by License Manager via options.php
-			// No manual handling needed here
+			// License management is now handled by License Manager via options.php.
+			// No manual handling needed here.
 		}
 
 		return $status;
