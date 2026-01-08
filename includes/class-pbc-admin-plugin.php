@@ -794,6 +794,11 @@ class PBC_Admin_Plugin {
 		}
 
 		// Use FormsCRM Settings renderer (same as formscrm-inmovilla).
+		if ( ! class_exists( '\Closemarketing\WPLicenseManager\FormsCRMSettings' ) ) {
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'License Manager FormsCRMSettings class not found. Please check Composer dependencies.', 'pbc' ) . '</p></div>';
+			return;
+		}
+		
 		$settings = new \Closemarketing\WPLicenseManager\FormsCRMSettings(
 			$pbc_license_instance,
 			array(

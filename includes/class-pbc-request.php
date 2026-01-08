@@ -68,6 +68,7 @@ class PBC_Requests {
 		}
 		if ( ! empty( $pbc_variation ) && $current_phase && isset( $pbc_variation[ $current_phase ] ) ) {
 			$variation_data = $pbc_variation[ $current_phase ];
+			$svar           = 0; // Initialize default value.
 			
 			// Check if it's multiple selection (array) or single selection.
 			if ( is_array( $variation_data ) ) {
@@ -117,13 +118,13 @@ class PBC_Requests {
 			}
 			
 			// Gets image variation with filter dependency.
-			if ( isset( $_SESSION[ $session_key ] ) && is_array( $_SESSION[ $session_key ] ) ) {
+			if ( $svar > 0 && isset( $_SESSION[ $session_key ] ) && is_array( $_SESSION[ $session_key ] ) ) {
 				$session_data = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				$imgprodurl   = CALC::get_image_variation_url( $session_data, $svar );
 			}
 
 			$variations_images_flipped = get_option( 'variations_images_flipped' );
-			if ( ! empty( $variations_images_flipped ) ) {
+			if ( $svar > 0 && ! empty( $variations_images_flipped ) ) {
 				for ( $j = 1; $j < (int) $current_phase; $j++ ) {
 					if ( isset( $_SESSION[ $session_key ][ $j ]['var']['id'] ) && in_array( $_SESSION[ $session_key ][ $j ]['var']['id'], $variations_images_flipped, true ) ) {
 						$flipped = true;
