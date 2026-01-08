@@ -86,7 +86,7 @@ add_action(
 					'name'            => WPPBC_ITEM_NAME,
 					'text_domain'     => 'pbc',
 				)
-			);
+				);
 	} catch ( \Exception $e ) {
 			add_action(
 				'admin_notices',
