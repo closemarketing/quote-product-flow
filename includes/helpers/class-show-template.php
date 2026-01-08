@@ -167,12 +167,12 @@ class PBC_Template {
 									$variation_title .= ' [' . $price_var . ']';
 							}
 								$variation_names[] = $variation_title;
-								$total_price += (float) $price;
+								$total_price      += (float) $price;
 						}
 
 						// Check if selection changed - if so, clear all subsequent steps.
-						$prev_vars            = isset( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) && is_array( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) ? $_SESSION[ $pbc_session_key ][ $key ]['vars'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-						$prev_vars_sorted     = $prev_vars;
+						$prev_vars        = isset( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) && is_array( $_SESSION[ $pbc_session_key ][ $key ]['vars'] ) ? $_SESSION[ $pbc_session_key ][ $key ]['vars'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$prev_vars_sorted = $prev_vars;
 						sort( $prev_vars_sorted );
 						$selected_vars_sorted = $selected_variation_ids;
 						sort( $selected_vars_sorted );
@@ -180,7 +180,7 @@ class PBC_Template {
 							// Selection changed, clear all subsequent steps from session.
 						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 								if ( (int) $step_key > (int) $key ) {
-								unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
+									unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
 									// Also clear user meta for logged in users.
 									if ( ! empty( $user_id ) ) {
 										delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
@@ -213,10 +213,10 @@ class PBC_Template {
 						// Check if selection changed - if so, clear all subsequent steps.
 						$prev_var_id = isset( $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] : 0;
 					if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
-						// Selection changed, clear all subsequent steps from session.
+							// Selection changed, clear all subsequent steps from session.
 						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 							if ( (int) $step_key > (int) $key ) {
-								unset( $_SESSION[ $pbc_session_key ][ $step_key ] );
+									unset( $_SESSION[ $pbc_session_key ][ $step_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 									// Also clear user meta for logged in users.
 									if ( ! empty( $user_id ) ) {
 										delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
@@ -242,11 +242,11 @@ class PBC_Template {
 							$variation_title .= ' [' . $price_var . ']';
 						}
 
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']   = $phase_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name'] = $phase_title;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']     = $variation_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']   = $variation_title;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']   = $field_type;
+						$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']      = $phase_id;
+						$_SESSION[ $pbc_session_key ][ $key ]['phase']['name']    = $phase_title; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['id']        = $variation_id;
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['name']      = $variation_title; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['type']      = $field_type;
 						$_SESSION[ $pbc_session_key ][ $key ]['var']['price_var'] = $price_var;
 						if ( $option_name ) {
 							$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
@@ -302,8 +302,8 @@ class PBC_Template {
 			<?php
 			// Show license notice if not active (only for logged-in admins).
 			// Don't show if bypass is active.
-		$show_notice = ! pbc_is_license_active() && is_user_logged_in() && current_user_can( 'manage_options' );
-		$is_bypassed = defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE;
+			$show_notice = ! pbc_is_license_active() && is_user_logged_in() && current_user_can( 'manage_options' );
+			$is_bypassed = defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE;
 
 		if ( $show_notice && ! $is_bypassed ) {
 				?>
@@ -318,7 +318,7 @@ class PBC_Template {
 								/* translators: %s: Link to activate license */
 								esc_html__( 'Activate your license to remove this notice and unlock full features. %s', 'pbc' ),
 								'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '" style="color: #ffffff; text-decoration: underline; font-weight: 500;">' . esc_html__( 'Go to Settings', 'pbc' ) . '</a>'
-							);
+								);
 							?>
 						</span>
 					</p>
