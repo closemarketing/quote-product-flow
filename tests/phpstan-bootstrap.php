@@ -74,3 +74,16 @@ if (!function_exists('as_schedule_recurring_action')) {
         return true;
     }
 }
+
+// Mock license function
+if (!function_exists('pbc_is_license_active')) {
+    /**
+     * Mock pbc_is_license_active function for PHPStan analysis.
+     *
+     * @return bool
+     */
+    function pbc_is_license_active() {
+        return false;
+    }
+}
+
