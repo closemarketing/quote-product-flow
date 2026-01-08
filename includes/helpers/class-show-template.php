@@ -318,7 +318,7 @@ class PBC_Template {
 								/* translators: %s: Link to activate license */
 								esc_html__( 'Activate your license to remove this notice and unlock full features. %s', 'pbc' ),
 								'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '" style="color: #ffffff; text-decoration: underline; font-weight: 500;">' . esc_html__( 'Go to Settings', 'pbc' ) . '</a>'
-								);
+							);
 							?>
 						</span>
 					</p>
