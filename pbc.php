@@ -82,11 +82,11 @@ add_action(
 					'product_uuid'    => WPPBC_LICENSE_PRODUCT_UUID,
 					'file'            => WPPBC_PLUGIN,
 					'version'         => WPPBC_VERSION,
-					'slug'            => 'product-budget-configurator',
-					'name'            => WPPBC_ITEM_NAME,
-					'text_domain'     => 'pbc',
-				)
-				);
+				'slug'            => 'product-budget-configurator',
+				'name'            => WPPBC_ITEM_NAME,
+				'text_domain'     => 'pbc',
+			)
+		);
 	} catch ( \Exception $e ) {
 			add_action(
 				'admin_notices',
