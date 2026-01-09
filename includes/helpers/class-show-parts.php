@@ -74,7 +74,14 @@ class SHOW {
 							}
 							
 							$input_type = 'number' === $question_input_type ? 'number' : 'text';
-							echo '<div class="variation-question-label">' . esc_html( $variation_data['title'] ) . '</div>';
+							$is_required = ! empty( $question_required ) && '1' === $question_required;
+							
+							echo '<div class="variation-question-label">';
+							echo esc_html( $variation_data['title'] );
+							if ( $is_required ) {
+								echo ' <span class="required-asterisk" style="color: #d32f2f;">*</span>';
+							}
+							echo '</div>';
 							?>
 							<input 
 								type="<?php echo esc_attr( $input_type ); ?>" 
@@ -85,7 +92,8 @@ class SHOW {
 								placeholder="<?php echo esc_attr( $question_placeholder ); ?>" 
 								data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
 								data-step="<?php echo esc_attr( $cstep ); ?>"
-								<?php echo $question_required ? 'required' : ''; ?>
+								data-question-key="<?php echo esc_attr( $question_key ); ?>"
+								<?php echo $is_required ? 'required="required"' : ''; ?>
 								<?php echo 'number' === $input_type ? 'step="any"' : ''; ?>
 							/>
 							<input type="hidden" name="pbc_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
@@ -148,10 +156,16 @@ class SHOW {
 					}
 					
 					$input_type = 'number' === $question_input_type ? 'number' : 'text';
+					$is_required = ! empty( $question_required ) && '1' === $question_required;
 					?>
 					<div class="variation-question-item">
 						<label class="variation-question-label" for="pbc_question_<?php echo esc_attr( $question_key ); ?>">
-							<?php echo esc_html( $variation_data['title'] ); ?>
+							<?php 
+							echo esc_html( $variation_data['title'] );
+							if ( $is_required ) {
+								echo ' <span class="required-asterisk" style="color: #d32f2f;">*</span>';
+							}
+							?>
 						</label>
 						<input 
 							type="<?php echo esc_attr( $input_type ); ?>" 
@@ -162,7 +176,8 @@ class SHOW {
 							placeholder="<?php echo esc_attr( $question_placeholder ); ?>" 
 							data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
 							data-step="<?php echo esc_attr( $cstep ); ?>"
-							<?php echo $question_required ? 'required' : ''; ?>
+							data-question-key="<?php echo esc_attr( $question_key ); ?>"
+							<?php echo $is_required ? 'required="required"' : ''; ?>
 							<?php echo 'number' === $input_type ? 'step="any"' : ''; ?>
 						/>
 						<input type="hidden" name="pbc_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />

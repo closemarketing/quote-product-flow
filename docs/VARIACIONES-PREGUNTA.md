@@ -342,6 +342,25 @@ Puedes personalizarlos en `pbc-configurator.css`
    - Añadir soporte para select/dropdown
    - Opciones predefinidas
 
+## Validación y Flujo
+
+### Validación Automática
+- ✅ **HTML5 Validation**: Los campos requeridos se validan automáticamente
+- ✅ **JavaScript Validation**: Alerta si faltan preguntas requeridas
+- ✅ **No auto-selección**: Las fases con solo preguntas no se saltan automáticamente
+- ✅ **Focus automático**: El primer input recibe el foco al cargar la fase
+
+### Comportamiento del Botón "Siguiente"
+- Si hay preguntas requeridas sin responder → Muestra alerta y no avanza
+- Si hay variaciones normales sin seleccionar → HTML5 validation lo maneja
+- Si todo está completo → Avanza normalmente
+
+### Mezcla de Tipos
+Si una fase tiene:
+- **Solo preguntas**: No se auto-selecciona nada, usuario debe responder
+- **Solo variaciones**: Se auto-selecciona la primera (comportamiento normal)
+- **Ambos**: Se auto-selecciona la primera variación normal, las preguntas deben responderse
+
 ## Resumen
 
 **Este nuevo enfoque es mucho más flexible y potente:**
@@ -351,6 +370,191 @@ Puedes personalizarlos en `pbc-configurator.css`
 ✅ Puedes mezclar ambos tipos en la misma fase  
 ✅ Las dependencias funcionan igual  
 ✅ Más fácil de configurar y mantener  
+✅ Validación automática de preguntas requeridas  
+✅ No se saltan fases con preguntas sin responder  
 
 **¡El sistema está listo para usar!** 🚀
+
+## Validación Robusta (Doble Capa)
+
+### Validación Frontend (JavaScript)
+El sistema valida en el cliente para mejor UX:
+
+```javascript
+// Solo valida al hacer click en "Siguiente"
+$(document).on('submit', '#configurator-form', function(e) {
+    var submitType = $(document.activeElement).attr('value');
+    if (submitType !== 'next') return true;
+    
+    var questionInputs = $('.pbc_question_input');
+    var allAnswered = true;
+    var missingRequired = [];
+    
+    questionInputs.each(function() {
+        var $input = $(this);
+        var isRequired = $input.prop('required') || $input.attr('required') === 'required';
+        var value = $.trim($input.val());
+        
+        if (isRequired && value === '') {
+            allAnswered = false;
+            missingRequired.push(/* nombre pregunta */);
+            $input.addClass('error-field'); // Borde rojo
+        } else {
+            $input.removeClass('error-field');
+        }
+    });
+    
+    if (!allAnswered) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert('Por favor, responde todas las preguntas requeridas:\n- ' + missingRequired.join('\n- '));
+        $('.pbc_question_input.error-field').first().focus();
+        return false;
+    }
+});
+```
+
+**Características:**
+- ✅ Validación solo al avanzar (no al retroceder)
+- ✅ Alerta con lista de preguntas faltantes
+- ✅ Focus automático en primer campo con error
+- ✅ Indicadores visuales (borde rojo + fondo rosa)
+- ✅ Asterisco rojo (*) en labels de campos requeridos
+
+### Validación Backend (PHP)
+Validación de seguridad en servidor:
+
+```php
+$should_advance = true;
+$validation_error = '';
+
+if ( 'next' === $submit ) {
+    $current_phase_id = $phases[ $current_step_from_form - 1 ];
+    $phase_variations = get_posts( /* obtener variaciones */ );
+    $required_question_keys = array();
+    
+    // Identificar preguntas requeridas
+    foreach ( $phase_variations as $var_id ) {
+        $is_question = get_post_meta( $var_id, 'pbc_is_question', true );
+        $is_required = get_post_meta( $var_id, 'pbc_question_required', true );
+        $question_key = get_post_meta( $var_id, 'pbc_question_key', true );
+        
+        if ( $is_question && $is_required && $question_key ) {
+            $required_question_keys[] = $question_key;
+        }
+    }
+    
+    // Validar respuestas
+    if ( ! empty( $required_question_keys ) ) {
+        foreach ( $required_question_keys as $req_key ) {
+            $answer = isset( $_POST['pbc_question'][ $req_key ] ) ? 
+                     trim( sanitize_text_field( wp_unslash( $_POST['pbc_question'][ $req_key ] ) ) ) : '';
+            
+            if ( '' === $answer ) {
+                $should_advance = false;
+                $validation_error = 'Por favor, responde todas las preguntas requeridas';
+                break;
+            }
+        }
+    }
+}
+
+if ( ! $should_advance ) {
+    $cstep = $current_step_from_form; // No avanzar
+    $_SESSION['pbc_output'] = array(
+        'type' => 'error',
+        'response' => '<div class="error">' . esc_html( $validation_error ) . '</div>',
+    );
+}
+```
+
+**Características:**
+- ✅ Sanitización completa de inputs
+- ✅ Validación con `trim()` (previene espacios)
+- ✅ Mensaje de error persistente en sesión
+- ✅ Fallback si JavaScript está deshabilitado
+- ✅ Compatible con WordPress Coding Standards
+
+### Indicadores Visuales
+
+#### CSS para Estados de Error
+```css
+.pbc_question_input.error-field {
+  border-color: #d32f2f !important;
+  border-width: 2px !important;
+  background-color: #ffebee;
+}
+
+.pbc_question_input:required {
+  border-left: 3px solid #9a781f;
+}
+
+.required-asterisk {
+  color: #d32f2f;
+  font-weight: bold;
+}
+```
+
+**Experiencia Visual:**
+- 🔴 Asterisco rojo (*) en campos requeridos
+- 🔴 Borde rojo en campos con error
+- 🟥 Fondo rosa claro en campos con error
+- 🟡 Borde izquierdo dorado en campos requeridos
+- ✨ Focus automático en primer error
+
+### Prevención de Auto-Skip de Fases con Preguntas
+
+El sistema incluye protección contra el auto-salto de fases que contienen preguntas:
+
+```javascript
+// En pbc-configurator.js - después de cargar respuesta AJAX
+var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0;
+var hasQuestions = $('.page-configurator').find('.pbc_question_input').length > 0;
+
+// Solo auto-saltar si NO hay variaciones NI preguntas
+if (newNextPhase && !hasVariations && !hasQuestions) {
+    // Auto-skip fase vacía
+    $('.page-configurator').find('button[name=submit]').trigger('click');
+} else {
+    // Fase tiene contenido - esperar interacción del usuario
+}
+```
+
+**¿Por qué es importante?**
+- Sin esta protección, fases con solo preguntas se saltarían automáticamente
+- El sistema detecta inputs `.pbc_question_input` y DETIENE el auto-skip
+- El usuario debe rellenar las preguntas y hacer click en "Siguiente"
+
+### Flujo de Validación Completo
+
+1. **Usuario llega a una fase:**
+   - Si tiene preguntas → Se DETIENE (no auto-skip)
+   - Si está vacía → Auto-skip al siguiente paso
+2. **Usuario rellena campos y hace click en "Siguiente"**
+3. **JavaScript valida:**
+   - Revisa todos los `.pbc_question_input[required]`
+   - Si hay vacíos → Muestra alerta + marca errores + focus
+   - Si todo OK → Permite submit
+4. **PHP valida (backend):**
+   - Recibe `$_POST['pbc_question']`
+   - Verifica campos requeridos
+   - Sanitiza valores con `trim()` y `sanitize_text_field()`
+   - Si hay vacíos → No avanza + muestra error
+   - Si todo OK → Guarda en `$_SESSION['pbc_questions']` y avanza
+
+### Casos Especiales
+
+#### Solo preguntas no requeridas
+- ✅ Se puede avanzar sin responder
+- ✅ No se muestran asteriscos
+- ✅ No hay validación
+
+#### Mix: requeridas + opcionales
+- ✅ Solo valida las requeridas
+- ✅ Acepta opcionales vacías
+- ✅ Mensaje específico solo para requeridas
+
+#### Solo variaciones normales
+- ✅ HTML5 validation maneja la selección
+- ✅ No interfiere con preguntas
 

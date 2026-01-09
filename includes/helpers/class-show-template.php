@@ -109,13 +109,86 @@ class PBC_Template {
 
 		if ( isset( $_POST['submit'] ) && $nonce_verified ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
-			if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
-				$cstep = (int) $_POST[ $submit . '_phase' ];
-			} elseif ( 'generate_pdf' === $submit && isset( $_SESSION['pbc_output'] ) ) {
-				echo '<script>window.open("' . esc_url( sanitize_url( $_SESSION['pbc_output'] ) ) . '", "_blank");</script>';
-				$cstep = 'calculate';
+			
+			// Get current step from form.
+			$current_step_from_form = isset( $_POST['pbc_current_phase'] ) ? (int) $_POST['pbc_current_phase'] : 1;
+			
+			// Check if we're advancing and if current phase has question variations or normal variations.
+			$should_advance = true;
+			$validation_error = '';
+			
+			if ( 'next' === $submit ) {
+				$current_phase_id = isset( $phases[ $current_step_from_form - 1 ] ) ? $phases[ $current_step_from_form - 1 ] : 0;
+				if ( $current_phase_id ) {
+					$phase_variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $current_phase_id . '&fields=ids' );
+					$has_required_questions = false;
+					$has_normal_variations = false;
+					$required_question_keys = array();
+					
+					foreach ( $phase_variations as $var_id ) {
+						$is_question = get_post_meta( $var_id, 'pbc_is_question', true );
+						if ( $is_question ) {
+							$is_required = get_post_meta( $var_id, 'pbc_question_required', true );
+							if ( $is_required ) {
+								$has_required_questions = true;
+								$question_key = get_post_meta( $var_id, 'pbc_question_key', true );
+								if ( $question_key ) {
+									$required_question_keys[] = $question_key;
+								}
+							}
+						} else {
+							$has_normal_variations = true;
+						}
+					}
+					
+					// Validate required questions.
+					if ( $has_required_questions && ! empty( $required_question_keys ) ) {
+						if ( empty( $_POST['pbc_question'] ) ) {
+							$should_advance = false;
+							$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
+						} else {
+							// Check each required question was answered.
+							foreach ( $required_question_keys as $req_key ) {
+								$answer = isset( $_POST['pbc_question'][ $req_key ] ) ? trim( sanitize_text_field( wp_unslash( $_POST['pbc_question'][ $req_key ] ) ) ) : '';
+								if ( '' === $answer ) {
+									$should_advance = false;
+									$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
+									break;
+								}
+							}
+						}
+					}
+					
+					// Validate normal variations (if they exist and no question variations).
+					if ( $has_normal_variations && ! $has_required_questions ) {
+						// Check if a variation is selected.
+						if ( empty( $_POST['pbc_variation'] ) || ! isset( $_POST['pbc_variation'][ $current_step_from_form ] ) ) {
+							$should_advance = false;
+							$validation_error = __( 'Por favor, selecciona una opción antes de continuar.', 'pbc' );
+						}
+					}
+				}
+			}
+			
+			if ( $should_advance ) {
+				if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
+					$cstep = (int) $_POST[ $submit . '_phase' ];
+				} elseif ( 'generate_pdf' === $submit && isset( $_SESSION['pbc_output'] ) ) {
+					echo '<script>window.open("' . esc_url( sanitize_url( $_SESSION['pbc_output'] ) ) . '", "_blank");</script>';
+					$cstep = 'calculate';
+				} else {
+					$cstep = 'calculate';
+				}
 			} else {
-				$cstep = 'calculate';
+				// Don't advance - stay on current step and show error.
+				$cstep = $current_step_from_form;
+				// Set error message in session to display.
+				if ( ! isset( $_SESSION['pbc_output'] ) ) {
+					$_SESSION['pbc_output'] = array();
+				}
+				$error_message = ! empty( $validation_error ) ? $validation_error : __( 'Por favor, completa todos los campos requeridos antes de continuar.', 'pbc' );
+				$_SESSION['pbc_output']['response'] = '<div class="error">' . esc_html( $error_message ) . '</div>';
+				$_SESSION['pbc_output']['type']     = 'error';
 			}
 
 			// Process questions if present.
@@ -151,7 +224,8 @@ class PBC_Template {
 								$_SESSION[ $pbc_session_key ][ $step ]['phase']['id']     = $phase_id;
 								$_SESSION[ $pbc_session_key ][ $step ]['phase']['name']   = $phase_title;
 								$_SESSION[ $pbc_session_key ][ $step ]['var']['id']       = $variation_id;
-								$_SESSION[ $pbc_session_key ][ $step ]['var']['name']     = $variation_title . ': ' . $answer;								$_SESSION[ $pbc_session_key ][ $step ]['var']['type']     = 'question';
+								$_SESSION[ $pbc_session_key ][ $step ]['var']['name']     = $variation_title . ': ' . $answer;								
+								$_SESSION[ $pbc_session_key ][ $step ]['var']['type']     = 'question';
 								$_SESSION[ $pbc_session_key ][ $step ]['var']['price']    = 0;
 								$_SESSION[ $pbc_session_key ][ $step ]['question_key']    = $question_key;
 								$_SESSION[ $pbc_session_key ][ $step ]['question_answer'] = $answer;
@@ -471,21 +545,34 @@ class PBC_Template {
 								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
 							}
 
-							// Show public.
-							$selected_var = 0;
-							if (
-								isset( $_SESSION[ $pbc_session_key ] ) &&
-								is_array( $_SESSION[ $pbc_session_key ] ) &&
-								isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
-								in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-							) {
-								$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
-							} else {
-								$selected_var = $variations[ current( array_keys( $variations ) ) ];
+						// Show public.
+						$selected_var = 0;
+						
+						// Check if there are any non-question variations to auto-select.
+						$non_question_variations = array();
+						foreach ( $variations as $var_id ) {
+							$is_question = get_post_meta( $var_id, 'pbc_is_question', true );
+							if ( ! $is_question ) {
+								$non_question_variations[] = $var_id;
 							}
-							if ( ! empty( $variations_section ) ) {
-								SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
-							}
+						}
+						
+						if (
+							isset( $_SESSION[ $pbc_session_key ] ) &&
+							is_array( $_SESSION[ $pbc_session_key ] ) &&
+							isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) &&
+							in_array( (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						) {
+							$selected_var = isset( $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $cstep ]['var']['id'] : 0;
+						} elseif ( ! empty( $non_question_variations ) ) {
+							// Only auto-select if there are non-question variations.
+							$selected_var = $non_question_variations[0];
+						}
+						// If all variations are questions, $selected_var remains 0 (no auto-selection).
+						
+						if ( ! empty( $variations_section ) ) {
+							SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
+						}
 						} else {
 							?>
 							<div class="error"><?php esc_html_e( 'No Variations Available', 'pbc' ); ?></div>

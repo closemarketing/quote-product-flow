@@ -43,6 +43,12 @@
   border-left: 3px solid #9a781f;
 }
 
+.pbc_question_input.error-field {
+  border-color: #d32f2f !important;
+  border-width: 2px !important;
+  background-color: #ffebee;
+}
+
 /* Vertical template question styles */
 .variation-question-item {
   margin-bottom: 15px;
