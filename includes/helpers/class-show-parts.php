@@ -42,6 +42,7 @@ class SHOW {
 		foreach ( $variations_section as $variation_data ) {
 			$variation_id = (int) $variation_data['id'];
 			$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
+			$is_question  = get_post_meta( $variation_id, 'pbc_is_question', true );
 
 			if ( 'wizard' === $template ) {
 				if ( $actual_variation_tag !== $variation_data['section'] ) {
@@ -49,7 +50,7 @@ class SHOW {
 					$actual_variation_tag = $variation_data['section'];
 				}
 				?>
-				<li class="variation_list">
+				<li class="variation_list <?php echo $is_question ? 'is-question' : ''; ?>">
 					<label>
 						<?php
 						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
@@ -58,7 +59,38 @@ class SHOW {
 							echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
 							echo '</div>';
 						}
-						if ( empty( $field_type ) ) {
+						
+						// Check if this is a question type variation.
+						if ( $is_question ) {
+							$question_key         = get_post_meta( $variation_id, 'pbc_question_key', true );
+							$question_input_type  = get_post_meta( $variation_id, 'pbc_question_input_type', true );
+							$question_placeholder = get_post_meta( $variation_id, 'pbc_question_placeholder', true );
+							$question_required    = get_post_meta( $variation_id, 'pbc_question_required', true );
+							
+							// Get saved answer from session if exists.
+							$saved_answer = '';
+							if ( isset( $_SESSION['pbc_questions'][ $question_key ] ) ) {
+								$saved_answer = $_SESSION['pbc_questions'][ $question_key ];
+							}
+							
+							$input_type = 'number' === $question_input_type ? 'number' : 'text';
+							echo '<div class="variation-question-label">' . esc_html( $variation_data['title'] ) . '</div>';
+							?>
+							<input 
+								type="<?php echo esc_attr( $input_type ); ?>" 
+								class="pbc_question_input" 
+								name="pbc_question[<?php echo esc_attr( $question_key ); ?>]" 
+								id="pbc_question_<?php echo esc_attr( $question_key ); ?>" 
+								value="<?php echo esc_attr( $saved_answer ); ?>" 
+								placeholder="<?php echo esc_attr( $question_placeholder ); ?>" 
+								data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
+								data-step="<?php echo esc_attr( $cstep ); ?>"
+								<?php echo $question_required ? 'required' : ''; ?>
+								<?php echo 'number' === $input_type ? 'step="any"' : ''; ?>
+							/>
+							<input type="hidden" name="pbc_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+							<?php
+						} elseif ( empty( $field_type ) ) {
 							?>
 							<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
 							<?php
@@ -102,7 +134,41 @@ class SHOW {
 				</li>
 				<?php
 			} elseif ( 'vertical' === $template ) {
-				if ( empty( $field_type ) ) {
+				// Check if this is a question type variation.
+				if ( $is_question ) {
+					$question_key         = get_post_meta( $variation_id, 'pbc_question_key', true );
+					$question_input_type  = get_post_meta( $variation_id, 'pbc_question_input_type', true );
+					$question_placeholder = get_post_meta( $variation_id, 'pbc_question_placeholder', true );
+					$question_required    = get_post_meta( $variation_id, 'pbc_question_required', true );
+					
+					// Get saved answer from session if exists.
+					$saved_answer = '';
+					if ( isset( $_SESSION['pbc_questions'][ $question_key ] ) ) {
+						$saved_answer = $_SESSION['pbc_questions'][ $question_key ];
+					}
+					
+					$input_type = 'number' === $question_input_type ? 'number' : 'text';
+					?>
+					<div class="variation-question-item">
+						<label class="variation-question-label" for="pbc_question_<?php echo esc_attr( $question_key ); ?>">
+							<?php echo esc_html( $variation_data['title'] ); ?>
+						</label>
+						<input 
+							type="<?php echo esc_attr( $input_type ); ?>" 
+							class="pbc_question_input" 
+							name="pbc_question[<?php echo esc_attr( $question_key ); ?>]" 
+							id="pbc_question_<?php echo esc_attr( $question_key ); ?>" 
+							value="<?php echo esc_attr( $saved_answer ); ?>" 
+							placeholder="<?php echo esc_attr( $question_placeholder ); ?>" 
+							data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
+							data-step="<?php echo esc_attr( $cstep ); ?>"
+							<?php echo $question_required ? 'required' : ''; ?>
+							<?php echo 'number' === $input_type ? 'step="any"' : ''; ?>
+						/>
+						<input type="hidden" name="pbc_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+					</div>
+					<?php
+				} elseif ( empty( $field_type ) ) {
 					if ( $actual_variation_tag !== $variation_data['section'] ) {
 						?>
 						<optgroup label="<?php echo esc_html( $variation_data['section'] ); ?>">

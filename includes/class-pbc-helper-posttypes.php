@@ -254,6 +254,48 @@ class PBC_Helper_PostTypes {
 					'std'         => '',
 					'placeholder' => __( 'Select a phase', 'pbc' ),
 				),
+				// QUESTION MODE.
+				array(
+					'name' => __( 'Convert to Question', 'pbc' ),
+					'id'   => "{$prefix}is_question",
+					'type' => 'checkbox',
+					'desc' => __( 'When enabled, this variation will show as an input field for the user to answer. The answer can be used in dependencies.', 'pbc' ),
+					'std'  => 0,
+				),
+				array(
+					'name'    => __( 'Question Key', 'pbc' ),
+					'id'      => "{$prefix}question_key",
+					'type'    => 'text',
+					'desc'    => __( 'Unique identifier for this question (e.g., house_m2, height). Use lowercase and underscores.', 'pbc' ),
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
+				array(
+					'name'    => __( 'Input Type', 'pbc' ),
+					'id'      => "{$prefix}question_input_type",
+					'type'    => 'select',
+					'options' => array(
+						'number' => __( 'Number', 'pbc' ),
+						'text'   => __( 'Text', 'pbc' ),
+					),
+					'std'     => 'number',
+					'desc'    => __( 'Type of input field to show', 'pbc' ),
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
+				array(
+					'name'    => __( 'Placeholder', 'pbc' ),
+					'id'      => "{$prefix}question_placeholder",
+					'type'    => 'text',
+					'desc'    => __( 'Placeholder text for the input (e.g., "Introduce los m²")', 'pbc' ),
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
+				array(
+					'name'    => __( 'Required', 'pbc' ),
+					'id'      => "{$prefix}question_required",
+					'type'    => 'checkbox',
+					'desc'    => __( 'Make this question required', 'pbc' ),
+					'std'     => 1,
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
 				// IMAGE ADVANCED (WP 3.5+).
 				array(
 					'name'             => __( 'Icon image', 'pbc' ),
@@ -355,6 +397,46 @@ class PBC_Helper_PostTypes {
 					'options' => array(
 						'textarea_rows' => 8,
 						'teeny'         => true,
+					),
+				),
+				// Question dependencies.
+				array(
+					'name'       => __( 'Depends on Question Answers', 'pbc' ),
+					'id'         => "{$prefix}question_depends",
+					'type'       => 'group',
+					'clone'      => true,
+					'sort_clone' => true,
+					'desc'       => __( 'Show this variation only when question answers meet these conditions', 'pbc' ),
+					'fields'     => array(
+						array(
+							'name'    => __( 'Question Key', 'pbc' ),
+							'id'      => "{$prefix}question_key_ref",
+							'type'    => 'text',
+							'desc'    => __( 'The question key to check (e.g., house_m2)', 'pbc' ),
+							'columns' => 3,
+						),
+						array(
+							'name'    => __( 'Operator', 'pbc' ),
+							'id'      => "{$prefix}question_operator",
+							'type'    => 'select',
+							'options' => array(
+								'>'  => __( 'Greater than (>)', 'pbc' ),
+								'>=' => __( 'Greater than or equal (>=)', 'pbc' ),
+								'<'  => __( 'Less than (<)', 'pbc' ),
+								'<=' => __( 'Less than or equal (<=)', 'pbc' ),
+								'='  => __( 'Equal (=)', 'pbc' ),
+								'!=' => __( 'Not equal (!=)', 'pbc' ),
+							),
+							'std'     => '>',
+							'columns' => 3,
+						),
+						array(
+							'name'    => __( 'Value', 'pbc' ),
+							'id'      => "{$prefix}question_value",
+							'type'    => 'text',
+							'desc'    => __( 'The value to compare against', 'pbc' ),
+							'columns' => 3,
+						),
 					),
 				),
 			),
