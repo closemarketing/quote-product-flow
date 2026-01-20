@@ -74,3 +74,28 @@ if (!function_exists('as_schedule_recurring_action')) {
         return true;
     }
 }
+
+// Mock license function
+if (!function_exists('pbc_is_license_active')) {
+    /**
+     * Mock function to check if license is active.
+     *
+     * @return bool
+     */
+    function pbc_is_license_active() {
+        return true;
+    }
+}
+
+// Mock License Manager classes - use spl_autoload_register to define them
+spl_autoload_register(function ($class) {
+    if ($class === 'Closemarketing\WPLicenseManager\FormsCRMSettings') {
+        eval('
+        namespace Closemarketing\WPLicenseManager;
+        class FormsCRMSettings {
+            public function __construct($license = null, array $args = []) {}
+            public function render() {}
+        }
+        ');
+    }
+});
