@@ -248,23 +248,44 @@ class SHOW {
 				} else {
 					$count = $cstep;
 				}
-				for ( $i = 1; $i <= $count; $i++ ) {
-					if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
-						continue;
-					}
-					$phase_key    = $i;
-					$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) : '';
-					$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
-					$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) : '';
-					$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
-					$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
+			for ( $i = 1; $i <= $count; $i++ ) {
+				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+					continue;
+				}
+				$phase_key    = $i;
+				$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) : '';
+				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
+				$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) : '';
+				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
+				$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
 
-					if ( 'calculate' === $cstep && empty( $field_type ) ) {
-						$total_price += (float) $var_price;
-					} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
-						$total_price = (float) $var_price * $total_price;
-					}
+				if ( 'calculate' === $cstep && empty( $field_type ) ) {
+					$total_price += (float) $var_price;
+				} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
+					$total_price = (float) $var_price * $total_price;
+				}
 
+			// Check if this phase has multiple questions.
+			$has_multiple_questions = isset( $_SESSION[ $pbc_session_key ][ $i ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $i ]['questions'] );
+
+			if ( $has_multiple_questions ) {
+				// Show all questions from this phase.
+				foreach ( $_SESSION[ $pbc_session_key ][ $i ]['questions'] as $question_data ) {
+					?>
+					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?> question-row">
+						<td class="name">
+							<?php
+							echo esc_html( $phase_key . '. ' . $question_data['variation_title'] . ': ' . $question_data['answer'] );
+							?>
+						</td>
+						<td class="price">
+							-
+						</td>
+					</tr>
+					<?php
+				}
+			} else {
+					// Show single variation or single question (old format).
 					?>
 					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
 						<td class="name">
@@ -287,6 +308,7 @@ class SHOW {
 					</tr>
 					<?php
 				}
+			}
 				if ( 'calculate' === $cstep && 'no' !== $show_prices ) {
 					?>
 					<tr class="variation_selected phase-total_price">

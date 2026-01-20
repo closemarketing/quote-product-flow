@@ -191,50 +191,82 @@ class PBC_Template {
 				$_SESSION['pbc_output']['type']     = 'error';
 			}
 
-			// Process questions if present.
-			if ( isset( $_POST['pbc_question'] ) && 'next' === $_POST['submit'] ) {
-				if ( ! isset( $_SESSION['pbc_questions'] ) ) {
-					$_SESSION['pbc_questions'] = array();
-				}
+		// Process questions if present.
+		if ( isset( $_POST['pbc_question'] ) && 'next' === $_POST['submit'] ) {
+			if ( ! isset( $_SESSION['pbc_questions'] ) ) {
+				$_SESSION['pbc_questions'] = array();
+			}
+			
+			$question_variation_ids = isset( $_POST['pbc_question_variation_id'] ) ? $_POST['pbc_question_variation_id'] : array(); // phpcs:ignore
+			
+			// Group questions by phase to save them all.
+			$questions_by_phase = array();
+			
+			foreach ( $_POST['pbc_question'] as $question_key => $answer ) { // phpcs:ignore
+				$question_key = sanitize_key( $question_key );
+				$answer = sanitize_text_field( wp_unslash( $answer ) );
 				
-				$question_variation_ids = isset( $_POST['pbc_question_variation_id'] ) ? $_POST['pbc_question_variation_id'] : array(); // phpcs:ignore
+				// Save answer in global questions array.
+				$_SESSION['pbc_questions'][ $question_key ] = $answer;
 				
-				foreach ( $_POST['pbc_question'] as $question_key => $answer ) { // phpcs:ignore
-					$question_key = sanitize_key( $question_key );
-					$answer = sanitize_text_field( wp_unslash( $answer ) );
-					
-					// Save answer in global questions array.
-					$_SESSION['pbc_questions'][ $question_key ] = $answer;
-					
-					// If we have the variation ID, also save in the standard format.
-					if ( isset( $question_variation_ids[ $question_key ] ) ) {
-						$variation_id = (int) $question_variation_ids[ $question_key ];
-						// Find which step this belongs to.
-						foreach ( $phases as $step_idx => $phase_id ) {
-							$phase_variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids' );
-							if ( in_array( $variation_id, $phase_variations, true ) ) {
-								$step = $step_idx + 1;
-								$phase_title = get_the_title( $phase_id );
-								$variation_title = get_the_title( $variation_id );
-								
-								if ( ! isset( $_SESSION[ $pbc_session_key ][ $step ] ) ) {
-									$_SESSION[ $pbc_session_key ][ $step ] = array();
-								}
-								
-								$_SESSION[ $pbc_session_key ][ $step ]['phase']['id']     = $phase_id;
-								$_SESSION[ $pbc_session_key ][ $step ]['phase']['name']   = $phase_title;
-								$_SESSION[ $pbc_session_key ][ $step ]['var']['id']       = $variation_id;
-								$_SESSION[ $pbc_session_key ][ $step ]['var']['name']     = $variation_title . ': ' . $answer;								
-								$_SESSION[ $pbc_session_key ][ $step ]['var']['type']     = 'question';
-								$_SESSION[ $pbc_session_key ][ $step ]['var']['price']    = 0;
-								$_SESSION[ $pbc_session_key ][ $step ]['question_key']    = $question_key;
-								$_SESSION[ $pbc_session_key ][ $step ]['question_answer'] = $answer;
-								break;
+				// If we have the variation ID, also save in the standard format.
+				if ( isset( $question_variation_ids[ $question_key ] ) ) {
+					$variation_id = (int) $question_variation_ids[ $question_key ];
+					// Find which step this belongs to.
+					foreach ( $phases as $step_idx => $phase_id ) {
+						$phase_variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids' );
+						if ( in_array( $variation_id, $phase_variations, true ) ) {
+							$step = $step_idx + 1;
+							$phase_title = get_the_title( $phase_id );
+							$variation_title = get_the_title( $variation_id );
+							
+							// Group questions by step to save them all later.
+							if ( ! isset( $questions_by_phase[ $step ] ) ) {
+								$questions_by_phase[ $step ] = array(
+									'phase_id'    => $phase_id,
+									'phase_title' => $phase_title,
+									'questions'   => array(),
+								);
 							}
+							
+							// Add this question to the phase group.
+							$questions_by_phase[ $step ]['questions'][] = array(
+								'variation_id'    => $variation_id,
+								'variation_title' => $variation_title,
+								'question_key'    => $question_key,
+								'answer'          => $answer,
+							);
+							break;
 						}
 					}
 				}
 			}
+			
+		// Now save all questions for each phase.
+		foreach ( $questions_by_phase as $step => $phase_data ) {
+			if ( ! isset( $_SESSION[ $pbc_session_key ][ $step ] ) ) {
+				$_SESSION[ $pbc_session_key ][ $step ] = array();
+			}
+			
+			// Save phase data.
+			$_SESSION[ $pbc_session_key ][ $step ]['phase']['id']   = $phase_data['phase_id'];
+			$_SESSION[ $pbc_session_key ][ $step ]['phase']['name'] = $phase_data['phase_title'];
+			
+			// Save all questions from this phase.
+			$_SESSION[ $pbc_session_key ][ $step ]['questions'] = $phase_data['questions'];
+			
+			// For backwards compatibility, also save the first question in the old format.
+			if ( ! empty( $phase_data['questions'] ) ) {
+				$first_question = $phase_data['questions'][0];
+				$_SESSION[ $pbc_session_key ][ $step ]['var']['id']       = $first_question['variation_id'];
+				$_SESSION[ $pbc_session_key ][ $step ]['var']['name']     = $first_question['variation_title'] . ': ' . $first_question['answer'];
+				$_SESSION[ $pbc_session_key ][ $step ]['var']['type']     = 'question';
+				$_SESSION[ $pbc_session_key ][ $step ]['var']['price']    = 0;
+				$_SESSION[ $pbc_session_key ][ $step ]['question_key']    = $first_question['question_key'];
+				$_SESSION[ $pbc_session_key ][ $step ]['question_answer'] = $first_question['answer'];
+			}
+		}
+		}
 
 			if ( isset( $_POST['pbc_variation'] ) && 'next' === $_POST['submit'] ) {
 				if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {

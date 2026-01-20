@@ -40,6 +40,10 @@ class PBC_Helper_PostTypes {
 
 		add_action( 'restrict_manage_posts', array( $this, 'admin_posts_filter' ) );
 		add_filter( 'parse_query', array( $this, 'pbc_posts_filter' ) );
+		
+		// Validate question key on save.
+		add_action( 'save_post_variation', array( $this, 'validate_question_key' ), 10, 3 );
+		add_action( 'admin_notices', array( $this, 'show_duplicate_key_notice' ) );
 	}
 
 	/**
@@ -894,6 +898,104 @@ class PBC_Helper_PostTypes {
 		}
 
 		return $query;
+	}
+
+	/**
+	 * Show duplicate key admin notice.
+	 *
+	 * @return void
+	 */
+	public function show_duplicate_key_notice() {
+		// Check if we're on the variation edit screen.
+		$screen = get_current_screen();
+		if ( ! $screen || 'variation' !== $screen->post_type ) {
+			return;
+		}
+
+		// Check for duplicate key parameter.
+		if ( isset( $_GET['pbc_duplicate_key'] ) && '1' === $_GET['pbc_duplicate_key'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_id      = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$question_key = get_transient( 'pbc_duplicate_key_' . $post_id );
+
+			if ( $question_key ) {
+				delete_transient( 'pbc_duplicate_key_' . $post_id );
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p>
+						<strong><?php esc_html_e( 'Error:', 'pbc' ); ?></strong>
+						<?php
+						printf(
+							/* translators: %s: question key */
+							esc_html__( 'Don\'t use the same key! Another variation already uses the Question Key "%s". Please use a unique key for each question.', 'pbc' ),
+							'<code>' . esc_html( $question_key ) . '</code>'
+						);
+						?>
+					</p>
+				</div>
+				<?php
+			}
+		}
+	}
+
+	/**
+	 * Validate question key uniqueness on save.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post Post object.
+	 * @param bool    $update Whether this is an existing post being updated.
+	 * @return void
+	 */
+	public function validate_question_key( $post_id, $post, $update ) {
+		// Skip autosaves and revisions.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		// Check if this is a question type variation.
+		$is_question = isset( $_POST['pbc_is_question'] ) ? (int) $_POST['pbc_is_question'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+		if ( ! $is_question ) {
+			return;
+		}
+
+		// Get the question key.
+		$question_key = isset( $_POST['pbc_question_key'] ) ? sanitize_key( wp_unslash( $_POST['pbc_question_key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( empty( $question_key ) ) {
+			return;
+		}
+
+		// Check if another variation already uses this key.
+		$existing_variations = get_posts(
+			array(
+				'post_type'      => 'variation',
+				'posts_per_page' => -1,
+				'post__not_in'   => array( $post_id ),
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
+						'key'   => 'pbc_question_key',
+						'value' => $question_key,
+					),
+				),
+				'fields'         => 'ids',
+			)
+		);
+
+		if ( ! empty( $existing_variations ) ) {
+			// Add admin notice.
+			add_filter(
+				'redirect_post_location',
+				function ( $location ) {
+					return add_query_arg( 'pbc_duplicate_key', '1', $location );
+				}
+			);
+
+			// Also set a transient for the notice.
+			set_transient( 'pbc_duplicate_key_' . $post_id, $question_key, 30 );
+		}
 	}
 }
 

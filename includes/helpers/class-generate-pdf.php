@@ -235,11 +235,31 @@ class PDF {
 		$i           = 0;
 		$total_qty   = 1;
 
-		foreach ( $itemv as $details ) {
-			if ( ! is_array( $details ) ) {
-				continue;
+	foreach ( $itemv as $details ) {
+		if ( ! is_array( $details ) ) {
+			continue;
+		}
+		
+		$phase_name = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) . ': ' : '';
+		
+		// Check if this phase has multiple questions.
+		$has_multiple_questions = isset( $details['questions'] ) && is_array( $details['questions'] );
+		
+		if ( $has_multiple_questions ) {
+			// Show all questions from this phase.
+			foreach ( $details['questions'] as $question_data ) {
+				$bg             = ( 0 === ( $i % 2 ) ) ? 'background' : '';
+				$variation_name = $phase_name . $question_data['variation_title'] . ': ' . $question_data['answer'];
+				
+				$output .= '<tr>';
+				$output .= '<td class="title ' . $bg . '">' . $variation_name . '</td>';
+				$output .= '<td class="value right ' . $bg . '">-</td>';
+				$output .= '</tr>';
+				++$i;
 			}
-			$variation_name  = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) . ': ' : '';
+		} else {
+			// Show single variation or single question (old format).
+			$variation_name  = $phase_name;
 			$variation_name .= isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 			$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
 			$bg              = ( 0 === ( $i % 2 ) ) ? 'background' : '';
@@ -264,6 +284,7 @@ class PDF {
 			}
 			++$i;
 		}
+	}
 		if ( ! $total_price ) {
 			$total_price = 0;
 			$tax         = 0;
