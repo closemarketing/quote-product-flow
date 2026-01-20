@@ -303,15 +303,15 @@ class CALC {
 				continue;
 			}
 			$phase_name = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
-			
+
 			// Check if this phase has multiple questions.
 			$has_multiple_questions = isset( $details['questions'] ) && is_array( $details['questions'] );
-			
+
 			if ( $has_multiple_questions ) {
 				// Save all questions from this phase.
 				foreach ( $details['questions'] as $question_data ) {
 					$variation_name = $question_data['variation_title'] . ': ' . $question_data['answer'];
-					
+
 					$meta[ 'pbc_phase_name_' . $i ] = $phase_name;
 					$meta[ 'pbc_phase_var_' . $i ]  = $variation_name;
 					$meta[ 'pbc_price_' . $i ]      = '-';
@@ -409,42 +409,42 @@ class CALC {
 				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
 				$subtotal_price = 0;
 
-			$i = 0;
+				$i = 0;
 			foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
-				if ( ! is_array( $details ) ) {
-					continue;
-				}
-				$phase_name = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
-				
-				// Check if this phase has multiple questions.
-				$has_multiple_questions = isset( $details['questions'] ) && is_array( $details['questions'] );
-				
-				if ( $has_multiple_questions ) {
-					// Show all questions from this phase.
-					foreach ( $details['questions'] as $question_data ) {
-						$variation_name = $question_data['variation_title'] . ': ' . $question_data['answer'];
-						$message       .= '<tr>';
-						$message       .= '<td>' . $phase_name . '</td>';
-						$message       .= '<td>' . $variation_name . '</td>';
-						$message       .= '<td>-</td>';
-						$message       .= '</tr>';
-					}
-				} else {
-					// Show single variation or single question (old format).
-					$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
-					$price           = (float) $details['var']['price'];
-					$subtotal_price += $price;
-					$message        .= '<tr>';
-					$message        .= '<td>' . $phase_name . '</td>';
-					$message        .= '<td>' . $variation_name . '</td>';
-					$message        .= '<td>';
-					if ( $price > 0 && $show_prices ) {
-						$message .= number_format( $price, 2, ',', '.' ) . ' €';
-					}
-					$message .= '</td>';
-					$message .= '</tr>';
-				}
-				++$i;
+					if ( ! is_array( $details ) ) {
+						continue;
+						}
+					$phase_name = isset( $details['phase']['name'] ) ? sanitize_text_field( $details['phase']['name'] ) : '';
+
+					// Check if this phase has multiple questions.
+					$has_multiple_questions = isset( $details['questions'] ) && is_array( $details['questions'] );
+
+					if ( $has_multiple_questions ) {
+						// Show all questions from this phase.
+						foreach ( $details['questions'] as $question_data ) {
+							$variation_name = $question_data['variation_title'] . ': ' . $question_data['answer'];
+							$message       .= '<tr>';
+							$message       .= '<td>' . $phase_name . '</td>';
+							$message       .= '<td>' . $variation_name . '</td>';
+							$message       .= '<td>-</td>';
+							$message       .= '</tr>';
+						}
+						} else {
+						// Show single variation or single question (old format).
+						$variation_name  = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
+						$price           = (float) $details['var']['price'];
+						$subtotal_price += $price;
+						$message        .= '<tr>';
+						$message        .= '<td>' . $phase_name . '</td>';
+						$message        .= '<td>' . $variation_name . '</td>';
+						$message        .= '<td>';
+						if ( $price > 0 && $show_prices ) {
+							$message .= number_format( $price, 2, ',', '.' ) . ' €';
+						}
+						$message .= '</td>';
+						$message .= '</tr>';
+						}
+					++$i;
 			}
 				$message .= '</table><br/>';
 				// Subtotal.

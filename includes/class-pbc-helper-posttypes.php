@@ -40,7 +40,7 @@ class PBC_Helper_PostTypes {
 
 		add_action( 'restrict_manage_posts', array( $this, 'admin_posts_filter' ) );
 		add_filter( 'parse_query', array( $this, 'pbc_posts_filter' ) );
-		
+
 		// Validate question key on save.
 		add_action( 'save_post_variation', array( $this, 'validate_question_key' ), 10, 3 );
 		add_action( 'admin_notices', array( $this, 'show_duplicate_key_notice' ) );

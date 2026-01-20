@@ -1067,7 +1067,7 @@ class PBC_Export_Import {
 
 		// Get import data from request - use custom sanitization to preserve CSV structure.
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Custom sanitization applied below.
-		$import_phases_csv     = isset( $_POST['import_phases'] ) ? wp_unslash( $_POST['import_phases'] ) : '';
+		$import_phases_csv = isset( $_POST['import_phases'] ) ? wp_unslash( $_POST['import_phases'] ) : '';
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Custom sanitization applied below.
 		$import_variations_csv = isset( $_POST['import_variations'] ) ? wp_unslash( $_POST['import_variations'] ) : '';
 

@@ -66,7 +66,7 @@ class PBC_Template {
 		$color_main = get_option( 'pbc_pdf_color_total' );
 
 		$custom_css = '
-		.page-configurator .btn, 
+		.page-configurator .btn,
 		.page-configurator button.btn,
 		.page-configurator button[type="submit"].btn,
 		.page-configurator .btn-next,
@@ -80,11 +80,11 @@ class PBC_Template {
 		.page-configurator .prev button.btn {
 			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ' !important;
 		}
-		.page-configurator .btn:hover, 
-		.page-configurator .btn:focus, 
+		.page-configurator .btn:hover,
+		.page-configurator .btn:focus,
 		.page-configurator button.btn:hover,
 		.page-configurator button.btn:focus,
-		.page-configurator button[type="submit"].btn:hover, 
+		.page-configurator button[type="submit"].btn:hover,
 		.page-configurator button[type="submit"].btn:focus {
 			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ' !important;
 		}';
@@ -109,14 +109,14 @@ class PBC_Template {
 
 		if ( isset( $_POST['submit'] ) && $nonce_verified ) {
 			$submit = sanitize_text_field( wp_unslash( $_POST['submit'] ) );
-			
+
 			// Get current step from form.
 			$current_step_from_form = isset( $_POST['pbc_current_phase'] ) ? (int) $_POST['pbc_current_phase'] : 1;
-			
+
 			// Check if we're advancing and if current phase has question variations or normal variations.
 			$should_advance = true;
 			$validation_error = '';
-			
+
 			if ( 'next' === $submit ) {
 				$current_phase_id = isset( $phases[ $current_step_from_form - 1 ] ) ? $phases[ $current_step_from_form - 1 ] : 0;
 				if ( $current_phase_id ) {
@@ -124,7 +124,7 @@ class PBC_Template {
 					$has_required_questions = false;
 					$has_normal_variations = false;
 					$required_question_keys = array();
-					
+
 					foreach ( $phase_variations as $var_id ) {
 						$is_question = get_post_meta( $var_id, 'pbc_is_question', true );
 						if ( $is_question ) {
@@ -140,7 +140,7 @@ class PBC_Template {
 							$has_normal_variations = true;
 						}
 					}
-					
+
 					// Validate required questions.
 					if ( $has_required_questions && ! empty( $required_question_keys ) ) {
 						if ( empty( $_POST['pbc_question'] ) ) {
@@ -158,7 +158,7 @@ class PBC_Template {
 							}
 						}
 					}
-					
+
 					// Validate normal variations (if they exist and no question variations).
 					if ( $has_normal_variations && ! $has_required_questions ) {
 						// Check if a variation is selected.
@@ -169,7 +169,7 @@ class PBC_Template {
 					}
 				}
 			}
-			
+
 			if ( $should_advance ) {
 				if ( isset( $_POST[ $submit . '_phase' ] ) && is_numeric( $_POST[ $submit . '_phase' ] ) ) {
 					$cstep = (int) $_POST[ $submit . '_phase' ];
@@ -196,19 +196,19 @@ class PBC_Template {
 			if ( ! isset( $_SESSION['pbc_questions'] ) ) {
 				$_SESSION['pbc_questions'] = array();
 			}
-			
+
 			$question_variation_ids = isset( $_POST['pbc_question_variation_id'] ) ? $_POST['pbc_question_variation_id'] : array(); // phpcs:ignore
-			
+
 			// Group questions by phase to save them all.
 			$questions_by_phase = array();
-			
+
 			foreach ( $_POST['pbc_question'] as $question_key => $answer ) { // phpcs:ignore
 				$question_key = sanitize_key( $question_key );
 				$answer = sanitize_text_field( wp_unslash( $answer ) );
-				
+
 				// Save answer in global questions array.
 				$_SESSION['pbc_questions'][ $question_key ] = $answer;
-				
+
 				// If we have the variation ID, also save in the standard format.
 				if ( isset( $question_variation_ids[ $question_key ] ) ) {
 					$variation_id = (int) $question_variation_ids[ $question_key ];
@@ -219,7 +219,7 @@ class PBC_Template {
 							$step = $step_idx + 1;
 							$phase_title = get_the_title( $phase_id );
 							$variation_title = get_the_title( $variation_id );
-							
+
 							// Group questions by step to save them all later.
 							if ( ! isset( $questions_by_phase[ $step ] ) ) {
 								$questions_by_phase[ $step ] = array(
@@ -228,7 +228,7 @@ class PBC_Template {
 									'questions'   => array(),
 								);
 							}
-							
+
 							// Add this question to the phase group.
 							$questions_by_phase[ $step ]['questions'][] = array(
 								'variation_id'    => $variation_id,
@@ -241,20 +241,20 @@ class PBC_Template {
 					}
 				}
 			}
-			
+
 		// Now save all questions for each phase.
 		foreach ( $questions_by_phase as $step => $phase_data ) {
 			if ( ! isset( $_SESSION[ $pbc_session_key ][ $step ] ) ) {
 				$_SESSION[ $pbc_session_key ][ $step ] = array();
 			}
-			
+
 			// Save phase data.
 			$_SESSION[ $pbc_session_key ][ $step ]['phase']['id']   = $phase_data['phase_id'];
 			$_SESSION[ $pbc_session_key ][ $step ]['phase']['name'] = $phase_data['phase_title'];
-			
+
 			// Save all questions from this phase.
 			$_SESSION[ $pbc_session_key ][ $step ]['questions'] = $phase_data['questions'];
-			
+
 			// For backwards compatibility, also save the first question in the old format.
 			if ( ! empty( $phase_data['questions'] ) ) {
 				$first_question = $phase_data['questions'][0];
@@ -384,7 +384,7 @@ class PBC_Template {
 			// Don't show if bypass is active.
 			$show_notice = ! pbc_is_license_active() && is_user_logged_in() && current_user_can( 'manage_options' );
 			$is_bypassed = defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE;
-			
+
 			if ( $show_notice && ! $is_bypassed ) {
 				?>
 				<div class="pbc-license-notice" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-left: 4px solid #5a67d8; padding: 12px 20px; margin: 0 0 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -449,7 +449,7 @@ class PBC_Template {
 					if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
 						$variations_depends = array();
 						$variations_question_depends = array();
-						
+
 						foreach ( $variations as $variation_id ) {
 							// Get variation dependencies.
 							$depends = get_post_meta( $variation_id, 'pbc_depends', true );
@@ -463,7 +463,7 @@ class PBC_Template {
 									}
 								}
 							}
-							
+
 							// Get question dependencies.
 							$question_depends = get_post_meta( $variation_id, 'pbc_question_depends', true );
 							if ( ! empty( $question_depends ) && is_array( $question_depends ) ) {
@@ -488,26 +488,26 @@ class PBC_Template {
 										}
 									}
 								}
-								
+
 								// Check question dependencies.
 								if ( isset( $variations_question_depends[ $variation_id ] ) ) {
 									foreach ( $variations_question_depends[ $variation_id ] as $question_depend ) {
 										$question_key = isset( $question_depend['pbc_question_key_ref'] ) ? $question_depend['pbc_question_key_ref'] : '';
 										$operator     = isset( $question_depend['pbc_question_operator'] ) ? $question_depend['pbc_question_operator'] : '>';
 										$compare_value = isset( $question_depend['pbc_question_value'] ) ? $question_depend['pbc_question_value'] : '';
-										
+
 										if ( empty( $question_key ) || ! isset( $all_question_answers[ $question_key ] ) ) {
 											continue;
 										}
-										
+
 										$answer_value = $all_question_answers[ $question_key ];
-										
+
 										// Perform comparison.
 										$condition_met = false;
 										if ( is_numeric( $answer_value ) && is_numeric( $compare_value ) ) {
 											$answer_value = (float) $answer_value;
 											$compare_value = (float) $compare_value;
-											
+
 											switch ( $operator ) {
 												case '>':
 													$condition_met = $answer_value > $compare_value;
@@ -539,13 +539,13 @@ class PBC_Template {
 													break;
 											}
 										}
-										
+
 										if ( ! $condition_met ) {
 											return false;
 										}
 									}
 								}
-								
+
 								return true;
 							}
 						);
@@ -579,7 +579,7 @@ class PBC_Template {
 
 						// Show public.
 						$selected_var = 0;
-						
+
 						// Check if there are any non-question variations to auto-select.
 						$non_question_variations = array();
 						foreach ( $variations as $var_id ) {
@@ -588,7 +588,7 @@ class PBC_Template {
 								$non_question_variations[] = $var_id;
 							}
 						}
-						
+
 						if (
 							isset( $_SESSION[ $pbc_session_key ] ) &&
 							is_array( $_SESSION[ $pbc_session_key ] ) &&
@@ -601,7 +601,7 @@ class PBC_Template {
 							$selected_var = $non_question_variations[0];
 						}
 						// If all variations are questions, $selected_var remains 0 (no auto-selection).
-						
+
 						if ( ! empty( $variations_section ) ) {
 							SHOW::variations_content( $variations_section, $selected_var, $cstep, $template );
 						}
