@@ -1,5 +1,5 @@
 jQuery(function($){
-	// Variation selected.
+	// Variation selected (radio buttons - single selection).
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
 		
@@ -71,6 +71,97 @@ jQuery(function($){
 						}
 					}
 
+				}
+			}
+		});
+	});
+
+	// Variation selected (checkboxes - multiple selection).
+	$(document).on('change', 'input[type=checkbox].pbc_variation_multiple', function(){
+		var cPhase = $('input[name=pbc_current_phase]').val();
+		var show_prices = PBCAjaxAction.show_prices;
+		
+		// Show recommendation button if we're on step 1 and at least one variation is selected.
+		if (parseInt(cPhase, 10) === 1) {
+			var hasSelection = $('input[type=checkbox].pbc_variation_multiple:checked').length > 0;
+			if (hasSelection) {
+				$('.recommendation').show();
+			} else {
+				$('.recommendation').hide();
+			}
+		}
+		
+		// Update description visibility for checked variations.
+		var variationId = $(this).val();
+		if ($(this).is(':checked')) {
+			$('.phase_descvar .descvar_' + variationId).addClass('actived').removeClass('hidden');
+		} else {
+			$('.phase_descvar .descvar_' + variationId).removeClass('actived').addClass('hidden');
+		}
+		
+		// Update summary via AJAX.
+		$.ajax({
+			url: PBCAjaxAction.ajax_url,
+			type: 'POST',
+			data: $('#configurator-form').serialize() + '&current_phase=' + cPhase + '&action=variation_selected',
+			dataType: "html",
+			success: function(response) {
+				var resArr = response.split(';;--;;');
+				var obj = jQuery.parseJSON(resArr[1]);
+				if (obj.type == 'error') {
+					$('.product_preview').find('.product_preview_status').html('<div>' + obj.msg + '</div>').show().delay(4000, function(){
+						window.setTimeout(function(){
+							$('.product_preview').find('.product_preview_status').html('').addClass('hidden');
+						}, 1000);
+					});
+				} else if (obj.type == 'success') {
+					$('.product_preview').find('.product_preview_status').addClass('hidden');
+					
+					// Update image if provided.
+					if (obj.url) {
+						if ($('.product_preview').find('.image-wrap img[phaseid="' + cPhase + '"]').length != 0) {
+							$('.product_preview').find('.image-wrap img[phaseid="' + cPhase + '"]').attr('src', obj.url);
+						} else {
+							var className = obj.flipped ? 'flipped' : '';
+							$('.product_preview').find('.image-wrap').append('<img phaseid="' + cPhase + '" class="' + className + '" src="' + obj.url + '" alt="product image"/>').show();
+						}
+					} else {
+						if ($('.product_preview').find('.image-wrap img[phaseid="' + cPhase + '"]').length != 0) {
+							$('.product_preview').find('.image-wrap img[phaseid="' + cPhase + '"]').remove();
+						}
+					}
+					
+					// Handle image flipping.
+					if (obj.flipped) {
+						$('.product_preview').find('.image-wrap img').each(function(){
+							if (!$(this).hasClass('flipped')) {
+								$(this).addClass('flipped');
+							}
+						});
+					} else {
+						$('.product_preview').find('.image-wrap img').each(function(){
+							if ($(this).hasClass('flipped')) {
+								$(this).removeClass('flipped');
+							}
+						});
+					}
+					
+					// Update summary table with multiple selections.
+					if (obj.option || obj.price) {
+						if ($('.variation_selected.phase-' + cPhase).length == 0) {
+							var html_append = '<table><tr class="variation_selected phase-' + cPhase + '"><td class="name">' + obj.option + '</td><td class="price">';
+							if (show_prices !== 'no') {
+								html_append += obj.price;
+							}
+							html_append += '</td></tr></table>';
+							$('.configurator_summary').append(html_append);
+						} else {
+							$('.variation_selected.phase-' + cPhase + ' td.name').html(obj.option);
+							if (show_prices !== 'no') {
+								$('.variation_selected.phase-' + cPhase + ' td.price').html(obj.price);
+							}
+						}
+					}
 				}
 			}
 		});

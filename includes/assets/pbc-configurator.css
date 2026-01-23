@@ -287,6 +287,49 @@
   vertical-align: top;
 }
 
+/* Multiple selection checkboxes styling */
+.phase_variations ul li.variation_list input[type="checkbox"].pbc_variation_multiple {
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.phase_variations ul li.variation_list label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.pbc-multiple-selections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.pbc-multiple-selections .pbc-checkbox-option {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pbc-multiple-selections .pbc-checkbox-option:hover {
+  background-color: #f5f5f5;
+}
+
+.pbc-multiple-selections .pbc-checkbox-option input[type="checkbox"] {
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
 .product_preview {
   position: relative;
   text-align: left;

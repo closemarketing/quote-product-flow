@@ -70,33 +70,32 @@ add_action(
 		global $pbc_license_instance;
 
 		if ( ! class_exists( '\Closemarketing\WPLicenseManager\License' ) ) {
-			return;
+				return;
 		}
 
-	try {
-		$pbc_license_instance = new \Closemarketing\WPLicenseManager\License(
-			array(
-				'api_url'          => WPPBC_LICENSE_API_URL,
-				'rest_api_key'     => WPPBC_LICENSE_API_KEY,
-				'rest_api_secret'  => WPPBC_LICENSE_API_SECRET,
-				'product_uuid'     => WPPBC_LICENSE_PRODUCT_UUID,
-				'file'             => WPPBC_PLUGIN,
-				'version'          => WPPBC_VERSION,
-				'slug'             => 'product-budget-configurator',
-				'name'             => WPPBC_ITEM_NAME,
-				'text_domain'      => 'pbc',
-			)
-		);
-	} catch ( \Exception $e ) {
-		add_action(
-			'admin_notices',
-			function () use ( $e ) {
-				echo '<div class="notice notice-error"><p>Product Budget Configurator: ' . esc_html( $e->getMessage() ) . '</p></div>';
-			}
-		);
-	}
-	},
-	5
+		try {
+				$pbc_license_instance = new \Closemarketing\WPLicenseManager\License(
+					array(
+						'api_url'         => WPPBC_LICENSE_API_URL,
+						'rest_api_key'    => WPPBC_LICENSE_API_KEY,
+						'rest_api_secret' => WPPBC_LICENSE_API_SECRET,
+						'product_uuid'    => WPPBC_LICENSE_PRODUCT_UUID,
+						'file'            => WPPBC_PLUGIN,
+						'version'         => WPPBC_VERSION,
+						'slug'            => 'product-budget-configurator',
+						'name'            => WPPBC_ITEM_NAME,
+						'text_domain'     => 'pbc',
+					)
+				);
+		} catch ( \Exception $e ) {
+				add_action(
+					'admin_notices',
+					function () use ( $e ) {
+						echo '<div class="notice notice-error"><p>Product Budget Configurator: ' . esc_html( $e->getMessage() ) . '</p></div>';
+					}
+				);
+		}
+		},
 );
 
 
@@ -245,12 +244,12 @@ add_action(
 
 			if ( 'expired' === $license_status ) {
 				$message = sprintf(
-					/* translators: %s: Settings page URL */
+				/* translators: %s: Settings page URL */
 					esc_html__( 'Your license has expired. Please renew your license to continue receiving updates and support. %s', 'pbc' ),
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Renew License', 'pbc' ) . '</a>'
 				);
-				$type    = 'error';
-			} else {
+				$type = 'error';
+		} else {
 				$message = sprintf(
 					/* translators: %s: Settings page URL */
 					esc_html__( 'Please activate your license to receive updates and support. %s', 'pbc' ),
@@ -282,10 +281,10 @@ add_action(
 			require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-parts.php';
 	}
 	if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php' ) ) {
-		require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php';
+			require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-show-template.php';
 	}
 	if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php' ) ) {
-		require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php';
+			require_once WPPBC_PLUGIN_PATH . 'includes/helpers/class-generate-pdf.php';
 	}
 
 		// Always load admin.

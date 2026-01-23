@@ -354,6 +354,7 @@
         },
         {
             "name": "wpackagist-plugin/meta-box",
+<<<<<<< HEAD
             "version": "5.11.0",
             "source": {
                 "type": "svn",
