@@ -957,7 +957,8 @@ class PBC_Export_Import {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$handle = fopen( $temp_file, 'r' );
 		if ( false !== $handle ) {
-			while ( ( $data = fgetcsv( $handle ) ) !== false ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition, Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+			// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Standard pattern for reading CSV files.
+			while ( ( $data = fgetcsv( $handle ) ) !== false ) {
 				$rows[] = $data;
 			}
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose

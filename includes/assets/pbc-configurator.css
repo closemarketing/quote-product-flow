@@ -782,3 +782,161 @@ div.site-content:has(div.page-configurator) {
 		justify-content: center;
 	}
 }
+
+/* Custom input fields - Textarea styles */
+.pbc-direct-input-wrapper,
+.pbc-custom-input-wrapper {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+/* Direct input (phases) - Base styles */
+.pbc-direct-input {
+	width: 100%;
+	min-width: 300px;
+	padding: 12px 15px;
+	font-size: 16px;
+	line-height: 1.5;
+	border: 2px solid #ddd;
+	border-radius: 4px;
+	font-family: inherit;
+	transition: border-color 0.3s ease;
+	box-sizing: border-box;
+}
+
+/* Textarea - Large text box */
+.pbc-direct-input-textarea {
+	resize: vertical;
+}
+
+/* Text - Single line input */
+.pbc-direct-input-text {
+	padding: 10px 15px;
+}
+
+/* Number - Input with custom arrows */
+.pbc-number-input-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	width: 100%;
+	max-width: 300px;
+}
+
+.pbc-number-btn {
+	background: #9a781f;
+	color: white;
+	border: 2px solid #9a781f;
+	padding: 10px 15px;
+	cursor: pointer;
+	font-size: 18px;
+	font-weight: bold;
+	transition: all 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 45px;
+	height: 45px;
+	user-select: none;
+}
+
+.pbc-number-btn:hover {
+	background: #7a5f17;
+	border-color: #7a5f17;
+}
+
+.pbc-number-btn:active {
+	background: #5a4511;
+	transform: scale(0.95);
+}
+
+.pbc-number-btn .pbc-number-arrow {
+	line-height: 1;
+	font-size: 20px;
+}
+
+.pbc-number-decrease {
+	border-radius: 4px 0 0 4px;
+	border-right: none;
+}
+
+.pbc-number-increase {
+	border-radius: 0 4px 4px 0;
+	border-left: none;
+}
+
+.pbc-direct-input-number {
+	padding: 10px 15px;
+	appearance: textfield;
+	-moz-appearance: textfield;
+	border: 2px solid #ddd;
+	border-left: none;
+	border-right: none;
+	border-radius: 0;
+	text-align: center;
+	font-size: 16px;
+	flex: 1;
+	min-width: 0;
+}
+
+.pbc-direct-input-number:focus {
+	outline: none;
+	border-color: #9a781f;
+	border-left: 2px solid #9a781f;
+	border-right: 2px solid #9a781f;
+}
+
+.pbc-direct-input-number::-webkit-outer-spin-button,
+.pbc-direct-input-number::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+@media (max-width: 768px) {
+	.pbc-number-input-wrapper {
+		max-width: 100%;
+	}
+	
+	.pbc-number-btn {
+		min-width: 40px;
+		height: 40px;
+		padding: 8px 12px;
+	}
+}
+
+/* Custom input (variations) - Smaller textarea */
+.pbc-custom-input {
+	width: 100%;
+	min-width: 300px;
+	padding: 8px 12px;
+	font-size: 14px;
+	line-height: 1.4;
+	border: 2px solid #ddd;
+	border-radius: 4px;
+	resize: vertical;
+	font-family: inherit;
+	transition: border-color 0.3s ease;
+	box-sizing: border-box;
+}
+
+.pbc-direct-input:focus,
+.pbc-custom-input:focus {
+	outline: none;
+	border-color: #9a781f;
+	box-shadow: 0 0 0 3px rgba(154, 120, 31, 0.1);
+}
+
+.pbc-direct-input::placeholder,
+.pbc-custom-input::placeholder {
+	color: #999;
+	opacity: 1;
+}
+
+@media (max-width: 768px) {
+	.pbc-direct-input,
+	.pbc-custom-input {
+		min-width: 100%;
+		font-size: 14px;
+		padding: 10px 12px;
+	}
+}

@@ -79,6 +79,7 @@ if (!function_exists('as_schedule_recurring_action')) {
 if (!function_exists('pbc_is_license_active')) {
     /**
      * Check if PBC license is active.
+     * Mock pbc_is_license_active function for PHPStan analysis.
      *
      * @return bool
      */
@@ -110,3 +111,9 @@ spl_autoload_register(function ($class) {
         ');
     }
 });
+=======
+        return false;
+    }
+}
+
+>>>>>>> input-variation

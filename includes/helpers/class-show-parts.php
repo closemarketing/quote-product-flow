@@ -32,7 +32,8 @@ class SHOW {
 	 * @return void
 	 */
 	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard', $allow_multiple = false ) {
-		$actual_variation_tag = '';
+		$actual_variation_tag  = '';
+		$variations_with_input = array(); // Store variations that need custom input.
 
 		// Get selected variations for multiple selection mode.
 		$selected_vars = array();
@@ -157,29 +158,34 @@ class SHOW {
 						<p class="pbc_descopt"><?php echo wp_kses_post( wpautop( $pbc_descopt ) ); ?></p>
 						<?php
 					}
-		?>
-	</li>
-	<?php
-} elseif ( 'vertical' === $template ) {
-	// Check if this is a question type variation.
-	if ( $is_question ) {
-		$question_key         = get_post_meta( $variation_id, 'pbc_question_key', true );
-		$question_input_type  = get_post_meta( $variation_id, 'pbc_question_input_type', true );
-		$question_placeholder = get_post_meta( $variation_id, 'pbc_question_placeholder', true );
-		$question_required    = get_post_meta( $variation_id, 'pbc_question_required', true );
-
-		// Get saved answer from session if exists.
-		$saved_answer = '';
-		if ( isset( $_SESSION['pbc_questions'][ $question_key ] ) ) {
-			$saved_answer = $_SESSION['pbc_questions'][ $question_key ];
-		}
-
-		$input_type  = 'number' === $question_input_type ? 'number' : 'text';
-		$is_required = ! empty( $question_required ) && '1' === $question_required;
-		?>
-		<div class="variation-question-item">
-			<label class="variation-question-label" for="pbc_question_<?php echo esc_attr( $question_key ); ?>">
+					// Check if this variation needs custom input and store it.
+					$show_custom_input = get_post_meta( $variation_id, 'pbc_show_custom_input', true );
+					if ( $show_custom_input ) {
+						$variations_with_input[] = $variation_id;
+					}
+					?>
+				</li>
 				<?php
+			} elseif ( 'vertical' === $template ) {
+				// Check if this is a question type variation.
+				if ( $is_question ) {
+					$question_key         = get_post_meta( $variation_id, 'pbc_question_key', true );
+					$question_input_type  = get_post_meta( $variation_id, 'pbc_question_input_type', true );
+					$question_placeholder = get_post_meta( $variation_id, 'pbc_question_placeholder', true );
+					$question_required    = get_post_meta( $variation_id, 'pbc_question_required', true );
+
+					// Get saved answer from session if exists.
+					$saved_answer = '';
+					if ( isset( $_SESSION['pbc_questions'][ $question_key ] ) ) {
+						$saved_answer = $_SESSION['pbc_questions'][ $question_key ];
+					}
+
+					$input_type  = 'number' === $question_input_type ? 'number' : 'text';
+					$is_required = ! empty( $question_required ) && '1' === $question_required;
+					?>
+					<div class="variation-question-item">
+						<label class="variation-question-label" for="pbc_question_<?php echo esc_attr( $question_key ); ?>">
+							<?php
 				echo esc_html( $variation_data['title'] );
 				if ( $is_required ) {
 					echo ' <span class="required-asterisk" style="color: #d32f2f;">*</span>';
@@ -238,6 +244,58 @@ class SHOW {
 			} else {
 			echo '</select>';
 		}
+
+		// Show custom input after all variations if any variation needs it.
+		if ( ! empty( $variations_with_input ) && 'wizard' === $template ) {
+			// Get saved value from session if available.
+			$saved_value           = '';
+			$selected_variation_id = 0;
+			$should_show           = false;
+
+			if ( PHP_SESSION_NONE !== session_status() && isset( $_SESSION ) ) {
+				// Try to get from session - we need to check all possible session keys.
+				foreach ( $_SESSION as $session_key => $session_data ) {
+					if ( is_string( $session_key ) && 0 === strpos( $session_key, 'pbc_variation_' ) ) {
+						if ( isset( $session_data[ $cstep ]['var']['id'] ) ) {
+							$selected_variation_id = (int) $session_data[ $cstep ]['var']['id'];
+							if ( in_array( $selected_variation_id, $variations_with_input, true ) ) {
+								$should_show = true;
+								if ( isset( $session_data[ $cstep ]['custom_input'][ $selected_variation_id ] ) ) {
+									$saved_value = sanitize_textarea_field( $session_data[ $cstep ]['custom_input'][ $selected_variation_id ] );
+								}
+							}
+						}
+					}
+				}
+			}
+			// Also check if current selected variation needs input.
+			if ( (int) $s_var > 0 && in_array( (int) $s_var, $variations_with_input, true ) ) {
+				$should_show           = true;
+				$selected_variation_id = (int) $s_var;
+				// Get saved value for current selection if not already set.
+				if ( empty( $saved_value ) && PHP_SESSION_NONE !== session_status() && isset( $_SESSION ) ) {
+					foreach ( $_SESSION as $session_key => $session_data ) {
+						if ( is_string( $session_key ) && 0 === strpos( $session_key, 'pbc_variation_' ) ) {
+							if ( isset( $session_data[ $cstep ]['custom_input'][ $selected_variation_id ] ) ) {
+								$saved_value = sanitize_textarea_field( $session_data[ $cstep ]['custom_input'][ $selected_variation_id ] );
+							}
+						}
+					}
+				}
+			}
+
+			// Show input wrapper for all variations that need it, JavaScript will show/hide the correct one.
+			?>
+			<div class="pbc-custom-input-wrapper" data-variation-ids="<?php echo esc_attr( implode( ',', $variations_with_input ) ); ?>" style="<?php echo $should_show ? '' : 'display: none;'; ?>">
+				<textarea 
+					class="pbc-custom-input" 
+					data-step="<?php echo esc_attr( $cstep ); ?>"
+					rows="3"
+					placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+				><?php echo esc_textarea( $saved_value ); ?></textarea>
+			</div>
+			<?php
+		}
 	}
 
 	/**
@@ -268,77 +326,81 @@ class SHOW {
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 		<table>
 			<?php
-				$user      = wp_get_current_user();
-				$user_role = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+			$user      = wp_get_current_user();
+			$user_role = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
 
-				$show_prices = CALC::get_show_prices_for_user( $user_role );
-			$total_price = 0;
-			if ( 'calculate' === $cstep ) {
-			$count = count( $phases );
-			} else {
-			$count = $cstep;
-			}
-			for ( $i = 1; $i <= $count; $i++ ) {
-			if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
-				continue;
+			$show_prices = CALC::get_show_prices_for_user( $user_role );
+				$total_price = 0;
+				if ( 'calculate' === $cstep ) {
+				$count = count( $phases );
+				} else {
+				$count = $cstep;
 				}
-			$phase_key    = $i;
+				for ( $i = 1; $i <= $count; $i++ ) {
+				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+					continue;
+					}
+				$phase_key    = $i;
 				$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) : '';
 				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
 				$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) : '';
 				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
-				$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
+				$var_type     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) : '';
+				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'pbc_field_type', true );
 
-			if ( 'calculate' === $cstep && empty( $field_type ) ) {
-				$total_price += (float) $var_price;
-			} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
-				$total_price = (float) $var_price * $total_price;
-			}
-
-			// Check if this phase has multiple questions.
-			$has_multiple_questions = isset( $_SESSION[ $pbc_session_key ][ $i ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $i ]['questions'] );
-
-		if ( $has_multiple_questions ) {
-				// Show all questions from this phase.
-				foreach ( $_SESSION[ $pbc_session_key ][ $i ]['questions'] as $question_data ) {
-					?>
-				<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?> question-row">
-					<td class="name">
-						<?php
-						echo esc_html( $phase_key . '. ' . $question_data['variation_title'] . ': ' . $question_data['answer'] );
-						?>
-					</td>
-					<td class="price">
-						-
-					</td>
-				</tr>
-					<?php
+				if ( 'calculate' === $cstep && empty( $field_type ) && 'direct_input' !== $var_type ) {
+					$total_price += (float) $var_price;
+					} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
+					$total_price = (float) $var_price * $total_price;
 					}
-		} else {
-				// Show single variation or single question (old format).
-				?>
-				<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
-					<td class="name">
-						<?php
-						if ( 'qty' === $field_type ) {
-							echo esc_html( $phase_key . '. ' . $var_name . ' x ' . $var_price );
-							} else {
-							echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
-							}
+
+				// Check if this phase has multiple questions.
+				$has_multiple_questions = isset( $_SESSION[ $pbc_session_key ][ $i ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $i ]['questions'] );
+
+				if ( $has_multiple_questions ) {
+					// Show all questions from this phase.
+					foreach ( $_SESSION[ $pbc_session_key ][ $i ]['questions'] as $question_data ) {
 						?>
-					</td>
-					<td class="price">
+					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?> question-row">
+						<td class="name">
+							<?php
+							echo esc_html( $phase_key . '. ' . $question_data['variation_title'] . ': ' . $question_data['answer'] );
+							?>
+						</td>
+						<td class="price">
+							-
+						</td>
+					</tr>
 						<?php
-						if ( $var_price && 'no' !== $show_prices ) {
-							echo esc_html( $var_price );
-							echo 'qty' === $field_type ? '' : ' €';
-							}
-						?>
-					</td>
-				</tr>
-						<?php
-			}
-		}
+						}
+				} else {
+					// Show single variation or single question (old format).
+					?>
+					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
+						<td class="name">
+							<?php
+							if ( 'direct_input' === $var_type ) {
+								// Direct input - show phase name and input value.
+								echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
+								} elseif ( 'qty' === $field_type ) {
+								echo esc_html( $phase_key . '. ' . $var_name . ' x ' . $var_price );
+								} else {
+								echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
+								}
+							?>
+						</td>
+						<td class="price">
+							<?php
+							if ( $var_price && 'no' !== $show_prices ) {
+								echo esc_html( $var_price );
+								echo 'qty' === $field_type ? '' : ' €';
+								}
+							?>
+						</td>
+					</tr>
+					<?php
+				}
+				}
 				if ( 'calculate' === $cstep && 'no' !== $show_prices ) {
 				?>
 					<tr class="variation_selected phase-total_price">

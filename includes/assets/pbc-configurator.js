@@ -1,4 +1,66 @@
 jQuery(function($){
+	// Function to toggle custom input fields based on selected variation.
+	function toggleCustomInputs() {
+		// Hide all custom input wrappers first.
+		$('.pbc-custom-input-wrapper').hide();
+		
+		// Show custom input for selected variation.
+		var selectedVariationId = $('input[type=radio].pbc_variation:checked').val();
+		if (selectedVariationId) {
+			// Find wrapper that contains this variation ID in its data attribute.
+			$('.pbc-custom-input-wrapper[data-variation-ids]').each(function() {
+				var variationIds = $(this).attr('data-variation-ids').split(',');
+				if ($.inArray(selectedVariationId, variationIds) !== -1) {
+					var $inputWrapper = $(this);
+					$inputWrapper.show();
+					// Update the name attribute to match the selected variation.
+					var currentStep = $('input[name=pbc_current_phase]').val();
+					$inputWrapper.find('textarea').attr('name', 'pbc_custom_input[' + currentStep + '][' + selectedVariationId + ']');
+				}
+			});
+		}
+	}
+
+	// Function to initialize number input controls.
+	function initNumberInputs() {
+		// Remove any existing handlers to prevent duplicates.
+		$(document).off('click', '.pbc-number-decrease');
+		$(document).off('click', '.pbc-number-increase');
+		
+		// Handle decrease button click.
+		$(document).on('click', '.pbc-number-decrease', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			var $input = $(this).siblings('.pbc-direct-input-number');
+			var currentValue = parseInt($input.val(), 10) || 0;
+			var newValue = Math.max(0, currentValue - 1);
+			$input.val(newValue);
+		});
+		
+		// Handle increase button click.
+		$(document).on('click', '.pbc-number-increase', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			var $input = $(this).siblings('.pbc-direct-input-number');
+			var currentValue = parseInt($input.val(), 10) || 0;
+			var newValue = currentValue + 1;
+			$input.val(newValue);
+		});
+		
+		// Ensure default value is 0 if empty.
+		$('.pbc-direct-input-number').each(function() {
+			if ($(this).val() === '' || $(this).val() === null || $(this).val() === undefined) {
+				$(this).val('0');
+			}
+		});
+	}
+
+	// Toggle custom inputs on page load.
+	toggleCustomInputs();
+	
+	// Initialize number input controls.
+	initNumberInputs();
+
 	// Variation selected (radio buttons - single selection).
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
@@ -7,6 +69,10 @@ jQuery(function($){
 		if (parseInt(cPhase, 10) === 1) {
 			$('.recommendation').show();
 		}
+		
+		// Toggle custom input fields.
+		toggleCustomInputs();
+		
 		var show_prices = PBCAjaxAction.show_prices;
 		$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
 		$('.phase_descvar .descvar_' + $(this).val() ).addClass('actived').removeClass('hidden');
@@ -444,6 +510,11 @@ jQuery(function($){
 			// Trigger click to update the preview.
 			$radio.trigger('click');
 			
+			// Toggle custom inputs after selecting variation.
+			setTimeout(function() {
+				toggleCustomInputs();
+			}, 100);
+			
 			// Check if this is the last recommendation step.
 			var isLastStep = (currentStep >= Math.max.apply(null, allSteps));
 			
@@ -583,22 +654,31 @@ jQuery(function($){
 				var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0 || 
 				                     $('.page-configurator').find('select.pbc_variation option').length > 0;
 				var hasQuestions = $('.page-configurator').find('.pbc_question_input').length > 0;
+				var hasDirectInput = $('.page-configurator').find('.pbc-direct-input-wrapper').length > 0;
 				var newNextPhase = $('.page-configurator').find('input[name=next_phase]').val();
 				
 				console.log('PBC Debug: Has variations:', hasVariations);
 				console.log('PBC Debug: Has questions:', hasQuestions);
+				console.log('PBC Debug: Has direct input:', hasDirectInput);
 				console.log('PBC Debug: New next phase:', newNextPhase);
 				
-				// Only auto-skip if there are NO variations AND NO questions.
+				// Toggle custom inputs after page load.
+				toggleCustomInputs();
+				
+				// Re-initialize number inputs after page load.
+				initNumberInputs();
+				
+				// Only auto-skip if there are no variations AND no questions AND no direct input.
 				if (
 					newNextPhase && 
 					newNextPhase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && 
 					!hasVariations &&
-					!hasQuestions
+					!hasQuestions &&
+					!hasDirectInput
 				)
 				{
-					console.log('PBC Debug: Auto-skipping empty step (no variations or questions)');
+					console.log('PBC Debug: Auto-skipping empty step (no variations, questions or direct input)');
 					$('.page-configurator').find('button[name=submit][value='+submit_val+']').trigger('click');
 				} else {
 					$('.page-configurator').find('.status_loader.phase_detail_loader').html('').addClass('hidden');
