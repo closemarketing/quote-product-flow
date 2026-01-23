@@ -40,6 +40,10 @@ class PBC_Helper_PostTypes {
 
 		add_action( 'restrict_manage_posts', array( $this, 'admin_posts_filter' ) );
 		add_filter( 'parse_query', array( $this, 'pbc_posts_filter' ) );
+
+		// Validate question key on save.
+		add_action( 'save_post_variation', array( $this, 'validate_question_key' ), 10, 3 );
+		add_action( 'admin_notices', array( $this, 'show_duplicate_key_notice' ) );
 	}
 
 	/**
@@ -254,6 +258,48 @@ class PBC_Helper_PostTypes {
 					'std'         => '',
 					'placeholder' => __( 'Select a phase', 'pbc' ),
 				),
+				// QUESTION MODE.
+				array(
+					'name' => __( 'Convert to Question', 'pbc' ),
+					'id'   => "{$prefix}is_question",
+					'type' => 'checkbox',
+					'desc' => __( 'When enabled, this variation will show as an input field for the user to answer. The answer can be used in dependencies.', 'pbc' ),
+					'std'  => 0,
+				),
+				array(
+					'name'    => __( 'Question Key', 'pbc' ),
+					'id'      => "{$prefix}question_key",
+					'type'    => 'text',
+					'desc'    => __( 'Unique identifier for this question (e.g., house_m2, height). Use lowercase and underscores.', 'pbc' ),
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
+				array(
+					'name'    => __( 'Input Type', 'pbc' ),
+					'id'      => "{$prefix}question_input_type",
+					'type'    => 'select',
+					'options' => array(
+						'number' => __( 'Number', 'pbc' ),
+						'text'   => __( 'Text', 'pbc' ),
+					),
+					'std'     => 'number',
+					'desc'    => __( 'Type of input field to show', 'pbc' ),
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
+				array(
+					'name'    => __( 'Placeholder', 'pbc' ),
+					'id'      => "{$prefix}question_placeholder",
+					'type'    => 'text',
+					'desc'    => __( 'Placeholder text for the input (e.g., "Introduce los m²")', 'pbc' ),
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
+				array(
+					'name'    => __( 'Required', 'pbc' ),
+					'id'      => "{$prefix}question_required",
+					'type'    => 'checkbox',
+					'desc'    => __( 'Make this question required', 'pbc' ),
+					'std'     => 1,
+					'visible' => array( "{$prefix}is_question", '=', 1 ),
+				),
 				// IMAGE ADVANCED (WP 3.5+).
 				array(
 					'name'             => __( 'Icon image', 'pbc' ),
@@ -355,6 +401,46 @@ class PBC_Helper_PostTypes {
 					'options' => array(
 						'textarea_rows' => 8,
 						'teeny'         => true,
+					),
+				),
+				// Question dependencies.
+				array(
+					'name'       => __( 'Depends on Question Answers', 'pbc' ),
+					'id'         => "{$prefix}question_depends",
+					'type'       => 'group',
+					'clone'      => true,
+					'sort_clone' => true,
+					'desc'       => __( 'Show this variation only when question answers meet these conditions', 'pbc' ),
+					'fields'     => array(
+						array(
+							'name'    => __( 'Question Key', 'pbc' ),
+							'id'      => "{$prefix}question_key_ref",
+							'type'    => 'text',
+							'desc'    => __( 'The question key to check (e.g., house_m2)', 'pbc' ),
+							'columns' => 3,
+						),
+						array(
+							'name'    => __( 'Operator', 'pbc' ),
+							'id'      => "{$prefix}question_operator",
+							'type'    => 'select',
+							'options' => array(
+								'>'  => __( 'Greater than (>)', 'pbc' ),
+								'>=' => __( 'Greater than or equal (>=)', 'pbc' ),
+								'<'  => __( 'Less than (<)', 'pbc' ),
+								'<=' => __( 'Less than or equal (<=)', 'pbc' ),
+								'='  => __( 'Equal (=)', 'pbc' ),
+								'!=' => __( 'Not equal (!=)', 'pbc' ),
+							),
+							'std'     => '>',
+							'columns' => 3,
+						),
+						array(
+							'name'    => __( 'Value', 'pbc' ),
+							'id'      => "{$prefix}question_value",
+							'type'    => 'text',
+							'desc'    => __( 'The value to compare against', 'pbc' ),
+							'columns' => 3,
+						),
 					),
 				),
 			),
@@ -812,6 +898,104 @@ class PBC_Helper_PostTypes {
 		}
 
 		return $query;
+	}
+
+	/**
+	 * Show duplicate key admin notice.
+	 *
+	 * @return void
+	 */
+	public function show_duplicate_key_notice() {
+		// Check if we're on the variation edit screen.
+		$screen = get_current_screen();
+		if ( ! $screen || 'variation' !== $screen->post_type ) {
+			return;
+		}
+
+		// Check for duplicate key parameter.
+		if ( isset( $_GET['pbc_duplicate_key'] ) && '1' === $_GET['pbc_duplicate_key'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_id      = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$question_key = get_transient( 'pbc_duplicate_key_' . $post_id );
+
+			if ( $question_key ) {
+				delete_transient( 'pbc_duplicate_key_' . $post_id );
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p>
+						<strong><?php esc_html_e( 'Error:', 'pbc' ); ?></strong>
+						<?php
+						printf(
+							/* translators: %s: question key */
+							esc_html__( 'Don\'t use the same key! Another variation already uses the Question Key "%s". Please use a unique key for each question.', 'pbc' ),
+							'<code>' . esc_html( $question_key ) . '</code>'
+						);
+						?>
+					</p>
+				</div>
+				<?php
+			}
+		}
+	}
+
+	/**
+	 * Validate question key uniqueness on save.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post Post object.
+	 * @param bool    $update Whether this is an existing post being updated.
+	 * @return void
+	 */
+	public function validate_question_key( $post_id, $post, $update ) {
+		// Skip autosaves and revisions.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		// Check if this is a question type variation.
+		$is_question = isset( $_POST['pbc_is_question'] ) ? (int) $_POST['pbc_is_question'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+		if ( ! $is_question ) {
+			return;
+		}
+
+		// Get the question key.
+		$question_key = isset( $_POST['pbc_question_key'] ) ? sanitize_key( wp_unslash( $_POST['pbc_question_key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( empty( $question_key ) ) {
+			return;
+		}
+
+		// Check if another variation already uses this key.
+		$existing_variations = get_posts(
+			array(
+				'post_type'      => 'variation',
+				'posts_per_page' => -1,
+				'post__not_in'   => array( $post_id ),
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
+						'key'   => 'pbc_question_key',
+						'value' => $question_key,
+					),
+				),
+				'fields'         => 'ids',
+			)
+		);
+
+		if ( ! empty( $existing_variations ) ) {
+			// Add admin notice.
+			add_filter(
+				'redirect_post_location',
+				function ( $location ) {
+					return add_query_arg( 'pbc_duplicate_key', '1', $location );
+				}
+			);
+
+			// Also set a transient for the notice.
+			set_transient( 'pbc_duplicate_key_' . $post_id, $question_key, 30 );
+		}
 	}
 }
 

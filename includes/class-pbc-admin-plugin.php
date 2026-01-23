@@ -839,7 +839,7 @@ class PBC_Admin_Plugin {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Recommended Configurations', 'pbc' ); ?></h1>
-			
+
 			<?php if ( isset( $update ) ) { ?>
 				<div id="message" class="<?php echo 'ok' === $return ? 'updated' : 'error'; ?>">
 					<p><?php echo esc_html( $update ); ?></p>
@@ -849,7 +849,7 @@ class PBC_Admin_Plugin {
 			<form method="post">
 				<div class="pbc_settings_area">
 					<p class="description"><?php esc_html_e( 'Configure different recommendations for each option in the first phase. For example, different recommendations for "Floor" vs "Ceiling".', 'pbc' ); ?></p>
-					
+
 					<?php
 					$variations_recommended = get_option( 'pbc_variations_recommended', array() );
 					$phases                 = get_posts(
@@ -1169,7 +1169,7 @@ class PBC_Admin_Plugin {
 
 			<div class="pbc-export-import-container" style="max-width: 100%;">
 				<div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
-				
+
 					<!-- Export Section -->
 					<div class="pbc-export-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); flex: 1; min-width: 400px;">
 						<h2 style="margin-top: 0;">
@@ -1177,7 +1177,7 @@ class PBC_Admin_Plugin {
 							<?php esc_html_e( 'Export Data', 'pbc' ); ?>
 						</h2>
 						<p><?php esc_html_e( 'Export all your phases and variations to two separate CSV files (one for phases, one for variations). These files can be imported on another WordPress installation.', 'pbc' ); ?></p>
-						
+
 						<button id="pbc-export-button" class="button button-primary button-hero" style="display: inline-flex; align-items: center; gap: 8px;">
 							<span class="dashicons dashicons-download"></span>
 							<?php esc_html_e( 'Export All Data', 'pbc' ); ?>
@@ -1195,7 +1195,7 @@ class PBC_Admin_Plugin {
 						<?php esc_html_e( 'Import Data', 'pbc' ); ?>
 					</h2>
 					<p><?php esc_html_e( 'Import phases and variations from previously exported CSV files. You can import both files together or one at a time.', 'pbc' ); ?></p>
-					
+
 					<div style="margin-bottom: 15px;">
 						<label for="pbc-import-file-phases" class="button button-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
 							<span class="dashicons dashicons-media-default"></span>
@@ -1703,7 +1703,7 @@ class PBC_Admin_Plugin {
 		?>
 		<div class="content">
 			<h3><?php esc_html_e( 'License Activation', 'pbc' ); ?></h3>
-			
+
 			<!-- License Status -->
 			<fieldset>
 				<label class="block"><?php esc_html_e( 'Current Status', 'pbc' ); ?></label>
@@ -1723,16 +1723,16 @@ class PBC_Admin_Plugin {
 				<label class="block" for="pbc_license_license_key">
 					<?php esc_html_e( 'License API Key', 'pbc' ); ?>
 				</label>
-				<input 
-					type="text" 
-					id="pbc_license_license_key" 
-					name="pbc_license_license_key" 
-					value="<?php echo esc_attr( $license_key ); ?>" 
+				<input
+					type="text"
+					id="pbc_license_license_key"
+					name="pbc_license_license_key"
+					value="<?php echo esc_attr( $license_key ); ?>"
 					style="width: 100%; font-family: monospace;"
 					placeholder="<?php esc_attr_e( 'Enter your license API key here...', 'pbc' ); ?>"
 				/>
 				<p class="description" style="margin-top: 5px;">
-					<?php esc_html_e( 'You can find this in your account dashboard at', 'pbc' ); ?> 
+					<?php esc_html_e( 'You can find this in your account dashboard at', 'pbc' ); ?>
 					<a href="<?php echo esc_url( defined( 'WPPBC_URL_API' ) ? WPPBC_URL_API : 'https://close.technology/' ); ?>" target="_blank" rel="noopener">close.technology</a>
 				</p>
 			</fieldset>

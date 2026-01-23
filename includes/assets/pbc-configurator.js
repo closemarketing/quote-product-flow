@@ -491,19 +491,23 @@ jQuery(function($){
 			setTimeout(function() {
 				var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0 || 
 				                     $('.page-configurator').find('select.pbc_variation option').length > 0;
+				var hasQuestions = $('.page-configurator').find('.pbc_question_input').length > 0;
 				var newNextPhase = $('.page-configurator').find('input[name=next_phase]').val();
 				
 				console.log('PBC Debug: Has variations:', hasVariations);
+				console.log('PBC Debug: Has questions:', hasQuestions);
 				console.log('PBC Debug: New next phase:', newNextPhase);
 				
+				// Only auto-skip if there are NO variations AND NO questions.
 				if (
 					newNextPhase && 
 					newNextPhase != 'calculate' &&
 					(submit_val == 'prev' || submit_val == 'next') && 
-					!hasVariations
+					!hasVariations &&
+					!hasQuestions
 				)
 				{
-					console.log('PBC Debug: Auto-skipping empty step');
+					console.log('PBC Debug: Auto-skipping empty step (no variations or questions)');
 					$('.page-configurator').find('button[name=submit][value='+submit_val+']').trigger('click');
 				} else {
 					$('.page-configurator').find('.status_loader.phase_detail_loader').html('').addClass('hidden');
@@ -692,5 +696,110 @@ jQuery(function($){
 				button.prop('disabled', false).text(originalText);
 			}
 		});
+	});
+
+	// Prevent question inputs from submitting form on Enter or arrow keys.
+	$(document).on('keydown', '.pbc_question_input', function(e) {
+		// Prevent Enter key from submitting the form.
+		if (e.keyCode === 13 || e.which === 13) {
+			e.preventDefault();
+			return false;
+		}
+		
+		// For number inputs, arrow keys should only change value, not trigger submit.
+		if ($(this).attr('type') === 'number') {
+			// Arrow up (38) or arrow down (40).
+			if (e.keyCode === 38 || e.keyCode === 40) {
+				// Let the default behavior happen (increment/decrement).
+				// But prevent any bubbling that might trigger form submit.
+				e.stopPropagation();
+			}
+		}
+	});
+
+	// Prevent blur/change events on question inputs from triggering anything.
+	$(document).on('change blur', '.pbc_question_input', function(e) {
+		e.stopPropagation();
+	});
+
+	// Prevent clicking inside question input from triggering anything.
+	$(document).on('click focus', '.pbc_question_input', function(e) {
+		e.stopPropagation();
+	});
+
+	// Question validation - ensure questions are answered before proceeding.
+	$(document).on('submit', '#configurator-form', function(e) {
+		// Only validate on "next" button click.
+		var submitType = $(document.activeElement).attr('value');
+		if (submitType !== 'next') {
+			return true;
+		}
+		
+		// Check if there are any question inputs in the current phase.
+		var questionInputs = $('.pbc_question_input');
+		
+		if (questionInputs.length > 0) {
+			var allAnswered = true;
+			var missingRequired = [];
+			
+			questionInputs.each(function() {
+				var $input = $(this);
+				var isRequired = $input.prop('required') || $input.attr('required') === 'required';
+				var value = $.trim($input.val());
+				var label = $input.closest('li, .variation-question-item').find('.variation-question-label').text().trim();
+				
+				if (!label || label === '') {
+					// Try to get from closest label element.
+					var $parentLabel = $input.closest('label');
+					if ($parentLabel.length) {
+						label = $parentLabel.clone().children().remove().end().text().trim();
+					}
+				}
+				
+				if (isRequired && value === '') {
+					allAnswered = false;
+					missingRequired.push(label || 'Campo requerido');
+					// Add visual feedback.
+					$input.addClass('error-field');
+				} else {
+					$input.removeClass('error-field');
+				}
+			});
+			
+			if (!allAnswered) {
+				e.preventDefault();
+				e.stopPropagation();
+				alert('Por favor, responde todas las preguntas requeridas:\n- ' + missingRequired.join('\n- '));
+				// Focus on first empty required field.
+				$('.pbc_question_input.error-field').first().focus();
+				return false;
+			}
+		}
+		
+		// Check if there are any non-question variations that need selection.
+		var normalVariations = $('input[type=radio].pbc_variation');
+		if (normalVariations.length > 0) {
+			var questionInputsCount = questionInputs.length;
+			// Only validate variations if there are no questions or if questions are optional.
+			if (questionInputsCount === 0) {
+				var anySelected = normalVariations.filter(':checked').length > 0;
+				if (!anySelected) {
+					e.preventDefault();
+					e.stopPropagation();
+					alert('Por favor, selecciona una opción antes de continuar.');
+					return false;
+				}
+			}
+		}
+	});
+
+	// Auto-focus first question input.
+	$(document).ready(function() {
+		var firstQuestion = $('.pbc_question_input:first');
+		if (firstQuestion.length > 0) {
+			setTimeout(function() {
+				firstQuestion.focus();
+			}, 300);
+		}
 	});
 });

@@ -165,7 +165,7 @@ function pbc_get_license_status() {
 	if ( defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE ) {
 		return 'active';
 	}
-	
+
 	global $pbc_license_instance;
 
 	if ( null === $pbc_license_instance ) {
