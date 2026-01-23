@@ -355,74 +355,74 @@ class PBC_Template {
 
 						// Gets variation ID in quantity input.
 						$option_qty_value = 0;
-						if ( isset( $_POST['pbc_variation_id'][ $key ] ) ) {
-							$option_qty_value = (int) $variation_id;
-							$variation_id     = (int) $_POST['pbc_variation_id'][ $key ];
-						}
+					if ( isset( $_POST['pbc_variation_id'][ $key ] ) ) {
+						$option_qty_value = (int) $variation_id;
+						$variation_id     = (int) $_POST['pbc_variation_id'][ $key ];
+					}
 
-<<<<<<< HEAD
-						// Check if selection changed - if so, clear all subsequent steps.
-						$prev_var_id = isset( $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] : 0;
-					if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
-							// Selection changed, clear all subsequent steps from session.
-						foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-							if ( (int) $step_key > (int) $key ) {
-									unset( $_SESSION[ $pbc_session_key ][ $step_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-									// Also clear user meta for logged in users.
-									if ( ! empty( $user_id ) ) {
-										delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
-									}
+					// Check if selection changed - if so, clear all subsequent steps.
+					$prev_var_id = isset( $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $key ]['var']['id'] : 0;
+				if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
+						// Selection changed, clear all subsequent steps from session.
+					foreach ( $_SESSION[ $pbc_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						if ( (int) $step_key > (int) $key ) {
+								unset( $_SESSION[ $pbc_session_key ][ $step_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+								// Also clear user meta for logged in users.
+								if ( ! empty( $user_id ) ) {
+									delete_user_meta( $user_id, 'pbc_phase_' . $step_key );
 								}
 							}
 						}
-
-						if ( ! empty( $user_id ) ) {
-							$phase_param['var']      = $variation_id;
-							$phase_param['pricevar'] = $price_var ? $price_var : '';
-							update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
-						}
-						if ( empty( $option_qty_value ) ) {
-							$price = CALC::get_price_variation( $variation_id, $price_var );
-						} else {
-							$price      = $option_qty_value;
-							$field_type = 'qty';
-						}
-
-						$variation_title = get_the_title( $variation_id );
-						if ( $price_var ) {
-							$variation_title .= ' [' . $price_var . ']';
-						}
-
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']      = $phase_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['phase']['name']    = $phase_title; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['id']        = $variation_id;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['name']      = $variation_title; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['type']      = $field_type;
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['price_var'] = $price_var;
-					if ( $option_name ) {
-						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
 					}
-					$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
 
-					// Save custom input value if exists.
-					if ( isset( $_POST['pbc_custom_input'][ $key ][ $variation_id ] ) ) {
-						$custom_input_value = sanitize_textarea_field( wp_unslash( $_POST['pbc_custom_input'][ $key ][ $variation_id ] ) );
-						if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ]['custom_input'] ) ) {
-							$_SESSION[ $pbc_session_key ][ $key ]['custom_input'] = array();
-						}
-						$_SESSION[ $pbc_session_key ][ $key ]['custom_input'][ $variation_id ] = $custom_input_value;
-						// Also append custom input to variation name if not empty.
-						if ( ! empty( $custom_input_value ) ) {
-							$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' (' . $custom_input_value . ')';
-						}
+					if ( ! empty( $user_id ) ) {
+						$phase_param['var']      = $variation_id;
+						$phase_param['pricevar'] = $price_var ? $price_var : '';
+						update_user_meta( $user_id, 'pbc_phase_' . $key, $phase_param );
+					}
+					if ( empty( $option_qty_value ) ) {
+						$price = CALC::get_price_variation( $variation_id, $price_var );
+					} else {
+						$price      = $option_qty_value;
+						$field_type = 'qty';
+					}
+
+					$variation_title = get_the_title( $variation_id );
+					if ( $price_var ) {
+						$variation_title .= ' [' . $price_var . ']';
+					}
+
+				$_SESSION[ $pbc_session_key ][ $key ]['phase']['id']      = $phase_id;
+				$_SESSION[ $pbc_session_key ][ $key ]['phase']['name']    = $phase_title; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$_SESSION[ $pbc_session_key ][ $key ]['var']['id']        = $variation_id;
+				$_SESSION[ $pbc_session_key ][ $key ]['var']['name']      = $variation_title; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$_SESSION[ $pbc_session_key ][ $key ]['var']['type']      = $field_type;
+				$_SESSION[ $pbc_session_key ][ $key ]['var']['price_var'] = $price_var;
+				if ( $option_name ) {
+					$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' [' . $option_name . ']';
+				}
+				$_SESSION[ $pbc_session_key ][ $key ]['var']['price'] = $price;
+
+				// Save custom input value if exists.
+				if ( isset( $_POST['pbc_custom_input'][ $key ][ $variation_id ] ) ) {
+					$custom_input_value = sanitize_textarea_field( wp_unslash( $_POST['pbc_custom_input'][ $key ][ $variation_id ] ) );
+					if ( ! isset( $_SESSION[ $pbc_session_key ][ $key ]['custom_input'] ) ) {
+						$_SESSION[ $pbc_session_key ][ $key ]['custom_input'] = array();
+					}
+					$_SESSION[ $pbc_session_key ][ $key ]['custom_input'][ $variation_id ] = $custom_input_value;
+					// Also append custom input to variation name if not empty.
+					if ( ! empty( $custom_input_value ) ) {
+						$_SESSION[ $pbc_session_key ][ $key ]['var']['name'] .= ' (' . $custom_input_value . ')';
 					}
 				}
-				if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
-					$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-					ksort( $session_data, SORT_NUMERIC );
-					$_SESSION[ $pbc_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				}
-			} elseif ( isset( $_POST['pbc_direct_input'] ) && 'next' === $_POST['submit'] ) {
+			}
+			if ( isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+				$session_data = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				ksort( $session_data, SORT_NUMERIC );
+				$_SESSION[ $pbc_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			}
+		} elseif ( isset( $_POST['pbc_direct_input'] ) && 'next' === $_POST['submit'] ) {
 				// Handle direct input when there are no variations.
 				if ( ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
 					$_SESSION[ $pbc_session_key ] = array();

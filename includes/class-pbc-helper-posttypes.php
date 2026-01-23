@@ -484,30 +484,6 @@ class PBC_Helper_PostTypes {
 					'desc' => __( 'If checked, users can select multiple variations instead of just one', 'pbc' ),
 					'std'  => false,
 				),
-			),
-		);
-
-		return $meta_boxes;
-	}
-
-	/**
-	 * Metabox phases
-	 *
-	 * @param array $meta_boxes Metaboxes.
-	 * @return array
-	 */
-	public function pbc_metabox_phase( $meta_boxes ) {
-		$prefix = 'pbc_';
-
-		// Meta box for phases.
-		$meta_boxes[] = array(
-			'id'         => 'phase_options',
-			'title'      => __( 'Phase Options', 'pbc' ),
-			'post_types' => array( 'phases' ),
-			'context'    => 'normal',
-			'priority'   => 'high',
-			'autosave'   => true,
-			'fields'     => array(
 				// CHECKBOX FOR DIRECT INPUT.
 				array(
 					'name' => __( 'Show direct input field', 'pbc' ),
