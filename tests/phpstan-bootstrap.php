@@ -101,19 +101,22 @@ if (!function_exists('pbc_is_license_registered')) {
 
 // Mock License Manager classes - using spl_autoload_register
 spl_autoload_register(function ($class) {
-    if ($class === 'Closemarketing\WPLicenseManager\FormsCRMSettings') {
+    if ($class === 'Closemarketing\WPLicenseManager\License') {
         eval('
         namespace Closemarketing\WPLicenseManager;
-        class FormsCRMSettings {
-            public function __construct($license = null, array $args = []) {}
-            public function render() {}
+        class License {
+            public function __construct(array $options = []) {}
+            public function get_option_key($key) { return "pbc_license_" . $key; }
+            public function get_option_value($key) { return ""; }
+            public function get_option_group() { return "pbc_license"; }
+            public function get_settings_section() { return "pbc_settings_license"; }
+            public function get_text_domain() { return "pbc"; }
+            public function get_plugin_name() { return "Product Budget Configurator"; }
+            public function is_license_active() { return false; }
+            public function license_activate($api_key) { return ""; }
+            public function license_deactivate($args) { return []; }
+            public function replace_license_key($current_api_key) {}
         }
         ');
     }
 });
-=======
-        return false;
-    }
-}
-
->>>>>>> input-variation
