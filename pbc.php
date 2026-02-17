@@ -251,14 +251,14 @@ add_action(
 				/* translators: %s: Settings page URL */
 					esc_html__( 'Your license has expired. Please renew your license to continue receiving updates and support. %s', 'pbc' ),
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Renew License', 'pbc' ) . '</a>'
-			);
+				);
 			$type = 'error';
 		} else {
 			$message = sprintf(
-					/* translators: %s: Settings page URL */
-					esc_html__( 'Please activate your license to receive updates and support. %s', 'pbc' ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Activate License', 'pbc' ) . '</a>'
-				);
+				/* translators: %s: Settings page URL */
+				esc_html__( 'Please activate your license to receive updates and support. %s', 'pbc' ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Activate License', 'pbc' ) . '</a>'
+			);
 			}
 			?>
 			<div class="notice notice-<?php echo esc_attr( $type ); ?> is-dismissible">
