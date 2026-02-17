@@ -269,6 +269,37 @@
   font-size: 20px;
 }
 
+.phase_note_top {
+  margin: 0 0 20px 0;
+  padding: 15px 20px;
+  border-left: 4px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.phase_note_top p {
+  margin: 0.5em 0;
+}
+
+.phase_note_top p:first-child {
+  margin-top: 0;
+}
+
+.phase_note_top p:last-child {
+  margin-bottom: 0;
+}
+
+.phase_note_top a {
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.phase_note_top strong {
+  font-weight: 700;
+}
+
 .phase_variations {
   margin-top: 40px;
 }

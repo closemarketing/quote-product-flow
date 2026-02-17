@@ -30,6 +30,7 @@ class PBC_Admin_Plugin {
 		// Initial stuff.
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'init' ) );
+		add_action( 'admin_init', array( $this, 'register_license_settings' ) );
 		add_action( 'admin_footer', array( $this, 'pbc_admin_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
@@ -67,6 +68,60 @@ class PBC_Admin_Plugin {
 		add_image_size( 'pbc_icon', 150, 230, false );
 		add_image_size( 'pbc_product', 570, 460, true );
 	}
+
+	/**
+	 * Register license settings.
+	 *
+	 * @return void
+	 */
+	public function register_license_settings() {
+		global $pbc_license;
+
+		if ( ! $pbc_license || ! class_exists( '\Closemarketing\WPLicenseManager\License' ) ) {
+			return;
+		}
+
+		// Register each individual license field.
+		register_setting(
+			'product-budget-configurator_license',
+			'product-budget-configurator_license_apikey',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			'product-budget-configurator_license',
+			'product-budget-configurator_license_deactivate_checkbox',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		// Hook into admin_init to process license activation/deactivation.
+		add_action(
+			'admin_init',
+			function () use ( $pbc_license ) {
+				// Check if license form was submitted and verify nonce.
+				if ( isset( $_POST['option_page'], $_POST['_wpnonce'] ) && 'product-budget-configurator_license' === $_POST['option_page'] && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'product-budget-configurator_license-options' ) ) {
+					if ( isset( $_POST['submit_license'] ) ) {
+						// Build input array for validate_license.
+						$input = array(
+							'product-budget-configurator_license_apikey'              => isset( $_POST['product-budget-configurator_license_apikey'] ) ? sanitize_text_field( wp_unslash( $_POST['product-budget-configurator_license_apikey'] ) ) : '',
+							'product-budget-configurator_license_deactivate_checkbox' => isset( $_POST['product-budget-configurator_license_deactivate_checkbox'] ) ? sanitize_text_field( wp_unslash( $_POST['product-budget-configurator_license_deactivate_checkbox'] ) ) : '',
+						);
+
+						// Call the license validation.
+						$pbc_license->validate_license( $input );
+					}
+				}
+			},
+			15
+		);
+	}
+
 	/**
 	 * PBC Admin Scripts
 	 */
@@ -774,10 +829,10 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function render_license_section() {
-		global $pbc_license_instance;
+		global $pbc_license;
 
 		// Check if license instance exists.
-		if ( empty( $pbc_license_instance ) || ! is_object( $pbc_license_instance ) ) {
+		if ( empty( $pbc_license ) || ! is_object( $pbc_license ) ) {
 			?>
 			<div class="pbc-settings-card pbc-license-card">
 				<div class="pbc-card-header">
@@ -793,30 +848,121 @@ class PBC_Admin_Plugin {
 			return;
 		}
 
-		// Use FormsCRM Settings renderer (same as formscrm-inmovilla).
-		if ( ! class_exists( '\Closemarketing\WPLicenseManager\FormsCRMSettings' ) ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'License Manager FormsCRMSettings class not found. Please check Composer dependencies.', 'pbc' ) . '</p></div>';
-			return;
-		}
+		// Render inline license settings.
+		$this->render_inline_license_settings( $pbc_license );
+	}
 
-		$settings = new \Closemarketing\WPLicenseManager\FormsCRMSettings(
-			$pbc_license_instance,
-			array(
-				'title'        => __( 'Product Budget Configurator License', 'pbc' ),
-				'description'  => __( 'Manage your license to receive automatic updates and support.', 'pbc' ),
-				'plugin_name'  => 'Product Budget Configurator',
-				'purchase_url' => 'https://close.technology/wordpress-plugins/product-budget-configurator/',
-				'renew_url'    => 'https://close.technology/my-account/',
-				'benefits'     => array(
-					__( 'Automatic plugin updates', 'pbc' ),
-					__( 'Access to new features', 'pbc' ),
-					__( 'Priority support', 'pbc' ),
-					__( 'Security patches', 'pbc' ),
-				),
-			)
-		);
+	/**
+	 * Render inline license settings.
+	 *
+	 * @param \Closemarketing\WPLicenseManager\License $license License instance.
+	 * @return void
+	 */
+	private function render_inline_license_settings( $license ) {
+		// Get license data.
+		$license_key    = $license->get_option_value( 'apikey' );
+		$is_active      = $license->is_license_active();
+		$license_status = get_option( 'product-budget-configurator_license_activated', 'Deactivated' );
 
-		$settings->render();
+		?>
+		<div class="pbc-settings-card pbc-license-card">
+			<!-- Header -->
+			<div class="pbc-card-header">
+				<h2><span class="dashicons dashicons-admin-network"></span> <?php esc_html_e( 'Product Budget Configurator License', 'pbc' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'Manage your license to receive automatic updates and support.', 'pbc' ); ?></p>
+			</div>
+
+			<!-- License Status -->
+			<div class="pbc-card-body">
+				<div style="margin-bottom: 20px;">
+					<?php if ( $is_active ) : ?>
+						<div style="padding: 15px; border-radius: 4px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: flex; align-items: center;">
+							<span style="font-size: 24px; margin-right: 10px;">✓</span>
+							<div>
+								<strong><?php esc_html_e( 'License Active', 'pbc' ); ?></strong>
+								<p style="margin: 5px 0 0 0; font-size: 13px;"><?php esc_html_e( 'Your license is active and you will receive automatic updates.', 'pbc' ); ?></p>
+							</div>
+						</div>
+					<?php else : ?>
+						<div style="padding: 15px; border-radius: 4px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: flex; align-items: center;">
+							<span style="font-size: 24px; margin-right: 10px;">✗</span>
+							<div>
+								<strong><?php esc_html_e( 'License Inactive', 'pbc' ); ?></strong>
+								<p style="margin: 5px 0 0 0; font-size: 13px;"><?php esc_html_e( 'Please enter your license key to enable updates and support.', 'pbc' ); ?></p>
+							</div>
+						</div>
+					<?php endif; ?>
+				</div>
+
+				<!-- License Form -->
+				<form method="post" action="options.php" style="margin-top: 20px;">
+					<?php settings_fields( 'product-budget-configurator_license' ); ?>
+
+					<!-- License Key Field -->
+					<fieldset style="margin-bottom: 20px;">
+						<label class="block" for="product-budget-configurator_license_apikey" style="font-weight: 600; margin-bottom: 8px; display: block;">
+							<?php esc_html_e( 'License Key', 'pbc' ); ?>
+						</label>
+						<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+							<input 
+								type="text" 
+								id="product-budget-configurator_license_apikey" 
+								name="product-budget-configurator_license_apikey" 
+								value="<?php echo esc_attr( $license_key ); ?>" 
+								style="flex: 1; min-width: 300px; font-family: monospace; padding: 8px 12px;"
+								placeholder="<?php esc_attr_e( 'CTECH-XXXXX-XXXXX-XXXXX-XXXXX', 'pbc' ); ?>"
+								<?php echo $is_active ? 'readonly' : ''; ?>
+							/>
+							<?php if ( $is_active ) : ?>
+								<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap;">
+									<input type="checkbox" name="product-budget-configurator_license_deactivate_checkbox" value="on" />
+									<span><?php esc_html_e( 'Deactivate', 'pbc' ); ?></span>
+								</label>
+							<?php endif; ?>
+						</div>
+						<p class="description" style="margin-top: 5px;">
+							<?php
+							printf(
+								/* translators: %s: Purchase URL */
+								esc_html__( 'Enter your license key. You can find it in %s.', 'pbc' ),
+								'<a href="https://close.technology/my-account/" target="_blank">' . esc_html__( 'your account', 'pbc' ) . '</a>'
+							);
+							?>
+						</p>
+					</fieldset>
+
+					<!-- Submit Button -->
+					<div style="padding-top: 15px; border-top: 1px solid #ddd;">
+						<button type="submit" name="submit_license" class="button button-primary button-large">
+							<span class="dashicons dashicons-update" style="margin-top: 4px;"></span>
+							<?php echo $is_active ? esc_html__( 'Update License', 'pbc' ) : esc_html__( 'Activate License', 'pbc' ); ?>
+						</button>
+					</div>
+				</form>
+
+				<!-- License Benefits -->
+				<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 4px;">
+					<h3 style="margin-top: 0;"><?php esc_html_e( 'License Benefits', 'pbc' ); ?></h3>
+					<p><?php esc_html_e( 'An active license provides the following benefits:', 'pbc' ); ?></p>
+					<ul style="list-style: none; padding-left: 0;">
+						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Automatic plugin updates', 'pbc' ); ?></li>
+						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Access to new features', 'pbc' ); ?></li>
+						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Priority support', 'pbc' ); ?></li>
+						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Security patches', 'pbc' ); ?></li>
+					</ul>
+					<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+					<div style="font-size: 0.9em;">
+						<p><strong><?php esc_html_e( 'Need Help?', 'pbc' ); ?></strong></p>
+						<p>
+							<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank"><?php esc_html_e( 'Purchase License', 'pbc' ); ?> →</a><br>
+							<a href="https://close.technology/my-account/" target="_blank"><?php esc_html_e( 'My Account', 'pbc' ); ?> →</a><br>
+							<a href="https://close.technology/support/" target="_blank"><?php esc_html_e( 'Support', 'pbc' ); ?> →</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php
 	}
 
 	/**

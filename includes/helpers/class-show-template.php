@@ -87,6 +87,14 @@ class PBC_Template {
 		.page-configurator button[type="submit"].btn:hover,
 		.page-configurator button[type="submit"].btn:focus {
 			background-color: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ' !important;
+		}
+		.phase_note_top {
+			background-color: ' . esc_attr( $color_main ) . ' !important;
+			color: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ' !important;
+		}
+		.phase_note_top p,
+		.phase_note_top a {
+			color: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ' !important;
 		}';
 
 		// Output the inline style.
@@ -545,6 +553,19 @@ class PBC_Template {
 			<div class="error"><?php esc_html_e( 'No Phases Available', 'pbc' ); ?></div>
 			</div>
 			<?php
+		}
+
+		// Show phase note if exists and we're not in calculate step - BEFORE wizard menu.
+		if ( 'calculate' !== $cstep ) {
+			$phase_id   = isset( $phases[ ( (int) $cstep - 1 ) ] ) ? $phases[ ( (int) $cstep - 1 ) ] : 0;
+			$phase_note = get_post_meta( $phase_id, 'pbc_phase_note', true );
+			if ( ! empty( $phase_note ) ) :
+				?>
+				<div class="phase_note_top">
+					<?php echo wp_kses_post( $phase_note ); ?>
+				</div>
+				<?php
+			endif;
 		}
 
 		if ( 'wizard' === $template ) {

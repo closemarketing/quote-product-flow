@@ -110,10 +110,16 @@ spl_autoload_register(function ($class) {
         }
         ');
     }
-});
-=======
-        return false;
+    if ($class === 'Closemarketing\WPLicenseManager\License') {
+        eval('
+        namespace Closemarketing\WPLicenseManager;
+        class License {
+            public function __construct(array $args = []) {}
+            public function is_license_active() { return true; }
+            public function get_api_key_status() { return true; }
+            public function get_option_value($key) { return ""; }
+            public function validate_license($input) {}
+        }
+        ');
     }
-}
-
->>>>>>> input-variation
+});
