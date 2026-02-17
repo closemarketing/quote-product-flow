@@ -567,7 +567,7 @@ class PBC_Template {
 				<?php
 			endif;
 		}
-		
+
 		if ( 'wizard' === $template ) {
 			SHOW::wizard_phases( $phases, $cstep );
 		}
