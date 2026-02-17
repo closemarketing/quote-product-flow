@@ -59,7 +59,7 @@ if ( file_exists( WPPBC_PLUGIN_PATH . 'vendor/autoload.php' ) ) {
  *
  * @var \Closemarketing\WPLicenseManager\License|null
  */
-$pbc_license_instance = null;
+$pbc_license = null;
 
 /**
  * Initialize License Manager.
@@ -67,35 +67,38 @@ $pbc_license_instance = null;
 add_action(
 	'plugins_loaded',
 	function () {
-		global $pbc_license_instance;
+		global $pbc_license;
 
 		if ( ! class_exists( '\Closemarketing\WPLicenseManager\License' ) ) {
-				return;
+			return;
 		}
 
-	try {
-		$pbc_license_instance = new \Closemarketing\WPLicenseManager\License(
-			array(
-				'api_url'         => WPPBC_LICENSE_API_URL,
-				'rest_api_key'    => WPPBC_LICENSE_API_KEY,
-				'rest_api_secret' => WPPBC_LICENSE_API_SECRET,
-				'product_uuid'    => WPPBC_LICENSE_PRODUCT_UUID,
-				'file'            => WPPBC_PLUGIN,
-				'version'         => WPPBC_VERSION,
-				'slug'            => 'product-budget-configurator',
-				'name'            => WPPBC_ITEM_NAME,
-				'text_domain'     => 'pbc',
-			)
-		);
-	} catch ( \Exception $e ) {
-		add_action(
-			'admin_notices',
-			function () use ( $e ) {
-				echo '<div class="notice notice-error"><p>Product Budget Configurator: ' . esc_html( $e->getMessage() ) . '</p></div>';
-			}
-		);
-	}
-},
+		try {
+			$pbc_license = new \Closemarketing\WPLicenseManager\License(
+				array(
+					'api_url'          => WPPBC_LICENSE_API_URL,
+					'rest_api_key'     => WPPBC_LICENSE_API_KEY,
+					'rest_api_secret'  => WPPBC_LICENSE_API_SECRET,
+					'product_uuid'     => WPPBC_LICENSE_PRODUCT_UUID,
+					'file'             => WPPBC_PLUGIN,
+					'version'          => WPPBC_VERSION,
+					'slug'             => 'product-budget-configurator',
+					'name'             => WPPBC_ITEM_NAME,
+					'text_domain'      => 'pbc',
+					'settings_page'    => 'pbc_menu',
+					'settings_tabs'    => 'pbc_license_tabs_disabled',    // Disabled - UI handled by PBC Admin.
+					'settings_content' => 'pbc_license_content_disabled', // Disabled - UI handled by PBC Admin.
+				)
+			);
+		} catch ( \Exception $e ) {
+			add_action(
+				'admin_notices',
+				function () use ( $e ) {
+					echo '<div class="notice notice-error"><p>Product Budget Configurator: ' . esc_html( $e->getMessage() ) . '</p></div>';
+				}
+			);
+		}
+	},
 	5
 );
 
@@ -112,13 +115,13 @@ function pbc_is_license_active() {
 		return true;
 	}
 
-	global $pbc_license_instance;
+	global $pbc_license;
 
-	if ( null === $pbc_license_instance ) {
+	if ( null === $pbc_license ) {
 		return false;
 	}
 
-	return $pbc_license_instance->is_license_active();
+	return $pbc_license->is_license_active();
 }
 
 /**
@@ -128,13 +131,13 @@ function pbc_is_license_active() {
  * @return bool True if license is registered, false otherwise.
  */
 function pbc_is_license_registered() {
-	global $pbc_license_instance;
+	global $pbc_license;
 
-	if ( empty( $pbc_license_instance ) ) {
+	if ( empty( $pbc_license ) ) {
 		return false;
 	}
 
-	return $pbc_license_instance->get_api_key_status();
+	return $pbc_license->get_api_key_status();
 }
 
 /**
@@ -144,9 +147,9 @@ function pbc_is_license_registered() {
  * @return bool True if license has expired, false otherwise.
  */
 function pbc_has_license_expired() {
-	global $pbc_license_instance;
+	global $pbc_license;
 
-	if ( null === $pbc_license_instance ) {
+	if ( null === $pbc_license ) {
 		return true;
 	}
 
@@ -166,9 +169,9 @@ function pbc_get_license_status() {
 		return 'active';
 	}
 
-	global $pbc_license_instance;
+	global $pbc_license;
 
-	if ( null === $pbc_license_instance ) {
+	if ( null === $pbc_license ) {
 		return 'inactive';
 	}
 
@@ -219,8 +222,8 @@ add_action(
 	'admin_notices',
 	function () {
 		// Only check if license instance is available.
-		global $pbc_license_instance;
-		if ( empty( $pbc_license_instance ) ) {
+		global $pbc_license;
+		if ( empty( $pbc_license ) ) {
 			return;
 		}
 

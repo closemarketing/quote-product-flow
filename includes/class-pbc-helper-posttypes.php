@@ -476,6 +476,19 @@ class PBC_Helper_PostTypes {
 			'priority'   => 'high',
 			'autosave'   => true,
 			'fields'     => array(
+				// WYSIWYG FOR NOTE.
+				array(
+					'name'    => __( 'Note', 'pbc' ),
+					'id'      => "{$prefix}phase_note",
+					'type'    => 'wysiwyg',
+					'desc'    => __( 'Add a note that will be displayed between phase elements', 'pbc' ),
+					'raw'     => false,
+					'options' => array(
+						'textarea_rows' => 5,
+						'teeny'         => true,
+						'media_buttons' => false,
+					),
+				),
 				// CHECKBOX FOR MULTIPLE SELECTIONS.
 				array(
 					'name' => __( 'Allow multiple selections', 'pbc' ),
