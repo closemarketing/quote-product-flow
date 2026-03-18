@@ -152,14 +152,23 @@
 .configurator_steps_nav {
   width: 100%;
   margin: 10px auto;
-  float: left;
-  padding-right: 15px;
+  float: none;
+  clear: both;
+  padding-right: 18px;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .configurator_steps_nav ul {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: grid;
+  /* Six steps per row on desktop so each label has more room (was ~8 with auto-fill). */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .page-configurator ul,
@@ -170,44 +179,54 @@
 
 .configurator_steps_nav li.configurator_steps {
   padding: 0;
-  margin: 0;
-  margin-bottom: 3px;
+  margin: 0 0 3px 0;
   background: #ededed;
   color: #000;
   position: relative;
-  float: left;
-  width: 12.5%;
-  min-height: 40px;
+  float: none;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
   height: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  vertical-align: middle;
+  align-items: stretch;
+  justify-content: stretch;
   text-align: center;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: visible;
   border-right: 2px solid #fff;
+  box-sizing: border-box;
 }
 
 .configurator_steps_nav li.configurator_steps .stepContainer {
   width: 100%;
-  height: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  padding: 8px 26px 8px 10px;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .configurator_steps_nav li.configurator_steps .step-name {
   background: none;
   border: none;
+  margin: 0;
   padding: 0;
-  display: inline-block;
+  display: block;
   height: auto;
   width: 100%;
-  padding-right: 0;
-  line-height: 1.3;
-  vertical-align: top;
+  max-width: 100%;
+  line-height: 1.35;
   font-size: 14px;
+  overflow: visible;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: none;
+  box-sizing: border-box;
 }
 
 .configurator_steps_nav li.configurator_steps .step-arrow-button {
@@ -216,8 +235,10 @@
   position: absolute;
   top: 50%;
   margin-top: -15px;
-  z-index: 1;
+  z-index: 2;
   right: -15px;
+  flex-shrink: 0;
+  pointer-events: none;
   -webkit-transform: rotate(-45deg);
   -moz-transform: rotate(-45deg);
   -ms-transform: rotate(-45deg);
@@ -313,7 +334,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 12px 0;
+  gap: 12px 8px;
 }
 
 .phase_variations ul li.variation_list {
@@ -327,7 +348,10 @@
 
 /* Choice options: full-width button cards (primary color when selected) */
 .phase_variations ul li.variation_list.pbc-choice-row {
-  padding: 0 6px;
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  padding: 0 4px;
   box-sizing: border-box;
   display: flex;
   margin-bottom: 0;
@@ -412,14 +436,19 @@
 
 @media (max-width: 782px) {
   .phase_variations ul li.variation_list.pbc-choice-row {
-    width: 48%;
+    flex: 0 0 calc(50% - 4px);
+    max-width: calc(50% - 4px);
+    min-width: 0;
+    width: calc(50% - 4px);
   }
 }
 
 @media (max-width: 480px) {
   .phase_variations ul li.variation_list.pbc-choice-row {
-    width: 100%;
-    display: block;
+    flex: 0 0 calc(50% - 4px);
+    max-width: calc(50% - 4px);
+    width: calc(50% - 4px);
+    display: flex;
   }
 }
 
@@ -788,24 +817,38 @@ img.flipped {
   border: 2px solid #A08621;
 }
 
+@media (max-width: 1024px) and (min-width: 769px) {
+  .configurator_steps_nav ul {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @media (max-width:768px) {
   .configurator_steps_nav {
-    padding-right: 0px;
+    padding-right: 0;
+  }
+
+  .configurator_steps_nav ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .configurator_steps_nav li.configurator_steps {
-    overflow: visible;
-    padding: 8px 5px;
-    min-height: 50px;
+    max-width: 100%;
+    min-height: 48px;
+  }
+
+  .configurator_steps_nav li.configurator_steps .stepContainer {
+    padding: 8px 10px;
+    min-height: 48px;
   }
 
   .configurator_steps_nav li.configurator_steps .step-arrow-button {
     display: none;
   }
-  
+
   .configurator_steps_nav li.configurator_steps .step-name {
     font-size: 12px;
-    line-height: 1.2;
+    line-height: 1.35;
   }
 
   .pbc-calculate-wrapper {
@@ -856,6 +899,11 @@ div.site-content:has(div.page-configurator) {
 #left-area ul {
   list-style-type: none;
   line-height: 26px;
+}
+
+#left-area ul,
+.entry-content ul {
+  padding: 0 0 23px 0;
 }
 
 /* Support Buttons */
