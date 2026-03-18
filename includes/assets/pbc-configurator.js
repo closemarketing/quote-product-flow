@@ -732,41 +732,47 @@ jQuery(function($){
 		});
 	});
 
-	// Share via WhatsApp.
+	// Share via WhatsApp: generates PDF and shares its download link (WhatsApp cannot attach files from browser).
 	$(document).on('click', '#pbc-share-whatsapp', function(e){
 		e.preventDefault();
+		var $btn = $(this);
+		if ($btn.hasClass('processing')) {
+			return;
+		}
 		var sessionKey = $('input[name=pbc_session_key]').val();
 		var parentPhase = $('input[name=pbc_parent_phase]').val();
-		var template = $('#configurator-form').data('template');
-		var currentUrl = window.location.href.split('#')[0];
+		var shareData = {
+			action: 'pbc_share_budget_pdf',
+			nonce: PBCAjaxAction.nonce,
+			session_key: sessionKey,
+			parent_phase: parentPhase
+		};
+		$('#configurator-form').find('.email_submit_fields input[name], .email_submit_fields textarea[name]').each(function() {
+			var n = $(this).attr('name');
+			if (n) {
+				shareData[n] = $(this).val();
+			}
+		});
+
+		$btn.addClass('processing').prop('disabled', true);
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,
 			type: 'POST',
-			data: {
-				action: 'get_shareable_config',
-				nonce: PBCAjaxAction.nonce,
-				session_key: sessionKey,
-				parent_phase: parentPhase,
-				template: template,
-				current_url: currentUrl
-			},
+			data: shareData,
+			dataType: 'json',
 			success: function(response) {
-				if (response.success && response.data.url) {
-					console.log('PBC: Generated URL:', response.data.url);
-					if (response.data.variations_count) {
-						console.log('PBC: Variations in URL:', response.data.variations_count);
-					}
-					var message = 'Mira esta configuración: ' + response.data.url;
-					var text = encodeURIComponent(message);
-					var whatsappUrl = 'https://wa.me/?text=' + text;
-					window.open(whatsappUrl, '_blank');
+				$btn.removeClass('processing').prop('disabled', false);
+				if (response.success && response.data && response.data.whatsapp_text) {
+					var text = encodeURIComponent(response.data.whatsapp_text);
+					window.open('https://wa.me/?text=' + text, '_blank');
 				} else {
-					var errMsg = (response.data && response.data.message) ? response.data.message : 'No se pudo generar el enlace de configuración.';
+					var errMsg = (response.data && response.data.message) ? response.data.message : 'No se pudo generar el PDF del presupuesto.';
 					alert(errMsg);
 				}
 			},
 			error: function() {
+				$btn.removeClass('processing').prop('disabled', false);
 				alert('Error al procesar la solicitud');
 			}
 		});

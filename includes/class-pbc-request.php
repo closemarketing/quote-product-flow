@@ -33,6 +33,9 @@ class PBC_Requests {
 		add_action( 'wp_ajax_get_shareable_config', array( $this, 'get_shareable_config_callback' ) );
 		add_action( 'wp_ajax_nopriv_get_shareable_config', array( $this, 'get_shareable_config_callback' ) );
 
+		add_action( 'wp_ajax_pbc_share_budget_pdf', array( $this, 'pbc_share_budget_pdf_callback' ) );
+		add_action( 'wp_ajax_nopriv_pbc_share_budget_pdf', array( $this, 'pbc_share_budget_pdf_callback' ) );
+
 		add_action( 'wp_ajax_send_config_email', array( $this, 'send_config_email_callback' ) );
 		add_action( 'wp_ajax_nopriv_send_config_email', array( $this, 'send_config_email_callback' ) );
 	}
@@ -357,6 +360,79 @@ class PBC_Requests {
 			array(
 				'url'              => esc_url_raw( $share_url ),
 				'variations_count' => $variation_count,
+			)
+		);
+	}
+
+	/**
+	 * AJAX: generate budget PDF and return URL for WhatsApp (or similar) sharing.
+	 *
+	 * WhatsApp cannot attach files from the browser; the message includes the direct PDF link.
+	 *
+	 * @return void
+	 */
+	public function pbc_share_budget_pdf_callback() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'pbc-nonce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+		}
+
+		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
+			if ( ! session_start() ) {
+				wp_send_json_error( array( 'message' => __( 'Session error.', 'pbc' ) ) );
+			}
+		}
+
+		$session_key  = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
+		$parent_phase = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
+
+		if ( empty( $session_key ) || ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Configuration not found. Complete the configurator first.', 'pbc' ),
+				)
+			);
+		}
+
+		if ( preg_match( '/pbc_variation_(\d+)/', $session_key, $matches ) ) {
+			$parent_phase = (int) $matches[1];
+		} elseif ( empty( $parent_phase ) ) {
+			$parent_phase = CALC::get_default_parent_phase();
+		}
+
+		$item = $_SESSION;
+		$item['pbc_contact']      = array(
+			'email'    => isset( $_POST['email_field'] ) ? sanitize_email( wp_unslash( $_POST['email_field'] ) ) : '',
+			'name'     => isset( $_POST['name_field'] ) ? sanitize_text_field( wp_unslash( $_POST['name_field'] ) ) : '',
+			'phone'    => isset( $_POST['phone_field'] ) ? sanitize_text_field( wp_unslash( $_POST['phone_field'] ) ) : '',
+			'city'     => isset( $_POST['city_field'] ) ? sanitize_text_field( wp_unslash( $_POST['city_field'] ) ) : '',
+			'state'    => isset( $_POST['state_field'] ) ? sanitize_text_field( wp_unslash( $_POST['state_field'] ) ) : '',
+			'comments' => isset( $_POST['comments_field'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments_field'] ) ) : '',
+		);
+		$item['pbc_session_key']  = $session_key;
+		$item['pbc_parent_phase'] = $parent_phase;
+
+		$item['pbc_enquiry'] = CALC::configurator_save_enquiry( $item );
+		$pdf_url             = PDF::generate_engine_pdf( $item, 'url' );
+
+		if ( empty( $pdf_url ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Could not generate the PDF. Try again or use “Generate budget”.', 'pbc' ),
+				)
+			);
+		}
+
+		$whatsapp_text = sprintf(
+			/* translators: %s: URL to download the budget PDF */
+			__( 'Budget (PDF): %s', 'pbc' ),
+			$pdf_url
+		);
+		$whatsapp_text = apply_filters( 'pbc_whatsapp_share_pdf_message', $whatsapp_text, $pdf_url, $item );
+
+		wp_send_json_success(
+			array(
+				'pdf_url'       => esc_url_raw( $pdf_url ),
+				'whatsapp_text' => $whatsapp_text,
 			)
 		);
 	}
