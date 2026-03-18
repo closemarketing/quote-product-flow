@@ -629,9 +629,10 @@ jQuery(function($){
 
 		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template')+'&nonce='+PBCAjaxAction.nonce;
 
-		console.log('PBC Debug: Submit button clicked:', submit_val);
-		console.log('PBC Debug: Next phase:', next_phase);
-		console.log('PBC Debug: Current phase:', $('input[name=pbc_current_phase]').val());
+		if (!thisButton.data('pbc-programmatic-next')) {
+			window.pbcAutoSkipCount = 0;
+		}
+		thisButton.removeData('pbc-programmatic-next');
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,  //server script to process data
@@ -640,50 +641,45 @@ jQuery(function($){
 			dataType: "html",
 			success: function(response) {
                 thisButton.prop('disabled', false);
-			
-			console.log('PBC Debug: Response length:', response.length);
-			console.log('PBC Debug: Response preview:', response.substring(0, 500));
-			
-			// Note: PDF opens automatically via script tag in response.
-			// No need to manually open it here as it would create duplicate tabs.
-			
+
 			$('.page-configurator').html(response);
-			
-			// Wait for DOM to be ready before checking for variations.
+
 			setTimeout(function() {
-				var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0 || 
-				                     $('.page-configurator').find('select.pbc_variation option').length > 0;
-				var hasQuestions = $('.page-configurator').find('.pbc_question_input').length > 0;
-				var hasDirectInput = $('.page-configurator').find('.pbc-direct-input-wrapper').length > 0;
-				var newNextPhase = $('.page-configurator').find('input[name=next_phase]').val();
-				
-				console.log('PBC Debug: Has variations:', hasVariations);
-				console.log('PBC Debug: Has questions:', hasQuestions);
-				console.log('PBC Debug: Has direct input:', hasDirectInput);
-				console.log('PBC Debug: New next phase:', newNextPhase);
-				
-				// Toggle custom inputs after page load.
+				var $pc = $('.page-configurator');
+				var hasVariations = $pc.find('input.pbc_variation').length > 0 ||
+					$pc.find('input.pbc_variation_multiple').length > 0 ||
+					$pc.find('select.pbc_variation option').length > 0;
+				var hasQuestions = $pc.find('.pbc_question_input').length > 0;
+				var hasDirectInput = $pc.find('.pbc-direct-input-wrapper').length > 0;
+				var hasPhaseNote = $pc.find('.phase_note_top').length > 0 && $.trim($pc.find('.phase_note_top').text()) !== '';
+				var newNextPhase = $pc.find('input[name=next_phase]').val();
+
 				toggleCustomInputs();
-				
-				// Re-initialize number inputs after page load.
 				initNumberInputs();
-				
-				// Only auto-skip if there are no variations AND no questions AND no direct input.
-				if (
-					newNextPhase && 
-					newNextPhase != 'calculate' &&
-					(submit_val == 'prev' || submit_val == 'next') && 
+
+				var canAutoSkip = newNextPhase &&
+					newNextPhase !== 'calculate' &&
+					(submit_val === 'prev' || submit_val === 'next') &&
 					!hasVariations &&
 					!hasQuestions &&
-					!hasDirectInput
-				)
-				{
-					console.log('PBC Debug: Auto-skipping empty step (no variations, questions or direct input)');
-					$('.page-configurator').find('button[name=submit][value='+submit_val+']').trigger('click');
+					!hasDirectInput &&
+					!hasPhaseNote &&
+					(typeof window.pbcAutoSkipCount === 'number' && window.pbcAutoSkipCount < 30);
+
+				if (canAutoSkip) {
+					window.pbcAutoSkipCount = (window.pbcAutoSkipCount || 0) + 1;
+					var $go = $pc.find('button[name=submit][value=' + submit_val + ']');
+					if ($go.length) {
+						$go.data('pbc-programmatic-next', 1);
+						$go.trigger('click');
+					} else {
+						$pc.find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+					}
 				} else {
-					$('.page-configurator').find('.status_loader.phase_detail_loader').html('').addClass('hidden');
-					if($('.page-configurator').find('.result_submit_action').length > 0){
-						$('.page-configurator').find('.result_submit_action').show().delay(3000).fadeOut(400);
+					window.pbcAutoSkipCount = 0;
+					$pc.find('.status_loader.phase_detail_loader').html('').addClass('hidden');
+					if ($pc.find('.result_submit_action').length > 0) {
+						$pc.find('.result_submit_action').show().delay(3000).fadeOut(400);
 					}
 				}
 			}, 100);

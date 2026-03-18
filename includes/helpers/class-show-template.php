@@ -128,51 +128,77 @@ class PBC_Template {
 			if ( 'next' === $submit ) {
 				$current_phase_id = isset( $phases[ $current_step_from_form - 1 ] ) ? $phases[ $current_step_from_form - 1 ] : 0;
 				if ( $current_phase_id ) {
-					$phase_variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $current_phase_id . '&fields=ids' );
-					$has_required_questions = false;
-					$has_normal_variations = false;
-					$required_question_keys = array();
+					// Only require choices for variations that are actually visible (same rules as render).
+					$visible_variation_ids = self::get_visible_variation_ids_for_step(
+						$current_phase_id,
+						$current_step_from_form,
+						$pbc_session_key,
+						$phases,
+						$phases_order
+					);
 
-					foreach ( $phase_variations as $var_id ) {
+					$has_required_questions   = false;
+					$has_normal_variations    = false;
+					$required_question_keys   = array();
+
+					foreach ( $visible_variation_ids as $var_id ) {
 						$is_question = get_post_meta( $var_id, 'pbc_is_question', true );
 						if ( $is_question ) {
 							$is_required = get_post_meta( $var_id, 'pbc_question_required', true );
 							if ( $is_required ) {
 								$has_required_questions = true;
-								$question_key = get_post_meta( $var_id, 'pbc_question_key', true );
+								$question_key           = get_post_meta( $var_id, 'pbc_question_key', true );
 								if ( $question_key ) {
 									$required_question_keys[] = $question_key;
 								}
 							}
 						} else {
 							$has_normal_variations = true;
-				}
-			}
-
-					// Validate required questions.
-					if ( $has_required_questions && ! empty( $required_question_keys ) ) {
-						if ( empty( $_POST['pbc_question'] ) ) {
-							$should_advance = false;
-							$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
-						} else {
-							// Check each required question was answered.
-							foreach ( $required_question_keys as $req_key ) {
-								$answer = isset( $_POST['pbc_question'][ $req_key ] ) ? trim( sanitize_text_field( wp_unslash( $_POST['pbc_question'][ $req_key ] ) ) ) : '';
-								if ( '' === $answer ) {
-									$should_advance = false;
-									$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
-									break;
-								}
-							}
 						}
 					}
 
-					// Validate normal variations (if they exist and no question variations).
-					if ( $has_normal_variations && ! $has_required_questions ) {
-						// Check if a variation is selected.
-						if ( empty( $_POST['pbc_variation'] ) || ! isset( $_POST['pbc_variation'][ $current_step_from_form ] ) ) {
-							$should_advance = false;
-							$validation_error = __( 'Por favor, selecciona una opción antes de continuar.', 'pbc' );
+					// Phase with no visible options: optional direct input, else allow (e.g. note-only step).
+					if ( empty( $visible_variation_ids ) ) {
+						$show_direct_input = get_post_meta( $current_phase_id, 'pbc_show_direct_input', true );
+						if ( $show_direct_input ) {
+							$input_type = get_post_meta( $current_phase_id, 'pbc_direct_input_type', true );
+							if ( empty( $input_type ) ) {
+								$input_type = 'textarea';
+							}
+							$di_raw = isset( $_POST['pbc_direct_input'][ $current_step_from_form ] )
+								? wp_unslash( $_POST['pbc_direct_input'][ $current_step_from_form ] )
+								: '';
+							if ( 'textarea' === $input_type ) {
+								$di_val = sanitize_textarea_field( $di_raw );
+							} else {
+								$di_val = sanitize_text_field( $di_raw );
+							}
+							if ( 'number' !== $input_type && '' === trim( (string) $di_val ) ) {
+								$should_advance   = false;
+								$validation_error = __( 'Por favor, completa el campo antes de continuar.', 'pbc' );
+							}
+						}
+					} else {
+						if ( $has_required_questions && ! empty( $required_question_keys ) ) {
+							if ( empty( $_POST['pbc_question'] ) ) {
+								$should_advance   = false;
+								$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
+							} else {
+								foreach ( $required_question_keys as $req_key ) {
+									$answer = isset( $_POST['pbc_question'][ $req_key ] ) ? trim( sanitize_text_field( wp_unslash( $_POST['pbc_question'][ $req_key ] ) ) ) : '';
+									if ( '' === $answer ) {
+										$should_advance   = false;
+										$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
+										break;
+									}
+								}
+							}
+						}
+						if ( $should_advance && $has_normal_variations && ! $has_required_questions ) {
+							if ( empty( $_POST['pbc_variation'] ) || ! isset( $_POST['pbc_variation'][ $current_step_from_form ] ) ) {
+								$should_advance   = false;
+								$validation_error = __( 'Por favor, selecciona una opción antes de continuar.', 'pbc' );
+							}
 						}
 					}
 				}
@@ -1117,5 +1143,130 @@ class PBC_Template {
 			</div>
 			<?php
 		}
+	}
+
+	/**
+	 * Variation IDs visible on a step (dependency filters match frontend render).
+	 *
+	 * @param int    $phase_id          Phase post ID.
+	 * @param int    $step_number       1-based step.
+	 * @param string $pbc_session_key Session key.
+	 * @param array  $phases            Phase IDs in order.
+	 * @param array  $phases_order      menu_order per phase (parallel).
+	 * @return array<int>
+	 */
+	public static function get_visible_variation_ids_for_step( $phase_id, $step_number, $pbc_session_key, $phases, $phases_order ) {
+		if ( empty( $phase_id ) || ! isset( $_SESSION[ $pbc_session_key ] ) || ! is_array( $_SESSION[ $pbc_session_key ] ) ) {
+			return array();
+		}
+		$variations = get_posts(
+			array(
+				'numberposts' => -1,
+				'post_type'   => 'variation',
+				'meta_key'    => 'pbc_phase',
+				'meta_value'  => (int) $phase_id,
+				'fields'      => 'ids',
+				'orderby'     => 'title',
+				'order'       => 'ASC',
+			)
+		);
+		if ( empty( $variations ) ) {
+			return array();
+		}
+		$session_data        = $_SESSION[ $pbc_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$prev_variations_ids = array();
+		foreach ( $session_data as $step_key => $prev_var ) {
+			if ( isset( $prev_var['var']['id'] ) ) {
+				$prev_variations_ids[ (int) $step_key - 1 ] = (int) $prev_var['var']['id'];
+			}
+		}
+		$variations_depends          = array();
+		$variations_question_depends = array();
+		foreach ( $variations as $variation_id ) {
+			$depends = get_post_meta( $variation_id, 'pbc_depends', true );
+			if ( ! empty( $depends ) ) {
+				$variations_depends[ $variation_id ] = array();
+				foreach ( $depends as $depend ) {
+					$arr = explode( '|', $depend['pbc_depvar'] );
+					if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
+						$order = array_search( (int) $arr[0], $phases_order, true );
+						if ( false !== $order ) {
+							$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
+						}
+					}
+				}
+			}
+			$question_depends = get_post_meta( $variation_id, 'pbc_question_depends', true );
+			if ( ! empty( $question_depends ) && is_array( $question_depends ) ) {
+				$variations_question_depends[ $variation_id ] = $question_depends;
+			}
+		}
+		$all_question_answers = isset( $_SESSION['pbc_questions'] ) ? $_SESSION['pbc_questions'] : array();
+		$cstep                = (int) $step_number;
+		$filtered             = array_filter(
+			$variations,
+			function ( $variation_id ) use ( $prev_variations_ids, $variations_depends, $variations_question_depends, $all_question_answers, $cstep ) {
+				if ( isset( $variations_depends[ $variation_id ] ) ) {
+					$depends_ids = $variations_depends[ $variation_id ];
+					for ( $i = 0; $i < $cstep - 1; $i++ ) {
+						if ( isset( $prev_variations_ids[ $i ] ) && isset( $depends_ids[ $i ] ) ) {
+							if ( ! in_array( $prev_variations_ids[ $i ], $depends_ids[ $i ], true ) ) {
+								return false;
+							}
+						}
+					}
+				}
+				if ( isset( $variations_question_depends[ $variation_id ] ) ) {
+					foreach ( $variations_question_depends[ $variation_id ] as $question_depend ) {
+						$question_key  = isset( $question_depend['pbc_question_key_ref'] ) ? $question_depend['pbc_question_key_ref'] : '';
+						$operator      = isset( $question_depend['pbc_question_operator'] ) ? $question_depend['pbc_question_operator'] : '>';
+						$compare_value = isset( $question_depend['pbc_question_value'] ) ? $question_depend['pbc_question_value'] : '';
+						if ( empty( $question_key ) || ! isset( $all_question_answers[ $question_key ] ) ) {
+							continue;
+						}
+						$answer_value  = $all_question_answers[ $question_key ];
+						$condition_met = false;
+						if ( is_numeric( $answer_value ) && is_numeric( $compare_value ) ) {
+							$answer_value  = (float) $answer_value;
+							$compare_value = (float) $compare_value;
+							switch ( $operator ) {
+								case '>':
+									$condition_met = $answer_value > $compare_value;
+									break;
+								case '>=':
+									$condition_met = $answer_value >= $compare_value;
+									break;
+								case '<':
+									$condition_met = $answer_value < $compare_value;
+									break;
+								case '<=':
+									$condition_met = $answer_value <= $compare_value;
+									break;
+								case '=':
+									$condition_met = $answer_value == $compare_value;
+									break;
+								case '!=':
+									$condition_met = $answer_value != $compare_value;
+									break;
+							}
+						} else {
+							switch ( $operator ) {
+								case '=':
+									$condition_met = $answer_value === $compare_value;
+									break;
+								case '!=':
+									$condition_met = $answer_value !== $compare_value;
+									break;
+							}
+						}
+						if ( ! $condition_met ) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+		);
+		return array_values( array_map( 'intval', $filtered ) );
 	}
 }
