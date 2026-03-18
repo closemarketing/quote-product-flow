@@ -120,6 +120,32 @@ class PDF {
 	}
 
 	/**
+	 * Text color (black/white) for readable contrast on a hex background (PDF tables).
+	 *
+	 * @param string $hex Background #RRGGBB or #RGB.
+	 * @return string '#000000' or '#ffffff'.
+	 */
+	private static function pdf_text_color_on_background( $hex ) {
+		$hex = is_string( $hex ) ? trim( $hex ) : '';
+		if ( '' === $hex || '#' !== $hex[0] ) {
+			return '#000000';
+		}
+		$h = substr( $hex, 1 );
+		if ( 3 === strlen( $h ) ) {
+			$h = $h[0] . $h[0] . $h[1] . $h[1] . $h[2] . $h[2];
+		}
+		if ( strlen( $h ) < 6 || ! ctype_xdigit( substr( $h, 0, 6 ) ) ) {
+			return '#000000';
+		}
+		$r   = hexdec( substr( $h, 0, 2 ) );
+		$g   = hexdec( substr( $h, 2, 2 ) );
+		$b   = hexdec( substr( $h, 4, 2 ) );
+		$lum = ( 0.2126 * $r + 0.7152 * $g + 0.0722 * $b ) / 255;
+
+		return $lum > 0.52 ? '#000000' : '#ffffff';
+	}
+
+	/**
 	 * Generates PDF from session
 	 *
 	 * @param array $item Item of budget to generate.
@@ -146,6 +172,8 @@ class PDF {
 		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
 		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
 
+		$summary_text_on_bg = self::pdf_text_color_on_background( $background_color );
+
 		$user        = wp_get_current_user();
 		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
 		$show_prices = CALC::get_show_prices_for_user( $user_role );
@@ -165,28 +193,33 @@ class PDF {
 		table.comments td.title{ width:600px;padding:5px 0 5px 15px; }
 		table td.value{ width:70px;padding:5px 15px 5px 0; }
 		table td.right{text-align:right;}
-		table.summary td.background, table.summary td.background{ background-color:$background_color; }
+		table.summary td.background{ background-color:$background_color;color:$summary_text_on_bg; }
 		table.summary-total td.empty{width:450px;}
 		table.summary-total td.title{width:50px;}
-		img.header_image{ width:700px;height:120px; }
+		table.header{ width:100%; margin:0 auto 10px auto; border:0; }
+		table.header td{ text-align:center; vertical-align:middle; padding:0; }
+		img.header_image{ width:700px; max-width:100%; height:auto; display:block; margin:0 auto; }
 		img.footer_image{ width:700px;height:70px; margin: 50px 0 0 30px;}
-		table.pdf-logo-wrap{ width:100%; border-collapse:collapse; margin:0 0 10px 0; }
-		table.pdf-logo-wrap td{ text-align:center; vertical-align:middle; padding:0; }
-		table.pdf-logo-wrap img{ display:inline-block; margin:0 auto; }
+		table.pdf-logo-wrap{ width:100%; border-collapse:collapse; margin:0 0 12px 0; border:0; }
+		table.pdf-logo-wrap td{ border:0; padding:0; vertical-align:middle; }
 		</style>";
 		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 		$pdf_image_selected = ! empty( $pdf_image_selected ) ? trim( $pdf_image_selected ) : '';
 		if ( ! empty( $pdf_image_selected ) ) {
-			// Convert URL to local path for Html2Pdf.
+			// Convert URL to local path for Html2Pdf. Three-column table centers reliably in Html2Pdf.
 			$pdf_image_local = self::url_to_local_path( $pdf_image_selected );
-			$output         .= '<table class="pdf-logo-wrap"><tr><td><img src="' . esc_attr( $pdf_image_local ) . '" width="200" alt=""/></td></tr></table>';
+			$output         .= '<table class="pdf-logo-wrap"><tr>';
+			$output         .= '<td style="width:25%;">&nbsp;</td>';
+			$output         .= '<td style="width:50%;text-align:center;" align="center"><img src="' . esc_attr( $pdf_image_local ) . '" width="200" alt=""/></td>';
+			$output         .= '<td style="width:25%;">&nbsp;</td>';
+			$output         .= '</tr></table>';
 		}
 		$header_image = get_option( 'pbc_pdf_image_header' );
 		$header_image = ! empty( $header_image ) ? trim( $header_image ) : '';
 		if ( ! empty( $header_image ) ) {
 			// Convert URL to local path for Html2Pdf.
 			$header_image_local = self::url_to_local_path( $header_image );
-			$output            .= '<table class="header"><tr><td><img src="' . esc_attr( $header_image_local ) . '" class="header_image"/></td></tr></table><br/>';
+			$output            .= '<table class="header"><tr><td align="center"><img src="' . esc_attr( $header_image_local ) . '" class="header_image" alt=""/></td></tr></table><br/>';
 		}
 		$output .= '<table class="product"><tr><td class="product-title">';
 		$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';

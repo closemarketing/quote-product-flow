@@ -337,6 +337,19 @@
   gap: 12px 8px;
 }
 
+.phase_variations ul:has(> li.pbc-choice-row) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 8px;
+  align-items: stretch;
+}
+
+.phase_variations ul:has(> li.pbc-choice-row) li.variation_list:not(.pbc-choice-row) {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+}
+
 .phase_variations ul li.variation_list {
   width: 24%;
   display: inline-block;
@@ -355,6 +368,13 @@
   box-sizing: border-box;
   display: flex;
   margin-bottom: 0;
+}
+
+.phase_variations ul:has(> li.pbc-choice-row) li.variation_list.pbc-choice-row {
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .phase_variations ul li.pbc-choice-row .pbc-choice-label {
@@ -435,11 +455,21 @@
 }
 
 @media (max-width: 782px) {
+  .phase_variations ul:has(> li.pbc-choice-row) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .phase_variations ul li.variation_list.pbc-choice-row {
     flex: 0 0 calc(50% - 4px);
     max-width: calc(50% - 4px);
     min-width: 0;
     width: calc(50% - 4px);
+  }
+
+  .phase_variations ul:has(> li.pbc-choice-row) li.variation_list.pbc-choice-row {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -449,6 +479,11 @@
     max-width: calc(50% - 4px);
     width: calc(50% - 4px);
     display: flex;
+  }
+
+  .phase_variations ul:has(> li.pbc-choice-row) li.variation_list.pbc-choice-row {
+    width: 100%;
+    max-width: 100%;
   }
 }
 
