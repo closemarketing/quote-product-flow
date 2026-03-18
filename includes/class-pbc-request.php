@@ -365,6 +365,60 @@ class PBC_Requests {
 	}
 
 	/**
+	 * Save enquiry, generate PDF on disk; used by WhatsApp share and share-by-email.
+	 *
+	 * @return array{item: array, pdf_path: string, pdf_url: string}|\WP_Error
+	 */
+	private function pbc_create_share_budget_pdf_data() {
+		$session_key  = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
+		$parent_phase = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
+
+		if ( empty( $session_key ) || ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
+			return new \WP_Error(
+				'pbc_no_config',
+				__( 'Configuration not found. Complete the configurator first.', 'pbc' )
+			);
+		}
+
+		if ( preg_match( '/pbc_variation_(\d+)/', $session_key, $matches ) ) {
+			$parent_phase = (int) $matches[1];
+		} elseif ( empty( $parent_phase ) ) {
+			$parent_phase = CALC::get_default_parent_phase();
+		}
+
+		$item                = $_SESSION;
+		$item['pbc_contact'] = array(
+			'email'    => isset( $_POST['email_field'] ) ? sanitize_email( wp_unslash( $_POST['email_field'] ) ) : '',
+			'name'     => isset( $_POST['name_field'] ) ? sanitize_text_field( wp_unslash( $_POST['name_field'] ) ) : '',
+			'phone'    => isset( $_POST['phone_field'] ) ? sanitize_text_field( wp_unslash( $_POST['phone_field'] ) ) : '',
+			'city'     => isset( $_POST['city_field'] ) ? sanitize_text_field( wp_unslash( $_POST['city_field'] ) ) : '',
+			'state'    => isset( $_POST['state_field'] ) ? sanitize_text_field( wp_unslash( $_POST['state_field'] ) ) : '',
+			'comments' => isset( $_POST['comments_field'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments_field'] ) ) : '',
+		);
+		$item['pbc_session_key']  = $session_key;
+		$item['pbc_parent_phase'] = $parent_phase;
+
+		$item['pbc_enquiry'] = CALC::configurator_save_enquiry( $item );
+		$pdf_path            = PDF::generate_engine_pdf( $item, 'path' );
+
+		if ( empty( $pdf_path ) || ! is_readable( $pdf_path ) ) {
+			return new \WP_Error(
+				'pbc_pdf_fail',
+				__( 'Could not generate the PDF. Try again or use “Generate budget”.', 'pbc' )
+			);
+		}
+
+		$upload_dir = wp_upload_dir();
+		$pdf_url    = $upload_dir['baseurl'] . '/pbc/' . basename( $pdf_path );
+
+		return array(
+			'item'     => $item,
+			'pdf_path' => $pdf_path,
+			'pdf_url'  => $pdf_url,
+		);
+	}
+
+	/**
 	 * AJAX: generate budget PDF and return URL for WhatsApp (or similar) sharing.
 	 *
 	 * WhatsApp cannot attach files from the browser; the message includes the direct PDF link.
@@ -382,45 +436,13 @@ class PBC_Requests {
 			}
 		}
 
-		$session_key  = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
-		$parent_phase = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
-
-		if ( empty( $session_key ) || ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Configuration not found. Complete the configurator first.', 'pbc' ),
-				)
-			);
+		$data = $this->pbc_create_share_budget_pdf_data();
+		if ( is_wp_error( $data ) ) {
+			wp_send_json_error( array( 'message' => $data->get_error_message() ) );
 		}
 
-		if ( preg_match( '/pbc_variation_(\d+)/', $session_key, $matches ) ) {
-			$parent_phase = (int) $matches[1];
-		} elseif ( empty( $parent_phase ) ) {
-			$parent_phase = CALC::get_default_parent_phase();
-		}
-
-		$item = $_SESSION;
-		$item['pbc_contact']      = array(
-			'email'    => isset( $_POST['email_field'] ) ? sanitize_email( wp_unslash( $_POST['email_field'] ) ) : '',
-			'name'     => isset( $_POST['name_field'] ) ? sanitize_text_field( wp_unslash( $_POST['name_field'] ) ) : '',
-			'phone'    => isset( $_POST['phone_field'] ) ? sanitize_text_field( wp_unslash( $_POST['phone_field'] ) ) : '',
-			'city'     => isset( $_POST['city_field'] ) ? sanitize_text_field( wp_unslash( $_POST['city_field'] ) ) : '',
-			'state'    => isset( $_POST['state_field'] ) ? sanitize_text_field( wp_unslash( $_POST['state_field'] ) ) : '',
-			'comments' => isset( $_POST['comments_field'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments_field'] ) ) : '',
-		);
-		$item['pbc_session_key']  = $session_key;
-		$item['pbc_parent_phase'] = $parent_phase;
-
-		$item['pbc_enquiry'] = CALC::configurator_save_enquiry( $item );
-		$pdf_url             = PDF::generate_engine_pdf( $item, 'url' );
-
-		if ( empty( $pdf_url ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Could not generate the PDF. Try again or use “Generate budget”.', 'pbc' ),
-				)
-			);
-		}
+		$item    = $data['item'];
+		$pdf_url = $data['pdf_url'];
 
 		$whatsapp_text = sprintf(
 			/* translators: %s: URL to download the budget PDF */
@@ -455,15 +477,7 @@ class PBC_Requests {
 			}
 		}
 
-		$session_key     = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
-		$parent_phase    = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
-		$template        = isset( $_POST['template'] ) ? sanitize_text_field( wp_unslash( $_POST['template'] ) ) : 'wizard';
-		$current_url     = isset( $_POST['current_url'] ) ? esc_url_raw( wp_unslash( $_POST['current_url'] ) ) : '';
 		$recipient_email = isset( $_POST['recipient_email'] ) ? sanitize_email( wp_unslash( $_POST['recipient_email'] ) ) : '';
-
-		if ( empty( $session_key ) ) {
-			wp_send_json_error( 'Invalid session key' );
-		}
 
 		if ( empty( $recipient_email ) || ! is_email( $recipient_email ) ) {
 			wp_send_json_error(
@@ -473,94 +487,67 @@ class PBC_Requests {
 			);
 		}
 
-		if ( empty( $current_url ) ) {
-			$current_url = home_url( add_query_arg( array() ) );
+		$data = $this->pbc_create_share_budget_pdf_data();
+		if ( is_wp_error( $data ) ) {
+			wp_send_json_error( array( 'message' => $data->get_error_message() ) );
 		}
 
-		if ( empty( $parent_phase ) ) {
-			if ( preg_match( '/pbc_variation_(\d+)/', $session_key, $matches ) ) {
-				$parent_phase = isset( $matches[1] ) ? (int) $matches[1] : 0;
-			}
-		}
+		$item     = $data['item'];
+		$pdf_path = $data['pdf_path'];
 
-		if ( empty( $parent_phase ) ) {
-			$parent_phase = CALC::get_default_parent_phase();
-		}
-
-		if ( empty( $parent_phase ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Parent phase missing.', 'pbc' ),
-				)
-			);
-		}
-
-		if ( ! isset( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Configuration not found.', 'pbc' ),
-				)
-			);
-		}
-
-		// Build URL parameters from session data.
-		$url_params = array(
-			'pbc_parent' => $parent_phase,
+		$subject = apply_filters(
+			'pbc_share_email_pdf_subject',
+			__( 'Your budget (PDF)', 'pbc' ),
+			$item,
+			$recipient_email
+		);
+		$message = apply_filters(
+			'pbc_share_email_pdf_message',
+			__( 'Please find your budget attached as a PDF.', 'pbc' ) . "\n\n" . sprintf(
+				/* translators: %s: site name */
+				__( 'Regards, %s', 'pbc' ),
+				wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES )
+			),
+			$item,
+			$recipient_email
 		);
 
-		// Check if user can see prices.
-		$current_user = wp_get_current_user();
-		$roles        = (array) $current_user->roles;
-		$user_role    = ! empty( $roles ) ? $roles[0] : '';
-		$show_prices  = CALC::get_show_prices_for_user( $user_role );
+		$headers     = array( 'Content-Type: text/plain; charset=UTF-8' );
+		$attachments = array( $pdf_path );
 
-		if ( 'yes' === $show_prices ) {
-			$url_params['pbc_show_prices'] = '1';
-		}
+		/**
+		 * Adjust share-email mail (e.g. extra headers or replace attachments).
+		 *
+		 * @param array $args {
+		 *     @type string   $to
+		 *     @type string   $subject
+		 *     @type string   $message
+		 *     @type string[] $headers
+		 *     @type string[] $attachments
+		 *     @type array    $item Budget item data.
+		 * }
+		 */
+		$mail_args = apply_filters(
+			'pbc_share_email_pdf_mail',
+			array(
+				'to'          => $recipient_email,
+				'subject'     => $subject,
+				'message'     => $message,
+				'headers'     => $headers,
+				'attachments' => $attachments,
+				'item'        => $item,
+			),
+			$item,
+			$recipient_email
+		);
 
-		// Add each variation to URL parameters - only numeric steps.
-		$session_data = isset( $_SESSION[ $session_key ] ) ? $_SESSION[ $session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		foreach ( $session_data as $step => $data ) {
-			// Only process numeric step keys (1, 2, 3, etc.).
-			if ( ! is_numeric( $step ) ) {
-				continue;
-			}
-			if ( ! is_array( $data ) || ! isset( $data['var']['id'] ) ) {
-				continue;
-			}
-			$url_params[ 'v' . $step ] = (int) $data['var']['id'];
-
-			// Add price variation name (dropdown value) if exists, not the calculated price.
-			if ( isset( $data['var']['price_var'] ) && ! empty( $data['var']['price_var'] ) ) {
-				$url_params[ 'p' . $step ] = sanitize_text_field( $data['var']['price_var'] );
-			}
-		}
-
-		$base_url = remove_query_arg( array( 'pbc_share', 'pbc_parent', 'pbc_show_prices' ), $current_url );
-		// Remove any existing v and p params (and old pbc_v/pbc_p for backwards compatibility).
-		$base_url = preg_replace( '/[&?]pbc_v\d+=[^&]*/', '', $base_url );
-		$base_url = preg_replace( '/[&?]pbc_p\d+=[^&]*/', '', $base_url );
-		$base_url = preg_replace( '/[&?]v\d+=[^&]*/', '', $base_url );
-		$base_url = preg_replace( '/[&?]p\d+=[^&]*/', '', $base_url );
-		$base_url = rtrim( $base_url, '?&' );
-
-		$share_url = add_query_arg( $url_params, $base_url );
-
-		if ( empty( $share_url ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Unable to generate share URL.', 'pbc' ),
-				)
-			);
-		}
-
-		// Prepare email.
-		$subject  = __( 'Budget Configuration', 'pbc' );
-		$message  = __( 'You can view the configuration here:', 'pbc' ) . "\n\n";
-		$message .= esc_url_raw( $share_url );
-
-		// Send email.
-		$sent = wp_mail( $recipient_email, $subject, $message );
+		$sent = wp_mail(
+			$mail_args['to'],
+			$mail_args['subject'],
+			$mail_args['message'],
+			$mail_args['headers'],
+			$mail_args['attachments']
+		);
 
 		if ( $sent ) {
 			wp_send_json_success(

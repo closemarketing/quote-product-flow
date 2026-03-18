@@ -808,21 +808,25 @@ jQuery(function($){
 
 		var sessionKey = $('input[name=pbc_session_key]').val();
 		var parentPhase = $('input[name=pbc_parent_phase]').val();
-		var template = $('#configurator-form').data('template');
-		var currentUrl = window.location.href.split('#')[0];
+		var emailData = {
+			action: 'send_config_email',
+			nonce: PBCAjaxAction.nonce,
+			session_key: sessionKey,
+			parent_phase: parentPhase,
+			recipient_email: recipientEmail
+		};
+		$('#configurator-form').find('.email_submit_fields input[name], .email_submit_fields textarea[name]').each(function() {
+			var n = $(this).attr('name');
+			if (n) {
+				emailData[n] = $(this).val();
+			}
+		});
 
 		$.ajax({
 			url: PBCAjaxAction.ajax_url,
 			type: 'POST',
-			data: {
-				action: 'send_config_email',
-				nonce: PBCAjaxAction.nonce,
-				session_key: sessionKey,
-				parent_phase: parentPhase,
-				template: template,
-				current_url: currentUrl,
-				recipient_email: recipientEmail
-			},
+			data: emailData,
+			dataType: 'json',
 			success: function(response) {
 				$button.removeClass('processing');
 				if (response.success) {

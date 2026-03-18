@@ -69,7 +69,7 @@ WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
 = 1.5.2 =
-* Changed: WhatsApp share generates the budget PDF and sends the PDF download link (filter `pbc_whatsapp_share_pdf_message`).
+* Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the budget PDF (filters `pbc_share_email_pdf_*`, `pbc_whatsapp_share_pdf_message`).
 * Improved: Configurator choice cards — max 4 per row with consistent cell width; mobile 2 columns.
 * Improved: Step navigation — 6 steps per row on desktop, better text contrast; PDF row text color on colored backgrounds.
 * Improved: PDF — centered logo; financial summary hidden when prices are off or subtotal is zero; filter `pbc_pdf_show_financial_summary`.
