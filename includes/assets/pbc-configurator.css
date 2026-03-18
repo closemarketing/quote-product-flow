@@ -51,6 +51,7 @@
   min-height: 0;
   gap: 0;
   cursor: default;
+  height: 100%;
 }
 
 .variation-question-label {
