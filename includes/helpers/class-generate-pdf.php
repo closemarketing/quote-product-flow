@@ -149,7 +149,7 @@ class PDF {
 		$user        = wp_get_current_user();
 		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
 		$show_prices = CALC::get_show_prices_for_user( $user_role );
-		$show_prices = 'yes' === $show_prices ? true : false;
+		$show_prices = ( 'yes' === $show_prices );
 
 		// Starts PDF.
 		$output             = '<page backcolor="#fff">';
@@ -170,13 +170,16 @@ class PDF {
 		table.summary-total td.title{width:50px;}
 		img.header_image{ width:700px;height:120px; }
 		img.footer_image{ width:700px;height:70px; margin: 50px 0 0 30px;}
+		table.pdf-logo-wrap{ width:100%; border-collapse:collapse; margin:0 0 10px 0; }
+		table.pdf-logo-wrap td{ text-align:center; vertical-align:middle; padding:0; }
+		table.pdf-logo-wrap img{ display:inline-block; margin:0 auto; }
 		</style>";
 		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
 		$pdf_image_selected = ! empty( $pdf_image_selected ) ? trim( $pdf_image_selected ) : '';
 		if ( ! empty( $pdf_image_selected ) ) {
 			// Convert URL to local path for Html2Pdf.
 			$pdf_image_local = self::url_to_local_path( $pdf_image_selected );
-			$output         .= "<img src='" . esc_attr( $pdf_image_local ) . "' width='200'/>";
+			$output         .= '<table class="pdf-logo-wrap"><tr><td><img src="' . esc_attr( $pdf_image_local ) . '" width="200" alt=""/></td></tr></table>';
 		}
 		$header_image = get_option( 'pbc_pdf_image_header' );
 		$header_image = ! empty( $header_image ) ? trim( $header_image ) : '';
@@ -294,7 +297,17 @@ class PDF {
 
 		$output .= '</table>';
 
-		if ( $show_prices ) {
+		// Financial block only when prices are allowed for this user/role and the config has a subtotal.
+		$include_financial_summary = $show_prices && $total_price > 0.00001;
+		$include_financial_summary = (bool) apply_filters(
+			'pbc_pdf_show_financial_summary',
+			$include_financial_summary,
+			$item,
+			$total_price,
+			$show_prices
+		);
+
+		if ( $include_financial_summary ) {
 			// Summary.
 			$output .= '<br/><br/><table class="summary-total"><tr>';
 			$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
