@@ -244,6 +244,8 @@
 .configurator-left {
   width: 50%;
   float: left;
+  box-sizing: border-box;
+  padding-right: 8px;
 }
 
 .page-configurator-vertical .configurator-left {
@@ -255,9 +257,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 49%;
+  width: calc(50% - 8px);
   float: right;
   vertical-align: top;
+  box-sizing: border-box;
 }
 
 .page-configurator-vertical .configurator-right {
@@ -307,6 +310,10 @@
 .phase_variations ul {
   margin: 0;
   list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px 0;
 }
 
 .phase_variations ul li.variation_list {
@@ -322,10 +329,12 @@
 .phase_variations ul li.variation_list.pbc-choice-row {
   padding: 0 6px;
   box-sizing: border-box;
+  display: flex;
+  margin-bottom: 0;
 }
 
 .phase_variations ul li.pbc-choice-row .pbc-choice-label {
-  display: block;
+  display: flex;
   position: relative;
   width: 100%;
   margin: 0;
@@ -352,13 +361,13 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  min-height: 52px;
   padding: 14px 12px;
   border: 2px solid #e2e2e2;
   border-radius: 12px;
   background: #f7f7f7;
   box-sizing: border-box;
   transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  flex: 1;
 }
 
 .phase_variations ul li.pbc-choice-row:hover .pbc-option-card {
@@ -846,7 +855,6 @@ div.site-content:has(div.page-configurator) {
 
 #left-area ul {
   list-style-type: none;
-  padding: 0 0 0 0;
   line-height: 26px;
 }
 
