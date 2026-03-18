@@ -606,24 +606,31 @@ class PBC_Helper_PostTypes {
 	 */
 	public function render_budget_configuration( $post ) {
 		$post_id = is_object( $post ) ? $post->ID : $post;
-		$rows    = array();
+		$rows = array();
 		for ( $i = 0; $i < 50; $i++ ) {
 			$phase_var = get_post_meta( $post_id, 'pbc_phase_var_' . $i, true );
 			if ( $phase_var ) {
 				$rows[] = array(
-					'desc'  => $phase_var,
-					'price' => get_post_meta( $post_id, 'pbc_price_' . $i, true ),
+					'desc'       => $phase_var,
+					'price'      => get_post_meta( $post_id, 'pbc_price_' . $i, true ),
+					'type'       => get_post_meta( $post_id, 'pbc_type_' . $i, true ),
+					'phase_name' => get_post_meta( $post_id, 'pbc_phase_name_' . $i, true ),
 				);
 			}
 		}
 		if ( empty( $rows ) ) {
-			$rows[] = array( 'desc' => '', 'price' => '' );
+			$rows[] = array(
+				'desc'       => '',
+				'price'      => '',
+				'type'       => '',
+				'phase_name' => '',
+			);
 		}
 		$phase_options = CALC::get_phases_options();
 		wp_nonce_field( 'pbc_budget_config_save', 'pbc_budget_config_nonce' );
 		?>
 		<p class="description" style="margin-bottom:12px;">
-			<?php esc_html_e( 'When a customer submits the configurator on your site, lines are filled automatically. For a new budget you can add lines here, type them manually or insert them from the catalog (phase + variation).', 'pbc' ); ?>
+			<?php esc_html_e( 'Lines mirror the configurator: standard options (price), quantity fields, free-text questions, and phases with multiple selections (one combined line). You can insert from the catalog or type manually.', 'pbc' ); ?>
 		</p>
 		<?php if ( ! empty( $phase_options ) ) : ?>
 		<div class="pbc-catalog-picker" style="margin:12px 0;padding:12px;background:#f6f7f7;border:1px solid #c3c4c7;border-radius:4px;">
@@ -636,15 +643,34 @@ class PBC_Helper_PostTypes {
 						<option value="<?php echo esc_attr( (string) $pid ); ?>"><?php echo esc_html( $plabel ); ?></option>
 					<?php endforeach; ?>
 				</select>
+				<span id="pbc-catalog-phase-hint" style="margin-left:8px;color:#50575e;"></span>
 			</p>
-			<p style="margin:6px 0;">
-				<label for="pbc-catalog-variation" style="display:inline-block;min-width:90px;"><?php esc_html_e( 'Variation', 'pbc' ); ?></label>
-				<select id="pbc-catalog-variation" style="min-width:280px;">
-					<option value=""><?php esc_html_e( 'Select variation…', 'pbc' ); ?></option>
-				</select>
-				<span id="pbc-catalog-price-hint" style="margin-left:8px;color:#50575e;"></span>
-			</p>
-			<button type="button" class="button" id="pbc-insert-catalog-row"><?php esc_html_e( 'Insert row', 'pbc' ); ?></button>
+			<div id="pbc-catalog-multi-mode" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #c3c4c7;">
+				<strong><?php esc_html_e( 'Multiple selection (combined in one line)', 'pbc' ); ?></strong>
+				<p class="description"><?php esc_html_e( 'Select several price options and insert one line with all names and the sum of prices (same as when the customer ticks several boxes).', 'pbc' ); ?></p>
+				<div id="pbc-catalog-multi-list" style="max-height:220px;overflow:auto;margin:8px 0;padding:8px;background:#fff;border:1px solid #c3c4c7;"></div>
+				<button type="button" class="button button-primary" id="pbc-insert-multi-row"><?php esc_html_e( 'Insert combined selection', 'pbc' ); ?></button>
+			</div>
+			<div id="pbc-catalog-single-mode" style="margin-top:12px;">
+				<strong><?php esc_html_e( 'Single option or question', 'pbc' ); ?></strong>
+				<p style="margin:6px 0;">
+					<label for="pbc-catalog-variation" style="display:inline-block;min-width:90px;"><?php esc_html_e( 'Variation', 'pbc' ); ?></label>
+					<select id="pbc-catalog-variation" style="min-width:280px;">
+						<option value=""><?php esc_html_e( 'Select variation…', 'pbc' ); ?></option>
+					</select>
+					<span id="pbc-catalog-price-hint" style="margin-left:8px;color:#50575e;"></span>
+				</p>
+				<p id="pbc-catalog-answer-wrap" style="display:none;margin:6px 0;">
+					<label for="pbc-catalog-answer" style="display:inline-block;min-width:90px;"><?php esc_html_e( 'Answer', 'pbc' ); ?></label>
+					<input type="text" id="pbc-catalog-answer" class="regular-text" placeholder="<?php esc_attr_e( 'Customer answer (same format as on the website)', 'pbc' ); ?>" />
+				</p>
+				<p id="pbc-catalog-qty-wrap" style="display:none;margin:6px 0;">
+					<label for="pbc-catalog-qty" style="display:inline-block;min-width:90px;"><?php esc_html_e( 'Quantity', 'pbc' ); ?></label>
+					<input type="number" id="pbc-catalog-qty" min="1" value="1" style="width:80px;" />
+					<span class="description"><?php esc_html_e( 'Total price = quantity × unit price.', 'pbc' ); ?></span>
+				</p>
+				<button type="button" class="button" id="pbc-insert-catalog-row"><?php esc_html_e( 'Insert row', 'pbc' ); ?></button>
+			</div>
 		</div>
 		<?php else : ?>
 		<p class="notice notice-warning inline" style="padding:8px 12px;">
@@ -654,9 +680,10 @@ class PBC_Helper_PostTypes {
 		<table class="widefat striped" style="margin-top:12px;">
 			<thead>
 				<tr>
-					<th style="width:55%;"><?php esc_html_e( 'Phase / option (description)', 'pbc' ); ?></th>
-					<th style="width:25%;"><?php esc_html_e( 'Price', 'pbc' ); ?></th>
-					<th style="width:20%;"><?php esc_html_e( 'Actions', 'pbc' ); ?></th>
+					<th style="width:42%;"><?php esc_html_e( 'Phase / option (description)', 'pbc' ); ?></th>
+					<th style="width:18%;"><?php esc_html_e( 'Price', 'pbc' ); ?></th>
+					<th style="width:22%;"><?php esc_html_e( 'Line type', 'pbc' ); ?></th>
+					<th style="width:18%;"><?php esc_html_e( 'Actions', 'pbc' ); ?></th>
 				</tr>
 			</thead>
 			<tbody id="pbc-budget-rows">
@@ -664,9 +691,32 @@ class PBC_Helper_PostTypes {
 				<tr>
 					<td>
 						<input type="text" class="widefat pbc-row-desc" name="pbc_line_desc[]" value="<?php echo esc_attr( $row['desc'] ); ?>" />
+						<input type="hidden" class="pbc-row-phase-name" name="pbc_line_phase_name[]" value="<?php echo esc_attr( $row['phase_name'] ); ?>" />
 					</td>
 					<td>
-						<input type="text" class="widefat pbc-row-price" name="pbc_line_price[]" value="<?php echo esc_attr( $row['price'] ); ?>" placeholder="0,00" />
+						<input type="text" class="widefat pbc-row-price" name="pbc_line_price[]" value="<?php echo esc_attr( $row['price'] ); ?>" placeholder="0,00 / -" />
+					</td>
+					<td>
+						<select class="widefat pbc-row-type" name="pbc_line_type[]">
+							<?php
+							$lt = isset( $row['type'] ) ? (string) $row['type'] : '';
+							$line_types = array(
+								''          => __( 'Default (price)', 'pbc' ),
+								'price'     => __( 'Fixed price option', 'pbc' ),
+								'qty'       => __( 'Quantity × unit', 'pbc' ),
+								'question'  => __( 'Question / answer', 'pbc' ),
+								'multiple'  => __( 'Multiple options (combined)', 'pbc' ),
+							);
+							foreach ( $line_types as $k => $lab ) {
+								printf(
+									'<option value="%s"%s>%s</option>',
+									esc_attr( $k ),
+									selected( $lt, $k, false ),
+									esc_html( $lab )
+								);
+							}
+							?>
+						</select>
 					</td>
 					<td>
 						<button type="button" class="button-link-delete pbc-remove-budget-row"><?php esc_html_e( 'Remove', 'pbc' ); ?></button>
@@ -680,8 +730,20 @@ class PBC_Helper_PostTypes {
 		</p>
 		<script type="text/template" id="pbc-budget-row-template">
 			<tr>
-				<td><input type="text" class="widefat pbc-row-desc" name="pbc_line_desc[]" value="" /></td>
-				<td><input type="text" class="widefat pbc-row-price" name="pbc_line_price[]" value="" placeholder="0,00" /></td>
+				<td>
+					<input type="text" class="widefat pbc-row-desc" name="pbc_line_desc[]" value="" />
+					<input type="hidden" class="pbc-row-phase-name" name="pbc_line_phase_name[]" value="" />
+				</td>
+				<td><input type="text" class="widefat pbc-row-price" name="pbc_line_price[]" value="" placeholder="0,00 / -" /></td>
+				<td>
+					<select class="widefat pbc-row-type" name="pbc_line_type[]">
+						<option value=""><?php echo esc_html__( 'Default (price)', 'pbc' ); ?></option>
+						<option value="price"><?php echo esc_html__( 'Fixed price option', 'pbc' ); ?></option>
+						<option value="qty"><?php echo esc_html__( 'Quantity × unit', 'pbc' ); ?></option>
+						<option value="question"><?php echo esc_html__( 'Question / answer', 'pbc' ); ?></option>
+						<option value="multiple"><?php echo esc_html__( 'Multiple options (combined)', 'pbc' ); ?></option>
+					</select>
+				</td>
 				<td><button type="button" class="button-link-delete pbc-remove-budget-row"><?php echo esc_html__( 'Remove', 'pbc' ); ?></button></td>
 			</tr>
 		</script>
@@ -714,9 +776,15 @@ class PBC_Helper_PostTypes {
 			'pbcEnquiryBudget',
 			array(
 				'phaseVariations' => $this->get_phase_variations_admin_data(),
+				'phaseFlags'      => $this->get_phases_admin_flags(),
 				'i18n'            => array(
-					'selectVariation' => __( 'Select variation…', 'pbc' ),
-					'suggestedPrice'  => __( 'Suggested price:', 'pbc' ),
+					'selectVariation'   => __( 'Select variation…', 'pbc' ),
+					'suggestedPrice'    => __( 'Suggested price:', 'pbc' ),
+					'phaseMulti'        => __( 'Multiple selection phase', 'pbc' ),
+					'needAnswer'        => __( 'Enter the answer for this question.', 'pbc' ),
+					'pickMulti'         => __( 'Select at least one option.', 'pbc' ),
+					'noOptionsMulti'    => __( 'No price options in this phase (only questions?). Add questions using single mode on another step or a manual row.', 'pbc' ),
+					'perUnit'           => __( 'per unit', 'pbc' ),
 				),
 			)
 		);
@@ -728,7 +796,7 @@ class PBC_Helper_PostTypes {
 	 * @return array<int, array<int, array<string, int|string>>>
 	 */
 	private function get_phase_variations_admin_data() {
-		$by_phase    = array();
+		$by_phase      = array();
 		$variationscpt = get_posts(
 			array(
 				'post_type'      => 'variation',
@@ -755,40 +823,70 @@ class PBC_Helper_PostTypes {
 					$phase_title .= $phase_parent->post_title . ' - ';
 				}
 			}
-			$phase_order  = CALC::adds_zero( $phase_post->menu_order );
-			$line_label   = $phase_title . $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
-			$var_sku      = get_post_meta( $var_item->ID, 'pbc_sku', true );
-			$line_label  .= ! empty( $var_sku ) ? ' (' . $var_sku . ')' : '';
-			$price        = $this->get_variation_default_price_formatted( $var_item->ID );
+			$phase_order = CALC::adds_zero( $phase_post->menu_order );
+			$line_label  = $phase_title . $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
+			$var_sku     = get_post_meta( $var_item->ID, 'pbc_sku', true );
+			$line_label .= ! empty( $var_sku ) ? ' (' . $var_sku . ')' : '';
+
+			$pricegroup   = get_post_meta( $var_item->ID, 'pbc_pricegroup', true );
+			$unit         = 0.0;
+			$first_mea    = '';
+			if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
+				foreach ( $pricegroup as $row ) {
+					if ( isset( $row['pbc_pricem'] ) && '' !== $row['pbc_pricem'] && is_numeric( $row['pbc_pricem'] ) ) {
+						$unit      = (float) $row['pbc_pricem'];
+						$first_mea = isset( $row['pbc_meaprice'] ) ? (string) $row['pbc_meaprice'] : '';
+						break;
+					}
+				}
+			}
+			$short_label = $var_item->post_title;
+			if ( '' !== $first_mea ) {
+				$short_label .= ' [' . $first_mea . ']';
+			}
+			$is_question = (bool) get_post_meta( $var_item->ID, 'pbc_is_question', true );
+			$field_type  = get_post_meta( $var_item->ID, 'pbc_field_type', true );
+			if ( $is_question ) {
+				$line_label .= ' — ' . __( 'Question', 'pbc' );
+			} elseif ( 'qty' === $field_type ) {
+				$line_label .= ' — ' . __( 'Quantity field', 'pbc' );
+			}
+			$price_display = $unit > 0 ? number_format( $unit, 2, ',', '.' ) : '-';
 			if ( ! isset( $by_phase[ $phase_id ] ) ) {
 				$by_phase[ $phase_id ] = array();
 			}
 			$by_phase[ $phase_id ][] = array(
-				'id'        => $var_item->ID,
-				'lineLabel' => $line_label,
-				'price'     => $price,
+				'id'            => $var_item->ID,
+				'lineLabel'     => $line_label,
+				'shortLabel'    => $short_label,
+				'questionTitle' => $var_item->post_title,
+				'isQuestion'    => $is_question,
+				'fieldType'     => ( 'qty' === $field_type ) ? 'qty' : '',
+				'unitPrice'     => $unit,
+				'price'         => $price_display,
 			);
 		}
 		return $by_phase;
 	}
 
 	/**
-	 * First numeric price from variation price group.
+	 * Phase flags for budget admin (multiple selection, title).
 	 *
-	 * @param int $variation_id Variation post ID.
-	 * @return string
+	 * @return array<string, array{allowMultiple: bool, phaseName: string}>
 	 */
-	private function get_variation_default_price_formatted( $variation_id ) {
-		$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
-		if ( empty( $pricegroup ) || ! is_array( $pricegroup ) ) {
-			return '-';
-		}
-		foreach ( $pricegroup as $row ) {
-			if ( isset( $row['pbc_pricem'] ) && '' !== $row['pbc_pricem'] && is_numeric( $row['pbc_pricem'] ) ) {
-				return number_format( (float) $row['pbc_pricem'], 2, ',', '.' );
+	private function get_phases_admin_flags() {
+		$flags = array();
+		foreach ( array_keys( CALC::get_phases_options() ) as $pid ) {
+			$pid = (int) $pid;
+			if ( $pid < 1 ) {
+				continue;
 			}
+			$flags[ (string) $pid ] = array(
+				'allowMultiple' => (bool) get_post_meta( $pid, 'pbc_allow_multiple_selections', true ),
+				'phaseName'     => get_the_title( $pid ),
+			);
 		}
-		return '-';
+		return $flags;
 	}
 
 	/**
@@ -826,17 +924,27 @@ class PBC_Helper_PostTypes {
 			delete_post_meta( $post_id, 'pbc_type_' . $c );
 		}
 
-		$descs  = isset( $_POST['pbc_line_desc'] ) ? wp_unslash( $_POST['pbc_line_desc'] ) : array();
-		$prices = isset( $_POST['pbc_line_price'] ) ? wp_unslash( $_POST['pbc_line_price'] ) : array();
+		$descs        = isset( $_POST['pbc_line_desc'] ) ? wp_unslash( $_POST['pbc_line_desc'] ) : array();
+		$prices       = isset( $_POST['pbc_line_price'] ) ? wp_unslash( $_POST['pbc_line_price'] ) : array();
+		$types        = isset( $_POST['pbc_line_type'] ) ? wp_unslash( $_POST['pbc_line_type'] ) : array();
+		$phase_names  = isset( $_POST['pbc_line_phase_name'] ) ? wp_unslash( $_POST['pbc_line_phase_name'] ) : array();
 		if ( ! is_array( $descs ) ) {
 			$descs = array();
 		}
 		if ( ! is_array( $prices ) ) {
 			$prices = array();
 		}
+		if ( ! is_array( $types ) ) {
+			$types = array();
+		}
+		if ( ! is_array( $phase_names ) ) {
+			$phase_names = array();
+		}
+
+		$allowed_types = array( '', 'price', 'qty', 'question', 'multiple' );
 
 		$index = 0;
-		$max   = max( count( $descs ), count( $prices ) );
+		$max   = max( count( $descs ), count( $prices ), count( $types ), count( $phase_names ) );
 		for ( $r = 0; $r < $max; $r++ ) {
 			$desc = isset( $descs[ $r ] ) ? sanitize_text_field( $descs[ $r ] ) : '';
 			if ( '' === trim( $desc ) ) {
@@ -846,8 +954,15 @@ class PBC_Helper_PostTypes {
 			if ( '' === trim( $price ) ) {
 				$price = '-';
 			}
+			$line_type = isset( $types[ $r ] ) ? sanitize_text_field( $types[ $r ] ) : '';
+			if ( ! in_array( $line_type, $allowed_types, true ) ) {
+				$line_type = '';
+			}
+			$phase_n = isset( $phase_names[ $r ] ) ? sanitize_text_field( $phase_names[ $r ] ) : '';
 			update_post_meta( $post_id, 'pbc_phase_var_' . $index, $desc );
 			update_post_meta( $post_id, 'pbc_price_' . $index, $price );
+			update_post_meta( $post_id, 'pbc_type_' . $index, $line_type );
+			update_post_meta( $post_id, 'pbc_phase_name_' . $index, $phase_n );
 			++$index;
 		}
 		update_post_meta( $post_id, 'pbc_total_var', $index );
