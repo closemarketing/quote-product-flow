@@ -3,6 +3,7 @@ Contributors: closemarketing, davidperez
 Tags: budget, configurator
 Requires at least: 4.0
 Tested up to: 6.0
+Stable tag: 1.5.1
 
 Creates a configurator with all variables.
 
@@ -67,7 +68,13 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
-= 2.0.2 ==
+= 1.5.1 =
+* Added: Full budget line editor in admin (enquiry) — add rows manually or from catalog.
+* Added: Support for question, quantity, fixed price, and multiple-selection line types when building budgets in admin.
+* Added: Classic editor for enquiry post type so budget metabox saves reliably.
+* Improved: Presupuestos show phase name and line type metadata consistent with frontend submissions.
+
+= 1.5.0 =
 *  Added: Custom input fields for variations - show textarea when specific variation is selected
 *  Added: Direct input fields for phases - show input directly without variations
 *  Added: Three input types for phases: Textarea (large), Text (single line), and Number (with increment/decrement buttons)
@@ -76,8 +83,6 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Improved: Custom input fields appear below all variations (not inside each variation)
 *  Improved: Input values are saved in session and displayed in configuration summary
 *  Fixed: Form no longer auto-skips steps when direct input fields are present
-
-= 2.0.1 ==
 *  Added: Multiple selection support per phase with checkboxes
 *  Added: Real-time AJAX updates for multiple checkbox selections
 *  Added: Comma-separated display of multiple selected variations
@@ -96,8 +101,6 @@ WordPress installation and then activate the Plugin from Plugins page.
 *  Fixed: Notice messages now display in black color for better readability
 *  Improved: Modern button styling with rounded corners, shadows, and hover effects
 *  Fixed: Button order maintained consistently: Back > Restart > Recommendation > Next/Calculate
-
-= 2.0.0 ==
 *  Configurator skip fixed panel.
 *  Settings Page Redesign: Complete visual overhaul with modern card-based layout, purple gradient theme, and improved user experience. License management now integrated directly into settings.
 *  Added: Export/Import page with real-time logging.
