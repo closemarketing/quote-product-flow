@@ -346,92 +346,92 @@ class SHOW {
 			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
 		<table>
 			<?php
-			$user      = wp_get_current_user();
-			$user_role = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+			$user            = wp_get_current_user();
+			$user_role       = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
+			$show_prices     = CALC::get_show_prices_for_user( $user_role );
+			$show_price_ui   = ( 'yes' === $show_prices );
 
-			$show_prices = CALC::get_show_prices_for_user( $user_role );
-				$total_price = 0;
-				if ( 'calculate' === $cstep ) {
-				$count = count( $phases );
-				} else {
-				$count = $cstep;
-				}
-				for ( $i = 1; $i <= $count; $i++ ) {
+			$count = ( 'calculate' === $cstep ) ? count( $phases ) : (int) $cstep;
+
+			$total_price = 0;
+			for ( $i = 1; $i <= $count; $i++ ) {
 				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
 					continue;
-					}
-				$phase_key    = $i;
-				$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) : '';
+				}
 				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
-				$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) : '';
 				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
-				$var_type     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) : '';
+				$var_type     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ) : '';
 				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'pbc_field_type', true );
-
 				if ( 'calculate' === $cstep && empty( $field_type ) && 'direct_input' !== $var_type ) {
 					$total_price += (float) $var_price;
-					} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
+				} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
 					$total_price = (float) $var_price * $total_price;
-					}
+				}
+			}
 
-				// Check if this phase has multiple questions.
+			$show_price_column = $show_price_ui && ( 'calculate' !== $cstep || $total_price > 0.00001 );
+			$show_price_column = (bool) apply_filters( 'pbc_summary_show_price_column', $show_price_column, $pbc_session_key, $cstep, $total_price, $show_price_ui );
+
+			for ( $i = 1; $i <= $count; $i++ ) {
+				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+					continue;
+				}
+				$phase_key    = $i;
+				$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ) : '';
+				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
+				$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ) : '';
+				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
+				$var_type     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ) : '';
+				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'pbc_field_type', true );
+
 				$has_multiple_questions = isset( $_SESSION[ $pbc_session_key ][ $i ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $i ]['questions'] );
 
 				if ( $has_multiple_questions ) {
-					// Show all questions from this phase.
 					foreach ( $_SESSION[ $pbc_session_key ][ $i ]['questions'] as $question_data ) {
 						?>
 					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?> question-row">
 						<td class="name">
-							<?php
-							echo esc_html( $phase_key . '. ' . $question_data['variation_title'] . ': ' . $question_data['answer'] );
-							?>
+							<?php echo esc_html( $phase_key . '. ' . $question_data['variation_title'] . ': ' . $question_data['answer'] ); ?>
 						</td>
-						<td class="price">
-							-
-						</td>
+						<?php if ( $show_price_column ) { ?>
+						<td class="price">-</td>
+						<?php } ?>
 					</tr>
 						<?php
-						}
+					}
 				} else {
-					// Show single variation or single question (old format).
 					?>
 					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?>">
 						<td class="name">
 							<?php
 							if ( 'direct_input' === $var_type ) {
-								// Direct input - show phase name and input value.
 								echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
-								} elseif ( 'qty' === $field_type ) {
+							} elseif ( 'qty' === $field_type ) {
 								echo esc_html( $phase_key . '. ' . $var_name . ' x ' . $var_price );
-								} else {
+							} else {
 								echo esc_html( $phase_key . '. ' . $phase_name . ': ' . $var_name );
-								}
+							}
 							?>
 						</td>
+						<?php if ( $show_price_column ) { ?>
 						<td class="price">
 							<?php
-							if ( $var_price && 'no' !== $show_prices ) {
-								echo esc_html( $var_price );
+							if ( $var_price && $show_price_ui ) {
+								echo esc_html( (string) $var_price );
 								echo 'qty' === $field_type ? '' : ' €';
-								}
+							}
 							?>
 						</td>
+						<?php } ?>
 					</tr>
 					<?php
 				}
-				}
-				if ( 'calculate' === $cstep && 'no' !== $show_prices ) {
+			}
+			if ( 'calculate' === $cstep && $show_price_ui && $total_price > 0.00001 ) {
 				?>
 					<tr class="variation_selected phase-total_price">
 						<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
-						<td class="price">
-				<?php
-				if ( $total_price ) {
-					echo number_format( $total_price, 2, ',', '.' ) . ' €';
-					}
-				?>
-						</td>
+						<td class="price"><?php echo esc_html( number_format( $total_price, 2, ',', '.' ) . ' €' ); ?></td>
 					</tr>
 					<tr class="variation_selected phase-total_price">
 						<td class="name"><?php esc_html_e( 'VAT not included', 'pbc' ); ?></td>

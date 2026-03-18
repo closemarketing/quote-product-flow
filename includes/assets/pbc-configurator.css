@@ -753,6 +753,10 @@
   text-align: right;
 }
 
+.configurator_summary table tr > td.name:only-child {
+  width: 100%;
+}
+
 .configurator_summary tr.phase-total_price td {
   padding-top: 15px;
 }
