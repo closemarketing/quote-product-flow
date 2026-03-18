@@ -953,10 +953,16 @@ class PBC_Template {
 					function moveConfiguratorAction() {
 						if (typeof jQuery !== 'undefined') {
 							jQuery(document).ready(function($) {
-								$('.configurator_form_action').insertBefore('.product_preview');
+								var $c = $('.pbc-calculate-container');
+								var $act = $('.configurator_form_action');
+								var $pv = $c.find('.product_preview');
+								if ($pv.length) {
+									$act.insertBefore($pv);
+								} else {
+									$act.prependTo($c);
+								}
 							});
 						} else {
-							// Fallback: try again after a short delay
 							setTimeout(moveConfiguratorAction, 100);
 						}
 					}
@@ -965,10 +971,12 @@ class PBC_Template {
 				</script>
 				<?php
 			}
+			$pbc_skip_calculate_empty_preview = ( 'calculate' === $cstep && ! CALC::calculate_has_product_preview_image( $pbc_session_key ) );
 			?>
 			<?php if ( 'calculate' === $cstep ) { ?>
-			<div class="pbc-calculate-container">
+			<div class="pbc-calculate-container<?php echo $pbc_skip_calculate_empty_preview ? ' pbc-calculate-no-preview' : ''; ?>">
 			<?php } ?>
+			<?php if ( ! $pbc_skip_calculate_empty_preview ) { ?>
 			<div class="product_preview
 			<?php
 			if ( 'calculate' === $cstep ) {
@@ -1057,6 +1065,7 @@ class PBC_Template {
 				</div>
 				<div class="status_loader product_preview_status fixed hidden"></div>
 			</div>
+			<?php } ?>
 			<?php
 			if ( 'wizard' === $template ) {
 				SHOW::action_buttons( $phases, $cstep );

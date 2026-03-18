@@ -73,6 +73,71 @@ class CALC {
 	}
 
 	/**
+	 * Whether the calculate step will render at least one product preview image (same logic as template).
+	 *
+	 * @param string $session_key Session key e.g. pbc_variation_{id}.
+	 * @return bool
+	 */
+	public static function calculate_has_product_preview_image( $session_key ) {
+		if ( empty( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return false;
+		}
+		$sess = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$to   = count( $sess ) + 1;
+		$ss_var = 0;
+
+		for ( $i = 1; $i < $to; $i++ ) {
+			$imgprodid  = '';
+			$imgprodurl = '';
+			if ( isset( $sess[ $i ]['var']['id'] ) ) {
+				$ss_var       = (int) $sess[ $i ]['var']['id'];
+				$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
+				if ( ! empty( $imgprodgroup ) ) {
+					foreach ( $imgprodgroup as $deps ) {
+						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
+							$prev_var = array();
+							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+								$imgprod_arr = explode( '|', $depvarimgprod );
+								if ( ! empty( $imgprod_arr[0] ) && ! empty( $imgprod_arr[1] ) ) {
+									$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
+								}
+							}
+							if ( ! empty( $sess ) && ! empty( $prev_var ) ) {
+								foreach ( $prev_var as $s_phase_key => $s_variations ) {
+									if ( isset( $prev_var[ $s_phase_key ] ) &&
+										isset( $sess[ $s_phase_key ]['var']['id'] ) &&
+										in_array( $sess[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
+										$imgprodid = $deps['pbc_imgprod'][0];
+									} else {
+										$imgprodid = '';
+										break;
+									}
+								}
+							}
+						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
+							$imgprodid = $deps['pbc_imgprod'][0];
+							break;
+						}
+						if ( $imgprodid ) {
+							break;
+						}
+					}
+				}
+				if ( $imgprodid ) {
+					$src = wp_get_attachment_image_src( $imgprodid, 'full', true );
+					if ( ! empty( $src[0] ) ) {
+						return true;
+					}
+				}
+			}
+		}
+
+		$fallback = ! empty( $ss_var ) ? self::get_image_variation_url( $sess, $ss_var ) : '';
+
+		return ! empty( $fallback );
+	}
+
+	/**
 	 * Gets total price from enquiry
 	 *
 	 * @param integer $post_id Post ID of the enquiry.
