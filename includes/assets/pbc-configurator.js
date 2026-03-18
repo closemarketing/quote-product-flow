@@ -745,6 +745,7 @@ jQuery(function($){
 			type: 'POST',
 			data: {
 				action: 'get_shareable_config',
+				nonce: PBCAjaxAction.nonce,
 				session_key: sessionKey,
 				parent_phase: parentPhase,
 				template: template,
@@ -809,6 +810,7 @@ jQuery(function($){
 			type: 'POST',
 			data: {
 				action: 'send_config_email',
+				nonce: PBCAjaxAction.nonce,
 				session_key: sessionKey,
 				parent_phase: parentPhase,
 				template: template,
