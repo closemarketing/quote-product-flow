@@ -369,7 +369,26 @@ class SHOW {
 				}
 			}
 
-			$show_price_column = $show_price_ui && ( 'calculate' !== $cstep || $total_price > 0.00001 );
+			$show_price_column = false;
+			if ( $show_price_ui ) {
+				if ( 'calculate' === $cstep ) {
+					$show_price_column = ( $total_price > 0.00001 );
+				} else {
+					for ( $j = 1; $j <= $count; $j++ ) {
+						if ( ! isset( $_SESSION[ $pbc_session_key ][ $j ] ) ) {
+							continue;
+						}
+						if ( isset( $_SESSION[ $pbc_session_key ][ $j ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $j ]['questions'] ) ) {
+							continue;
+						}
+						$step_price = isset( $_SESSION[ $pbc_session_key ][ $j ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $j ]['var']['price'] : 0;
+						if ( $step_price > 0.00001 ) {
+							$show_price_column = true;
+							break;
+						}
+					}
+				}
+			}
 			$show_price_column = (bool) apply_filters( 'pbc_summary_show_price_column', $show_price_column, $pbc_session_key, $cstep, $total_price, $show_price_ui );
 
 			for ( $i = 1; $i <= $count; $i++ ) {
