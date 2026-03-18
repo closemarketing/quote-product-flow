@@ -715,6 +715,14 @@
   text-align: center;
 }
 
+.configurator_result_share .share_buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
 .email_submit_fields {
   display: flex;
   flex-direction: column;
