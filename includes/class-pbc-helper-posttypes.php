@@ -29,6 +29,9 @@ class PBC_Helper_PostTypes {
 		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_variation' ) );
 		add_filter( 'rwmb_meta_boxes', array( $this, 'pbc_metabox_phase' ) );
 		add_action( 'add_meta_boxes_enquiry', array( $this, 'pbc_metabox_enquiry' ) );
+		add_action( 'save_post_enquiry', array( $this, 'save_budget_configuration_lines' ), 10, 2 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_enquiry_budget_admin_assets' ) );
+		add_filter( 'use_block_editor_for_post_type', array( $this, 'use_classic_editor_for_enquiry' ), 100, 2 );
 
 		add_filter( 'manage_edit-phases_columns', array( $this, 'add_new_phases_columns' ) );
 		add_action( 'manage_phases_posts_custom_column', array( $this, 'manage_phases_columns' ), 10, 2 );
@@ -603,33 +606,265 @@ class PBC_Helper_PostTypes {
 	 */
 	public function render_budget_configuration( $post ) {
 		$post_id = is_object( $post ) ? $post->ID : $post;
+		$rows    = array();
+		for ( $i = 0; $i < 50; $i++ ) {
+			$phase_var = get_post_meta( $post_id, 'pbc_phase_var_' . $i, true );
+			if ( $phase_var ) {
+				$rows[] = array(
+					'desc'  => $phase_var,
+					'price' => get_post_meta( $post_id, 'pbc_price_' . $i, true ),
+				);
+			}
+		}
+		if ( empty( $rows ) ) {
+			$rows[] = array( 'desc' => '', 'price' => '' );
+		}
+		$phase_options = CALC::get_phases_options();
+		wp_nonce_field( 'pbc_budget_config_save', 'pbc_budget_config_nonce' );
 		?>
-		<table>
+		<p class="description" style="margin-bottom:12px;">
+			<?php esc_html_e( 'When a customer submits the configurator on your site, lines are filled automatically. For a new budget you can add lines here, type them manually or insert them from the catalog (phase + variation).', 'pbc' ); ?>
+		</p>
+		<?php if ( ! empty( $phase_options ) ) : ?>
+		<div class="pbc-catalog-picker" style="margin:12px 0;padding:12px;background:#f6f7f7;border:1px solid #c3c4c7;border-radius:4px;">
+			<strong><?php esc_html_e( 'Insert from catalog', 'pbc' ); ?></strong>
+			<p style="margin:8px 0 6px;">
+				<label for="pbc-catalog-phase" style="display:inline-block;min-width:90px;"><?php esc_html_e( 'Phase', 'pbc' ); ?></label>
+				<select id="pbc-catalog-phase" style="min-width:280px;">
+					<option value=""><?php esc_html_e( 'Select phase…', 'pbc' ); ?></option>
+					<?php foreach ( $phase_options as $pid => $plabel ) : ?>
+						<option value="<?php echo esc_attr( (string) $pid ); ?>"><?php echo esc_html( $plabel ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</p>
+			<p style="margin:6px 0;">
+				<label for="pbc-catalog-variation" style="display:inline-block;min-width:90px;"><?php esc_html_e( 'Variation', 'pbc' ); ?></label>
+				<select id="pbc-catalog-variation" style="min-width:280px;">
+					<option value=""><?php esc_html_e( 'Select variation…', 'pbc' ); ?></option>
+				</select>
+				<span id="pbc-catalog-price-hint" style="margin-left:8px;color:#50575e;"></span>
+			</p>
+			<button type="button" class="button" id="pbc-insert-catalog-row"><?php esc_html_e( 'Insert row', 'pbc' ); ?></button>
+		</div>
+		<?php else : ?>
+		<p class="notice notice-warning inline" style="padding:8px 12px;">
+			<?php esc_html_e( 'No phases found. Create phases and variations under Product Budget Configurator so you can build budgets from the catalog.', 'pbc' ); ?>
+		</p>
+		<?php endif; ?>
+		<table class="widefat striped" style="margin-top:12px;">
 			<thead>
 				<tr>
-					<th style="width:20%" class="sn">#</th>
-					<th style="width:50%" class="phase-variation"><?php esc_html_e( 'Phase/Variation', 'pbc' ); ?></th>
-					<th style="width:30%" class="price"><?php esc_html_e( 'Price', 'pbc' ); ?></th>
+					<th style="width:55%;"><?php esc_html_e( 'Phase / option (description)', 'pbc' ); ?></th>
+					<th style="width:25%;"><?php esc_html_e( 'Price', 'pbc' ); ?></th>
+					<th style="width:20%;"><?php esc_html_e( 'Actions', 'pbc' ); ?></th>
 				</tr>
 			</thead>
-			<tbody>
-				<?php
-				for ( $i = 0; $i < 50; $i++ ) {
-					$phase_var = get_post_meta( $post_id, 'pbc_phase_var_' . $i, true );
-					if ( $phase_var ) {
-						?>
-						<tr>
-							<td class="sn"><?php echo (int) $i; ?></td>
-							<td class="phase-variation"><?php echo esc_html( $phase_var ); ?></td>
-							<td class="price"><?php echo esc_html( get_post_meta( $post_id, 'pbc_price_' . $i, true ) ); ?></td>
-						</tr>
-						<?php
-					}
-				}
-				?>
+			<tbody id="pbc-budget-rows">
+				<?php foreach ( $rows as $row ) : ?>
+				<tr>
+					<td>
+						<input type="text" class="widefat pbc-row-desc" name="pbc_line_desc[]" value="<?php echo esc_attr( $row['desc'] ); ?>" />
+					</td>
+					<td>
+						<input type="text" class="widefat pbc-row-price" name="pbc_line_price[]" value="<?php echo esc_attr( $row['price'] ); ?>" placeholder="0,00" />
+					</td>
+					<td>
+						<button type="button" class="button-link-delete pbc-remove-budget-row"><?php esc_html_e( 'Remove', 'pbc' ); ?></button>
+					</td>
+				</tr>
+				<?php endforeach; ?>
 			</tbody>
 		</table>
+		<p style="margin-top:10px;">
+			<button type="button" class="button pbc-add-budget-row"><?php esc_html_e( 'Add empty row', 'pbc' ); ?></button>
+		</p>
+		<script type="text/template" id="pbc-budget-row-template">
+			<tr>
+				<td><input type="text" class="widefat pbc-row-desc" name="pbc_line_desc[]" value="" /></td>
+				<td><input type="text" class="widefat pbc-row-price" name="pbc_line_price[]" value="" placeholder="0,00" /></td>
+				<td><button type="button" class="button-link-delete pbc-remove-budget-row"><?php echo esc_html__( 'Remove', 'pbc' ); ?></button></td>
+			</tr>
+		</script>
 		<?php
+	}
+
+	/**
+	 * Admin scripts for enquiry budget editor.
+	 *
+	 * @param string $hook_suffix Current admin page.
+	 * @return void
+	 */
+	public function enqueue_enquiry_budget_admin_assets( $hook_suffix ) {
+		if ( 'post.php' !== $hook_suffix && 'post-new.php' !== $hook_suffix ) {
+			return;
+		}
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'enquiry' !== $screen->post_type ) {
+			return;
+		}
+		wp_enqueue_script(
+			'pbc-admin-enquiry-budget',
+			WPPBC_PLUGIN_URL . 'includes/assets/pbc-admin-enquiry-budget.js',
+			array( 'jquery' ),
+			WPPBC_VERSION,
+			true
+		);
+		wp_localize_script(
+			'pbc-admin-enquiry-budget',
+			'pbcEnquiryBudget',
+			array(
+				'phaseVariations' => $this->get_phase_variations_admin_data(),
+				'i18n'            => array(
+					'selectVariation' => __( 'Select variation…', 'pbc' ),
+					'suggestedPrice'  => __( 'Suggested price:', 'pbc' ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Variations grouped by phase for admin budget UI.
+	 *
+	 * @return array<int, array<int, array<string, int|string>>>
+	 */
+	private function get_phase_variations_admin_data() {
+		$by_phase    = array();
+		$variationscpt = get_posts(
+			array(
+				'post_type'      => 'variation',
+				'posts_per_page' => -1,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+				'post_status'    => array( 'publish', 'draft', 'private' ),
+			)
+		);
+		foreach ( $variationscpt as $var_item ) {
+			$phase_id = (int) get_post_meta( $var_item->ID, 'pbc_phase', true );
+			if ( ! $phase_id ) {
+				continue;
+			}
+			$phase_post = get_post( $phase_id );
+			if ( empty( $phase_post ) ) {
+				continue;
+			}
+			$phase_title    = '';
+			$post_parent_id = isset( $phase_post->post_parent ) ? (int) $phase_post->post_parent : 0;
+			if ( $post_parent_id > 0 ) {
+				$phase_parent = get_post( $post_parent_id );
+				if ( $phase_parent ) {
+					$phase_title .= $phase_parent->post_title . ' - ';
+				}
+			}
+			$phase_order  = CALC::adds_zero( $phase_post->menu_order );
+			$line_label   = $phase_title . $phase_order . ' - ' . $phase_post->post_title . ' - ' . $var_item->post_title;
+			$var_sku      = get_post_meta( $var_item->ID, 'pbc_sku', true );
+			$line_label  .= ! empty( $var_sku ) ? ' (' . $var_sku . ')' : '';
+			$price        = $this->get_variation_default_price_formatted( $var_item->ID );
+			if ( ! isset( $by_phase[ $phase_id ] ) ) {
+				$by_phase[ $phase_id ] = array();
+			}
+			$by_phase[ $phase_id ][] = array(
+				'id'        => $var_item->ID,
+				'lineLabel' => $line_label,
+				'price'     => $price,
+			);
+		}
+		return $by_phase;
+	}
+
+	/**
+	 * First numeric price from variation price group.
+	 *
+	 * @param int $variation_id Variation post ID.
+	 * @return string
+	 */
+	private function get_variation_default_price_formatted( $variation_id ) {
+		$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
+		if ( empty( $pricegroup ) || ! is_array( $pricegroup ) ) {
+			return '-';
+		}
+		foreach ( $pricegroup as $row ) {
+			if ( isset( $row['pbc_pricem'] ) && '' !== $row['pbc_pricem'] && is_numeric( $row['pbc_pricem'] ) ) {
+				return number_format( (float) $row['pbc_pricem'], 2, ',', '.' );
+			}
+		}
+		return '-';
+	}
+
+	/**
+	 * Save budget lines from enquiry metabox.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @return void
+	 */
+	public function save_budget_configuration_lines( $post_id, $post ) {
+		if ( ! isset( $_POST['pbc_budget_config_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pbc_budget_config_nonce'] ) ), 'pbc_budget_config_save' ) ) {
+			return;
+		}
+		// Block editor / REST saves do not send metabox fields; never wipe stored lines.
+		if ( ! isset( $_POST['pbc_line_desc'] ) || ! is_array( $_POST['pbc_line_desc'] ) ) {
+			return;
+		}
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( ! $post || 'enquiry' !== $post->post_type ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		for ( $c = 0; $c < 120; $c++ ) {
+			delete_post_meta( $post_id, 'pbc_phase_var_' . $c );
+			delete_post_meta( $post_id, 'pbc_price_' . $c );
+			delete_post_meta( $post_id, 'pbc_phase_name_' . $c );
+			delete_post_meta( $post_id, 'pbc_type_' . $c );
+		}
+
+		$descs  = isset( $_POST['pbc_line_desc'] ) ? wp_unslash( $_POST['pbc_line_desc'] ) : array();
+		$prices = isset( $_POST['pbc_line_price'] ) ? wp_unslash( $_POST['pbc_line_price'] ) : array();
+		if ( ! is_array( $descs ) ) {
+			$descs = array();
+		}
+		if ( ! is_array( $prices ) ) {
+			$prices = array();
+		}
+
+		$index = 0;
+		$max   = max( count( $descs ), count( $prices ) );
+		for ( $r = 0; $r < $max; $r++ ) {
+			$desc = isset( $descs[ $r ] ) ? sanitize_text_field( $descs[ $r ] ) : '';
+			if ( '' === trim( $desc ) ) {
+				continue;
+			}
+			$price = isset( $prices[ $r ] ) ? sanitize_text_field( $prices[ $r ] ) : '-';
+			if ( '' === trim( $price ) ) {
+				$price = '-';
+			}
+			update_post_meta( $post_id, 'pbc_phase_var_' . $index, $desc );
+			update_post_meta( $post_id, 'pbc_price_' . $index, $price );
+			++$index;
+		}
+		update_post_meta( $post_id, 'pbc_total_var', $index );
+	}
+
+	/**
+	 * Use classic editor for enquiries so budget metabox fields are submitted on save.
+	 *
+	 * @param bool   $use_block_editor Whether to use block editor.
+	 * @param string $post_type        Post type slug.
+	 * @return bool
+	 */
+	public function use_classic_editor_for_enquiry( $use_block_editor, $post_type ) {
+		if ( 'enquiry' === $post_type ) {
+			return false;
+		}
+		return $use_block_editor;
 	}
 
 	/**
