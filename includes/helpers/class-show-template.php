@@ -66,6 +66,11 @@ class PBC_Template {
 		$color_main = get_option( 'pbc_pdf_color_total' );
 
 		$custom_css = '
+		.page-configurator,
+		.page-configurator-vertical {
+			--pbc-primary: ' . esc_attr( $color_main ) . ';
+			--pbc-primary-contrast: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ';
+		}
 		.page-configurator .btn,
 		.page-configurator button.btn,
 		.page-configurator button[type="submit"].btn,

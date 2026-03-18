@@ -63,16 +63,17 @@ class SHOW {
 					echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
 					$actual_variation_tag = $variation_data['section'];
 				}
+				$is_choice_row = ! $is_question && empty( $field_type );
 				?>
-				<li class="variation_list <?php echo $is_question ? 'is-question' : ''; ?>">
-					<label>
+				<li class="variation_list <?php echo $is_question ? 'is-question' : ''; ?><?php echo $is_choice_row ? ' pbc-choice-row' : ''; ?>">
+					<label class="<?php echo $is_choice_row ? 'pbc-choice-label' : ''; ?>">
 						<?php
 						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
-						if ( $imgicon ) {
-			echo '<div class="variation_img">';
-			echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
-			echo '</div>';
-		}
+						if ( $imgicon && ! $is_choice_row ) {
+							echo '<div class="variation_img">';
+							echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+							echo '</div>';
+						}
 
 		// Check if this is a question type variation.
 		if ( $is_question ) {
@@ -115,14 +116,33 @@ class SHOW {
 		} elseif ( empty( $field_type ) ) {
 			if ( $allow_multiple ) {
 				?>
-				<input type="checkbox" class="pbc_variation pbc_variation_multiple" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+				<input type="checkbox" class="pbc_variation pbc_variation_multiple pbc-option-native" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+				<span class="pbc-option-card">
+					<?php
+					if ( $imgicon ) {
+						echo '<div class="variation_img">';
+						echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+						echo '</div>';
+					}
+					?>
+					<span class="pbc-option-title"><?php echo esc_html( $variation_data['title'] ); ?></span>
+				</span>
 				<?php
 			} else {
 				?>
-				<input type="radio" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+				<input type="radio" class="pbc_variation pbc-option-native" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+				<span class="pbc-option-card">
+					<?php
+					if ( $imgicon ) {
+						echo '<div class="variation_img">';
+						echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+						echo '</div>';
+					}
+					?>
+					<span class="pbc-option-title"><?php echo esc_html( $variation_data['title'] ); ?></span>
+				</span>
 				<?php
 			}
-			echo esc_html( $variation_data['title'] );
 						} elseif ( 'qty' === $field_type ) {
 							$s_var = $s_var === $variation_id ? 1 : $s_var;
 							?>
@@ -212,8 +232,8 @@ class SHOW {
 		if ( $allow_multiple ) {
 			?>
 			<label class="pbc-checkbox-option">
-				<input type="checkbox" class="pbc_variation pbc_variation_multiple" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
-				<?php echo esc_html( $variation_data['title'] ); ?>
+				<input type="checkbox" class="pbc_variation pbc_variation_multiple pbc-option-native" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+				<span class="pbc-checkbox-option-text"><?php echo esc_html( $variation_data['title'] ); ?></span>
 			</label>
 			<?php
 		} else {

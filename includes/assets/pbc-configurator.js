@@ -61,6 +61,15 @@ jQuery(function($){
 	// Initialize number input controls.
 	initNumberInputs();
 
+	window.pbcSyncVerticalMultipleCards = function () {
+		$('.pbc-multiple-selections .pbc-checkbox-option').each(function () {
+			var $lb = $(this);
+			$lb.toggleClass('pbc-option-active', $lb.find('.pbc-option-native').prop('checked'));
+		});
+	};
+	window.pbcSyncVerticalMultipleCards();
+	$(document).on('change', '.pbc-multiple-selections .pbc-option-native', window.pbcSyncVerticalMultipleCards);
+
 	// Variation selected (radio buttons - single selection).
 	$(document).on('click', 'input[type=radio].pbc_variation', function(){
 		var cPhase = $('input[name=pbc_current_phase]').val();
@@ -656,6 +665,9 @@ jQuery(function($){
 
 				toggleCustomInputs();
 				initNumberInputs();
+				if (typeof window.pbcSyncVerticalMultipleCards === 'function') {
+					window.pbcSyncVerticalMultipleCards();
+				}
 
 				var canAutoSkip = newNextPhase &&
 					newNextPhase !== 'calculate' &&
