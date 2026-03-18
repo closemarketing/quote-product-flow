@@ -20,15 +20,27 @@
   max-width: 400px;
   padding: 10px 15px;
   font-size: 14px;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  transition: border-color 0.3s ease;
+  border: 2px solid #7a7a7a;
+  border-radius: 6px;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.page-configurator .pbc_question_input,
+.page-configurator-vertical .pbc_question_input {
+  border: 2px solid #6b6b6b !important;
+  background: #fff !important;
+}
+
+.pbc_question_input:hover {
+  border-color: #4a4a4a;
 }
 
 .pbc_question_input:focus {
   outline: none;
-  border-color: #9a781f;
-  box-shadow: 0 0 0 3px rgba(154, 120, 31, 0.1);
+  border-color: var(--pbc-primary, #9a781f) !important;
+  box-shadow: 0 0 0 3px rgba(154, 120, 31, 0.18);
 }
 
 .pbc_question_input[type="number"] {
@@ -1100,11 +1112,23 @@ div.site-content:has(div.page-configurator) {
 	padding: 12px 15px;
 	font-size: 16px;
 	line-height: 1.5;
-	border: 2px solid #ddd;
-	border-radius: 4px;
+	border: 2px solid #6b6b6b;
+	border-radius: 6px;
 	font-family: inherit;
-	transition: border-color 0.3s ease;
+	background: #fff;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 	box-sizing: border-box;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.page-configurator .pbc-direct-input,
+.page-configurator-vertical .pbc-direct-input {
+	border: 2px solid #6b6b6b !important;
+	background: #fff !important;
+}
+
+.pbc-direct-input:hover {
+	border-color: #4a4a4a;
 }
 
 /* Textarea - Large text box */
@@ -1129,7 +1153,8 @@ div.site-content:has(div.page-configurator) {
 .pbc-number-btn {
 	background: #9a781f;
 	color: white;
-	border: 2px solid #9a781f;
+	border: none;
+	border-right: 1px solid rgba(255, 255, 255, 0.25);
 	padding: 10px 15px;
 	cursor: pointer;
 	font-size: 18px;
@@ -1159,20 +1184,20 @@ div.site-content:has(div.page-configurator) {
 }
 
 .pbc-number-decrease {
-	border-radius: 4px 0 0 4px;
-	border-right: none;
+	border-radius: 0;
 }
 
 .pbc-number-increase {
-	border-radius: 0 4px 4px 0;
-	border-left: none;
+	border-radius: 0;
+	border-right: none;
+	border-left: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .pbc-direct-input-number {
 	padding: 10px 15px;
 	appearance: textfield;
 	-moz-appearance: textfield;
-	border: 2px solid #ddd;
+	border: 2px solid #6b6b6b;
 	border-left: none;
 	border-right: none;
 	border-radius: 0;
@@ -1180,13 +1205,29 @@ div.site-content:has(div.page-configurator) {
 	font-size: 16px;
 	flex: 1;
 	min-width: 0;
+	background: #fff;
+}
+
+.page-configurator .pbc-number-input-wrapper,
+.page-configurator-vertical .pbc-number-input-wrapper {
+	border: 2px solid #6b6b6b;
+	border-radius: 6px;
+	overflow: hidden;
+	background: #fff;
+}
+
+.page-configurator .pbc-number-input-wrapper .pbc-direct-input-number,
+.page-configurator-vertical .pbc-number-input-wrapper .pbc-direct-input-number {
+	border-top: none;
+	border-bottom: none;
 }
 
 .pbc-direct-input-number:focus {
 	outline: none;
-	border-color: #9a781f;
-	border-left: 2px solid #9a781f;
-	border-right: 2px solid #9a781f;
+	border-color: var(--pbc-primary, #9a781f);
+	border-left: 2px solid var(--pbc-primary, #9a781f);
+	border-right: 2px solid var(--pbc-primary, #9a781f);
+	box-shadow: inset 0 0 0 1px rgba(154, 120, 31, 0.25);
 }
 
 .pbc-direct-input-number::-webkit-outer-spin-button,
@@ -1214,19 +1255,31 @@ div.site-content:has(div.page-configurator) {
 	padding: 8px 12px;
 	font-size: 14px;
 	line-height: 1.4;
-	border: 2px solid #ddd;
-	border-radius: 4px;
+	border: 2px solid #6b6b6b;
+	border-radius: 6px;
 	resize: vertical;
 	font-family: inherit;
-	transition: border-color 0.3s ease;
+	background: #fff;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 	box-sizing: border-box;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.page-configurator .pbc-custom-input,
+.page-configurator-vertical .pbc-custom-input {
+	border: 2px solid #6b6b6b !important;
+	background: #fff !important;
+}
+
+.pbc-custom-input:hover {
+	border-color: #4a4a4a;
 }
 
 .pbc-direct-input:focus,
 .pbc-custom-input:focus {
 	outline: none;
-	border-color: #9a781f;
-	box-shadow: 0 0 0 3px rgba(154, 120, 31, 0.1);
+	border-color: var(--pbc-primary, #9a781f) !important;
+	box-shadow: 0 0 0 3px rgba(154, 120, 31, 0.18);
 }
 
 .pbc-direct-input::placeholder,
