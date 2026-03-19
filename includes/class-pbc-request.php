@@ -370,6 +370,7 @@ class PBC_Requests {
 	 * @return array{item: array, pdf_path: string, pdf_url: string}|\WP_Error
 	 */
 	private function pbc_create_share_budget_pdf_data() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in calling functions.
 		$session_key  = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
 		$parent_phase = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
 
@@ -395,6 +396,7 @@ class PBC_Requests {
 			'state'    => isset( $_POST['state_field'] ) ? sanitize_text_field( wp_unslash( $_POST['state_field'] ) ) : '',
 			'comments' => isset( $_POST['comments_field'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments_field'] ) ) : '',
 		);
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		$item['pbc_session_key']  = $session_key;
 		$item['pbc_parent_phase'] = $parent_phase;
 
