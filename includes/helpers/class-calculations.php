@@ -102,7 +102,7 @@ class CALC {
 									$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
 								}
 							}
-							if ( ! empty( $sess ) && ! empty( $prev_var ) ) {
+							if ( ! empty( $prev_var ) ) {
 								foreach ( $prev_var as $s_phase_key => $s_variations ) {
 									if ( isset( $prev_var[ $s_phase_key ] ) &&
 										isset( $sess[ $s_phase_key ]['var']['id'] ) &&

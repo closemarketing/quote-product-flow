@@ -518,7 +518,7 @@ class PBC_Requests {
 		/**
 		 * Adjust share-email mail (e.g. extra headers or replace attachments).
 		 *
-		 * @param array $args {
+		 * @param array  $args {
 		 *     @type string   $to
 		 *     @type string   $subject
 		 *     @type string   $message
@@ -526,6 +526,8 @@ class PBC_Requests {
 		 *     @type string[] $attachments
 		 *     @type array    $item Budget item data.
 		 * }
+		 * @param array  $item Budget item data.
+		 * @param string $recipient_email Recipient email address.
 		 */
 		$mail_args = apply_filters(
 			'pbc_share_email_pdf_mail',
