@@ -321,16 +321,28 @@
 }
 
 .configurator_steps_nav li.configurator_steps.active {
-  background: #949697;
+  background: var(--pbc-primary, #9a781f);
 }
 
 .configurator_steps_nav li.configurator_steps.active .step-name {
-  color: #fff;
   font-weight: bold;
 }
 
 .configurator_steps_nav li.configurator_steps.active .step-arrow-button {
-  background: #949697;
+  background: var(--pbc-primary, #9a781f);
+}
+
+.configurator_steps_nav li.configurator_steps.clickable {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.configurator_steps_nav li.configurator_steps.clickable:hover {
+  background: #d5d5d5;
+}
+
+.configurator_steps_nav li.configurator_steps.clickable:hover .step-arrow-button {
+  background: #d5d5d5;
 }
 
 .configurator-left {

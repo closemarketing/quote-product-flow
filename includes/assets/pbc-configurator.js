@@ -993,4 +993,80 @@ jQuery(function($){
 			}, 300);
 		}
 	});
+
+	// Global variable to track target step for navigation.
+	window.pbcNavigationTarget = null;
+
+	// Handle navigation steps clicks.
+	$(document).on('click', '.configurator_steps.clickable', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var targetStep = parseInt($(this).data('step'), 10);
+		var currentStep = parseInt($('input[name=pbc_current_phase]').val(), 10);
+		
+		// Only allow navigation to previous steps.
+		if (targetStep >= currentStep) {
+			return;
+		}
+		
+		// Set the target step globally.
+		window.pbcNavigationTarget = targetStep;
+		
+		// Start navigation by clicking prev button.
+		var $prevButton = $('button[name=submit][value=prev]');
+		if ($prevButton.length > 0) {
+			$prevButton.trigger('click');
+		}
+	});
+	
+	// Override the submit button handler to check if we need to continue navigation.
+	var originalSubmitHandler = $(document).find('button[name=submit]');
+	
+	// Intercept the AJAX success to check navigation target.
+	$(document).ajaxSuccess(function(event, xhr, settings) {
+		// Only handle configurator submit actions.
+		if (settings.data && settings.data.indexOf('action=configurator_submit') !== -1) {
+			// Wait a bit for the DOM to update.
+			setTimeout(function() {
+				checkNavigationTarget();
+			}, 150);
+		}
+	});
+	
+	// Function to check if we reached the target step.
+	function checkNavigationTarget() {
+		if (window.pbcNavigationTarget === null) {
+			return;
+		}
+		
+		var currentStep = parseInt($('input[name=pbc_current_phase]').val(), 10);
+		
+		// Check if we reached the target.
+		if (currentStep === window.pbcNavigationTarget) {
+			// We reached the target, clear it.
+			window.pbcNavigationTarget = null;
+			return;
+		}
+		
+		// Check if we went past the target (shouldn't happen, but just in case).
+		if (currentStep < window.pbcNavigationTarget) {
+			window.pbcNavigationTarget = null;
+			return;
+		}
+		
+		// We still need to go back more.
+		if (currentStep > window.pbcNavigationTarget) {
+			var $prevButton = $('button[name=submit][value=prev]');
+			if ($prevButton.length > 0) {
+				// Continue navigating back.
+				setTimeout(function() {
+					$prevButton.trigger('click');
+				}, 100);
+			} else {
+				// No prev button found, stop.
+				window.pbcNavigationTarget = null;
+			}
+		}
+	}
 });

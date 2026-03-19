@@ -476,8 +476,9 @@ class SHOW {
 			<?php
 			$steps = 1;
 			foreach ( $phases as $phase ) {
+				$is_clickable = $steps < (int) $cstep ? ' clickable' : '';
 				?>
-				<li class="configurator_steps step-<?php echo esc_attr( $steps ); ?><?php echo $steps === (int) $cstep ? ' active' : ''; ?>">
+				<li class="configurator_steps step-<?php echo esc_attr( $steps ); ?><?php echo $steps === (int) $cstep ? ' active' : ''; ?><?php echo esc_attr( $is_clickable ); ?>" data-step="<?php echo esc_attr( $steps ); ?>">
 					<div class="stepContainer">
 						<div class="step-name"><?php echo esc_html( get_the_title( $phase ) ); ?></div>
 						<span class="step-arrow-button"></span>
