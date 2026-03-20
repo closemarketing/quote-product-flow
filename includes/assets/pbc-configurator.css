@@ -166,9 +166,12 @@
 .page-configurator .btn:hover,
 .page-configurator button.btn:hover,
 .page-configurator button[type="submit"].btn:hover {
-  background: black !important;
+  background: var(
+    --pbc-primary-hover,
+    color-mix(in srgb, var(--pbc-primary, #9a781f) 82%, black)
+  ) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 4px 8px color-mix(in srgb, var(--pbc-primary, #9a781f) 35%, transparent) !important;
 }
 
 .page-configurator .btn.btn-pdf {
@@ -177,7 +180,10 @@
 
 .page-configurator .next .btn:hover::after,
 .page-configurator .next button.btn:hover::after {
-  border-left-color: black !important;
+  border-left-color: var(
+    --pbc-primary-hover,
+    color-mix(in srgb, var(--pbc-primary, #9a781f) 82%, black)
+  ) !important;
 }
 
 /* Botones prev sin flecha */
@@ -1216,13 +1222,14 @@ div.site-content:has(div.page-configurator) {
 /* Number - Input with custom arrows */
 .pbc-number-input-wrapper {
 	display: flex;
-	align-items: center;
+	align-items: stretch;
 	gap: 0;
 	width: 100%;
 	max-width: 300px;
 }
 
 .pbc-number-btn {
+	box-sizing: border-box;
 	background: var(--pbc-primary, #9a781f) !important;
 	color: var(--pbc-primary-contrast, #fff) !important;
 	border: none;
@@ -1231,22 +1238,38 @@ div.site-content:has(div.page-configurator) {
 	cursor: pointer;
 	font-size: 18px;
 	font-weight: bold;
-	transition: all 0.3s ease;
+	transition: background-color 0.2s ease, transform 0.15s ease;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	min-width: 45px;
-	height: 45px;
+	min-height: 45px;
+	height: auto;
 	user-select: none;
+	opacity: 1 !important;
+	filter: none !important;
+	-webkit-tap-highlight-color: transparent;
 }
 
-.pbc-number-btn:hover {
-	background: var(--pbc-primary-hover, #7a5f17) !important;
-	border-color: var(--pbc-primary-hover, #7a5f17) !important;
+.pbc-number-btn:hover,
+.pbc-number-btn:focus-visible {
+	background: var(
+		--pbc-primary-hover,
+		color-mix(in srgb, var(--pbc-primary, #9a781f) 82%, black)
+	) !important;
+	color: var(--pbc-primary-contrast, #fff) !important;
+	opacity: 1 !important;
+	filter: none !important;
 }
 
 .pbc-number-btn:active {
-	background: var(--pbc-primary-active, #5a4511) !important;
+	background: var(
+		--pbc-primary-active,
+		color-mix(in srgb, var(--pbc-primary, #9a781f) 68%, black)
+	) !important;
+	color: var(--pbc-primary-contrast, #fff) !important;
+	opacity: 1 !important;
+	filter: none !important;
 	transform: scale(0.95);
 }
 
@@ -1266,6 +1289,7 @@ div.site-content:has(div.page-configurator) {
 }
 
 .pbc-direct-input-number {
+	box-sizing: border-box;
 	padding: 10px 15px;
 	appearance: textfield;
 	-moz-appearance: textfield;
@@ -1275,8 +1299,10 @@ div.site-content:has(div.page-configurator) {
 	border-radius: 0;
 	text-align: center;
 	font-size: 16px;
+	line-height: 1.25;
 	flex: 1;
 	min-width: 0;
+	min-height: 45px;
 	background: #fff;
 }
 
@@ -1315,8 +1341,13 @@ div.site-content:has(div.page-configurator) {
 	
 	.pbc-number-btn {
 		min-width: 40px;
-		height: 40px;
+		min-height: 40px;
+		height: auto;
 		padding: 8px 12px;
+	}
+
+	.pbc-direct-input-number {
+		min-height: 40px;
 	}
 }
 

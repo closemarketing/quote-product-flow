@@ -70,6 +70,8 @@ class PBC_Template {
 		.page-configurator-vertical {
 			--pbc-primary: ' . esc_attr( $color_main ) . ';
 			--pbc-primary-contrast: ' . esc_attr( CALC::calculate_color_text( $color_main ) ) . ';
+			--pbc-primary-hover: ' . esc_attr( CALC::adjust_brightness( $color_main, -20 ) ) . ';
+			--pbc-primary-active: ' . esc_attr( CALC::adjust_brightness( $color_main, -40 ) ) . ';
 		}
 		.page-configurator .btn,
 		.page-configurator button.btn,
