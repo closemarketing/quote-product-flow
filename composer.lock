@@ -354,15 +354,15 @@
         },
         {
             "name": "wpackagist-plugin/meta-box",
-            "version": "5.11.1",
+            "version": "5.11.4",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/meta-box/",
-                "reference": "tags/5.11.1"
+                "reference": "tags/5.11.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/meta-box.5.11.1.zip"
+                "url": "https://downloads.wordpress.org/plugin/meta-box.5.11.4.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -2924,5 +2924,5 @@
     "platform-overrides": {
         "php": "7.4.33"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
