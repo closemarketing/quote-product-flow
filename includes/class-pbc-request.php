@@ -69,6 +69,8 @@ class PBC_Requests {
 			);
 			die( 0 );
 		}
+		// Release session file lock. Data remains in $_SESSION memory for reads.
+		session_write_close();
 		if ( ! empty( $pbc_variation ) && $current_phase && isset( $pbc_variation[ $current_phase ] ) ) {
 			$variation_data = $pbc_variation[ $current_phase ];
 			$svar           = 0; // Initialize default value.
@@ -233,6 +235,11 @@ class PBC_Requests {
 		$all_details = ob_get_contents();
 		ob_end_clean();
 
+		// Release session file lock after all session writes are complete.
+		if ( PHP_SESSION_ACTIVE === session_status() ) {
+			session_write_close();
+		}
+
 		// Don't use wp_kses_post as it strips scripts needed for AJAX response.
 		// The content is already escaped in PBC_Template::render().
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -257,6 +264,8 @@ class PBC_Requests {
 				wp_send_json_error( 'Session error' );
 			}
 		}
+		// Release session file lock. This callback only reads from $_SESSION.
+		session_write_close();
 
 		$session_key  = isset( $_POST['session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['session_key'] ) ) : '';
 		$parent_phase = isset( $_POST['parent_phase'] ) ? (int) $_POST['parent_phase'] : 0;
@@ -437,6 +446,8 @@ class PBC_Requests {
 				wp_send_json_error( array( 'message' => __( 'Session error.', 'pbc' ) ) );
 			}
 		}
+		// Release session file lock. This callback only reads from $_SESSION.
+		session_write_close();
 
 		$data = $this->pbc_create_share_budget_pdf_data();
 		if ( is_wp_error( $data ) ) {
@@ -478,6 +489,8 @@ class PBC_Requests {
 				wp_send_json_error( 'Session error' );
 			}
 		}
+		// Release session file lock. This callback only reads from $_SESSION.
+		session_write_close();
 
 		$recipient_email = isset( $_POST['recipient_email'] ) ? sanitize_email( wp_unslash( $_POST['recipient_email'] ) ) : '';
 

@@ -34,6 +34,18 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function pbc_configurator_session() {
+		// Don't start session for REST API requests — avoids "PHP session active" Site Health error.
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return;
+		}
+		// REST_REQUEST is defined after init fires, so also check the request URI.
+		if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+			$rest_prefix = function_exists( 'rest_get_url_prefix' ) ? rest_get_url_prefix() : 'wp-json';
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( false !== strpos( $_SERVER['REQUEST_URI'], '/' . $rest_prefix . '/' ) ) {
+				return;
+			}
+		}
 		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			session_start();
 		}
