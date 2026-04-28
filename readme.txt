@@ -3,7 +3,7 @@ Contributors: closemarketing, davidperez
 Tags: budget, configurator
 Requires at least: 4.0
 Tested up to: 6.0
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 
 Creates a configurator with all variables.
 
@@ -68,6 +68,11 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+= 1.5.3 =
+* Performance: Preload variation posts, meta and taxonomy terms in batch before render loop, eliminating N+1 queries per variation (200+ plugin queries reduced to 3).
+* Fixed: PHP session lock released immediately after `session_start()` to prevent REST API timeouts.
+* Fixed: Safe access to `wp_count_posts()` result in `is_multiple_products()` to avoid `stdClass::$publish` notice.
+
 = 1.5.2 =
 * Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the budget PDF (filters `pbc_share_email_pdf_*`, `pbc_whatsapp_share_pdf_message`).
 * Improved: Configurator choice cards — max 4 per row with consistent cell width; mobile 2 columns.
