@@ -211,7 +211,8 @@ class CALC {
 			'fields'         => 'ids',
 		);
 		$parent_phases = get_posts( $args );
-		$total_phases  = (int) wp_count_posts( 'phases' )->publish;
+		$counts       = wp_count_posts( 'phases' );
+		$total_phases  = isset( $counts->publish ) ? (int) $counts->publish : 0;
 
 		return count( $parent_phases ) !== $total_phases;
 	}
