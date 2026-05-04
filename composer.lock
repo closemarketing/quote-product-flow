@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "closemarketing/wp-plugin-license-manager",
-            "version": "1.2.1",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/closemarketing/wp-plugin-license-manager.git",
-                "reference": "a3c84ac30e2c7d9b9fd99af29aaca3cfdb155582"
+                "reference": "a1acfc73fdadf5d92613c1c3493820459cce384d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/closemarketing/wp-plugin-license-manager/zipball/a3c84ac30e2c7d9b9fd99af29aaca3cfdb155582",
-                "reference": "a3c84ac30e2c7d9b9fd99af29aaca3cfdb155582",
+                "url": "https://api.github.com/repos/closemarketing/wp-plugin-license-manager/zipball/a1acfc73fdadf5d92613c1c3493820459cce384d",
+                "reference": "a1acfc73fdadf5d92613c1c3493820459cce384d",
                 "shasum": ""
             },
             "require": {
@@ -64,7 +64,7 @@
                 "issues": "https://github.com/closemarketing/wp-plugin-license-manager/issues",
                 "source": "https://github.com/closemarketing/wp-plugin-license-manager"
             },
-            "time": "2025-12-15T22:18:51+00:00"
+            "time": "2026-04-30T08:06:22+00:00"
         },
         {
             "name": "composer/installers",
