@@ -293,6 +293,9 @@ add_action(
 
 		// Always load admin.
 		if ( is_admin() ) {
+			if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/class-pbc-svg-support.php' ) ) {
+				require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-svg-support.php';
+			}
 			if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php' ) ) {
 				require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-admin-plugin.php';
 			}
