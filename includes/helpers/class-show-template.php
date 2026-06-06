@@ -63,7 +63,7 @@ class PBC_Template {
 		}
 
 		// Add inline style for the template.
-		$color_main = get_option( 'pbc_pdf_color_total' );
+		$color_main = apply_filters( 'pbc_primary_color', '#835536' );
 
 		$custom_css = '
 		.page-configurator,
@@ -518,67 +518,13 @@ class PBC_Template {
 			$cstep = (int) $_GET['phase'];
 		}
 
-		// Support contact buttons - Always visible in all steps.
-		$support_enabled = get_option( 'pbc_support_enabled' );
-		$support_phone   = get_option( 'pbc_support_phone' );
-		$support_email   = get_option( 'pbc_support_email' );
-
-	if ( 'yes' === $support_enabled && ( $support_phone || $support_email ) ) {
-		?>
-		<div class="pbc-support-buttons pbc-support-sticky" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999;">
-			<div class="support-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
-				<?php if ( $support_phone ) { ?>
-					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $support_phone ) ); ?>"
-						class="pbc-support-link btn-phone"
-						title="<?php esc_attr_e( 'Call technical support', 'pbc' ); ?>"
-						style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
-						<span class="dashicons dashicons-phone" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
-						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Support', 'pbc' ); ?></span>
-					</a>
-				<?php } ?>
-				<?php if ( $support_email ) { ?>
-					<a href="mailto:<?php echo esc_attr( $support_email ); ?>"
-						class="pbc-support-link btn-email"
-						title="<?php esc_attr_e( 'Email technical support', 'pbc' ); ?>"
-						style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; line-height: 1;">
-						<span class="dashicons dashicons-email" style="width: 20px; height: 20px; font-size: 20px; display: flex; align-items: center; justify-content: center;"></span>
-						<span class="btn-text" style="line-height: 1;"><?php esc_html_e( 'Email', 'pbc' ); ?></span>
-					</a>
-				<?php } ?>
-			</div>
-		</div>
-			<?php
-			}
+		// Support contact buttons - provided by Pro via action hook.
+		do_action( 'pbc_configurator_support_buttons', $phase_pid );
 
 		if ( ! defined( 'DOING_AJAX' ) ) {
 			?>
 			<div class="page-configurator <?php echo 'page-configurator-' . esc_attr( $template ); ?>">
 			<?php
-			// Show license notice if not active (only for logged-in admins).
-			// Don't show if bypass is active.
-			$show_notice = ! pbc_is_license_active() && is_user_logged_in() && current_user_can( 'manage_options' );
-			$is_bypassed = defined( 'PBC_BYPASS_LICENSE' ) && PBC_BYPASS_LICENSE;
-
-			if ( $show_notice && ! $is_bypassed ) {
-				?>
-				<div class="pbc-license-notice" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-left: 4px solid #5a67d8; padding: 12px 20px; margin: 0 0 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-					<p style="margin: 0; color: #ffffff; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-						<span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
-							<?php esc_html_e( 'Demo Mode', 'pbc' ); ?>
-						</span>
-						<span>
-					<?php
-						printf(
-							/* translators: %s: Link to activate license */
-							esc_html__( 'Activate your license to remove this notice and unlock full features. %s', 'pbc' ),
-							'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '" style="color: #ffffff; text-decoration: underline; font-weight: 500;">' . esc_html__( 'Go to Settings', 'pbc' ) . '</a>'
-						);
-						?>
-						</span>
-					</p>
-				</div>
-				<?php
-			}
 		} // End if ! defined( 'DOING_AJAX' ).
 
 		if ( empty( $phases ) ) {

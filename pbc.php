@@ -104,6 +104,15 @@ add_action(
 
 
 /**
+ * Check if PBC Pro features are available.
+ *
+ * @return bool
+ */
+function pbc_is_pro() {
+	return (bool) apply_filters( 'pbc_is_pro', false );
+}
+
+/**
  * Check if PBC license is active (valid and not expired).
  *
  * @since 1.0.0
@@ -217,58 +226,40 @@ function pbc_get_license_data() {
 	);
 }
 
-// License activation notice.
+// Upgrade to Pro notice for free plugin users.
 add_action(
 	'admin_notices',
 	function () {
-		// Only check if license instance is available.
-		global $pbc_license;
-		if ( empty( $pbc_license ) ) {
+		if ( pbc_is_pro() ) {
 			return;
 		}
 
-		// Only show on PBC pages and plugins page.
 		$screen = get_current_screen();
 		if ( empty( $screen ) ) {
 			return;
 		}
 
-		$show_on_screens = array( 'plugins', 'phases', 'variations', 'options', 'pbc_menu' );
-		$is_pbc_screen   = 'pbc_menu' === $screen->parent_base || in_array( $screen->id, $show_on_screens, true ) || in_array( $screen->post_type, array( 'phases', 'variations', 'options' ), true );
+		$is_pbc_screen = 'pbc_menu' === $screen->parent_base
+			|| in_array( $screen->id, array( 'plugins', 'pbc_menu' ), true )
+			|| in_array( $screen->post_type, array( 'phases', 'variation' ), true );
 
-		if ( ! $is_pbc_screen ) {
+		if ( ! $is_pbc_screen || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-
-		$license_status = pbc_get_license_status();
-
-		if ( 'active' !== $license_status ) {
-			$message = '';
-			$type    = 'warning';
-
-			if ( 'expired' === $license_status ) {
-				$message = sprintf(
-				/* translators: %s: Settings page URL */
-					esc_html__( 'Your license has expired. Please renew your license to continue receiving updates and support. %s', 'pbc' ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Renew License', 'pbc' ) . '</a>'
+		?>
+		<div class="notice notice-info is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'Product Budget Configurator Free', 'pbc' ); ?></strong> &mdash;
+				<?php
+				printf(
+					/* translators: %s: Upgrade URL */
+					esc_html__( 'Unlock recommendations, PDF branding, role discounts, import/export and more. %s', 'pbc' ),
+					'<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank">' . esc_html__( 'Upgrade to Pro', 'pbc' ) . '</a>'
 				);
-			$type = 'error';
-		} else {
-			$message = sprintf(
-				/* translators: %s: Settings page URL */
-				esc_html__( 'Please activate your license to receive updates and support. %s', 'pbc' ),
-				'<a href="' . esc_url( admin_url( 'admin.php?page=pbc_menu' ) ) . '">' . esc_html__( 'Activate License', 'pbc' ) . '</a>'
-			);
-			}
-			?>
-			<div class="notice notice-<?php echo esc_attr( $type ); ?> is-dismissible">
-				<p>
-					<strong><?php esc_html_e( 'Product Budget Configurator:', 'pbc' ); ?></strong>
-					<?php echo wp_kses_post( $message ); ?>
-				</p>
-			</div>
-			<?php
-		}
+				?>
+			</p>
+		</div>
+		<?php
 	},
 	99
 );
@@ -302,9 +293,6 @@ add_action(
 			if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php' ) ) {
 				require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-helper-posttypes.php';
 			}
-			if ( file_exists( WPPBC_PLUGIN_PATH . 'includes/class-pbc-export-import.php' ) ) {
-				require_once WPPBC_PLUGIN_PATH . 'includes/class-pbc-export-import.php';
-			}
 		}
 
 		// Always load frontend files.
@@ -320,34 +308,3 @@ add_action(
 	100
 );
 
-/**
- * Conditionally load premium features based on license status.
- *
- * This allows the plugin to work but shows license warnings when invalid.
- *
- * @since 2.0.0
- */
-add_action(
-	'plugins_loaded',
-	function () {
-		/**
-		 * Filter to bypass license check for premium features.
-		 *
-		 * @since 2.0.0
-		 * @param bool $bypass Whether to bypass license check. Default false.
-		 */
-		$bypass_license = apply_filters( 'pbc_bypass_license_check', false );
-
-		if ( $bypass_license || pbc_is_license_active() ) {
-			/**
-			 * Action fired when premium features should be loaded.
-			 *
-			 * Use this hook to conditionally load premium-only features.
-			 *
-			 * @since 2.0.0
-			 */
-			do_action( 'pbc_load_premium_features' );
-		}
-	},
-	110
-);

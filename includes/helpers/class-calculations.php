@@ -403,20 +403,14 @@ class CALC {
 	 */
 	public static function get_user_discount_and_role() {
 		$user = wp_get_current_user();
-		if ( ! empty( $user->roles ) ) {
-			$role_slug     = $user->roles[0];
-			$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
-			if ( ! empty( $role_discount ) ) {
-				return [
-					'role'     => $role_slug,
-					'discount' => $role_discount,
-				];
-			}
-		}
-		return [
-			'role'     => '',
-			'discount' => 0,
-		];
+		$role = ! empty( $user->roles ) ? $user->roles[0] : '';
+		return apply_filters(
+			'pbc_user_discount_and_role',
+			array(
+				'role'     => $role,
+				'discount' => 0,
+			)
+		);
 	}
 
 	/**
@@ -434,13 +428,11 @@ class CALC {
 		if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
 			$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ), true );
 			if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
-				$price = $pricegroup[0]['pbc_pricem'];
-				if ( ! empty( $user->roles ) ) {
-					$role_slug     = $user->roles[0];
-					$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
-					if ( ! empty( $role_discount ) ) {
-						$price = $price - ( $price * $role_discount / 100 );
-					}
+				$price     = $pricegroup[0]['pbc_pricem'];
+				$role_slug = ! empty( $user->roles ) ? $user->roles[0] : '';
+				$discount  = (int) apply_filters( 'pbc_user_discount', 0, $role_slug, $variation_id );
+				if ( $discount > 0 ) {
+					$price = $price - ( $price * $discount / 100 );
 				}
 			}
 		}
@@ -558,10 +550,9 @@ class CALC {
 			);
 		} else {
 			$emails       = explode( ',', $email_field );
-			$admin_emails = get_option( 'pbc_admin_email_notification' );
-			if ( $admin_emails ) {
-				$admin_emails = explode( ',', $admin_emails );
-				$emails       = array_merge( $emails, $admin_emails );
+			$admin_emails = apply_filters( 'pbc_admin_notification_emails', array(), $item );
+			if ( ! empty( $admin_emails ) ) {
+				$emails = array_merge( $emails, $admin_emails );
 			}
 			$emails = array_map( 'trim', $emails );
 			$emails = array_unique( $emails );
@@ -646,21 +637,21 @@ class CALC {
 				$message .= '<br>' . get_option( 'blogname' );
 				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
-				// Insert_enquiry Post.
-				$post_id     = self::configurator_save_enquiry( $item );
 				$attachments = array();
 				$pdf_path    = null;
 
-				if ( $post_id ) {
-					$item['pbc_enquiry']     = $post_id;
-					$item['pbc_budget_date'] = gmdate( 'd-m-Y' );
-
-					// Generate PDF and get the file path.
-					$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
-
-					if ( $pdf_path && file_exists( $pdf_path ) ) {
-						$attachments = array( $pdf_path );
+				if ( apply_filters( 'pbc_save_enquiry', false, $item ) ) {
+					$post_id = self::configurator_save_enquiry( $item );
+					if ( $post_id ) {
+						$item['pbc_enquiry']     = $post_id;
+						$item['pbc_budget_date'] = gmdate( 'd-m-Y' );
 					}
+				}
+
+				// Always generate PDF for attachment.
+				$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
+				if ( $pdf_path && file_exists( $pdf_path ) ) {
+					$attachments = array( $pdf_path );
 				}
 
 				// Send email.
@@ -696,15 +687,9 @@ class CALC {
 	 * @return string 'yes' or 'no'
 	 */
 	public static function get_show_prices_for_user( $user_role = '' ) {
-		if ( ! empty( $user_role ) ) {
-			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
-
-			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
-				return 'yes';
-			}
-			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
-				return 'no';
-			}
+		$role_override = apply_filters( 'pbc_show_prices_for_role', null, $user_role );
+		if ( null !== $role_override ) {
+			return 'yes' === $role_override ? 'yes' : 'no';
 		}
 
 		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );

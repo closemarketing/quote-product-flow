@@ -166,11 +166,8 @@ class PDF {
 		$total_vars       = count( $item[ $session_key ] );
 		$itemv            = $item[ $session_key ];
 		$contact          = isset( $item['pbc_contact'] ) ? $item['pbc_contact'] : array();
-		$pdf_color_odd    = get_option( 'pbc_pdf_color_odd' );
-		$background_color = $pdf_color_odd && '#' === substr( $pdf_color_odd, 0, 1 ) ? trim( $pdf_color_odd ) : '#ffebcb';
-
-		$pdf_color_total  = get_option( 'pbc_pdf_color_total' );
-		$background_total = $pdf_color_total && '#' === substr( $pdf_color_total, 0, 1 ) ? trim( $pdf_color_total ) : '#835536';
+		$background_color = apply_filters( 'pbc_pdf_odd_row_color', '#ffebcb' );
+		$background_total = apply_filters( 'pbc_pdf_total_row_color', '#835536' );
 
 		$summary_text_on_bg = self::pdf_text_color_on_background( $background_color );
 
@@ -203,23 +200,13 @@ class PDF {
 		table.pdf-logo-wrap{ width:100%; border-collapse:collapse; margin:0 0 12px 0; border:0; }
 		table.pdf-logo-wrap td{ border:0; padding:0; vertical-align:middle; }
 		</style>";
-		$pdf_image_selected = get_option( 'pbc_pdf_image_selected' );
-		$pdf_image_selected = ! empty( $pdf_image_selected ) ? trim( $pdf_image_selected ) : '';
-		if ( ! empty( $pdf_image_selected ) ) {
-			// Convert URL to local path for Html2Pdf. Three-column table centers reliably in Html2Pdf.
-			$pdf_image_local = self::url_to_local_path( $pdf_image_selected );
-			$output         .= '<table class="pdf-logo-wrap"><tr>';
-			$output         .= '<td style="width:25%;">&nbsp;</td>';
-			$output         .= '<td style="width:50%;text-align:center;" align="center"><img src="' . esc_attr( $pdf_image_local ) . '" width="200" alt=""/></td>';
-			$output         .= '<td style="width:25%;">&nbsp;</td>';
-			$output         .= '</tr></table>';
+		$logo_html = apply_filters( 'pbc_pdf_logo_html', '', $item );
+		if ( ! empty( $logo_html ) ) {
+			$output .= $logo_html;
 		}
-		$header_image = get_option( 'pbc_pdf_image_header' );
-		$header_image = ! empty( $header_image ) ? trim( $header_image ) : '';
-		if ( ! empty( $header_image ) ) {
-			// Convert URL to local path for Html2Pdf.
-			$header_image_local = self::url_to_local_path( $header_image );
-			$output            .= '<table class="header"><tr><td align="center"><img src="' . esc_attr( $header_image_local ) . '" class="header_image" alt=""/></td></tr></table><br/>';
+		$header_html = apply_filters( 'pbc_pdf_header_html', '', $item );
+		if ( ! empty( $header_html ) ) {
+			$output .= $header_html;
 		}
 		$output .= '<table class="product"><tr><td class="product-title">';
 		$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
@@ -389,12 +376,9 @@ class PDF {
 			$output .= wp_kses_post( $comments ) . '</p></td></tr></table><br/>';
 		}
 
-		$footer_image = get_option( 'pbc_pdf_image_footer' );
-		$footer_image = ! empty( $footer_image ) ? trim( $footer_image ) : '';
-		if ( ! empty( $footer_image ) ) {
-			// Convert URL to local path for Html2Pdf.
-			$footer_image_local = self::url_to_local_path( $footer_image );
-			$output            .= '<table class="footer"><tr><td><img src="' . esc_attr( $footer_image_local ) . '" class="footer_image"/></td></tr></table><br/>';
+		$footer_html = apply_filters( 'pbc_pdf_footer_html', '', $item );
+		if ( ! empty( $footer_html ) ) {
+			$output .= $footer_html;
 		}
 
 		$output .= '</page>';
