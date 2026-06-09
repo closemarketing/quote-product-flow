@@ -226,13 +226,46 @@ class PBC_Admin_Plugin {
 					<!-- Left Column -->
 					<div class="pbc-column-left">
 						<?php $this->render_general_configuration_section(); ?>
-						<?php do_action( 'pbc_admin_settings_left_column' ); ?>
+						<?php
+						if ( has_action( 'pbc_admin_settings_left_column' ) ) {
+							do_action( 'pbc_admin_settings_left_column' );
+						} else {
+							$this->render_pro_locked_card(
+								'dashicons-phone',
+								__( 'Support Contact', 'product-budget-configurator' ),
+								array(
+									array( 'type' => 'checkbox', 'label' => __( 'Enable support contact buttons in configurator', 'product-budget-configurator' ) ),
+									array( 'type' => 'text', 'label' => __( 'Support Phone Number', 'product-budget-configurator' ) ),
+									array( 'type' => 'text', 'label' => __( 'Support Email Address', 'product-budget-configurator' ) ),
+								)
+							);
+						}
+						?>
 					</div>
 
 					<!-- Right Column -->
 					<div class="pbc-column-right">
 						<?php $this->render_pdf_configuration_section(); ?>
-						<?php do_action( 'pbc_admin_settings_right_column' ); ?>
+						<?php
+						if ( has_action( 'pbc_admin_settings_right_column' ) ) {
+							do_action( 'pbc_admin_settings_right_column' );
+						} else {
+							$this->render_pro_locked_card(
+								'dashicons-groups',
+								__( 'User Role Specific Options', 'product-budget-configurator' ),
+								array(
+									array( 'type' => 'table', 'label' => __( 'Role discounts and price visibility per user role', 'product-budget-configurator' ) ),
+								)
+							);
+							$this->render_pro_locked_card(
+								'dashicons-tag',
+								__( 'Bulk Price Updater', 'product-budget-configurator' ),
+								array(
+									array( 'type' => 'text', 'label' => __( 'Set the percentage to bulk update prices', 'product-budget-configurator' ) ),
+								)
+							);
+						}
+						?>
 					</div>
 				</div>
 
@@ -404,7 +437,72 @@ class PBC_Admin_Plugin {
 					</select>
 					<p class="description"><?php esc_html_e( 'Global configuration to show prices. Can be customized by user role below.', 'product-budget-configurator' ); ?></p>
 				</fieldset>
-				<?php do_action( 'pbc_admin_general_settings_extra' ); ?>
+				<?php
+				if ( has_action( 'pbc_admin_general_settings_extra' ) ) {
+					do_action( 'pbc_admin_general_settings_extra' );
+				} else {
+					?>
+					<div class="pbc-pro-overlay-wrap">
+						<div class="pbc-pro-fields-preview" aria-hidden="true">
+							<fieldset><label class="block"><?php esc_html_e( 'Flip Images Horizontal', 'product-budget-configurator' ); ?></label><input type="text" disabled style="width:100%;" /></fieldset>
+							<fieldset><label class="block"><?php esc_html_e( 'Email Notification', 'product-budget-configurator' ); ?></label><input type="text" disabled style="width:100%;" /></fieldset>
+						</div>
+						<div class="pbc-pro-overlay">
+							<span class="dashicons dashicons-lock pbc-pro-lock-icon"></span>
+							<p><?php esc_html_e( 'These options require Pro', 'product-budget-configurator' ); ?></p>
+							<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank" class="button button-primary"><?php esc_html_e( 'Upgrade to Pro', 'product-budget-configurator' ); ?></a>
+						</div>
+					</div>
+					<?php
+				}
+				?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render a pro-locked settings card with blurred field preview and upgrade overlay.
+	 *
+	 * @param string $icon   Dashicons class.
+	 * @param string $title  Card title.
+	 * @param array  $fields Array of field descriptors: ['type' => 'text|checkbox|table', 'label' => '...'].
+	 * @return void
+	 */
+	private function render_pro_locked_card( $icon, $title, $fields ) {
+		?>
+		<div class="pbc-settings-card pbc-pro-locked">
+			<div class="pbc-card-header">
+				<h2>
+					<span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
+					<?php echo esc_html( $title ); ?>
+					<span class="pbc-pro-badge"><?php esc_html_e( 'PRO', 'product-budget-configurator' ); ?></span>
+				</h2>
+			</div>
+			<div class="pbc-card-body">
+				<div class="pbc-pro-overlay-wrap">
+					<div class="pbc-pro-fields-preview pbc-form-grid" aria-hidden="true">
+						<?php foreach ( $fields as $field ) : ?>
+							<fieldset>
+								<label class="block"><?php echo esc_html( $field['label'] ); ?></label>
+								<?php if ( 'checkbox' === $field['type'] ) : ?>
+									<input type="checkbox" disabled />
+								<?php elseif ( 'table' === $field['type'] ) : ?>
+									<div style="background:#f0f0f0;height:60px;border-radius:4px;"></div>
+								<?php else : ?>
+									<input type="text" disabled style="width:100%;" />
+								<?php endif; ?>
+							</fieldset>
+						<?php endforeach; ?>
+					</div>
+					<div class="pbc-pro-overlay">
+						<span class="dashicons dashicons-lock pbc-pro-lock-icon"></span>
+						<p><?php esc_html_e( 'This feature requires Pro', 'product-budget-configurator' ); ?></p>
+						<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank" class="button button-primary">
+							<?php esc_html_e( 'Upgrade to Pro', 'product-budget-configurator' ); ?>
+						</a>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php
@@ -416,19 +514,30 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function render_pdf_configuration_section() {
-		if ( ! has_action( 'pbc_admin_pdf_settings' ) ) {
-			return;
+		if ( has_action( 'pbc_admin_pdf_settings' ) ) {
+			?>
+			<div class="pbc-settings-card">
+				<div class="pbc-card-header">
+					<h2><span class="dashicons dashicons-media-document"></span> <?php esc_html_e( 'PDF Configuration', 'product-budget-configurator' ); ?></h2>
+				</div>
+				<div class="pbc-card-body">
+					<?php do_action( 'pbc_admin_pdf_settings' ); ?>
+				</div>
+			</div>
+			<?php
+		} else {
+			$this->render_pro_locked_card(
+				'dashicons-media-document',
+				__( 'PDF Configuration', 'product-budget-configurator' ),
+				array(
+					array( 'type' => 'text', 'label' => __( 'PDF Image Logo', 'product-budget-configurator' ) ),
+					array( 'type' => 'text', 'label' => __( 'PDF Image Header', 'product-budget-configurator' ) ),
+					array( 'type' => 'text', 'label' => __( 'PDF Image Footer', 'product-budget-configurator' ) ),
+					array( 'type' => 'text', 'label' => __( 'Color for Odd Rows', 'product-budget-configurator' ) ),
+					array( 'type' => 'text', 'label' => __( 'Color for Total', 'product-budget-configurator' ) ),
+				)
+			);
 		}
-		?>
-		<div class="pbc-settings-card">
-			<div class="pbc-card-header">
-				<h2><span class="dashicons dashicons-media-document"></span> <?php esc_html_e( 'PDF Configuration', 'product-budget-configurator' ); ?></h2>
-			</div>
-			<div class="pbc-card-body">
-				<?php do_action( 'pbc_admin_pdf_settings' ); ?>
-			</div>
-		</div>
-		<?php
 	}
 
 
