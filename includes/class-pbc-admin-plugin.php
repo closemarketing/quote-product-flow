@@ -416,11 +416,13 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function render_pdf_configuration_section() {
+		if ( ! has_action( 'pbc_admin_pdf_settings' ) ) {
+			return;
+		}
 		?>
 		<div class="pbc-settings-card">
 			<div class="pbc-card-header">
 				<h2><span class="dashicons dashicons-media-document"></span> <?php esc_html_e( 'PDF Configuration', 'product-budget-configurator' ); ?></h2>
-				<p class="description"><?php esc_html_e( 'Basic PDF export is available. Upgrade to Pro for branding (logo, header, footer, custom colors).', 'product-budget-configurator' ); ?></p>
 			</div>
 			<div class="pbc-card-body">
 				<?php do_action( 'pbc_admin_pdf_settings' ); ?>
