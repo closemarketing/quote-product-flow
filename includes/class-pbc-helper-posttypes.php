@@ -50,6 +50,10 @@ class PBC_Helper_PostTypes {
 		// Validate question key on save.
 		add_action( 'save_post_variation', array( $this, 'validate_question_key' ), 10, 3 );
 		add_action( 'admin_notices', array( $this, 'show_duplicate_key_notice' ) );
+
+		// Duplicate post.
+		add_filter( 'post_row_actions', array( $this, 'add_duplicate_row_action' ), 10, 2 );
+		add_action( 'admin_action_pbc_duplicate_post', array( $this, 'handle_duplicate_post' ) );
 	}
 
 	/**
@@ -1773,6 +1777,106 @@ class PBC_Helper_PostTypes {
 			// Also set a transient for the notice.
 			set_transient( 'pbc_duplicate_key_' . $post_id, $question_key, 30 );
 		}
+	}
+	/**
+	 * Add duplicate row action to PBC post types.
+	 *
+	 * @param array   $actions Row actions.
+	 * @param WP_Post $post    Post object.
+	 * @return array
+	 */
+	public function add_duplicate_row_action( $actions, $post ) {
+		$pbc_post_types = array( 'phases', 'variation', 'enquiry' );
+
+		if ( ! in_array( $post->post_type, $pbc_post_types, true ) ) {
+			return $actions;
+		}
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return $actions;
+		}
+
+		$url = wp_nonce_url(
+			add_query_arg(
+				array(
+					'action'  => 'pbc_duplicate_post',
+					'post_id' => $post->ID,
+				),
+				admin_url( 'admin.php' )
+			),
+			'pbc_duplicate_post_' . $post->ID
+		);
+
+		$actions['pbc_duplicate'] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Duplicate', 'product-budget-configurator' ) . '</a>';
+
+		return $actions;
+	}
+
+	/**
+	 * Handle post duplication.
+	 *
+	 * @return void
+	 */
+	public function handle_duplicate_post() {
+		$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
+
+		if ( ! $post_id ) {
+			wp_die( esc_html__( 'Invalid post ID.', 'product-budget-configurator' ) );
+		}
+
+		check_admin_referer( 'pbc_duplicate_post_' . $post_id );
+
+		$post = get_post( $post_id );
+
+		if ( ! $post ) {
+			wp_die( esc_html__( 'Post not found.', 'product-budget-configurator' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( esc_html__( 'You do not have permission to duplicate this post.', 'product-budget-configurator' ) );
+		}
+
+		$new_post_args = array(
+			'post_title'     => $post->post_title . ' ' . __( '(Copy)', 'product-budget-configurator' ),
+			'post_content'   => $post->post_content,
+			'post_excerpt'   => $post->post_excerpt,
+			'post_status'    => 'draft',
+			'post_type'      => $post->post_type,
+			'post_author'    => get_current_user_id(),
+			'post_parent'    => $post->post_parent,
+			'menu_order'     => $post->menu_order,
+			'comment_status' => $post->comment_status,
+			'ping_status'    => $post->ping_status,
+		);
+
+		$new_post_id = wp_insert_post( $new_post_args );
+
+		if ( is_wp_error( $new_post_id ) ) {
+			wp_die( esc_html( $new_post_id->get_error_message() ) );
+		}
+
+		// Copy all postmeta.
+		$meta_entries = get_post_meta( $post_id );
+		foreach ( $meta_entries as $meta_key => $meta_values ) {
+			// Skip internal WP meta.
+			if ( in_array( $meta_key, array( '_edit_lock', '_edit_last' ), true ) ) {
+				continue;
+			}
+			foreach ( $meta_values as $meta_value ) {
+				add_post_meta( $new_post_id, $meta_key, maybe_unserialize( $meta_value ) );
+			}
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'post_type' => $post->post_type,
+					'duplicated' => '1',
+				),
+				admin_url( 'edit.php' )
+			)
+		);
+		exit;
 	}
 }
 
