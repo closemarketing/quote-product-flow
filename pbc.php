@@ -29,9 +29,15 @@ if ( ! defined( 'WPPBC_ITEM_NAME' ) ) {
 if ( ! defined( 'WPPBC_VERSION' ) ) {
 	define( 'WPPBC_VERSION', '2.0.0-beta.1' );
 }
-define( 'WPPBC_PLUGIN', __FILE__ );
-define( 'WPPBC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'WPPBC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'WPPBC_PLUGIN' ) ) {
+	define( 'WPPBC_PLUGIN', __FILE__ );
+}
+if ( ! defined( 'WPPBC_PLUGIN_URL' ) ) {
+	define( 'WPPBC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+}
+if ( ! defined( 'WPPBC_PLUGIN_PATH' ) ) {
+	define( 'WPPBC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+}
 if ( ! defined( 'WPPBC_URL_API' ) ) {
 	define( 'WPPBC_URL_API', 'https://close.technology/' );
 }

@@ -692,6 +692,13 @@ class CALC {
 			return 'yes' === $role_override ? 'yes' : 'no';
 		}
 
+		if ( ! empty( $user_role ) ) {
+			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role, null );
+			if ( null !== $role_setting ) {
+				return 'yes' === $role_setting ? 'yes' : 'no';
+			}
+		}
+
 		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
 		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
