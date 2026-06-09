@@ -530,29 +530,29 @@ button.select-image.select-image-selected:hover {
 	border-left-color: #764ba2 !important;
 }
 
-/* Deactivate field styling */
-.pbc-deactivate-field {
-	background: linear-gradient(135deg, #fff3cd 0%, #fcf8e3 100%) !important;
-	border-left: 4px solid #ffc107 !important;
-	padding: 0 !important;
+/* License actions row */
+.pbc-license-actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-top: 16px;
 }
 
-.pbc-deactivate-field label.block {
-	margin-bottom: 0 !important;
-	transition: all 0.2s ease;
-}
-
-.pbc-deactivate-field label.block:hover {
-	background: #ffe69c !important;
-}
-
-/* Deactivate checkbox styling */
-input[type="checkbox"][name="pbc_license_deactivate"] {
-	width: 20px;
-	height: 20px;
+.pbc-license-deactivate-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #721c24;
 	cursor: pointer;
-	accent-color: #ffc107;
-	flex-shrink: 0;
+}
+
+.pbc-license-deactivate-label input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	accent-color: #dc3545;
+	cursor: pointer;
+	margin: 0;
 }
 
 /* Description links */
