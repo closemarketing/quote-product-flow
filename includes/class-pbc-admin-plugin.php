@@ -170,14 +170,6 @@ class PBC_Admin_Plugin {
 				'menu_slug'   => 'edit-tags.php?taxonomy=variation_tag',
 				'function'    => null,
 			),
-			array(
-				'parent_slug' => 'pbc_menu',
-				'page_title'  => __( 'Product Budget Configurator', 'product-budget-configurator' ),
-				'menu_title'  => __( 'Settings', 'product-budget-configurator' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => 'pbc_menu',
-				'function'    => array( $this, 'pbc_display_admin_page' ),
-			),
 		);
 
 		// Add each submenu item to custom admin menu.
@@ -193,6 +185,12 @@ class PBC_Admin_Plugin {
 		}
 
 		do_action( 'pbc_admin_register_menus' );
+
+		// Rename the auto-added first submenu (parent clone) to "Settings".
+		global $submenu;
+		if ( isset( $submenu['pbc_menu'][0] ) ) {
+			$submenu['pbc_menu'][0][0] = __( 'Settings', 'product-budget-configurator' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		}
 	}
 
 	/**
