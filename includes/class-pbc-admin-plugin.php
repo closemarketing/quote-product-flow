@@ -294,6 +294,8 @@ class PBC_Admin_Plugin {
 					</button>
 				</div>
 			</form>
+
+			<?php do_action( 'pbc_admin_license_section' ); ?>
 		</div>
 		<?php
 	}
