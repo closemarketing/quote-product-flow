@@ -212,23 +212,26 @@ select,
 
 /* Button Styles */
 button.select-image.select-image-selected {
-	padding: 10px 20px;
-	background: #667eea;
+	padding: 0 12px;
+	height: 30px;
+	line-height: 30px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: #fff;
 	border: none;
-	border-radius: 6px;
+	border-radius: 4px;
 	cursor: pointer;
+	font-size: 13px;
 	font-weight: 500;
 	transition: all 0.2s ease;
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
+	vertical-align: middle;
 }
 
 button.select-image.select-image-selected:hover {
-	background: #764ba2;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 	transform: translateY(-1px);
-	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 /* Image Preview */
@@ -386,14 +389,18 @@ button.select-image.select-image-selected:hover {
 }
 
 #bulk-updater-prices {
-	padding: 10px 24px;
+	padding: 0 12px;
+	height: 30px;
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: #fff;
 	border: none;
-	border-radius: 6px;
+	border-radius: 4px;
 	cursor: pointer;
+	font-size: 13px;
 	font-weight: 500;
+	line-height: 30px;
 	transition: all 0.2s ease;
+	vertical-align: middle;
 }
 
 #bulk-updater-prices:hover {
