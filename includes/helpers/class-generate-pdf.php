@@ -448,13 +448,11 @@ class PDF {
 								}
 							}
 
-							if ( ! empty( $itemv ) ) {
-								foreach ( $itemv as $s_phase_key => $svariations ) {
-									if ( isset( $prev_var[ $s_phase_key ] ) &&
-										isset( $itemv[ $s_phase_key ]['var']['id'] ) && in_array( $itemv[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
-										$imgprodid = $deps['pbc_imgprod'][0];
-										break 2;
-									}
+							foreach ( $itemv as $s_phase_key => $svariations ) {
+								if ( isset( $prev_var[ $s_phase_key ] ) &&
+									isset( $itemv[ $s_phase_key ]['var']['id'] ) && in_array( $itemv[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
+									$imgprodid = $deps['pbc_imgprod'][0];
+									break 2;
 								}
 							}
 						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
