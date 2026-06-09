@@ -25,7 +25,8 @@ class PBC_Public {
 	public function __construct() {
 		add_action( 'init', array( $this, 'pbc_configurator_session' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_shortcode( 'pbc', array( $this, 'pbc_configurator' ) );
+		add_shortcode( 'product-budget-configurator', array( $this, 'pbc_configurator' ) );
+		add_shortcode( 'pbc', array( $this, 'pbc_configurator' ) ); // backwards compatibility
 	}
 
 	/**

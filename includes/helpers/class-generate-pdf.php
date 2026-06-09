@@ -28,7 +28,7 @@ class PDF {
 	 * @return string|null
 	 */
 	public static function generate_engine_pdf( $item = array(), $type_return = 'path' ) {
-		$filename      = __( 'budget', 'pbc' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
+		$filename      = __( 'budget', 'product-budget-configurator' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
 		$dirname       = self::get_budget_base_dir( 'path' );
 		$filename_path = $dirname . $filename;
 
@@ -159,7 +159,7 @@ class PDF {
 		if ( empty( $item[ $session_key ] ) || ! is_array( $item[ $session_key ] ) ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Configurator not ready!', 'pbc' ),
+				'response' => __( 'Configurator not ready!', 'product-budget-configurator' ),
 			);
 			return $result;
 		}
@@ -209,35 +209,35 @@ class PDF {
 			$output .= $header_html;
 		}
 		$output .= '<table class="product"><tr><td class="product-title">';
-		$output .= '<h1>' . esc_html__( 'Budget', 'pbc' ) . '</h1>';
-		$output .= '<strong>' . esc_html__( 'Date', 'pbc' ) . ':</strong> ' . $budget_date . '<br/>';
+		$output .= '<h1>' . esc_html__( 'Budget', 'product-budget-configurator' ) . '</h1>';
+		$output .= '<strong>' . esc_html__( 'Date', 'product-budget-configurator' ) . ':</strong> ' . $budget_date . '<br/>';
 
 		// Budget ID.
 		$budget_id = isset( $item['pbc_enquiry'] ) ? (int) $item['pbc_enquiry'] : 0;
 		if ( ! empty( $budget_id ) ) {
-			$output .= '<strong>' . esc_html__( 'Budget ID', 'pbc' ) . ':</strong> ' . $budget_id . '<br/>';
+			$output .= '<strong>' . esc_html__( 'Budget ID', 'product-budget-configurator' ) . ':</strong> ' . $budget_id . '<br/>';
 		}
 
 		// Contact.
 		if ( ! empty( $contact['email'] ) ) {
-			$output .= '<p><strong>' . esc_html__( 'Contact', 'pbc' ) . ': ' . $contact['name'] . '</strong>';
+			$output .= '<p><strong>' . esc_html__( 'Contact', 'product-budget-configurator' ) . ': ' . $contact['name'] . '</strong>';
 			if ( ! empty( $contact['email'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'Email', 'pbc' ) . ':</strong> ' . $contact['email'];
+				$output .= '<br/><strong>' . esc_html__( 'Email', 'product-budget-configurator' ) . ':</strong> ' . $contact['email'];
 			}
 			if ( ! empty( $contact['phone'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'Phone', 'pbc' ) . ':</strong> ' . $contact['phone'];
+				$output .= '<br/><strong>' . esc_html__( 'Phone', 'product-budget-configurator' ) . ':</strong> ' . $contact['phone'];
 			}
 			if ( ! empty( $contact['city'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'City', 'pbc' ) . ':</strong> ' . $contact['city'];
+				$output .= '<br/><strong>' . esc_html__( 'City', 'product-budget-configurator' ) . ':</strong> ' . $contact['city'];
 			}
 			if ( ! empty( $contact['state'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'State', 'pbc' ) . ':</strong> ' . $contact['state'] . '';
+				$output .= '<br/><strong>' . esc_html__( 'State', 'product-budget-configurator' ) . ':</strong> ' . $contact['state'] . '';
 			}
 			$output .= '</p>';
 		}
 
-		$output .= '<h2>' . esc_html__( 'Characteristics selected', 'pbc' ) . '</h2>';
-		$output .= '<p>' . esc_html__( 'Lists of options selected:', 'pbc' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
+		$output .= '<h2>' . esc_html__( 'Characteristics selected', 'product-budget-configurator' ) . '</h2>';
+		$output .= '<p>' . esc_html__( 'Lists of options selected:', 'product-budget-configurator' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
 
 		// Flipped images.
 		$flipped                   = false;
@@ -330,7 +330,7 @@ class PDF {
 		if ( $include_financial_summary ) {
 			// Summary.
 			$output .= '<br/><br/><table class="summary-total"><tr>';
-			$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'pbc' ) . '</td>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'product-budget-configurator' ) . '</td>';
 			$output .= '<td class="value right">';
 			if ( $tax > 0 ) {
 				$output .= number_format( $tax, 2, ',', '.' ) . ' €';
@@ -339,7 +339,7 @@ class PDF {
 			$output .= '</tr>';
 
 			// Subtotal.
-			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'pbc' ) . '</td>';
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'product-budget-configurator' ) . '</td>';
 			$output .= '<td class="value right">';
 			if ( $total_price > 0 ) {
 				$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
@@ -348,7 +348,7 @@ class PDF {
 			$output .= '</tr>';
 
 			// Quantity.
-			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'pbc' ) . '</td>';
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'product-budget-configurator' ) . '</td>';
 			$output .= '<td class="value right">';
 			if ( $total_price > 0 ) {
 				$output .= number_format( $total_qty, 2, ',', '.' );
@@ -359,7 +359,7 @@ class PDF {
 			// Total.
 			$output .= '<tr>';
 			$color   = CALC::calculate_color_text( $background_total );
-			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'pbc' ) . '</td>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'product-budget-configurator' ) . '</td>';
 			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 			if ( $total_pricevat > 0 ) {
 				$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
@@ -372,7 +372,7 @@ class PDF {
 		// Comments.
 		$comments = isset( $contact['comments'] ) ? sanitize_text_field( $contact['comments'] ) : '';
 		if ( ! empty( $comments ) ) {
-			$output .= '<table class="comments"><tr><td class="title"><p><strong>' . esc_html__( 'Comments', 'pbc' ) . '</strong><br/>';
+			$output .= '<table class="comments"><tr><td class="title"><p><strong>' . esc_html__( 'Comments', 'product-budget-configurator' ) . '</strong><br/>';
 			$output .= wp_kses_post( $comments ) . '</p></td></tr></table><br/>';
 		}
 

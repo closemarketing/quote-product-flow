@@ -7,17 +7,10 @@
 		{
 			"type": "composer",
 			"url": "https://wpackagist.org"
-		},
-		{
-			"type": "composer",
-			"url": "https://packages.metabox.io/2e4180fda99b097f63bec435fd908cc4"
 		}
 	],
 	"require": {
-		"wpackagist-plugin/meta-box": "^5.6.7",
-		"meta-box/meta-box-group": "dev-master",
-		"spipu/html2pdf": "^5.2",
-		"closemarketing/wp-plugin-license-manager": "^1.1"
+		"spipu/html2pdf": "^5.2"
 	},
 	"config": {
 		"allow-plugins": {
@@ -29,20 +22,7 @@
 			"php": "7.4.33"
 		}
 	},
-	"extra": {
-		"installer-paths": {
-			"vendor/meta-box/{$name}": [
-				"vendor:wpackagist-plugin",
-				"vendor:meta-box"
-			]
-		}
-	},
-	"autoload": {
-		"files": [
-			"vendor/meta-box/meta-box/meta-box.php",
-			"vendor/meta-box/meta-box-group/meta-box-group.php"
-		]
-	},
+	"autoload": {},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "^3.10",
 		"phpcsstandards/phpcsutils": "^1.0",

@@ -9,29 +9,42 @@ circle.yml
 composer.json
 composer.lock
 .wordpress-org
-vendor/spipu/html2pdf/examples
-.cursor
+.wordpress-playground
+.wp-env.json
+
+# Develop
+node_modules/
+package.json
+package-lock.json
+
+# Testing
+phpcs.xml.dist
+.phpcs.xml.dist
+phpstan.neon.dist
+.phpunit.result.cache
+phpunit.xml.dist
+.phplint.yml
+tests/
+bin/
+
+# AI
+AGENTS.md
+CLAUDE.md
+.claude/
+.cursor/
+docs/
+
+# Lang
 *.pot
 *.po
-phpcs.xml.dist
+
+# Vendor extras
 vendor/spipu/html2pdf/Tests
 vendor/spipu/html2pdf/examples
 vendor/spipu/html2pdf/doc
+vendor/spipu/html2pdf/doc/
 vendor/spipu/html2pdf/.github
-vender/bin/
-vendor/tecnickcom/tcpdf/examples
 vendor/spipu/html2pdf/.gitignore
 vendor/spipu/html2pdf/.travis.yml
-vendor/spipu/html2pdf/doc/
+vendor/tecnickcom/tcpdf/examples
 vendor/tecnickcom/tcpdf/examples/
-uni2cid_ag15.php
-cid0*.*
-freesans*.*
-freeserif*.*
-phpstan.neon.dist
-tests/
-.phplint.yml
-bin/
-phpunit.xml.dist
-.phpunit.result.cache
-docs/

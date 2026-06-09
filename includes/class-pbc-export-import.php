@@ -300,7 +300,7 @@ class PBC_Export_Import {
 
 		// Validate import data.
 		if ( empty( $import_data['phases'] ) && empty( $import_data['variations'] ) ) {
-			$result['message'] = __( 'No data to import.', 'pbc' );
+			$result['message'] = __( 'No data to import.', 'product-budget-configurator' );
 			return $result;
 		}
 
@@ -355,7 +355,7 @@ class PBC_Export_Import {
 					}
 				} else {
 					// translators: %s is the phase title that failed to import.
-					$result['errors'][] = sprintf( __( 'Failed to import phase: %s', 'pbc' ), $phase_data['title'] );
+					$result['errors'][] = sprintf( __( 'Failed to import phase: %s', 'product-budget-configurator' ), $phase_data['title'] );
 				}
 			}
 
@@ -387,7 +387,7 @@ class PBC_Export_Import {
 					}
 				} else {
 					// translators: %s is the variation title that failed to import.
-					$result['errors'][] = sprintf( __( 'Failed to import variation: %s', 'pbc' ), $var_data['title'] );
+					$result['errors'][] = sprintf( __( 'Failed to import variation: %s', 'product-budget-configurator' ), $var_data['title'] );
 				}
 			}
 
@@ -416,7 +416,7 @@ class PBC_Export_Import {
 		$result['success'] = true;
 		$result['message'] = sprintf(
 			// translators: %1$d phases created, %2$d phases updated, %3$d variations created, %4$d variations updated.
-			__( 'Import completed. Phases: %1$d created, %2$d updated. Variations: %3$d created, %4$d updated.', 'pbc' ),
+			__( 'Import completed. Phases: %1$d created, %2$d updated. Variations: %3$d created, %4$d updated.', 'product-budget-configurator' ),
 			$result['phases_created'],
 			$result['phases_updated'],
 			$result['variations_created'],
@@ -782,11 +782,11 @@ class PBC_Export_Import {
 	public function export_data_ajax() {
 		// Security check.
 		if ( ! check_ajax_referer( 'pbc_export_import_nonce', 'nonce', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'product-budget-configurator' ) ) );
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'pbc' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'product-budget-configurator' ) ) );
 		}
 
 		$export_data    = $this->export_all_data();
@@ -805,7 +805,7 @@ class PBC_Export_Import {
 				'total_variations'    => count( $export_data['variations'] ),
 				'message'             => sprintf(
 					// translators: %1$d is phases count, %2$d is variations count.
-					__( 'Exported %1$d phases and %2$d variations.', 'pbc' ),
+					__( 'Exported %1$d phases and %2$d variations.', 'product-budget-configurator' ),
 					count( $export_data['phases'] ),
 					count( $export_data['variations'] )
 				),
@@ -1053,11 +1053,11 @@ class PBC_Export_Import {
 	public function import_data_ajax() {
 		// Security check.
 		if ( ! check_ajax_referer( 'pbc_export_import_nonce', 'nonce', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'product-budget-configurator' ) ) );
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'pbc' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'product-budget-configurator' ) ) );
 		}
 
 		// Increase limits for large imports.
@@ -1077,7 +1077,7 @@ class PBC_Export_Import {
 		$import_variations_csv = $this->sanitize_csv_content( $import_variations_csv );
 
 		if ( empty( $import_phases_csv ) && empty( $import_variations_csv ) ) {
-			wp_send_json_error( array( 'message' => __( 'No import data provided.', 'pbc' ) ) );
+			wp_send_json_error( array( 'message' => __( 'No import data provided.', 'product-budget-configurator' ) ) );
 		}
 
 		// Parse CSVs to import data format.
@@ -1097,7 +1097,7 @@ class PBC_Export_Import {
 		if ( empty( $import_data['phases'] ) && empty( $import_data['variations'] ) ) {
 			wp_send_json_error(
 				array(
-					'message'          => __( 'Invalid CSV format or no data found.', 'pbc' ),
+					'message'          => __( 'Invalid CSV format or no data found.', 'product-budget-configurator' ),
 					'phases_lines'     => substr_count( $import_phases_csv, "\n" ),
 					'variations_lines' => substr_count( $import_variations_csv, "\n" ),
 				)

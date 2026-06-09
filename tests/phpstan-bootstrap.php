@@ -52,22 +52,6 @@ if (!function_exists('wp_doing_ajax')) {
     }
 }
 
-if (!function_exists('rwmb_meta')) {
-    /**
-     * Mock rwmb_meta function for PHPStan analysis.
-     *
-     * @param string $key
-     * @param mixed $args
-     * @param mixed $post_id
-     * @return mixed
-     */
-    function rwmb_meta($key = '', $args = null, $post_id = null) {
-        // Return null or a dummy value for static analysis.
-        return null;
-    }
-}
-
-
 // Mock Action Scheduler function
 if (!function_exists('as_schedule_recurring_action')) {
     function as_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args = [], $group = '') {

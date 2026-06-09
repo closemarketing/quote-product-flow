@@ -311,7 +311,7 @@ class SHOW {
 					class="pbc-custom-input" 
 					data-step="<?php echo esc_attr( $cstep ); ?>"
 					rows="3"
-					placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+					placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'product-budget-configurator' ); ?>"
 				><?php echo esc_textarea( $saved_value ); ?></textarea>
 			</div>
 			<?php
@@ -343,7 +343,7 @@ class SHOW {
 				<?php
 			}
 			?>
-			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
+			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'product-budget-configurator' ); ?></h2>
 		<table>
 			<?php
 			$user            = wp_get_current_user();
@@ -449,11 +449,11 @@ class SHOW {
 			if ( 'calculate' === $cstep && $show_price_ui && $total_price > 0.00001 ) {
 				?>
 					<tr class="variation_selected phase-total_price">
-						<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
+						<td class="name"><?php esc_html_e( 'Total', 'product-budget-configurator' ); ?></td>
 						<td class="price"><?php echo esc_html( number_format( $total_price, 2, ',', '.' ) . ' €' ); ?></td>
 					</tr>
 					<tr class="variation_selected phase-total_price">
-						<td class="name"><?php esc_html_e( 'VAT not included', 'pbc' ); ?></td>
+						<td class="name"><?php esc_html_e( 'VAT not included', 'product-budget-configurator' ); ?></td>
 						<td class="price"></td>
 					</tr>
 				<?php } ?>
@@ -512,10 +512,10 @@ class SHOW {
 				$prev_button = '';
 			} elseif ( 'calculate' === $cstep ) {
 				$prev_step   = count( $phases );
-				$prev_button = __( 'Back', 'pbc' );
+				$prev_button = __( 'Back', 'product-budget-configurator' );
 			} else {
 				$prev_step   = $cstep - 1;
-				$prev_button = __( 'Back', 'pbc' );
+				$prev_button = __( 'Back', 'product-budget-configurator' );
 			}
 
 			if ( 'calculate' === $cstep ) {
@@ -523,10 +523,10 @@ class SHOW {
 				$next_button = '';
 			} elseif ( count( $phases ) === $cstep ) {
 				$next_step   = 'calculate';
-				$next_button = __( 'Calculate', 'pbc' );
+				$next_button = __( 'Calculate', 'product-budget-configurator' );
 			} else {
 				$next_step   = $cstep + 1;
-				$next_button = __( 'Next', 'pbc' );
+				$next_button = __( 'Next', 'product-budget-configurator' );
 			}
 
 			// Check if there are recommended variations configured.
@@ -542,12 +542,12 @@ class SHOW {
 			<?php } ?>
 			<?php if ( $cstep > 1 ) { ?>
 			<div class="restart">
-				<button type="button" id="pbc-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'pbc' ); ?></button>
+				<button type="button" id="pbc-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'product-budget-configurator' ); ?></button>
 			</div>
 			<?php } ?>
 			<?php if ( 1 === $cstep && $has_recommendations ) { ?>
 			<div class="recommendation" style="display:none;">
-				<button type="button" id="pbc-load-recommendation" class="btn btn-recommendation"><?php esc_html_e( 'Recommendation', 'pbc' ); ?></button>
+				<button type="button" id="pbc-load-recommendation" class="btn btn-recommendation"><?php esc_html_e( 'Recommendation', 'product-budget-configurator' ); ?></button>
 			</div>
 			<?php } ?>
 			<div class="next">

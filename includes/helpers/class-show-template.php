@@ -182,20 +182,20 @@ class PBC_Template {
 							}
 							if ( 'number' !== $input_type && '' === trim( (string) $di_val ) ) {
 								$should_advance   = false;
-								$validation_error = __( 'Por favor, completa el campo antes de continuar.', 'pbc' );
+								$validation_error = __( 'Por favor, completa el campo antes de continuar.', 'product-budget-configurator' );
 							}
 						}
 					} else {
 						if ( $has_required_questions && ! empty( $required_question_keys ) ) {
 							if ( empty( $_POST['pbc_question'] ) ) {
 								$should_advance   = false;
-								$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
+								$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'product-budget-configurator' );
 							} else {
 								foreach ( $required_question_keys as $req_key ) {
 									$answer = isset( $_POST['pbc_question'][ $req_key ] ) ? trim( sanitize_text_field( wp_unslash( $_POST['pbc_question'][ $req_key ] ) ) ) : '';
 									if ( '' === $answer ) {
 										$should_advance   = false;
-										$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'pbc' );
+										$validation_error = __( 'Por favor, responde todas las preguntas requeridas antes de continuar.', 'product-budget-configurator' );
 										break;
 									}
 								}
@@ -204,7 +204,7 @@ class PBC_Template {
 						if ( $should_advance && $has_normal_variations && ! $has_required_questions ) {
 							if ( empty( $_POST['pbc_variation'] ) || ! isset( $_POST['pbc_variation'][ $current_step_from_form ] ) ) {
 								$should_advance   = false;
-								$validation_error = __( 'Por favor, selecciona una opción antes de continuar.', 'pbc' );
+								$validation_error = __( 'Por favor, selecciona una opción antes de continuar.', 'product-budget-configurator' );
 							}
 						}
 					}
@@ -227,7 +227,7 @@ class PBC_Template {
 				if ( ! isset( $_SESSION['pbc_output'] ) ) {
 					$_SESSION['pbc_output'] = array();
 				}
-				$error_message = ! empty( $validation_error ) ? $validation_error : __( 'Por favor, completa todos los campos requeridos antes de continuar.', 'pbc' );
+				$error_message = ! empty( $validation_error ) ? $validation_error : __( 'Por favor, completa todos los campos requeridos antes de continuar.', 'product-budget-configurator' );
 				$_SESSION['pbc_output']['response'] = '<div class="error">' . esc_html( $error_message ) . '</div>';
 				$_SESSION['pbc_output']['type']     = 'error';
 			}
@@ -529,7 +529,7 @@ class PBC_Template {
 
 		if ( empty( $phases ) ) {
 			?>
-			<div class="error"><?php esc_html_e( 'No Phases Available', 'pbc' ); ?></div>
+			<div class="error"><?php esc_html_e( 'No Phases Available', 'product-budget-configurator' ); ?></div>
 			</div>
 			<?php
 		}
@@ -795,11 +795,11 @@ class PBC_Template {
 											class="pbc-direct-input pbc-direct-input-textarea"
 											name="pbc_direct_input[<?php echo esc_attr( $cstep ); ?>]"
 											rows="5"
-											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'product-budget-configurator' ); ?>"
 										><?php echo esc_textarea( $saved_value ); ?></textarea>
 									<?php } elseif ( 'number' === $input_type ) { ?>
 										<div class="pbc-number-input-wrapper">
-											<button type="button" class="pbc-number-btn pbc-number-decrease" data-step="<?php echo esc_attr( $cstep ); ?>" aria-label="<?php echo esc_attr__( 'Decrease', 'pbc' ); ?>">
+											<button type="button" class="pbc-number-btn pbc-number-decrease" data-step="<?php echo esc_attr( $cstep ); ?>" aria-label="<?php echo esc_attr__( 'Decrease', 'product-budget-configurator' ); ?>">
 												<span class="pbc-number-arrow">←</span>
 											</button>
 											<input
@@ -811,7 +811,7 @@ class PBC_Template {
 												step="1"
 												data-step="<?php echo esc_attr( $cstep ); ?>"
 											/>
-											<button type="button" class="pbc-number-btn pbc-number-increase" data-step="<?php echo esc_attr( $cstep ); ?>" aria-label="<?php echo esc_attr__( 'Increase', 'pbc' ); ?>">
+											<button type="button" class="pbc-number-btn pbc-number-increase" data-step="<?php echo esc_attr( $cstep ); ?>" aria-label="<?php echo esc_attr__( 'Increase', 'product-budget-configurator' ); ?>">
 												<span class="pbc-number-arrow">→</span>
 											</button>
 										</div>
@@ -821,14 +821,14 @@ class PBC_Template {
 											class="pbc-direct-input pbc-direct-input-text"
 											name="pbc_direct_input[<?php echo esc_attr( $cstep ); ?>]"
 											value="<?php echo esc_attr( $saved_value ); ?>"
-											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'product-budget-configurator' ); ?>"
 										/>
 									<?php } ?>
 								</div>
 								<?php
 							} else {
 								?>
-								<div class="error"><?php esc_html_e( 'No Variations Available', 'pbc' ); ?></div>
+								<div class="error"><?php esc_html_e( 'No Variations Available', 'product-budget-configurator' ); ?></div>
 								<?php
 							}
 						}
@@ -1033,42 +1033,42 @@ class PBC_Template {
 					$session_type = isset( $_SESSION['pbc_output']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION['pbc_output']['type'] ) ) : '';
 					if ( ! isset( $_SESSION['pbc_output'] ) || 'success' !== $session_type ) {
 						?>
-						<h2><?php esc_html_e( 'Share Configuration', 'pbc' ); ?></h2>
+						<h2><?php esc_html_e( 'Share Configuration', 'product-budget-configurator' ); ?></h2>
 						<div class="share_buttons">
 							<button type="button" class="btn btn-share btn-whatsapp" id="pbc-share-whatsapp">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
 									<path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
 								</svg>
-								<?php esc_html_e( 'Share via WhatsApp', 'pbc' ); ?>
+								<?php esc_html_e( 'Share via WhatsApp', 'product-budget-configurator' ); ?>
 							</button>
 							<button type="button" class="btn btn-share btn-email" id="pbc-share-email">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
 									<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
 								</svg>
-								<?php esc_html_e( 'Share via Email', 'pbc' ); ?>
+								<?php esc_html_e( 'Share via Email', 'product-budget-configurator' ); ?>
 							</button>
 						</div>
-						<h2 style="margin-top: 30px;"><?php esc_html_e( 'Client Details', 'pbc' ); ?></h2>
+						<h2 style="margin-top: 30px;"><?php esc_html_e( 'Client Details', 'product-budget-configurator' ); ?></h2>
 						<div class="email_submit_fields">
 							<input type="hidden" name="pbc_session_key" value="<?php echo esc_attr( $pbc_session_key ); ?>">
 							<input type="hidden" name="pbc_parent_phase" value="<?php echo (int) $phase_pid; ?>">
-							<input type="text" name="email_field" placeholder="<?php esc_html_e( 'separate multiple email by comma', 'pbc' ); ?>"/>
-							<input type="text" name="name_field" placeholder="<?php esc_html_e( 'Your name', 'pbc' ); ?>"/>
-							<input type="text" name="phone_field" placeholder="<?php esc_html_e( 'Phone number', 'pbc' ); ?>"/>
-							<input type="text" name="city_field" placeholder="<?php esc_html_e( 'Your City', 'pbc' ); ?>"/>
-							<input type="text" name="state_field" placeholder="<?php esc_html_e( 'State', 'pbc' ); ?>"/>
-							<textarea name="comments_field" placeholder="<?php esc_html_e( 'Your comments', 'pbc' ); ?>"></textarea>
+							<input type="text" name="email_field" placeholder="<?php esc_html_e( 'separate multiple email by comma', 'product-budget-configurator' ); ?>"/>
+							<input type="text" name="name_field" placeholder="<?php esc_html_e( 'Your name', 'product-budget-configurator' ); ?>"/>
+							<input type="text" name="phone_field" placeholder="<?php esc_html_e( 'Phone number', 'product-budget-configurator' ); ?>"/>
+							<input type="text" name="city_field" placeholder="<?php esc_html_e( 'Your City', 'product-budget-configurator' ); ?>"/>
+							<input type="text" name="state_field" placeholder="<?php esc_html_e( 'State', 'product-budget-configurator' ); ?>"/>
+							<textarea name="comments_field" placeholder="<?php esc_html_e( 'Your comments', 'product-budget-configurator' ); ?>"></textarea>
 							<?php
 							$show_button_email = get_option( 'pbc_budget_show_button_email' );
 							if ( 'no' !== $show_button_email ) {
 								?>
-								<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php esc_html_e( 'Send', 'pbc' ); ?></button>
+								<button type="submit" name="submit" class="btn btn-submit" value="email_send"><?php esc_html_e( 'Send', 'product-budget-configurator' ); ?></button>
 								<?php
 							}
 							$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 							if ( 'no' !== $show_button_pdf ) {
 								?>
-								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate Budget', 'pbc' ); ?></button>
+								<button type="submit" name="submit" class="btn btn-submit" value="generate_pdf"><?php esc_html_e( 'Generate Budget', 'product-budget-configurator' ); ?></button>
 							<?php } ?>
 						</div>
 						<?php

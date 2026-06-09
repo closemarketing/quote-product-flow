@@ -501,7 +501,7 @@ class CALC {
 		}
 		$meta['pbc_total_var'] = $i;
 
-		$title  = __( 'Enquiry', 'pbc' ) . ' - ' . gmdate( 'Y-m-d H:i:s' );
+		$title  = __( 'Enquiry', 'product-budget-configurator' ) . ' - ' . gmdate( 'Y-m-d H:i:s' );
 		$title .= ! empty( $name_field ) ? ' - ' . $name_field . '-' . $phone_field : '';
 
 		$enquiry_post = array(
@@ -536,17 +536,17 @@ class CALC {
 		if ( ! $email_field ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Email field empty!', 'pbc' ),
+				'response' => __( 'Email field empty!', 'product-budget-configurator' ),
 			);
 		} elseif ( ! $name_field ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Name field is empty!', 'pbc' ),
+				'response' => __( 'Name field is empty!', 'product-budget-configurator' ),
 			);
 		} elseif ( ! $phone_field ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Phone field is empty!', 'pbc' ),
+				'response' => __( 'Phone field is empty!', 'product-budget-configurator' ),
 			);
 		} else {
 			$emails       = explode( ',', $email_field );
@@ -561,20 +561,20 @@ class CALC {
 			if ( ! isset( $_SESSION[ $pbc_session_key ] ) ) {
 				$result = array(
 					'type'     => 'error',
-					'response' => __( 'Configurator not ready!', 'pbc' ),
+					'response' => __( 'Configurator not ready!', 'product-budget-configurator' ),
 				);
 			} else {
-				$subject        = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
-				$message        = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
-				$message       .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
-				$message       .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
-				$message       .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
-				$message       .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
-				$message       .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
-				$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
+				$subject        = __( 'Budget Configurator', 'product-budget-configurator' ) . ' - ' . get_option( 'blogname' );
+				$message        = '<div><h2>' . __( 'Enquiry details:', 'product-budget-configurator' ) . '</h2><br/>';
+				$message       .= '<strong>' . __( 'Name:', 'product-budget-configurator' ) . '</strong>' . $name_field . '<br/>';
+				$message       .= '<strong>' . __( 'Email:', 'product-budget-configurator' ) . '</strong>' . $email_field . '<br/>';
+				$message       .= '<strong>' . __( 'Phone:', 'product-budget-configurator' ) . '</strong>' . $phone_field . '<br/>';
+				$message       .= '<strong>' . __( 'City:', 'product-budget-configurator' ) . '</strong>' . $city_field . '<br/>';
+				$message       .= '<strong>' . __( 'State:', 'product-budget-configurator' ) . '</strong>' . $state_field . '<br/>';
+				$message       .= '<strong>' . __( 'Comments:', 'product-budget-configurator' ) . '</strong>' . $comments_field . '<br/>';
 				$message       .= '<br/></div>';
-				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4><br>';
-				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
+				$message       .= '<h4>' . __( 'Configuration details:', 'product-budget-configurator' ) . '</h4><br>';
+				$message       .= '<table><tr><th>' . __( 'Phase', 'product-budget-configurator' ) . '</th><th>' . __( 'Variation', 'product-budget-configurator' ) . '</th><th>' . __( 'Price', 'product-budget-configurator' ) . '</th></tr>';
 				$subtotal_price = 0;
 
 				$i = 0;
@@ -619,16 +619,16 @@ class CALC {
 				if ( $show_prices ) {
 					$message .= '<table>';
 					$message .= '<tr>';
-					$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+					$message .= '<td>' . __( 'Subtotal:', 'product-budget-configurator' ) . '</td>';
 					$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '<tr>';
-					$message .= '<td>' . __( 'Tax:', 'pbc' ) . '</td>';
+					$message .= '<td>' . __( 'Tax:', 'product-budget-configurator' ) . '</td>';
 					$vat      = $subtotal_price * 0.21;
 					$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '<tr>';
-					$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+					$message .= '<td>' . __( 'Total:', 'product-budget-configurator' ) . '</td>';
 					$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '</table>';
@@ -665,12 +665,12 @@ class CALC {
 				if ( ! $mail_sent ) {
 					$result = array(
 						'type'     => 'error',
-						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+						'response' => __( 'Error in sending mail. Please try again!', 'product-budget-configurator' ),
 					);
 				} else {
 					$result = array(
 						'type'     => 'success',
-						'response' => __( 'Mail sent!', 'pbc' ),
+						'response' => __( 'Mail sent!', 'product-budget-configurator' ),
 					);
 				}
 			}

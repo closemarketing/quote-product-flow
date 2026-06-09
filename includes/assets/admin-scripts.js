@@ -633,4 +633,107 @@ jQuery(document).ready(function($) {
 		$warningDiv.show();
 	}
 
+	// ---- PBC repeatable groups (variation metabox) ----
+
+	// Generic add-row for tables (pricegroup, question_depends).
+	$(document).on('click', '.pbc-add-row', function() {
+		var tableId = $(this).data('table');
+		var tplId   = $(this).data('tpl');
+		var tpl     = $('#' + tplId).html();
+		$('#' + tableId + ' tbody').append(tpl);
+	});
+
+	$(document).on('click', '.pbc-remove-row', function() {
+		$(this).closest('tr').remove();
+	});
+
+	// Depends grid: add/remove.
+	$(document).on('click', '#pbc-add-dep-row', function() {
+		var tpl = $('#pbc-depends-tpl').html();
+		$('#pbc-depends-table').append(tpl);
+	});
+
+	$(document).on('click', '.pbc-remove-dep', function() {
+		$(this).closest('.pbc-depends-item').remove();
+	});
+
+	// Add imgprodgroup row.
+	$(document).on('click', '#pbc-add-imgprodgroup-row', function() {
+		var tbody   = $('#pbc-imgprodgroup-table tbody');
+		var idx     = tbody.find('tr').length;
+		var options = tbody.find('tr:first-child td:first-child select').html() || '';
+		var row     = '<tr data-index="' + idx + '">' +
+			'<td style="width:70%;max-width:0;"><select name="pbc_imgprodgroup[' + idx + '][pbc_depvarimgprod][]" multiple style="width:100%;height:80px;box-sizing:border-box;">' + options + '</select>' +
+			'<p class="description">Hold Ctrl/Cmd to select multiple</p></td>' +
+			'<td><div class="pbc-image-field">' +
+				'<input type="hidden" name="pbc_imgprodgroup[' + idx + '][pbc_imgprod]" class="pbc-imgprod-id" value="" />' +
+				'<img src="" style="max-width:80px;max-height:64px;display:none;margin-bottom:4px;" class="pbc-img-preview" />' +
+				'<button type="button" class="button pbc-upload-imgprod">Select image</button>' +
+				'<button type="button" class="button pbc-remove-imgprod" style="display:none;">Remove</button>' +
+			'</div></td>' +
+			'<td><button type="button" class="button-link-delete pbc-remove-row">Remove</button></td>' +
+		'</tr>';
+		tbody.append(row);
+	});
+
+	// Icon image upload (single field).
+	$(document).on('click', '.pbc-upload-image', function(e) {
+		e.preventDefault();
+		var targetId = $(this).data('target');
+		var $btn     = $(this);
+		var frame    = wp.media({
+			title:    'Select image',
+			button:   { text: 'Use this image' },
+			multiple: false
+		});
+		frame.on('select', function() {
+			var attachment = frame.state().get('selection').first().toJSON();
+			$('#' + targetId).val(attachment.id);
+			var url = attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url;
+			$btn.siblings('.pbc-img-preview').attr('src', url).show();
+			$btn.siblings('.pbc-remove-image').show();
+		});
+		frame.open();
+	});
+
+	$(document).on('click', '.pbc-remove-image', function(e) {
+		e.preventDefault();
+		var targetId = $(this).data('target');
+		$('#' + targetId).val('');
+		$(this).siblings('.pbc-img-preview').attr('src', '').hide();
+		$(this).hide();
+	});
+
+	// Imgprodgroup image upload.
+	$(document).on('click', '.pbc-upload-imgprod', function(e) {
+		e.preventDefault();
+		var $btn  = $(this);
+		var frame = wp.media({
+			title:    'Select product image',
+			button:   { text: 'Use this image' },
+			multiple: false
+		});
+		frame.on('select', function() {
+			var attachment = frame.state().get('selection').first().toJSON();
+			var url = attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url;
+			$btn.closest('.pbc-image-field').find('.pbc-imgprod-id').val(attachment.id);
+			$btn.closest('.pbc-image-field').find('.pbc-img-preview').attr('src', url).show();
+			$btn.closest('.pbc-image-field').find('.pbc-remove-imgprod').show();
+		});
+		frame.open();
+	});
+
+	$(document).on('click', '.pbc-remove-imgprod', function(e) {
+		e.preventDefault();
+		var $field = $(this).closest('.pbc-image-field');
+		$field.find('.pbc-imgprod-id').val('');
+		$field.find('.pbc-img-preview').attr('src', '').hide();
+		$(this).hide();
+	});
+
+	// Toggle question fields visibility.
+	$('#pbc_is_question').on('change', function() {
+		$('.pbc-question-field').toggle(this.checked);
+	});
+
 });

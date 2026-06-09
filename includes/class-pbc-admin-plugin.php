@@ -17,20 +17,12 @@ use Close\PBC\Helpers\PDF;
  */
 class PBC_Admin_Plugin {
 	/**
-	 * Error message for license activation
-	 *
-	 * @var string
-	 */
-	private $license_error_message = '';
-
-	/**
 	 * Construct and intialize
 	 */
 	public function __construct() {
 		// Initial stuff.
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'init' ) );
-		add_action( 'admin_init', array( $this, 'register_license_settings' ) );
 		add_action( 'admin_footer', array( $this, 'pbc_admin_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
@@ -58,64 +50,14 @@ class PBC_Admin_Plugin {
 	}
 
 	/**
-	 * Register license settings.
-	 *
-	 * @return void
-	 */
-	public function register_license_settings() {
-		global $pbc_license;
-
-		if ( ! $pbc_license || ! class_exists( '\Closemarketing\WPLicenseManager\License' ) ) {
-			return;
-		}
-
-		// Register each individual license field.
-		register_setting(
-			'product-budget-configurator_license',
-			'product-budget-configurator_license_apikey',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
-			)
-		);
-
-		register_setting(
-			'product-budget-configurator_license',
-			'product-budget-configurator_license_deactivate_checkbox',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
-			)
-		);
-
-		// Hook into admin_init to process license activation/deactivation.
-		add_action(
-			'admin_init',
-			function () use ( $pbc_license ) {
-				// Check if license form was submitted and verify nonce.
-				if ( isset( $_POST['option_page'], $_POST['_wpnonce'] ) && 'product-budget-configurator_license' === $_POST['option_page'] && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'product-budget-configurator_license-options' ) ) {
-					if ( isset( $_POST['submit_license'] ) ) {
-						// Build input array for validate_license.
-						$input = array(
-							'product-budget-configurator_license_apikey'              => isset( $_POST['product-budget-configurator_license_apikey'] ) ? sanitize_text_field( wp_unslash( $_POST['product-budget-configurator_license_apikey'] ) ) : '',
-							'product-budget-configurator_license_deactivate_checkbox' => isset( $_POST['product-budget-configurator_license_deactivate_checkbox'] ) ? sanitize_text_field( wp_unslash( $_POST['product-budget-configurator_license_deactivate_checkbox'] ) ) : '',
-						);
-
-						// Call the license validation.
-						$pbc_license->validate_license( $input );
-					}
-				}
-			},
-			15
-		);
-	}
-
-	/**
 	 * PBC Admin Scripts
 	 */
 	public function pbc_admin_scripts() {
 		$screen = get_current_screen();
-		if ( ! empty( $screen ) && ( 'pbc_menu' === $screen->parent_base ) ) {
+		if ( ! empty( $screen ) && (
+			'pbc_menu' === $screen->parent_base ||
+			in_array( $screen->post_type, array( 'variation', 'phases' ), true )
+		) ) {
 			wp_enqueue_script( 'post' );
 			wp_enqueue_script( 'pbc-media' );
 			wp_enqueue_style( 'pbc-admin' );
@@ -142,15 +84,17 @@ class PBC_Admin_Plugin {
 			'pbc-media',
 			'pbc_media_strings',
 			array(
-				'no_image_selected' => __( 'Please select an image file (jpeg, png) only', 'pbc' ),
+				'no_image_selected' => __( 'Please select an image file (jpeg, png) only', 'product-budget-configurator' ),
 			)
 		);
 		wp_register_style( 'pbc-admin', WPPBC_PLUGIN_URL . 'includes/assets/admin.css', array(), WPPBC_VERSION );
 
+		wp_enqueue_script( 'media-upload' );
+		wp_enqueue_media();
 		wp_enqueue_script(
 			'pbc-admin-scripts',
 			WPPBC_PLUGIN_URL . 'includes/assets/admin-scripts.js',
-			array( 'jquery' ),
+			array( 'jquery', 'media-upload' ),
 			WPPBC_VERSION,
 			true
 		);
@@ -192,47 +136,47 @@ class PBC_Admin_Plugin {
 	public function pbc_add_admin_menus() {
 		// Add custom admin menu.
 		add_menu_page(
-			__( 'Product Budget Configurator', 'pbc' ),
+			__( 'Product Budget Configurator', 'product-budget-configurator' ),
 			'PBC',
 			'manage_options',
 			'pbc_menu',
 			array( $this, 'pbc_display_admin_page' ),
 			'dashicons-tagcloud',
-			2
+			99
 		);
 
 		$submenu_pages = array(
 			array(
 				'parent_slug' => 'pbc_menu',
-				'page_title'  => __( 'Product Budget Configurator', 'pbc' ),
-				'menu_title'  => __( 'Settings', 'pbc' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => 'pbc_menu',
-				'function'    => array( $this, 'pbc_display_admin_page' ),
-			),
-			array(
-				'parent_slug' => 'pbc_menu',
-				'page_title'  => __( 'Phases of Configurator', 'pbc' ),
-				'menu_title'  => __( 'Phases', 'pbc' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => 'edit.php?post_type=phases',
-				'function'    => null,
-			),
-			array(
-				'parent_slug' => 'pbc_menu',
-				'page_title'  => __( 'Variations in Phases', 'pbc' ),
-				'menu_title'  => __( 'Variations', 'pbc' ),
+				'page_title'  => __( 'Variations in Phases', 'product-budget-configurator' ),
+				'menu_title'  => __( 'Variations', 'product-budget-configurator' ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => 'edit.php?post_type=variation',
 				'function'    => null,
 			),
 			array(
 				'parent_slug' => 'pbc_menu',
-				'page_title'  => __( 'Sections in variations', 'pbc' ),
-				'menu_title'  => __( 'Sections', 'pbc' ),
+				'page_title'  => __( 'Phases of Configurator', 'product-budget-configurator' ),
+				'menu_title'  => __( 'Phases', 'product-budget-configurator' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'edit.php?post_type=phases',
+				'function'    => null,
+			),
+			array(
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __( 'Sections in variations', 'product-budget-configurator' ),
+				'menu_title'  => __( 'Sections', 'product-budget-configurator' ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => 'edit-tags.php?taxonomy=variation_tag',
 				'function'    => null,
+			),
+			array(
+				'parent_slug' => 'pbc_menu',
+				'page_title'  => __( 'Product Budget Configurator', 'product-budget-configurator' ),
+				'menu_title'  => __( 'Settings', 'product-budget-configurator' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => 'pbc_menu',
+				'function'    => array( $this, 'pbc_display_admin_page' ),
 			),
 		);
 
@@ -257,19 +201,17 @@ class PBC_Admin_Plugin {
 	 * @return void
 	 */
 	public function pbc_display_admin_page() {
-		$this->license_error_message = ''; // Reset error message.
-		$return                      = $this->save_post_options();
+		$return = $this->save_post_options();
 		if ( 'ok' === $return ) {
-			$update = __( 'Successfully Saved!', 'pbc' );
+			$update = __( 'Successfully Saved!', 'product-budget-configurator' );
 		} elseif ( 'error' === $return ) {
-			// Use license error message if available, otherwise generic error.
-			$error = ! empty( $this->license_error_message ) ? $this->license_error_message : __( 'Error saving settings', 'pbc' );
+			$error = __( 'Error saving settings', 'product-budget-configurator' );
 		}
 		?>
 		<div class='wrap pbc-settings-wrap'>
 			<div class="pbc-settings-header">
 				<h1><span class="dashicons dashicons-admin-settings"></span> <?php echo esc_html( $GLOBALS['title'] ); ?></h1>
-				<p class="pbc-settings-subtitle"><?php esc_html_e( 'Configure your product budget configurator global settings', 'pbc' ); ?></p>
+				<p class="pbc-settings-subtitle"><?php esc_html_e( 'Configure your product budget configurator global settings', 'product-budget-configurator' ); ?></p>
 			</div>
 
 			<?php if ( isset( $update ) ) { ?>
@@ -298,13 +240,13 @@ class PBC_Admin_Plugin {
 				<div class="pbc-settings-container" style="margin-top: 20px;">
 					<div class="pbc-settings-card">
 						<div class="pbc-card-header">
-							<h2><span class="dashicons dashicons-star-filled"></span> <?php esc_html_e( 'Upgrade to Pro', 'pbc' ); ?></h2>
-							<p class="description"><?php esc_html_e( 'Unlock powerful features with PBC Pro', 'pbc' ); ?></p>
+							<h2><span class="dashicons dashicons-star-filled"></span> <?php esc_html_e( 'Upgrade to Pro', 'product-budget-configurator' ); ?></h2>
+							<p class="description"><?php esc_html_e( 'Unlock powerful features with PBC Pro', 'product-budget-configurator' ); ?></p>
 						</div>
 						<div class="pbc-card-body">
-							<p><?php esc_html_e( 'Pro features include: PDF branding (logo, header, footer, custom colors), email notifications, support buttons, WhatsApp/email sharing, shareable URLs, role discounts, role price visibility, recommendations, import/export, bulk price updater, and enquiry management.', 'pbc' ); ?></p>
+							<p><?php esc_html_e( 'Pro features include: PDF branding (logo, header, footer, custom colors), email notifications, support buttons, WhatsApp/email sharing, shareable URLs, role discounts, role price visibility, recommendations, import/export, bulk price updater, and enquiry management.', 'product-budget-configurator' ); ?></p>
 							<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank" class="button button-primary">
-								<?php esc_html_e( 'Upgrade to Pro', 'pbc' ); ?>
+								<?php esc_html_e( 'Upgrade to Pro', 'product-budget-configurator' ); ?>
 							</a>
 						</div>
 					</div>
@@ -315,15 +257,10 @@ class PBC_Admin_Plugin {
 					<input type="hidden" name="form_submit" value="true"/>
 					<input type="hidden" name="pbc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'pbc_nonce' ) ); ?>"/>
 					<button type="submit" class="button button-primary button-hero">
-						<span class="dashicons dashicons-saved"></span> <?php esc_html_e( 'Save All Settings', 'pbc' ); ?>
+						<span class="dashicons dashicons-saved"></span> <?php esc_html_e( 'Save All Settings', 'product-budget-configurator' ); ?>
 					</button>
 				</div>
 			</form>
-
-			<!-- License Section (separate form, after main form - full width) -->
-			<div style="margin-top: 20px;">
-				<?php $this->render_license_section(); ?>
-			</div>
 		</div>
 		<?php
 	}
@@ -340,7 +277,7 @@ class PBC_Admin_Plugin {
 		$status = '';
 		// Verify nonce.
 		if ( isset( $_POST['pbc_nonce'] ) && ! wp_verify_nonce( sanitize_key( $_POST['pbc_nonce'] ), 'pbc_nonce' ) ) {
-			wp_die( esc_html__( 'Security check failed. Please try again.', 'pbc' ) );
+			wp_die( esc_html__( 'Security check failed. Please try again.', 'product-budget-configurator' ) );
 			return;
 		}
 		if ( isset( $_POST['form_submit'] ) ) {
@@ -357,10 +294,7 @@ class PBC_Admin_Plugin {
 				}
 			}
 
-			// License management is now handled by License Manager via options.php.
-			// No manual handling needed here.
-
-			do_action( 'pbc_save_admin_settings', $_POST );
+				do_action( 'pbc_save_admin_settings', $_POST );
 		}
 
 		return $status;
@@ -375,9 +309,9 @@ class PBC_Admin_Plugin {
 		?>
 		<table class="phases-lists-table">
 			<tr>
-				<th class="order-col"><?php esc_html_e( 'Order', 'pbc' ); ?></th>
-				<th class="phases-col"><?php esc_html_e( 'Phases', 'pbc' ); ?></th>
-				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'pbc' ); ?></th>
+				<th class="order-col"><?php esc_html_e( 'Order', 'product-budget-configurator' ); ?></th>
+				<th class="phases-col"><?php esc_html_e( 'Phases', 'product-budget-configurator' ); ?></th>
+				<th class="variations-col"><?php esc_html_e( 'Number of Variations', 'product-budget-configurator' ); ?></th>
 			</tr>
 			<?php
 			$phases = get_posts( 'posts_per_page=-1&post_type=phases&orderby=menu_order&order=ASC' );
@@ -402,7 +336,7 @@ class PBC_Admin_Plugin {
 			}
 			?>
 			<tr>
-				<td colspan="2" ><?php esc_html_e( 'Total: ', 'pbc' ); ?></td>
+				<td colspan="2" ><?php esc_html_e( 'Total: ', 'product-budget-configurator' ); ?></td>
 				<td><?php echo (int) $total_count; ?></td>
 			</tr>
 		</table>
@@ -422,53 +356,53 @@ class PBC_Admin_Plugin {
 		<!-- General Configuration Card -->
 		<div class="pbc-settings-card">
 			<div class="pbc-card-header">
-				<h2><span class="dashicons dashicons-admin-generic"></span> <?php esc_html_e( 'General Configuration', 'pbc' ); ?></h2>
+				<h2><span class="dashicons dashicons-admin-generic"></span> <?php esc_html_e( 'General Configuration', 'product-budget-configurator' ); ?></h2>
 			</div>
 			<div class="pbc-card-body pbc-form-grid">
 				<fieldset>
-					<label class="block" for="preview_width"><?php esc_html_e( 'Preview Width', 'pbc' ); ?></label>
+					<label class="block" for="preview_width"><?php esc_html_e( 'Preview Width', 'product-budget-configurator' ); ?></label>
 					<?php $preview_width = get_option( 'pbc_preview_width' ); ?>
-					<input class="pbc_field" type="text" name="preview_width" value="<?php echo $preview_width ? esc_attr( $preview_width ) : ''; ?>" placeholder="<?php esc_html_e( 'default: 570', 'pbc' ); ?>" />
-					<p class="description"><?php esc_html_e( 'Width in pixels for product preview images', 'pbc' ); ?></p>
+					<input class="pbc_field" type="text" name="preview_width" value="<?php echo $preview_width ? esc_attr( $preview_width ) : ''; ?>" placeholder="<?php esc_html_e( 'default: 570', 'product-budget-configurator' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Width in pixels for product preview images', 'product-budget-configurator' ); ?></p>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show PDF Download Button', 'pbc' ); ?></label>
+					<label class="block" for="option_show_final_button_pdf"><?php esc_html_e( 'Show PDF Download Button', 'product-budget-configurator' ); ?></label>
 					<?php
 					$show_button_pdf = get_option( 'pbc_budget_show_button_pdf' );
 					$pages           = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="option_show_final_button_pdf" class="pbc-select">';
-						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
-						echo '<option value="no" ' . selected( $show_button_pdf, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '<option value="yes" ' . selected( $show_button_pdf, 'yes' ) . '>' . esc_html__( 'Yes', 'product-budget-configurator' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_button_pdf, 'no' ) . '>' . esc_html__( 'No', 'product-budget-configurator' ) . '</option>';
 						echo '</select>';
 					}
 					?>
-					<p class="description"><?php esc_html_e( 'Display PDF download button on final step', 'pbc' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Display PDF download button on final step', 'product-budget-configurator' ); ?></p>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="option_show_final_button_email"><?php esc_html_e( 'Show Email Enquiry Button', 'pbc' ); ?></label>
+					<label class="block" for="option_show_final_button_email"><?php esc_html_e( 'Show Email Enquiry Button', 'product-budget-configurator' ); ?></label>
 					<?php
 					$show_button_email = get_option( 'pbc_budget_show_button_email' );
 					$pages             = get_pages();
 					if ( ! empty( $pages ) ) {
 						echo '<select name="option_show_final_button_email" class="pbc-select">';
-						echo '<option value="yes" ' . selected( $show_button_email, 'yes' ) . '>' . esc_html__( 'Yes', 'pbc' ) . '</option>';
-						echo '<option value="no" ' . selected( $show_button_email, 'no' ) . '>' . esc_html__( 'No', 'pbc' ) . '</option>';
+						echo '<option value="yes" ' . selected( $show_button_email, 'yes' ) . '>' . esc_html__( 'Yes', 'product-budget-configurator' ) . '</option>';
+						echo '<option value="no" ' . selected( $show_button_email, 'no' ) . '>' . esc_html__( 'No', 'product-budget-configurator' ) . '</option>';
 						echo '</select>';
 					}
 					?>
-					<p class="description"><?php esc_html_e( 'Display email enquiry button on final step', 'pbc' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Display email enquiry button on final step', 'product-budget-configurator' ); ?></p>
 				</fieldset>
 				<fieldset>
-					<label class="block" for="option_show_prices_global"><?php esc_html_e( 'Show Prices (Global)', 'pbc' ); ?></label>
+					<label class="block" for="option_show_prices_global"><?php esc_html_e( 'Show Prices (Global)', 'product-budget-configurator' ); ?></label>
 					<?php
 					$show_prices_global = get_option( 'pbc_show_prices_global', 'yes' );
 					?>
 					<select name="option_show_prices_global" class="pbc-select">
-						<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Yes', 'pbc' ); ?></option>
-						<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'pbc' ); ?></option>
+						<option value="yes" <?php selected( $show_prices_global, 'yes' ); ?>><?php esc_html_e( 'Yes', 'product-budget-configurator' ); ?></option>
+						<option value="no" <?php selected( $show_prices_global, 'no' ); ?>><?php esc_html_e( 'No', 'product-budget-configurator' ); ?></option>
 					</select>
-					<p class="description"><?php esc_html_e( 'Global configuration to show prices. Can be customized by user role below.', 'pbc' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Global configuration to show prices. Can be customized by user role below.', 'product-budget-configurator' ); ?></p>
 				</fieldset>
 				<?php do_action( 'pbc_admin_general_settings_extra' ); ?>
 			</div>
@@ -485,8 +419,8 @@ class PBC_Admin_Plugin {
 		?>
 		<div class="pbc-settings-card">
 			<div class="pbc-card-header">
-				<h2><span class="dashicons dashicons-media-document"></span> <?php esc_html_e( 'PDF Configuration', 'pbc' ); ?></h2>
-				<p class="description"><?php esc_html_e( 'Basic PDF export is available. Upgrade to Pro for branding (logo, header, footer, custom colors).', 'pbc' ); ?></p>
+				<h2><span class="dashicons dashicons-media-document"></span> <?php esc_html_e( 'PDF Configuration', 'product-budget-configurator' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'Basic PDF export is available. Upgrade to Pro for branding (logo, header, footer, custom colors).', 'product-budget-configurator' ); ?></p>
 			</div>
 			<div class="pbc-card-body">
 				<?php do_action( 'pbc_admin_pdf_settings' ); ?>
@@ -495,148 +429,6 @@ class PBC_Admin_Plugin {
 		<?php
 	}
 
-
-	/**
-	 * Render License Section
-	 *
-	 * @return void
-	 */
-	public function render_license_section() {
-		global $pbc_license;
-
-		// Check if license instance exists.
-		if ( empty( $pbc_license ) || ! is_object( $pbc_license ) ) {
-			?>
-			<div class="pbc-settings-card pbc-license-card">
-				<div class="pbc-card-header">
-					<h2><span class="dashicons dashicons-admin-network"></span> <?php esc_html_e( 'License', 'pbc' ); ?></h2>
-				</div>
-				<div class="pbc-card-body">
-					<div class="notice notice-error inline">
-						<p><?php esc_html_e( 'License Manager is not available. Please ensure wp-plugin-license-manager is installed.', 'pbc' ); ?></p>
-					</div>
-				</div>
-			</div>
-			<?php
-			return;
-		}
-
-		// Render inline license settings.
-		$this->render_inline_license_settings( $pbc_license );
-	}
-
-	/**
-	 * Render inline license settings.
-	 *
-	 * @param \Closemarketing\WPLicenseManager\License $license License instance.
-	 * @return void
-	 */
-	private function render_inline_license_settings( $license ) {
-		// Get license data.
-		$license_key    = $license->get_option_value( 'apikey' );
-		$is_active      = $license->is_license_active();
-		$license_status = get_option( 'product-budget-configurator_license_activated', 'Deactivated' );
-
-		?>
-		<div class="pbc-settings-card pbc-license-card">
-			<!-- Header -->
-			<div class="pbc-card-header">
-				<h2><span class="dashicons dashicons-admin-network"></span> <?php esc_html_e( 'Product Budget Configurator License', 'pbc' ); ?></h2>
-				<p class="description"><?php esc_html_e( 'Manage your license to receive automatic updates and support.', 'pbc' ); ?></p>
-			</div>
-
-			<!-- License Status -->
-			<div class="pbc-card-body">
-				<div style="margin-bottom: 20px;">
-					<?php if ( $is_active ) : ?>
-						<div style="padding: 15px; border-radius: 4px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: flex; align-items: center;">
-							<span style="font-size: 24px; margin-right: 10px;">✓</span>
-							<div>
-								<strong><?php esc_html_e( 'License Active', 'pbc' ); ?></strong>
-								<p style="margin: 5px 0 0 0; font-size: 13px;"><?php esc_html_e( 'Your license is active and you will receive automatic updates.', 'pbc' ); ?></p>
-							</div>
-						</div>
-					<?php else : ?>
-						<div style="padding: 15px; border-radius: 4px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: flex; align-items: center;">
-							<span style="font-size: 24px; margin-right: 10px;">✗</span>
-							<div>
-								<strong><?php esc_html_e( 'License Inactive', 'pbc' ); ?></strong>
-								<p style="margin: 5px 0 0 0; font-size: 13px;"><?php esc_html_e( 'Please enter your license key to enable updates and support.', 'pbc' ); ?></p>
-							</div>
-						</div>
-					<?php endif; ?>
-				</div>
-
-				<!-- License Form -->
-				<form method="post" action="options.php" style="margin-top: 20px;">
-					<?php settings_fields( 'product-budget-configurator_license' ); ?>
-
-					<!-- License Key Field -->
-					<fieldset style="margin-bottom: 20px;">
-						<label class="block" for="product-budget-configurator_license_apikey" style="font-weight: 600; margin-bottom: 8px; display: block;">
-							<?php esc_html_e( 'License Key', 'pbc' ); ?>
-						</label>
-						<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-							<input 
-								type="text" 
-								id="product-budget-configurator_license_apikey" 
-								name="product-budget-configurator_license_apikey" 
-								value="<?php echo esc_attr( $license_key ); ?>" 
-								style="flex: 1; min-width: 300px; font-family: monospace; padding: 8px 12px;"
-								placeholder="<?php esc_attr_e( 'CTECH-XXXXX-XXXXX-XXXXX-XXXXX', 'pbc' ); ?>"
-								<?php echo $is_active ? 'readonly' : ''; ?>
-							/>
-							<?php if ( $is_active ) : ?>
-								<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap;">
-									<input type="checkbox" name="product-budget-configurator_license_deactivate_checkbox" value="on" />
-									<span><?php esc_html_e( 'Deactivate', 'pbc' ); ?></span>
-								</label>
-							<?php endif; ?>
-						</div>
-						<p class="description" style="margin-top: 5px;">
-							<?php
-							printf(
-								/* translators: %s: Purchase URL */
-								esc_html__( 'Enter your license key. You can find it in %s.', 'pbc' ),
-								'<a href="https://close.technology/my-account/" target="_blank">' . esc_html__( 'your account', 'pbc' ) . '</a>'
-							);
-							?>
-						</p>
-					</fieldset>
-
-					<!-- Submit Button -->
-					<div style="padding-top: 15px; border-top: 1px solid #ddd;">
-						<button type="submit" name="submit_license" class="button button-primary button-large">
-							<span class="dashicons dashicons-update" style="margin-top: 4px;"></span>
-							<?php echo $is_active ? esc_html__( 'Update License', 'pbc' ) : esc_html__( 'Activate License', 'pbc' ); ?>
-						</button>
-					</div>
-				</form>
-
-				<!-- License Benefits -->
-				<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 4px;">
-					<h3 style="margin-top: 0;"><?php esc_html_e( 'License Benefits', 'pbc' ); ?></h3>
-					<p><?php esc_html_e( 'An active license provides the following benefits:', 'pbc' ); ?></p>
-					<ul style="list-style: none; padding-left: 0;">
-						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Automatic plugin updates', 'pbc' ); ?></li>
-						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Access to new features', 'pbc' ); ?></li>
-						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Priority support', 'pbc' ); ?></li>
-						<li style="padding: 5px 0;"><span class="dashicons dashicons-yes" style="color: #46b450;"></span> <?php esc_html_e( 'Security patches', 'pbc' ); ?></li>
-					</ul>
-					<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-					<div style="font-size: 0.9em;">
-						<p><strong><?php esc_html_e( 'Need Help?', 'pbc' ); ?></strong></p>
-						<p>
-							<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank"><?php esc_html_e( 'Purchase License', 'pbc' ); ?> →</a><br>
-							<a href="https://close.technology/my-account/" target="_blank"><?php esc_html_e( 'My Account', 'pbc' ); ?> →</a><br>
-							<a href="https://close.technology/support/" target="_blank"><?php esc_html_e( 'Support', 'pbc' ); ?> →</a>
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-		<?php
-	}
 
 	/**
 	 * General Settings Meta Box Callback (deprecated, kept for compatibility)
@@ -675,7 +467,7 @@ class PBC_Admin_Plugin {
 	public function pbc_restart_process() {
 		// Verify nonce.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'pbc-nonce' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'pbc' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'product-budget-configurator' ) ) );
 		}
 
 		// Clear ALL PBC session data.
@@ -711,7 +503,7 @@ class PBC_Admin_Plugin {
 
 		wp_send_json_success(
 			array(
-				'message' => __( 'Process restarted successfully.', 'pbc' ),
+				'message' => __( 'Process restarted successfully.', 'product-budget-configurator' ),
 			)
 		);
 	}
