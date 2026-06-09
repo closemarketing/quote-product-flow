@@ -429,13 +429,15 @@ class CALC {
 	 */
 	public static function get_price_variation( $variation_id, $price_var ) {
 		$user  = wp_get_current_user();
-		$price = null;
+		$price = 0;
 
 		$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
 		if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
-			$price = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ), true );
-			if ( false === $price && isset( $pricegroup[0]['pbc_pricem'] ) ) {
-				$price = $pricegroup[0]['pbc_pricem'];
+			$found = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ), true );
+			if ( false !== $found && isset( $pricegroup[ $found ]['pbc_pricem'] ) ) {
+				$price = (float) $pricegroup[ $found ]['pbc_pricem'];
+			} elseif ( isset( $pricegroup[0]['pbc_pricem'] ) ) {
+				$price = (float) $pricegroup[0]['pbc_pricem'];
 				if ( ! empty( $user->roles ) ) {
 					$role_slug     = $user->roles[0];
 					$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
@@ -445,7 +447,7 @@ class CALC {
 				}
 			}
 		}
-		return $price;
+		return (float) $price;
 	}
 
 	/**
