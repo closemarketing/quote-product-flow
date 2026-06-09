@@ -88,6 +88,9 @@ Budgets are saved as custom posts (enquiries) and PDF files in `/wp-content/uplo
 == Changelog ==
 
 = 2.0.0 =
+* Performance: Preload variation posts, meta and taxonomy terms in batch before render loop, eliminating N+1 queries per variation (200+ plugin queries reduced to 3).
+* Fixed: PHP session lock released immediately after `session_start()` to prevent REST API timeouts.
+* Fixed: Safe access to `wp_count_posts()` result in `is_multiple_products()` to avoid `stdClass::$publish` notice.
 
 = 1.5.2 =
 * Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the PDF (filters `pbc_share_email_pdf_*`, `pbc_whatsapp_share_pdf_message`).

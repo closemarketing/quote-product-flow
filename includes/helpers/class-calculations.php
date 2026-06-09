@@ -211,7 +211,8 @@ class CALC {
 			'fields'         => 'ids',
 		);
 		$parent_phases = get_posts( $args );
-		$total_phases  = (int) wp_count_posts( 'phases' )->publish;
+		$counts       = wp_count_posts( 'phases' );
+		$total_phases  = isset( $counts->publish ) ? (int) $counts->publish : 0;
 
 		return count( $parent_phases ) !== $total_phases;
 	}
@@ -422,7 +423,7 @@ class CALC {
 	 */
 	public static function get_price_variation( $variation_id, $price_var ) {
 		$user  = wp_get_current_user();
-		$price = null;
+		$price = 0;
 
 		$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
 		if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
@@ -436,7 +437,7 @@ class CALC {
 				}
 			}
 		}
-		return $price;
+		return (float) $price;
 	}
 
 	/**

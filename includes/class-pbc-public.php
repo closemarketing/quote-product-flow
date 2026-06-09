@@ -35,8 +35,14 @@ class PBC_Public {
 	 * @return void
 	 */
 	public function pbc_configurator_session() {
+		// Skip session on REST API requests to avoid blocking HTTP requests.
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return;
+		}
 		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
 			session_start();
+			// Release session lock immediately so other requests are not blocked.
+			session_write_close();
 		}
 	}
 

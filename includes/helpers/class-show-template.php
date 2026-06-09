@@ -578,7 +578,30 @@ class PBC_Template {
 						}
 					}
 
-					$variations = get_posts( 'numberposts=-1&post_type=variation&meta_key=pbc_phase&meta_value=' . $phase_id . '&fields=ids&orderby=title&order=asc' );
+					$variations_posts = get_posts(
+						array(
+							'numberposts' => -1,
+							'post_type'   => 'variation',
+							'meta_key'    => 'pbc_phase',
+							'meta_value'  => $phase_id,
+							'orderby'     => 'title',
+							'order'       => 'asc',
+						)
+					);
+					// Preload posts, meta and terms into cache to avoid N+1 queries.
+					if ( ! empty( $variations_posts ) ) {
+						$variations = array_map( 'intval', wp_list_pluck( $variations_posts, 'ID' ) );
+						// Prime WP_Post object cache so get_the_title() hits no DB.
+						foreach ( $variations_posts as $vpost ) {
+							wp_cache_set( $vpost->ID, $vpost, 'posts' );
+						}
+						// Preload all post meta in one query.
+						update_postmeta_cache( $variations );
+						// Preload taxonomy terms in batch so wp_get_post_terms() hits no DB.
+						update_object_term_cache( $variations, 'variation' );
+					} else {
+						$variations = array();
+					}
 					if ( ! empty( $variations ) && isset( $_SESSION[ $pbc_session_key ] ) ) {
 						$variations_depends = array();
 						$variations_question_depends = array();

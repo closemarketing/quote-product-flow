@@ -23,6 +23,11 @@
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
+define( 'WPPBC_VERSION', '2.0.0-beta.1' );
+define( 'WPPBC_PLUGIN', __FILE__ );
+define( 'WPPBC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'WPPBC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+
 if ( ! defined( 'WPPBC_ITEM_NAME' ) ) {
 	define( 'WPPBC_ITEM_NAME', 'Product Budget Configurator' );
 }
