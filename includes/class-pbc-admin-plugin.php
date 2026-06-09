@@ -270,6 +270,7 @@ class PBC_Admin_Plugin {
 				</div>
 
 				<!-- Upgrade to Pro Card -->
+				<?php if ( ! apply_filters( 'pbc_is_pro', false ) ) : ?>
 				<div class="pbc-settings-container" style="margin-top: 20px;">
 					<div class="pbc-settings-card">
 						<div class="pbc-card-header">
@@ -284,6 +285,7 @@ class PBC_Admin_Plugin {
 						</div>
 					</div>
 				</div>
+				<?php endif; ?>
 
 				<!-- Save Button -->
 				<div class="pbc-settings-footer">
