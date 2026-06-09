@@ -422,7 +422,12 @@ class PBC_Helper_PostTypes {
 			</thead>
 			<tbody>
 				<?php
-				$price_rows = ! empty( $pbc_pricegroup ) ? $pbc_pricegroup : array( array( 'pbc_meaprice' => '', 'pbc_pricem' => '' ) );
+				$price_rows = ! empty( $pbc_pricegroup ) ? $pbc_pricegroup : array(
+					array(
+						'pbc_meaprice' => '',
+						'pbc_pricem' => '',
+					),
+				);
 				foreach ( $price_rows as $row ) :
 					$meaprice = isset( $row['pbc_meaprice'] ) ? $row['pbc_meaprice'] : '';
 					$pricem   = isset( $row['pbc_pricem'] ) ? $row['pbc_pricem'] : '';
@@ -491,7 +496,12 @@ class PBC_Helper_PostTypes {
 			</thead>
 			<tbody>
 				<?php
-				$imgprod_rows = ! empty( $pbc_imgprodgroup ) ? $pbc_imgprodgroup : array( array( 'pbc_depvarimgprod' => array(), 'pbc_imgprod' => array() ) );
+				$imgprod_rows = ! empty( $pbc_imgprodgroup ) ? $pbc_imgprodgroup : array(
+					array(
+						'pbc_depvarimgprod' => array(),
+						'pbc_imgprod' => array(),
+					),
+				);
 				foreach ( $imgprod_rows as $ri => $row ) :
 					$depvarimgprod = isset( $row['pbc_depvarimgprod'] ) ? (array) $row['pbc_depvarimgprod'] : array();
 					$imgprod_ids   = isset( $row['pbc_imgprod'] ) ? (array) $row['pbc_imgprod'] : array();
@@ -586,7 +596,13 @@ class PBC_Helper_PostTypes {
 				<?php
 				$qdep_rows = ! empty( $pbc_question_depends ) ? $pbc_question_depends : array();
 				if ( empty( $qdep_rows ) ) {
-					$qdep_rows = array( array( 'pbc_question_key_ref' => '', 'pbc_question_operator' => '>', 'pbc_question_value' => '' ) );
+					$qdep_rows = array(
+						array(
+							'pbc_question_key_ref' => '',
+							'pbc_question_operator' => '>',
+							'pbc_question_value' => '',
+						),
+					);
 				}
 				$operator_options = array(
 					'>'  => __( 'Greater than (>)', 'product-budget-configurator' ),
@@ -741,7 +757,7 @@ class PBC_Helper_PostTypes {
 			'pbc_field_type'          => 'sanitize_key',
 			'pbc_question_key'        => 'sanitize_key',
 			'pbc_question_input_type' => 'sanitize_key',
-			'pbc_question_placeholder'=> 'sanitize_text_field',
+			'pbc_question_placeholder' => 'sanitize_text_field',
 			'pbc_descopt'             => 'wp_kses_post',
 			'pbc_descvar'             => 'wp_kses_post',
 		);

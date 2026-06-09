@@ -232,9 +232,18 @@ class PBC_Admin_Plugin {
 								'dashicons-phone',
 								__( 'Support Contact', 'product-budget-configurator' ),
 								array(
-									array( 'type' => 'checkbox', 'label' => __( 'Enable support contact buttons in configurator', 'product-budget-configurator' ) ),
-									array( 'type' => 'text', 'label' => __( 'Support Phone Number', 'product-budget-configurator' ) ),
-									array( 'type' => 'text', 'label' => __( 'Support Email Address', 'product-budget-configurator' ) ),
+									array(
+										'type' => 'checkbox',
+										'label' => __( 'Enable support contact buttons in configurator', 'product-budget-configurator' ),
+									),
+									array(
+										'type' => 'text',
+										'label' => __( 'Support Phone Number', 'product-budget-configurator' ),
+									),
+									array(
+										'type' => 'text',
+										'label' => __( 'Support Email Address', 'product-budget-configurator' ),
+									),
 								)
 							);
 						}
@@ -252,14 +261,20 @@ class PBC_Admin_Plugin {
 								'dashicons-groups',
 								__( 'User Role Specific Options', 'product-budget-configurator' ),
 								array(
-									array( 'type' => 'table', 'label' => __( 'Role discounts and price visibility per user role', 'product-budget-configurator' ) ),
+									array(
+										'type' => 'table',
+										'label' => __( 'Role discounts and price visibility per user role', 'product-budget-configurator' ),
+									),
 								)
 							);
 							$this->render_pro_locked_card(
 								'dashicons-tag',
 								__( 'Bulk Price Updater', 'product-budget-configurator' ),
 								array(
-									array( 'type' => 'text', 'label' => __( 'Set the percentage to bulk update prices', 'product-budget-configurator' ) ),
+									array(
+										'type' => 'text',
+										'label' => __( 'Set the percentage to bulk update prices', 'product-budget-configurator' ),
+									),
 								)
 							);
 						}
@@ -532,11 +547,26 @@ class PBC_Admin_Plugin {
 				'dashicons-media-document',
 				__( 'PDF Configuration', 'product-budget-configurator' ),
 				array(
-					array( 'type' => 'text', 'label' => __( 'PDF Image Logo', 'product-budget-configurator' ) ),
-					array( 'type' => 'text', 'label' => __( 'PDF Image Header', 'product-budget-configurator' ) ),
-					array( 'type' => 'text', 'label' => __( 'PDF Image Footer', 'product-budget-configurator' ) ),
-					array( 'type' => 'text', 'label' => __( 'Color for Odd Rows', 'product-budget-configurator' ) ),
-					array( 'type' => 'text', 'label' => __( 'Color for Total', 'product-budget-configurator' ) ),
+					array(
+						'type' => 'text',
+						'label' => __( 'PDF Image Logo', 'product-budget-configurator' ),
+					),
+					array(
+						'type' => 'text',
+						'label' => __( 'PDF Image Header', 'product-budget-configurator' ),
+					),
+					array(
+						'type' => 'text',
+						'label' => __( 'PDF Image Footer', 'product-budget-configurator' ),
+					),
+					array(
+						'type' => 'text',
+						'label' => __( 'Color for Odd Rows', 'product-budget-configurator' ),
+					),
+					array(
+						'type' => 'text',
+						'label' => __( 'Color for Total', 'product-budget-configurator' ),
+					),
 				)
 			);
 		}
@@ -640,12 +670,6 @@ class PBC_Admin_Plugin {
 
 		return (int) $attachment_id;
 	}
-
-
-
-
-
-
 }
 
 new PBC_Admin_Plugin();

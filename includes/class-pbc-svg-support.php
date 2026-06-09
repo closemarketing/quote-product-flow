@@ -71,7 +71,7 @@ class PBC_SVG_Support {
 			return $upload;
 		}
 
-		$svg_content = file_get_contents( $file );
+		$svg_content = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		if ( ! $svg_content ) {
 			return $upload;
 		}
@@ -79,11 +79,11 @@ class PBC_SVG_Support {
 		$sanitized = $this->sanitize_svg( $svg_content );
 		if ( false === $sanitized ) {
 			$upload['error'] = 'SVG file is corrupted or invalid.';
-			unlink( $file );
+			wp_delete_file( $file );
 			return $upload;
 		}
 
-		file_put_contents( $file, $sanitized );
+		file_put_contents( $file, $sanitized ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		return $upload;
 	}
 
@@ -120,7 +120,7 @@ class PBC_SVG_Support {
 		libxml_clear_errors();
 
 		$dom = new DOMDocument();
-		if ( ! @$dom->loadXML( $svg, LIBXML_NONET ) ) {
+		if ( ! @$dom->loadXML( $svg, LIBXML_NONET ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 			libxml_use_internal_errors( $old_use_errors );
 			return false;
 		}
@@ -139,7 +139,7 @@ class PBC_SVG_Support {
 		// Remove event handlers and dangerous attributes.
 		$this->remove_dangerous_attributes( $dom );
 
-		return $dom->saveXML( $dom->documentElement ) ?: false;
+		return $dom->saveXML( $dom->documentElement ) ? $dom->saveXML( $dom->documentElement ) : false; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	}
 
 	/**
@@ -149,43 +149,44 @@ class PBC_SVG_Support {
 	 * @return void
 	 */
 	private function remove_dangerous_attributes( $node ) {
-		if ( $node->nodeType !== XML_ELEMENT_NODE ) {
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- PHP native DOM API
+		if ( XML_ELEMENT_NODE !== $node->nodeType ) {
 			return;
 		}
 
 		$to_remove = array();
 		if ( $node->hasAttributes() ) {
 			foreach ( $node->attributes as $attr ) {
-				$name  = strtolower( $attr->nodeName );
-				$value = $attr->nodeValue;
+				$name  = strtolower( $attr->nodeName ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$value = $attr->nodeValue; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 				// Remove all on* handlers.
 				if ( 0 === strpos( $name, 'on' ) ) {
-					$to_remove[] = $attr->nodeName;
+					$to_remove[] = $attr->nodeName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					continue;
 				}
 
 				// Remove javascript: URLs.
 				if ( false !== strpos( $value, 'javascript:' ) ) {
-					$to_remove[] = $attr->nodeName;
+					$to_remove[] = $attr->nodeName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					continue;
 				}
 
 				// Remove data: URLs (except image/* for inline images).
 				if ( false !== strpos( $value, 'data:' ) && false === strpos( $value, 'data:image/' ) ) {
-					$to_remove[] = $attr->nodeName;
+					$to_remove[] = $attr->nodeName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					continue;
 				}
 
 				// Remove vbscript: URLs.
 				if ( false !== strpos( $value, 'vbscript:' ) ) {
-					$to_remove[] = $attr->nodeName;
+					$to_remove[] = $attr->nodeName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					continue;
 				}
 
 				// Remove url() with external references in style attribute.
 				if ( 'style' === $name && ( false !== strpos( $value, 'url(' ) || false !== strpos( $value, 'expression(' ) ) ) {
-					$to_remove[] = $attr->nodeName;
+					$to_remove[] = $attr->nodeName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					continue;
 				}
 			}
@@ -198,7 +199,7 @@ class PBC_SVG_Support {
 
 		// Process child nodes.
 		if ( $node->hasChildNodes() ) {
-			foreach ( $node->childNodes as $child ) {
+			foreach ( $node->childNodes as $child ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				$this->remove_dangerous_attributes( $child );
 			}
 		}
