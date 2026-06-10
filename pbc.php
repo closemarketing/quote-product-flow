@@ -88,7 +88,7 @@ add_action(
 				<?php
 				printf(
 					/* translators: %s: Upgrade URL */
-					esc_html__( 'Unlock recommendations, PDF branding, role discounts, import/export and more. %s', 'product-budget-configurator' ),
+					esc_html__( 'Unlock recommendations, PDF branding, role discounts and more. %s', 'product-budget-configurator' ),
 					'<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank">' . esc_html__( 'Upgrade to Pro', 'product-budget-configurator' ) . '</a>'
 				);
 				?>

@@ -1,5 +1,5 @@
 === Product Budget Configurator ===
-Contributors: closemarketing, davidperez
+Contributors: closetechnology, davidperez
 Tags: configurator, budget, pricing, product, calculator
 Requires at least: 5.0
 Tested up to: 7.0

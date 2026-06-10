@@ -118,14 +118,6 @@ class PBC_Admin_Plugin {
 			)
 		);
 
-		wp_localize_script(
-			'pbc-admin-scripts',
-			'ajaxActionExportImport',
-			array(
-				'url'   => admin_url( 'admin-ajax.php' ),
-				'nonce' => wp_create_nonce( 'pbc_export_import_nonce' ),
-			)
-		);
 	}
 
 	/**
@@ -291,7 +283,7 @@ class PBC_Admin_Plugin {
 							<p class="description"><?php esc_html_e( 'Unlock powerful features with PBC Pro', 'product-budget-configurator' ); ?></p>
 						</div>
 						<div class="pbc-card-body">
-							<p><?php esc_html_e( 'Pro features include: PDF branding (logo, header, footer, custom colors), email notifications, support buttons, WhatsApp/email sharing, shareable URLs, role discounts, role price visibility, recommendations, import/export, bulk price updater, and enquiry management.', 'product-budget-configurator' ); ?></p>
+							<p><?php esc_html_e( 'Pro features include: PDF branding (logo, header, footer, custom colors), email notifications, support buttons, WhatsApp/email sharing, shareable URLs, role discounts, role price visibility, recommendations, bulk price updater, and enquiry management.', 'product-budget-configurator' ); ?></p>
 							<a href="https://close.technology/wordpress-plugins/product-budget-configurator/" target="_blank" class="button button-primary">
 								<?php esc_html_e( 'Upgrade to Pro', 'product-budget-configurator' ); ?>
 							</a>
@@ -326,7 +318,7 @@ class PBC_Admin_Plugin {
 		}
 		$status = '';
 		// Verify nonce.
-		if ( isset( $_POST['pbc_nonce'] ) && ! wp_verify_nonce( sanitize_key( $_POST['pbc_nonce'] ), 'pbc_nonce' ) ) {
+		if ( isset( $_POST['pbc_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['pbc_nonce'] ), 'pbc_nonce' ) ) {
 			wp_die( esc_html__( 'Security check failed. Please try again.', 'product-budget-configurator' ) );
 			return;
 		}
