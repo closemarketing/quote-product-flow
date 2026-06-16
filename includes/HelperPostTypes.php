@@ -1,6 +1,4 @@
 <?php
-namespace CLOSE\QProductFlow;
-
 /**
  * Class for Calculations
  *
@@ -9,6 +7,8 @@ namespace CLOSE\QProductFlow;
  * @copyright  2022 Closemarketing
  * @version    1.0
  */
+
+namespace CLOSE\QProductFlow;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -144,7 +144,6 @@ class HelperPostTypes {
 				'rewrite'            => false,
 			)
 		);
-
 	}
 
 	/**

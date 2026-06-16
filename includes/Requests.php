@@ -1,8 +1,4 @@
 <?php
-namespace CLOSE\QProductFlow;
-
-use CLOSE\QProductFlow\Helpers\Template;
-
 /**
  * Class Admin
  *
@@ -11,6 +7,8 @@ use CLOSE\QProductFlow\Helpers\Template;
  * @copyright  2022 Closemarketing
  * @version    1.0
  */
+
+namespace CLOSE\QProductFlow;
 
 defined( 'ABSPATH' ) || exit;
 

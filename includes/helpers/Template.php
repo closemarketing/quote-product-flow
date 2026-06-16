@@ -1,6 +1,4 @@
 <?php
-namespace CLOSE\QProductFlow\Helpers;
-
 /**
  * Show Template Wizard
  *
@@ -9,6 +7,8 @@ namespace CLOSE\QProductFlow\Helpers;
  * @copyright  2024 Closemarketing
  * @version    1.0
  */
+
+namespace CLOSE\QProductFlow\Helpers;
 
 defined( 'ABSPATH' ) || exit;
 

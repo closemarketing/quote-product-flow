@@ -1,6 +1,4 @@
 <?php
-namespace CLOSE\QProductFlow;
-
 /**
  * SVG Upload Support
  *
@@ -9,6 +7,8 @@ namespace CLOSE\QProductFlow;
  * @copyright  2024 Closemarketing
  * @version    1.0
  */
+
+namespace CLOSE\QProductFlow;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -207,4 +207,3 @@ class SvgSupport {
 		}
 	}
 }
-

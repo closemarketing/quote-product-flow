@@ -1,6 +1,4 @@
 <?php
-namespace CLOSE\QProductFlow;
-
 /**
  * Class Admin
  *
@@ -9,6 +7,8 @@ namespace CLOSE\QProductFlow;
  * @copyright  2022 Closemarketing
  * @version    1.0
  */
+
+namespace CLOSE\QProductFlow;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -318,6 +318,7 @@ class AdminPlugin {
 							<strong>
 								<?php
 								$done = get_option( 'qpfw_cpt_migration_done' );
+								// translators: %s is the plugin version number when migration ran.
 								echo $done ? esc_html( sprintf( __( 'Done (v%s)', 'quote-product-flow' ), $done ) ) : esc_html__( 'Pending', 'quote-product-flow' );
 								?>
 							</strong>

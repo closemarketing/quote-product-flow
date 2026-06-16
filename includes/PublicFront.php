@@ -1,8 +1,4 @@
 <?php
-namespace CLOSE\QProductFlow;
-
-use CLOSE\QProductFlow\Helpers\Template;
-
 /**
  * Public methods
  *
@@ -11,6 +7,8 @@ use CLOSE\QProductFlow\Helpers\Template;
  * @copyright  2023 Closemarketing
  * @version    1.0
  */
+
+namespace CLOSE\QProductFlow;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -141,4 +139,3 @@ class PublicFront {
 		Template::render( $qpfw_atts['pid'], $qpfw_atts['template'] );
 	}
 }
-
