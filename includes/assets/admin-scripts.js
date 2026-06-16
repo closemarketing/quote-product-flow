@@ -6,11 +6,11 @@ jQuery(document).ready(function($) {
 
 		$.ajax({
 			type: 'POST',
-			url: ajaxAction.url,
+			url: qpfwAjaxAction.url,
 			data: {
 				action: 'qpfw_enquiry_pdf',
 				post_id: post_id_pdf,
-				nonce: ajaxAction.pdf_nonce
+				nonce: qpfwAjaxAction.pdf_nonce
 			},
 			beforeSend: function() { $("#qpfw-pdf-"+post_id_pdf+".spinner").addClass("is-active"); },
 			complete: function() { $("#qpfw-pdf-"+post_id_pdf+".spinner").removeClass("is-active"); },
@@ -30,11 +30,11 @@ jQuery(document).ready(function($) {
 
 		$.ajax({
 			type: 'POST',
-			url: ajaxActionPrice.url,
+			url: qpfwAjaxActionPrice.url,
 			data: {
 				action: 'price_updater',
 				percentage: $("#qpfw-percentage-price").val(),
-				nonce: ajaxActionPrice.nonce
+				nonce: qpfwAjaxActionPrice.nonce
 			},
 			beforeSend: function() { 
 				$("#qpfw-price-updater-button.spinner").addClass("is-active");
@@ -228,13 +228,13 @@ jQuery(document).ready(function($) {
 		
 		// Get rendered HTML via AJAX (with dependency filtering).
 		$.ajax({
-			url: ajaxAction.url,
+			url: qpfwAjaxAction.url,
 			type: 'POST',
 			data: {
 				action: 'qpfw_render_recommendation_group',
 				var_id: varId,
 				var_name: varName,
-				nonce: ajaxAction.nonce
+				nonce: qpfwAjaxAction.nonce
 			},
 			success: function(response) {
 				if (response.success && response.data.html) {

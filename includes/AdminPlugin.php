@@ -102,7 +102,7 @@ class AdminPlugin {
 		);
 		wp_localize_script(
 			'qpfw-admin-scripts',
-			'ajaxAction',
+			'qpfwAjaxAction',
 			array(
 				'url'       => admin_url( 'admin-ajax.php' ),
 				'nonce'     => wp_create_nonce( 'qpfw_admin_nonce' ),
@@ -111,7 +111,7 @@ class AdminPlugin {
 		);
 		wp_localize_script(
 			'qpfw-admin-scripts',
-			'ajaxActionPrice',
+			'qpfwAjaxActionPrice',
 			array(
 				'url'   => admin_url( 'admin-ajax.php' ),
 				'nonce' => wp_create_nonce( 'qpfw_price_updater_nonce' ),
