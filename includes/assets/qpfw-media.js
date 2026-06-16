@@ -5,7 +5,7 @@ jQuery(function($){
 		event.preventDefault();
 
 		// Create unique frame name for each button
-		var frame_name = 'pbc_' + input_name;
+		var frame_name = 'qpfw_' + input_name;
 		
 		// check for media manager instance
 		if(wp.media.frames[frame_name]) {
@@ -39,11 +39,11 @@ jQuery(function($){
                 if(attachment.attributes.mime == 'image/jpeg' || attachment.attributes.mime == 'image/png' || attachment.attributes.mime == 'image/webp') {
                     var url = attachment.attributes.url;
                     $('input[name="' + input_name + '"]').val(url);
-                    $('input[name="' + input_name + '"]').parents('fieldset').find('.pbc_field_preview').html('<img src="' + url + '" alt="Image Preview" /><span class="pbc_field_preview_remove">&times;</span>');
+                    $('input[name="' + input_name + '"]').parents('fieldset').find('.qpfw_field_preview').html('<img src="' + url + '" alt="Image Preview" /><span class="qpfw_field_preview_remove">&times;</span>');
                     $('input[name="' + input_name + '"]').attr('data-imageId', attachment.attributes.id);
                 } else {
                     if(event == 'select') {
-                        alert(pbc_media_strings.no_image_selected);
+                        alert(qpfw_media_strings.no_image_selected);
                         return;
                     }
                 }
@@ -69,14 +69,14 @@ jQuery(function($){
 		});
 		wp.media.frames[frame_name].open();
 	});
-    $(document).on('click', '.pbc_field_preview_remove', function(event){
+    $(document).on('click', '.qpfw_field_preview_remove', function(event){
         var current_button = $(this);
         var input_name = current_button.parents('fieldset').find('input');
         input_name.val('');
         input_name.attr('data-imageId', '');
-        current_button.parents('fieldset').find('.pbc_field_preview').html('');
+        current_button.parents('fieldset').find('.qpfw_field_preview').html('');
     });
-    $(document).find('.pbc_color_picker').each(function(){
+    $(document).find('.qpfw_color_picker').each(function(){
         $(this).wpColorPicker();
     });
 });

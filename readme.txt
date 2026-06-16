@@ -1,4 +1,4 @@
-=== Product Budget Configurator ===
+=== Quote Product Flow ===
 Contributors: closetechnology, davidperez
 Tags: configurator, budget, pricing, product, calculator
 Requires at least: 5.0
@@ -12,7 +12,7 @@ Interactive step-by-step product configurator with dynamic pricing, budget gener
 
 == Description ==
 
-**Product Budget Configurator** lets you build an interactive, multi-step product configurator on your WordPress site. Customers walk through phases, pick variations, and receive a detailed budget — all without leaving the page.
+**Quote Product Flow** lets you build an interactive, multi-step product configurator on your WordPress site. Customers walk through phases, pick variations, and receive a detailed budget — all without leaving the page.
 
 = Features =
 
@@ -37,7 +37,7 @@ Interactive step-by-step product configurator with dynamic pricing, budget gener
 
 = Pro Features =
 
-Unlock additional power with [Product Budget Configurator Pro](https://close.technology/wordpress-plugins/product-budget-configurator/):
+Unlock additional power with [Quote Product Flow Pro](https://close.technology/wordpress-plugins/quote-product-flow/):
 
 * **Role-based discounts** — different prices per WordPress user role
 * **PDF branding** — custom logo, colors, and layout in generated PDFs
@@ -46,16 +46,16 @@ Unlock additional power with [Product Budget Configurator Pro](https://close.tec
 
 == Installation ==
 
-1. Upload the `product-budget-configurator` folder to `/wp-content/plugins/` or install via **Plugins > Add New**.
+1. Upload the `quote-product-flow` folder to `/wp-content/plugins/` or install via **Plugins > Add New**.
 2. Activate the plugin from the **Plugins** page.
 3. Go to **PBC** in the admin menu to configure settings.
-4. Add the shortcode `[product-budget-configurator]` to any page to display the configurator.
+4. Add the shortcode `[quote-product-flow]` to any page to display the configurator.
 
 == Frequently Asked Questions ==
 
 = How do I add the configurator to a page? =
 
-Add the shortcode `[product-budget-configurator]` to any page or post content.
+Add the shortcode `[quote-product-flow]` to any page or post content.
 
 = Can users select more than one option per step? =
 
@@ -93,7 +93,7 @@ Budgets are saved as custom posts (enquiries) and PDF files in `/wp-content/uplo
 * Fixed: Safe access to `wp_count_posts()` result in `is_multiple_products()` to avoid `stdClass::$publish` notice.
 
 = 1.5.2 =
-* Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the PDF (filters `pbc_share_email_pdf_*`, `pbc_whatsapp_share_pdf_message`).
+* Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the PDF (filters `pbc_share_email_pdf_*`, `qpfw_whatsapp_share_pdf_message`).
 * Improved: Configurator choice cards — max 4 per row with consistent cell width; mobile 2 columns.
 * Improved: Step navigation — 6 steps per row on desktop, better text contrast; PDF row text color on colored backgrounds.
 * Improved: PDF — centered logo; financial summary hidden when prices are off or subtotal is zero; filter `pbc_pdf_show_financial_summary`.
@@ -131,7 +131,7 @@ Budgets are saved as custom posts (enquiries) and PDF files in `/wp-content/uplo
 * Added: PDF saving and client data capture.
 * Added: Role-based price discounts.
 * Added: Price visibility toggle.
-* Removed: Template page option (use shortcode `[product-budget-configurator]`).
+* Removed: Template page option (use shortcode `[quote-product-flow]`).
 * Fixed: Dependencies and phase handling; image alpha/WebP.
 
 = 1.3.1 =

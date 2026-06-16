@@ -2,20 +2,20 @@ jQuery(function($){
 	// Function to toggle custom input fields based on selected variation.
 	function toggleCustomInputs() {
 		// Hide all custom input wrappers first.
-		$('.pbc-custom-input-wrapper').hide();
+		$('.qpfw-custom-input-wrapper').hide();
 		
 		// Show custom input for selected variation.
-		var selectedVariationId = $('input[type=radio].pbc_variation:checked').val();
+		var selectedVariationId = $('input[type=radio].qpfw_variation:checked').val();
 		if (selectedVariationId) {
 			// Find wrapper that contains this variation ID in its data attribute.
-			$('.pbc-custom-input-wrapper[data-variation-ids]').each(function() {
+			$('.qpfw-custom-input-wrapper[data-variation-ids]').each(function() {
 				var variationIds = $(this).attr('data-variation-ids').split(',');
 				if ($.inArray(selectedVariationId, variationIds) !== -1) {
 					var $inputWrapper = $(this);
 					$inputWrapper.show();
 					// Update the name attribute to match the selected variation.
-					var currentStep = $('input[name=pbc_current_phase]').val();
-					$inputWrapper.find('textarea').attr('name', 'pbc_custom_input[' + currentStep + '][' + selectedVariationId + ']');
+					var currentStep = $('input[name=qpfw_current_phase]').val();
+					$inputWrapper.find('textarea').attr('name', 'qpfw_custom_input[' + currentStep + '][' + selectedVariationId + ']');
 				}
 			});
 		}
@@ -24,31 +24,31 @@ jQuery(function($){
 	// Function to initialize number input controls.
 	function initNumberInputs() {
 		// Remove any existing handlers to prevent duplicates.
-		$(document).off('click', '.pbc-number-decrease');
-		$(document).off('click', '.pbc-number-increase');
+		$(document).off('click', '.qpfw-number-decrease');
+		$(document).off('click', '.qpfw-number-increase');
 		
 		// Handle decrease button click.
-		$(document).on('click', '.pbc-number-decrease', function(e) {
+		$(document).on('click', '.qpfw-number-decrease', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
-			var $input = $(this).siblings('.pbc-direct-input-number');
+			var $input = $(this).siblings('.qpfw-direct-input-number');
 			var currentValue = parseInt($input.val(), 10) || 0;
 			var newValue = Math.max(0, currentValue - 1);
 			$input.val(newValue);
 		});
 		
 		// Handle increase button click.
-		$(document).on('click', '.pbc-number-increase', function(e) {
+		$(document).on('click', '.qpfw-number-increase', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
-			var $input = $(this).siblings('.pbc-direct-input-number');
+			var $input = $(this).siblings('.qpfw-direct-input-number');
 			var currentValue = parseInt($input.val(), 10) || 0;
 			var newValue = currentValue + 1;
 			$input.val(newValue);
 		});
 		
 		// Ensure default value is 0 if empty.
-		$('.pbc-direct-input-number').each(function() {
+		$('.qpfw-direct-input-number').each(function() {
 			if ($(this).val() === '' || $(this).val() === null || $(this).val() === undefined) {
 				$(this).val('0');
 			}
@@ -61,18 +61,18 @@ jQuery(function($){
 	// Initialize number input controls.
 	initNumberInputs();
 
-	window.pbcSyncVerticalMultipleCards = function () {
-		$('.pbc-multiple-selections .pbc-checkbox-option').each(function () {
+	window.qpfwSyncVerticalMultipleCards = function () {
+		$('.qpfw-multiple-selections .qpfw-checkbox-option').each(function () {
 			var $lb = $(this);
-			$lb.toggleClass('pbc-option-active', $lb.find('.pbc-option-native').prop('checked'));
+			$lb.toggleClass('qpfw-option-active', $lb.find('.qpfw-option-native').prop('checked'));
 		});
 	};
-	window.pbcSyncVerticalMultipleCards();
-	$(document).on('change', '.pbc-multiple-selections .pbc-option-native', window.pbcSyncVerticalMultipleCards);
+	window.qpfwSyncVerticalMultipleCards();
+	$(document).on('change', '.qpfw-multiple-selections .qpfw-option-native', window.qpfwSyncVerticalMultipleCards);
 
 	// Variation selected (radio buttons - single selection).
-	$(document).on('click', 'input[type=radio].pbc_variation', function(){
-		var cPhase = $('input[name=pbc_current_phase]').val();
+	$(document).on('click', 'input[type=radio].qpfw_variation', function(){
+		var cPhase = $('input[name=qpfw_current_phase]').val();
 		
 		// Show recommendation button if we're on step 1 and a variation is selected.
 		if (parseInt(cPhase, 10) === 1) {
@@ -82,13 +82,13 @@ jQuery(function($){
 		// Toggle custom input fields.
 		toggleCustomInputs();
 		
-		var show_prices = PBCAjaxAction.show_prices;
+		var show_prices = QPFWAjaxAction.show_prices;
 		$('.phase_descvar .actived').addClass('hidden').removeClass('actived');
 		$('.phase_descvar .descvar_' + $(this).val() ).addClass('actived').removeClass('hidden');
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,  //server script to process data
+			url: QPFWAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
-			data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
+			data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=qpfw_variation_selected',
 			dataType: "html",
 			success: function(response) {
 				var resArr = response.split(';;--;;');
@@ -152,13 +152,13 @@ jQuery(function($){
 	});
 
 	// Variation selected (checkboxes - multiple selection).
-	$(document).on('change', 'input[type=checkbox].pbc_variation_multiple', function(){
-		var cPhase = $('input[name=pbc_current_phase]').val();
-		var show_prices = PBCAjaxAction.show_prices;
+	$(document).on('change', 'input[type=checkbox].qpfw_variation_multiple', function(){
+		var cPhase = $('input[name=qpfw_current_phase]').val();
+		var show_prices = QPFWAjaxAction.show_prices;
 		
 		// Show recommendation button if we're on step 1 and at least one variation is selected.
 		if (parseInt(cPhase, 10) === 1) {
-			var hasSelection = $('input[type=checkbox].pbc_variation_multiple:checked').length > 0;
+			var hasSelection = $('input[type=checkbox].qpfw_variation_multiple:checked').length > 0;
 			if (hasSelection) {
 				$('.recommendation').show();
 			} else {
@@ -176,9 +176,9 @@ jQuery(function($){
 		
 		// Update summary via AJAX.
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,
+			url: QPFWAjaxAction.ajax_url,
 			type: 'POST',
-			data: $('#configurator-form').serialize() + '&current_phase=' + cPhase + '&action=variation_selected',
+			data: $('#configurator-form').serialize() + '&current_phase=' + cPhase + '&action=qpfw_variation_selected',
 			dataType: "html",
 			success: function(response) {
 				var resArr = response.split(';;--;;');
@@ -243,19 +243,19 @@ jQuery(function($){
 	});
 
 	// Price variation selected.
-	$(document).on('click', 'select[class=pbc_pricevar]', function(){
-		$(this).parent().parent().find('input.pbc_variation').prop("checked", true);
+	$(document).on('click', 'select[class=qpfw_pricevar]', function(){
+		$(this).parent().parent().find('input.qpfw_variation').prop("checked", true);
 	});
 
 	// Price variation changed.
-	$(document).on('change', 'select[class=pbc_pricevar]', function(){
-		var cPhase = $('input[name=pbc_current_phase]').val();
-		var select_pricevar = $(this).parent().parent().find('input.pbc_variation');
-		var show_prices = PBCAjaxAction.show_prices;
+	$(document).on('change', 'select[class=qpfw_pricevar]', function(){
+		var cPhase = $('input[name=qpfw_current_phase]').val();
+		var select_pricevar = $(this).parent().parent().find('input.qpfw_variation');
+		var show_prices = QPFWAjaxAction.show_prices;
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,  //server script to process data
+			url: QPFWAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
-			data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=variation_selected',
+			data: $('#configurator-form').serialize()+'&current_phase='+cPhase+'&action=qpfw_variation_selected',
 			dataType: "html",
 			success: function(response) {
 					var resArr = response.split(';;--;;');
@@ -316,13 +316,13 @@ jQuery(function($){
 	});
 
 	// Load recommendation.
-	$(document).on('click', '#pbc-load-recommendation', function(e){
+	$(document).on('click', '#qpfw-load-recommendation', function(e){
 		e.preventDefault();
 		var button = $(this);
 		var originalText = button.text();
 		
 		// Get selected first variation (if any).
-		var $firstVariationRadio = $('input[type=radio].pbc_variation:checked');
+		var $firstVariationRadio = $('input[type=radio].qpfw_variation:checked');
 		
 		// Check if first variation is selected.
 		if ($firstVariationRadio.length === 0) {
@@ -336,16 +336,16 @@ jQuery(function($){
 		button.prop('disabled', true).text('Cargando...');
 		
 		// Get parent phase.
-		var parentPhase = $('input[name="pbc_parent_phase"]').val();
+		var parentPhase = $('input[name="qpfw_parent_phase"]').val();
 		
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,
+			url: QPFWAjaxAction.ajax_url,
 			type: 'POST',
 			data: {
-				action: 'pbc_get_recommendations',
+				action: 'qpfw_get_recommendations',
 				parent_phase: parentPhase,
 				first_variation: firstVariation,
-				nonce: PBCAjaxAction.recommendation_nonce
+				nonce: QPFWAjaxAction.recommendation_nonce
 			},
 			dataType: 'json',
 			success: function(response) {
@@ -353,7 +353,7 @@ jQuery(function($){
 					var recommendations = response.data.recommendations;
 					
 					// Get current step from the form.
-					var currentStep = parseInt($('input[name="pbc_current_phase"]').val(), 10) || 1;
+					var currentStep = parseInt($('input[name="qpfw_current_phase"]').val(), 10) || 1;
 					
 					// Start the process by clicking next and then applying recommendations.
 					startRecommendationProcess(recommendations, currentStep, button, originalText);
@@ -374,7 +374,7 @@ jQuery(function($){
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.error('PBC Recommendation AJAX Error:', {
+				console.error('QPFW Recommendation AJAX Error:', {
 					status: jqXHR.status,
 					statusText: jqXHR.statusText,
 					responseText: jqXHR.responseText,
@@ -439,7 +439,7 @@ jQuery(function($){
 			// Set up a listener for when the next step loads.
 			// We'll wait for the AJAX form submission to complete.
 			var checkInterval = setInterval(function() {
-				var newStep = parseInt($('input[name="pbc_current_phase"]').val(), 10);
+				var newStep = parseInt($('input[name="qpfw_current_phase"]').val(), 10);
 				
 				if (newStep === nextStep) {
 					// We reached the target step with recommendation.
@@ -478,7 +478,7 @@ jQuery(function($){
 			// Safety timeout: if step doesn't change properly in 10 seconds, stop.
 			setTimeout(function() {
 				clearInterval(checkInterval);
-				var finalStep = parseInt($('input[name="pbc_current_phase"]').val(), 10);
+				var finalStep = parseInt($('input[name="qpfw_current_phase"]').val(), 10);
 				if (finalStep !== nextStep) {
 					if (button && originalText) {
 						button.prop('disabled', false).text(originalText);
@@ -504,7 +504,7 @@ jQuery(function($){
 		var priceVar = recData.price_var;
 		
 		// Select the radio button.
-		var radioSelector = 'input[type=radio].pbc_variation[value="' + variationId + '"]';
+		var radioSelector = 'input[type=radio].qpfw_variation[value="' + variationId + '"]';
 		var $radio = $(radioSelector);
 		
 		if ($radio.length > 0) {
@@ -512,7 +512,7 @@ jQuery(function($){
 			
 			// If there's a price variation, select it.
 			if (priceVar) {
-				var priceVarSelector = 'select.pbc_pricevar[name="pbc_pricevar_' + variationId + '"]';
+				var priceVarSelector = 'select.qpfw_pricevar[name="qpfw_pricevar_' + variationId + '"]';
 				$(priceVarSelector).val(priceVar);
 			}
 			
@@ -574,7 +574,7 @@ jQuery(function($){
 		var priceVar = recData.price_var;
 		
 		// Select the radio button.
-		var radioSelector = 'input[type=radio].pbc_variation[value="' + variationId + '"]';
+		var radioSelector = 'input[type=radio].qpfw_variation[value="' + variationId + '"]';
 		var $radio = $(radioSelector);
 		
 		if ($radio.length > 0) {
@@ -582,7 +582,7 @@ jQuery(function($){
 			
 			// If there's a price variation, select it.
 			if (priceVar) {
-				var priceVarSelector = 'select.pbc_pricevar[name="pbc_pricevar_' + variationId + '"]';
+				var priceVarSelector = 'select.qpfw_pricevar[name="qpfw_pricevar_' + variationId + '"]';
 				$(priceVarSelector).val(priceVar);
 			}
 			
@@ -636,15 +636,15 @@ jQuery(function($){
 		e.preventDefault();
 		var next_phase = $('input[name=next_phase]').val();
 
-		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&submit='+submit_val+'&action=configurator_submit&pbc_template='+$('#configurator-form').data('template')+'&nonce='+PBCAjaxAction.nonce;
+		var formData = $('#'+form_id).serialize()+'&current_phase='+$('input[name=qpfw_current_phase]').val()+'&submit='+submit_val+'&action=qpfw_configurator_submit&qpfw_template='+$('#configurator-form').data('template')+'&nonce='+QPFWAjaxAction.nonce;
 
-		if (!thisButton.data('pbc-programmatic-next')) {
-			window.pbcAutoSkipCount = 0;
+		if (!thisButton.data('qpfw-programmatic-next')) {
+			window.qpfwAutoSkipCount = 0;
 		}
-		thisButton.removeData('pbc-programmatic-next');
+		thisButton.removeData('qpfw-programmatic-next');
 
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,  //server script to process data
+			url: QPFWAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
 			data: formData,
 			dataType: "html",
@@ -655,18 +655,18 @@ jQuery(function($){
 
 			setTimeout(function() {
 				var $pc = $('.page-configurator');
-				var hasVariations = $pc.find('input.pbc_variation').length > 0 ||
-					$pc.find('input.pbc_variation_multiple').length > 0 ||
-					$pc.find('select.pbc_variation option').length > 0;
-				var hasQuestions = $pc.find('.pbc_question_input').length > 0;
-				var hasDirectInput = $pc.find('.pbc-direct-input-wrapper').length > 0;
+				var hasVariations = $pc.find('input.qpfw_variation').length > 0 ||
+					$pc.find('input.qpfw_variation_multiple').length > 0 ||
+					$pc.find('select.qpfw_variation option').length > 0;
+				var hasQuestions = $pc.find('.qpfw_question_input').length > 0;
+				var hasDirectInput = $pc.find('.qpfw-direct-input-wrapper').length > 0;
 				var hasPhaseNote = $pc.find('.phase_note_top').length > 0 && $.trim($pc.find('.phase_note_top').text()) !== '';
 				var newNextPhase = $pc.find('input[name=next_phase]').val();
 
 				toggleCustomInputs();
 				initNumberInputs();
-				if (typeof window.pbcSyncVerticalMultipleCards === 'function') {
-					window.pbcSyncVerticalMultipleCards();
+				if (typeof window.qpfwSyncVerticalMultipleCards === 'function') {
+					window.qpfwSyncVerticalMultipleCards();
 				}
 
 				var canAutoSkip = newNextPhase &&
@@ -676,19 +676,19 @@ jQuery(function($){
 					!hasQuestions &&
 					!hasDirectInput &&
 					!hasPhaseNote &&
-					(typeof window.pbcAutoSkipCount === 'number' && window.pbcAutoSkipCount < 30);
+					(typeof window.qpfwAutoSkipCount === 'number' && window.qpfwAutoSkipCount < 30);
 
 				if (canAutoSkip) {
-					window.pbcAutoSkipCount = (window.pbcAutoSkipCount || 0) + 1;
+					window.qpfwAutoSkipCount = (window.qpfwAutoSkipCount || 0) + 1;
 					var $go = $pc.find('button[name=submit][value=' + submit_val + ']');
 					if ($go.length) {
-						$go.data('pbc-programmatic-next', 1);
+						$go.data('qpfw-programmatic-next', 1);
 						$go.trigger('click');
 					} else {
 						$pc.find('.status_loader.phase_detail_loader').html('').addClass('hidden');
 					}
 				} else {
-					window.pbcAutoSkipCount = 0;
+					window.qpfwAutoSkipCount = 0;
 					$pc.find('.status_loader.phase_detail_loader').html('').addClass('hidden');
 					if ($pc.find('.result_submit_action').length > 0) {
 						$pc.find('.result_submit_action').show().delay(3000).fadeOut(400);
@@ -697,11 +697,11 @@ jQuery(function($){
 			}, 100);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.error('PBC: AJAX Error!');
-				console.error('PBC: Status:', textStatus);
-				console.error('PBC: Error:', errorThrown);
-				console.error('PBC: Status Code:', jqXHR.status);
-				console.error('PBC: Response Text:', jqXHR.responseText);
+				console.error('QPFW: AJAX Error!');
+				console.error('QPFW: Status:', textStatus);
+				console.error('QPFW: Error:', errorThrown);
+				console.error('QPFW: Status Code:', jqXHR.status);
+				console.error('QPFW: Response Text:', jqXHR.responseText);
 				thisButton.prop('disabled', false);
 				alert('Error en la petición AJAX: ' + textStatus + '\nCódigo: ' + jqXHR.status + '\nPor favor, abre la consola del navegador (F12) para más detalles.');
 			}
@@ -714,9 +714,9 @@ jQuery(function($){
 		var form_id = 'configurator_login_form';
 
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,  //server script to process data
+			url: QPFWAjaxAction.ajax_url,  //server script to process data
 			type: 'POST',
-			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=pbc_current_phase]').val()+'&action=configurator_login',
+			data: $('#'+form_id).serialize()+'&current_phase='+$('input[name=qpfw_current_phase]').val()+'&action=qpfw_configurator_login',
 			dataType: "html",
 			success: function(response) {
 					var arr = response.split(';;-;;');
@@ -733,17 +733,17 @@ jQuery(function($){
 	});
 
 	// Share via WhatsApp: generates PDF and shares its download link (WhatsApp cannot attach files from browser).
-	$(document).on('click', '#pbc-share-whatsapp', function(e){
+	$(document).on('click', '#qpfw-share-whatsapp', function(e){
 		e.preventDefault();
 		var $btn = $(this);
 		if ($btn.hasClass('processing')) {
 			return;
 		}
-		var sessionKey = $('input[name=pbc_session_key]').val();
-		var parentPhase = $('input[name=pbc_parent_phase]').val();
+		var sessionKey = $('input[name=qpfw_session_key]').val();
+		var parentPhase = $('input[name=qpfw_parent_phase]').val();
 		var shareData = {
-			action: 'pbc_share_budget_pdf',
-			nonce: PBCAjaxAction.nonce,
+			action: 'qpfw_share_budget_pdf',
+			nonce: QPFWAjaxAction.nonce,
 			session_key: sessionKey,
 			parent_phase: parentPhase
 		};
@@ -757,7 +757,7 @@ jQuery(function($){
 		$btn.addClass('processing').prop('disabled', true);
 
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,
+			url: QPFWAjaxAction.ajax_url,
 			type: 'POST',
 			data: shareData,
 			dataType: 'json',
@@ -779,7 +779,7 @@ jQuery(function($){
 	});
 
 	// Share via Email.
-	$(document).on('click', '#pbc-share-email', function(e){
+	$(document).on('click', '#qpfw-share-email', function(e){
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -806,11 +806,11 @@ jQuery(function($){
 
 		$button.addClass('processing');
 
-		var sessionKey = $('input[name=pbc_session_key]').val();
-		var parentPhase = $('input[name=pbc_parent_phase]').val();
+		var sessionKey = $('input[name=qpfw_session_key]').val();
+		var parentPhase = $('input[name=qpfw_parent_phase]').val();
 		var emailData = {
 			action: 'send_config_email',
-			nonce: PBCAjaxAction.nonce,
+			nonce: QPFWAjaxAction.nonce,
 			session_key: sessionKey,
 			parent_phase: parentPhase,
 			recipient_email: recipientEmail
@@ -823,7 +823,7 @@ jQuery(function($){
 		});
 
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,
+			url: QPFWAjaxAction.ajax_url,
 			type: 'POST',
 			data: emailData,
 			dataType: 'json',
@@ -846,7 +846,7 @@ jQuery(function($){
 	});
 
 	// Restart process button.
-	$(document).on('click', '#pbc-restart-process', function(e){
+	$(document).on('click', '#qpfw-restart-process', function(e){
 		e.preventDefault();
 		
 		if (!confirm('¿Estás seguro de que quieres reiniciar el proceso? Se perderán todas las configuraciones actuales.')) {
@@ -860,11 +860,11 @@ jQuery(function($){
 		button.prop('disabled', true).text('Reiniciando...');
 		
 		$.ajax({
-			url: PBCAjaxAction.ajax_url,
+			url: QPFWAjaxAction.ajax_url,
 			type: 'POST',
 			data: {
-				action: 'pbc_restart_process',
-				nonce: PBCAjaxAction.nonce
+				action: 'qpfw_restart_process',
+				nonce: QPFWAjaxAction.nonce
 			},
 			dataType: 'json',
 			success: function(response) {
@@ -877,7 +877,7 @@ jQuery(function($){
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.error('PBC Restart Error:', {
+				console.error('QPFW Restart Error:', {
 					status: jqXHR.status,
 					statusText: jqXHR.statusText,
 					textStatus: textStatus,
@@ -890,7 +890,7 @@ jQuery(function($){
 	});
 
 	// Prevent question inputs from submitting form on Enter or arrow keys.
-	$(document).on('keydown', '.pbc_question_input', function(e) {
+	$(document).on('keydown', '.qpfw_question_input', function(e) {
 		// Prevent Enter key from submitting the form.
 		if (e.keyCode === 13 || e.which === 13) {
 			e.preventDefault();
@@ -909,12 +909,12 @@ jQuery(function($){
 	});
 
 	// Prevent blur/change events on question inputs from triggering anything.
-	$(document).on('change blur', '.pbc_question_input', function(e) {
+	$(document).on('change blur', '.qpfw_question_input', function(e) {
 		e.stopPropagation();
 	});
 
 	// Prevent clicking inside question input from triggering anything.
-	$(document).on('click focus', '.pbc_question_input', function(e) {
+	$(document).on('click focus', '.qpfw_question_input', function(e) {
 		e.stopPropagation();
 	});
 
@@ -927,7 +927,7 @@ jQuery(function($){
 		}
 		
 		// Check if there are any question inputs in the current phase.
-		var questionInputs = $('.pbc_question_input');
+		var questionInputs = $('.qpfw_question_input');
 		
 		if (questionInputs.length > 0) {
 			var allAnswered = true;
@@ -962,13 +962,13 @@ jQuery(function($){
 				e.stopPropagation();
 				alert('Por favor, responde todas las preguntas requeridas:\n- ' + missingRequired.join('\n- '));
 				// Focus on first empty required field.
-				$('.pbc_question_input.error-field').first().focus();
+				$('.qpfw_question_input.error-field').first().focus();
 				return false;
 			}
 		}
 		
 		// Check if there are any non-question variations that need selection.
-		var normalVariations = $('input[type=radio].pbc_variation');
+		var normalVariations = $('input[type=radio].qpfw_variation');
 		if (normalVariations.length > 0) {
 			var questionInputsCount = questionInputs.length;
 			// Only validate variations if there are no questions or if questions are optional.
@@ -986,7 +986,7 @@ jQuery(function($){
 
 	// Auto-focus first question input.
 	$(document).ready(function() {
-		var firstQuestion = $('.pbc_question_input:first');
+		var firstQuestion = $('.qpfw_question_input:first');
 		if (firstQuestion.length > 0) {
 			setTimeout(function() {
 				firstQuestion.focus();
@@ -995,7 +995,7 @@ jQuery(function($){
 	});
 
 	// Global variable to track target step for navigation.
-	window.pbcNavigationTarget = null;
+	window.qpfwNavigationTarget = null;
 
 	// Handle navigation steps clicks.
 	$(document).on('click', '.configurator_steps.clickable', function(e){
@@ -1003,7 +1003,7 @@ jQuery(function($){
 		e.stopPropagation();
 		
 		var targetStep = parseInt($(this).data('step'), 10);
-		var currentStep = parseInt($('input[name=pbc_current_phase]').val(), 10);
+		var currentStep = parseInt($('input[name=qpfw_current_phase]').val(), 10);
 		
 		// Only allow navigation to previous steps.
 		if (targetStep >= currentStep) {
@@ -1011,7 +1011,7 @@ jQuery(function($){
 		}
 		
 		// Set the target step globally.
-		window.pbcNavigationTarget = targetStep;
+		window.qpfwNavigationTarget = targetStep;
 		
 		// Start navigation by clicking prev button.
 		var $prevButton = $('button[name=submit][value=prev]');
@@ -1026,7 +1026,7 @@ jQuery(function($){
 	// Intercept the AJAX success to check navigation target.
 	$(document).ajaxSuccess(function(event, xhr, settings) {
 		// Only handle configurator submit actions.
-		if (settings.data && settings.data.indexOf('action=configurator_submit') !== -1) {
+		if (settings.data && settings.data.indexOf('action=qpfw_configurator_submit') !== -1) {
 			// Wait a bit for the DOM to update.
 			setTimeout(function() {
 				checkNavigationTarget();
@@ -1036,27 +1036,27 @@ jQuery(function($){
 	
 	// Function to check if we reached the target step.
 	function checkNavigationTarget() {
-		if (window.pbcNavigationTarget === null) {
+		if (window.qpfwNavigationTarget === null) {
 			return;
 		}
 		
-		var currentStep = parseInt($('input[name=pbc_current_phase]').val(), 10);
+		var currentStep = parseInt($('input[name=qpfw_current_phase]').val(), 10);
 		
 		// Check if we reached the target.
-		if (currentStep === window.pbcNavigationTarget) {
+		if (currentStep === window.qpfwNavigationTarget) {
 			// We reached the target, clear it.
-			window.pbcNavigationTarget = null;
+			window.qpfwNavigationTarget = null;
 			return;
 		}
 		
 		// Check if we went past the target (shouldn't happen, but just in case).
-		if (currentStep < window.pbcNavigationTarget) {
-			window.pbcNavigationTarget = null;
+		if (currentStep < window.qpfwNavigationTarget) {
+			window.qpfwNavigationTarget = null;
 			return;
 		}
 		
 		// We still need to go back more.
-		if (currentStep > window.pbcNavigationTarget) {
+		if (currentStep > window.qpfwNavigationTarget) {
 			var $prevButton = $('button[name=submit][value=prev]');
 			if ($prevButton.length > 0) {
 				// Continue navigating back.
@@ -1065,7 +1065,7 @@ jQuery(function($){
 				}, 100);
 			} else {
 				// No prev button found, stop.
-				window.pbcNavigationTarget = null;
+				window.qpfwNavigationTarget = null;
 			}
 		}
 	}

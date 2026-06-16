@@ -7,28 +7,28 @@
  */
 
 // Define plugin constants that are used throughout the codebase
-if (!defined('WPPBC_PLUGIN_URL')) {
-    define('WPPBC_PLUGIN_URL', 'http://localhost/wp-content/plugins/product-budget-configurator/');
+if (!defined('QPFW_PLUGIN_URL')) {
+    define('QPFW_PLUGIN_URL', 'http://localhost/wp-content/plugins/quote-product-flow/');
 }
 
-if ( !defined('WPPBC_PLUGIN_PATH') ) {
-    define('WPPBC_PLUGIN_PATH', '/path/to/wp-content/plugins/product-budget-configurator/');
+if ( !defined('QPFW_PLUGIN_PATH') ) {
+    define('QPFW_PLUGIN_PATH', '/path/to/wp-content/plugins/quote-product-flow/');
 }
 
-if (!defined('WPPBC_VERSION')) {
-    define('WPPBC_VERSION', '1.0.0');
+if (!defined('QPFW_VERSION')) {
+    define('QPFW_VERSION', '1.0.0');
 }
 
-if (!defined('WPPBC_PLUGIN')) {
-    define('WPPBC_PLUGIN', __FILE__);
+if (!defined('QPFW_PLUGIN')) {
+    define('QPFW_PLUGIN', __FILE__);
 }
 
-if (!defined('WPPBC_ITEM_NAME')) {
-    define('WPPBC_ITEM_NAME', 'Product Budget Configurator');
+if (!defined('QPFW_ITEM_NAME')) {
+    define('QPFW_ITEM_NAME', 'Quote Product Flow');
 }
 
-if (!defined('WPPBC_URL_API')) {
-    define('WPPBC_URL_API', 'https://close.technology/');
+if (!defined('QPFW_URL_API')) {
+    define('QPFW_URL_API', 'https://close.technology/');
 }
 
 
@@ -59,26 +59,26 @@ if (!function_exists('as_schedule_recurring_action')) {
     }
 }
 
-// Mock PBC license functions
-if (!function_exists('pbc_is_license_active')) {
+// Mock QPFW license functions
+if (!function_exists('qpfw_is_license_active')) {
     /**
-     * Check if PBC license is active.
-     * Mock pbc_is_license_active function for PHPStan analysis.
+     * Check if QPFW license is active.
+     * Mock qpfw_is_license_active function for PHPStan analysis.
      *
      * @return bool
      */
-    function pbc_is_license_active() {
+    function qpfw_is_license_active() {
         return true;
     }
 }
 
-if (!function_exists('pbc_is_license_registered')) {
+if (!function_exists('qpfw_is_license_registered')) {
     /**
-     * Check if PBC license is registered.
+     * Check if QPFW license is registered.
      *
      * @return bool
      */
-    function pbc_is_license_registered() {
+    function qpfw_is_license_registered() {
         return true;
     }
 }

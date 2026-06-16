@@ -1,4 +1,8 @@
 <?php
+namespace CLOSE\QProductFlow;
+
+use CLOSE\QProductFlow\Helpers\Template;
+
 /**
  * Class Admin
  *
@@ -10,25 +14,25 @@
 
 defined( 'ABSPATH' ) || exit;
 
-use Close\PBC\Helpers\CALC;
-use Close\PBC\Helpers\PDF;
+use CLOSE\QProductFlow\Helpers\CALC;
+use CLOSE\QProductFlow\Helpers\PDF;
 
 /**
  * Class for admin
  */
-class PBC_Requests {
+class Requests {
 	/**
 	 * Construct and intialize
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_variation_selected', array( $this, 'variation_selected_action_callback' ) );
-		add_action( 'wp_ajax_nopriv_variation_selected', array( $this, 'variation_selected_action_callback' ) );
+		add_action( 'wp_ajax_qpfw_variation_selected', array( $this, 'variation_selected_action_callback' ) );
+		add_action( 'wp_ajax_nopriv_qpfw_variation_selected', array( $this, 'variation_selected_action_callback' ) );
 
-		add_action( 'wp_ajax_configurator_submit', array( $this, 'configurator_submit_action_callback' ) );
-		add_action( 'wp_ajax_nopriv_configurator_submit', array( $this, 'configurator_submit_action_callback' ) );
+		add_action( 'wp_ajax_qpfw_configurator_submit', array( $this, 'configurator_submit_action_callback' ) );
+		add_action( 'wp_ajax_nopriv_qpfw_configurator_submit', array( $this, 'configurator_submit_action_callback' ) );
 
-		add_action( 'wp_ajax_configurator_login', array( $this, 'configurator_login_action_callback' ) );
-		add_action( 'wp_ajax_nopriv_configurator_login', array( $this, 'configurator_login_action_callback' ) );
+		add_action( 'wp_ajax_qpfw_configurator_login', array( $this, 'configurator_login_action_callback' ) );
+		add_action( 'wp_ajax_nopriv_qpfw_configurator_login', array( $this, 'configurator_login_action_callback' ) );
 	}
 
 	/**
@@ -37,15 +41,12 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function variation_selected_action_callback() {
-		// Verify nonce for AJAX request if provided.
-		if ( isset( $_REQUEST['nonce'] ) ) {
-			check_ajax_referer( 'pbc-nonce', 'nonce', false );
-		}
+		check_ajax_referer( 'qpfw-nonce', 'nonce' );
 
 		$current_phase = isset( $_REQUEST['current_phase'] ) ? (int) $_REQUEST['current_phase'] : 0;
-		$pbc_variation = isset( $_REQUEST['pbc_variation'] ) ? wp_unslash( $_REQUEST['pbc_variation'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$parent_phase  = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
-		$session_key   = 'pbc_variation_' . $parent_phase;
+		$qpfw_variation = isset( $_REQUEST['qpfw_variation'] ) ? wp_unslash( $_REQUEST['qpfw_variation'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$parent_phase  = isset( $_POST['qpfw_parent_phase'] ) ? (int) $_POST['qpfw_parent_phase'] : 0;
+		$session_key   = 'qpfw_variation_' . $parent_phase;
 		$option        = '';
 
 		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
@@ -60,8 +61,8 @@ class PBC_Requests {
 			);
 			die( 0 );
 		}
-		if ( ! empty( $pbc_variation ) && $current_phase && isset( $pbc_variation[ $current_phase ] ) ) {
-			$variation_data = $pbc_variation[ $current_phase ];
+		if ( ! empty( $qpfw_variation ) && $current_phase && isset( $qpfw_variation[ $current_phase ] ) ) {
+			$variation_data = $qpfw_variation[ $current_phase ];
 			$svar           = 0; // Initialize default value.
 
 			// Check if it's multiple selection (array) or single selection.
@@ -76,7 +77,7 @@ class PBC_Requests {
 
 				if ( ! empty( $selected_variations ) ) {
 					foreach ( $selected_variations as $var_id ) {
-						$pricevar     = isset( $_REQUEST[ "pbc_pricevar_$var_id" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$var_id" ] ) ) : null;
+						$pricevar     = isset( $_REQUEST[ "qpfw_pricevar_$var_id" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "qpfw_pricevar_$var_id" ] ) ) : null;
 						$var_price    = CALC::get_price_variation( $var_id, $pricevar );
 						$total_price += (float) $var_price;
 
@@ -97,11 +98,11 @@ class PBC_Requests {
 				if ( is_user_logged_in() ) {
 					$user_id                 = get_current_user_id();
 					$phase_param['var']      = $svar;
-					$phase_param['pricevar'] = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : '';
-					update_user_meta( $user_id, 'pbc_phase_' . $current_phase, $phase_param );
+					$phase_param['pricevar'] = isset( $_REQUEST[ "qpfw_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "qpfw_pricevar_$svar" ] ) ) : '';
+					update_user_meta( $user_id, 'qpfw_phase_' . $current_phase, $phase_param );
 							}
 
-				$pricevar = isset( $_REQUEST[ "pbc_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "pbc_pricevar_$svar" ] ) ) : null;
+				$pricevar = isset( $_REQUEST[ "qpfw_pricevar_$svar" ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ "qpfw_pricevar_$svar" ] ) ) : null;
 				$price    = CALC::get_price_variation( $svar, $pricevar );
 
 				$option_name = get_the_title( $svar );
@@ -154,10 +155,10 @@ class PBC_Requests {
 		$nonce_verified = false;
 
 		// Try to verify the form nonce first.
-		if ( isset( $_POST['pbc_template_wizard_nonce'] ) ) {
+		if ( isset( $_POST['qpfw_template_wizard_nonce'] ) ) {
 			$nonce_verified = wp_verify_nonce(
-				sanitize_text_field( wp_unslash( $_POST['pbc_template_wizard_nonce'] ) ),
-				'pbc_template_wizard_action'
+				sanitize_text_field( wp_unslash( $_POST['qpfw_template_wizard_nonce'] ) ),
+				'qpfw_template_wizard_action'
 			);
 		}
 
@@ -165,7 +166,7 @@ class PBC_Requests {
 		if ( ! $nonce_verified && isset( $_POST['nonce'] ) ) {
 			$nonce_verified = wp_verify_nonce(
 				sanitize_text_field( wp_unslash( $_POST['nonce'] ) ),
-				'pbc-nonce'
+				'qpfw-nonce'
 			);
 		}
 
@@ -190,9 +191,15 @@ class PBC_Requests {
 			$state_field    = ! empty( $_POST['state_field'] ) ? sanitize_text_field( wp_unslash( $_POST['state_field'] ) ) : '';
 			$comments_field = ! empty( $_POST['comments_field'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments_field'] ) ) : '';
 
+			$qpfw_session_data = array();
+			foreach ( $_SESSION as $session_key => $session_value ) {
+				if ( strpos( $session_key, 'qpfw_' ) === 0 ) {
+					$qpfw_session_data[ $session_key ] = $session_value;
+				}
+			}
 			$item = array_merge(
 				[
-					'pbc_contact' => [
+					'qpfw_contact' => [
 						'email'    => $email_field,
 						'name'     => $name_field,
 						'phone'    => $phone_field,
@@ -201,33 +208,33 @@ class PBC_Requests {
 						'comments' => $comments_field,
 					],
 				],
-				$_SESSION
+				$qpfw_session_data
 			);
 
-			$item['pbc_session_key']  = isset( $_POST['pbc_session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_session_key'] ) ) : '';
-			$item['pbc_parent_phase'] = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
+			$item['qpfw_session_key']  = isset( $_POST['qpfw_session_key'] ) ? sanitize_text_field( wp_unslash( $_POST['qpfw_session_key'] ) ) : '';
+			$item['qpfw_parent_phase'] = isset( $_POST['qpfw_parent_phase'] ) ? (int) $_POST['qpfw_parent_phase'] : 0;
 		}
 
 		if ( 'email_send' === $submit ) {
-			$_SESSION['pbc_output'] = CALC::configurator_result_email_send( $item );
+			$_SESSION['qpfw_output'] = CALC::configurator_result_email_send( $item );
 		} elseif ( 'generate_pdf' === $submit ) {
-			if ( apply_filters( 'pbc_save_enquiry', false, $item ) ) {
-				$item['pbc_enquiry'] = CALC::configurator_save_enquiry( $item );
+			if ( apply_filters( 'qpfw_save_enquiry', false, $item ) ) {
+				$item['qpfw_enquiry'] = CALC::configurator_save_enquiry( $item );
 			}
 			$pdf_url                = PDF::generate_engine_pdf( $item, 'url' );
-			$_SESSION['pbc_output'] = $pdf_url;
+			$_SESSION['qpfw_output'] = $pdf_url;
 		}
 
 		ob_start();
-		$parent_phase = isset( $_POST['pbc_parent_phase'] ) ? (int) $_POST['pbc_parent_phase'] : 0;
-		$template     = isset( $_POST['pbc_template'] ) ? sanitize_text_field( wp_unslash( $_POST['pbc_template'] ) ) : 'wizard';
+		$parent_phase = isset( $_POST['qpfw_parent_phase'] ) ? (int) $_POST['qpfw_parent_phase'] : 0;
+		$template     = isset( $_POST['qpfw_template'] ) ? sanitize_text_field( wp_unslash( $_POST['qpfw_template'] ) ) : 'wizard';
 
-		PBC_Template::render( $parent_phase, $template );
+		Template::render( $parent_phase, $template );
 		$all_details = ob_get_contents();
 		ob_end_clean();
 
 		// Don't use wp_kses_post as it strips scripts needed for AJAX response.
-		// The content is already escaped in PBC_Template::render().
+		// The content is already escaped in Template::render().
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $all_details;
 		die( 0 );
@@ -243,10 +250,7 @@ class PBC_Requests {
 	 * @return void
 	 */
 	public function configurator_login_action_callback() {
-		// Verify nonce for AJAX request if provided.
-		if ( isset( $_REQUEST['nonce'] ) ) {
-			check_ajax_referer( 'pbc-nonce', 'nonce', false );
-		}
+		check_ajax_referer( 'qpfw-nonce', 'nonce' );
 
 		$username = isset( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : '';
 		$password = isset( $_POST['password'] ) ? $_POST['password'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -272,4 +276,3 @@ class PBC_Requests {
 		die( 0 );
 	}
 }
-new PBC_Requests();

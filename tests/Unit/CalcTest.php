@@ -7,9 +7,9 @@
  * @package Product_Budget_Configurator
  */
 
-namespace Close\PBC\Tests\Unit;
+namespace CLOSE\QProductFlow\Tests\Unit;
 
-use Close\PBC\Helpers\CALC;
+use CLOSE\QProductFlow\Helpers\CALC;
 use WP_UnitTestCase;
 
 /**
@@ -80,13 +80,13 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_no_role() {
 		// Set global setting to yes.
-		update_option( 'pbc_show_prices_global', 'yes' );
+		update_option( 'qpfw_show_prices_global', 'yes' );
 
 		$result = CALC::get_show_prices_for_user( '' );
 		$this->assertEquals( 'yes', $result, 'Should return global setting when no role provided' );
 
 		// Clean up.
-		delete_option( 'pbc_show_prices_global' );
+		delete_option( 'qpfw_show_prices_global' );
 	}
 
 	/**
@@ -96,15 +96,15 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_with_role_setting() {
 		// Set global to no but specific role to yes.
-		update_option( 'pbc_show_prices_global', 'no' );
-		update_option( 'pbc_show_prices_user_administrator', 'yes' );
+		update_option( 'qpfw_show_prices_global', 'no' );
+		update_option( 'qpfw_show_prices_user_administrator', 'yes' );
 
 		$result = CALC::get_show_prices_for_user( 'administrator' );
 		$this->assertEquals( 'yes', $result, 'Should return role specific setting over global' );
 
 		// Clean up.
-		delete_option( 'pbc_show_prices_global' );
-		delete_option( 'pbc_show_prices_user_administrator' );
+		delete_option( 'qpfw_show_prices_global' );
+		delete_option( 'qpfw_show_prices_user_administrator' );
 	}
 
 	/**
@@ -114,13 +114,13 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_fallback_to_global() {
 		// Set only global setting.
-		update_option( 'pbc_show_prices_global', 'yes' );
+		update_option( 'qpfw_show_prices_global', 'yes' );
 
 		$result = CALC::get_show_prices_for_user( 'subscriber' );
 		$this->assertEquals( 'yes', $result, 'Should fall back to global when role has no specific setting' );
 
 		// Clean up.
-		delete_option( 'pbc_show_prices_global' );
+		delete_option( 'qpfw_show_prices_global' );
 	}
 
 	/**
@@ -130,7 +130,7 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_default_yes() {
 		// Make sure no settings exist.
-		delete_option( 'pbc_show_prices_global' );
+		delete_option( 'qpfw_show_prices_global' );
 
 		$result = CALC::get_show_prices_for_user( '' );
 		$this->assertEquals( 'yes', $result, 'Should default to yes when no settings exist' );
@@ -146,9 +146,9 @@ class CalcTest extends WP_UnitTestCase {
 		$post_id = $this->factory->post->create();
 
 		// Add some price meta fields.
-		add_post_meta( $post_id, 'pbc_price_1', '100.50' );
-		add_post_meta( $post_id, 'pbc_price_2', '50,25' );
-		add_post_meta( $post_id, 'pbc_price_3', '25.00' );
+		add_post_meta( $post_id, 'qpfw_price_1', '100.50' );
+		add_post_meta( $post_id, 'qpfw_price_2', '50,25' );
+		add_post_meta( $post_id, 'qpfw_price_3', '25.00' );
 
 		$total = CALC::get_total_from_enquiry( $post_id );
 

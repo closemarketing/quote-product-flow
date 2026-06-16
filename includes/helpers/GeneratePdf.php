@@ -8,12 +8,12 @@
  * @version    1.0
  */
 
-namespace Close\PBC\Helpers;
+namespace CLOSE\QProductFlow\Helpers;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Helper Calculate PBC.
+ * Helper Calculate QPFW.
  *
  * All helpers calculations.
  *
@@ -28,7 +28,7 @@ class PDF {
 	 * @return string|null
 	 */
 	public static function generate_engine_pdf( $item = array(), $type_return = 'path' ) {
-		$filename      = __( 'budget', 'product-budget-configurator' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
+		$filename      = __( 'budget', 'quote-product-flow' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
 		$dirname       = self::get_budget_base_dir( 'path' );
 		$filename_path = $dirname . $filename;
 
@@ -71,13 +71,13 @@ class PDF {
 	 */
 	public static function get_budget_base_dir( $type = 'path' ) {
 		$upload_dir = wp_upload_dir();
-		$dir_name   = $upload_dir['basedir'] . '/pbc/';
+		$dir_name   = $upload_dir['basedir'] . '/quote-product-flow/';
 		if ( ! file_exists( $dir_name ) ) {
 			wp_mkdir_p( $dir_name );
 		}
 
 		if ( 'url' === $type ) {
-			return $upload_dir['baseurl'] . '/pbc/';
+			return $upload_dir['baseurl'] . '/quote-product-flow/';
 		} else {
 			return $dir_name;
 		}
@@ -152,22 +152,22 @@ class PDF {
 	 * @return array
 	 */
 	public static function configurator_result_generate_pdf( $item = array() ) {
-		$parent_phase = isset( $item['pbc_parent_phase'] ) ? (int) $item['pbc_parent_phase'] : 0;
-		$session_key  = 'pbc_variation_' . $parent_phase;
-		$budget_date  = isset( $item['pbc_budget_date'] ) ? sanitize_text_field( $item['pbc_budget_date'] ) : gmdate( 'd-m-Y' );
+		$parent_phase = isset( $item['qpfw_parent_phase'] ) ? (int) $item['qpfw_parent_phase'] : 0;
+		$session_key  = 'qpfw_variation_' . $parent_phase;
+		$budget_date  = isset( $item['qpfw_budget_date'] ) ? sanitize_text_field( $item['qpfw_budget_date'] ) : gmdate( 'd-m-Y' );
 
 		if ( empty( $item[ $session_key ] ) || ! is_array( $item[ $session_key ] ) ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Configurator not ready!', 'product-budget-configurator' ),
+				'response' => __( 'Configurator not ready!', 'quote-product-flow' ),
 			);
 			return $result;
 		}
 		$total_vars       = count( $item[ $session_key ] );
 		$itemv            = $item[ $session_key ];
-		$contact          = isset( $item['pbc_contact'] ) ? $item['pbc_contact'] : array();
-		$background_color = apply_filters( 'pbc_pdf_odd_row_color', '#ffebcb' );
-		$background_total = apply_filters( 'pbc_pdf_total_row_color', '#835536' );
+		$contact          = isset( $item['qpfw_contact'] ) ? $item['qpfw_contact'] : array();
+		$background_color = apply_filters( 'qpfw_pdf_odd_row_color', '#ffebcb' );
+		$background_total = apply_filters( 'qpfw_pdf_total_row_color', '#835536' );
 
 		$summary_text_on_bg = self::pdf_text_color_on_background( $background_color );
 
@@ -200,44 +200,44 @@ class PDF {
 		table.pdf-logo-wrap{ width:100%; border-collapse:collapse; margin:0 0 12px 0; border:0; }
 		table.pdf-logo-wrap td{ border:0; padding:0; vertical-align:middle; }
 		</style>";
-		$logo_html = apply_filters( 'pbc_pdf_logo_html', '', $item );
+		$logo_html = apply_filters( 'qpfw_pdf_logo_html', '', $item );
 		if ( ! empty( $logo_html ) ) {
 			$output .= $logo_html;
 		}
-		$header_html = apply_filters( 'pbc_pdf_header_html', '', $item );
+		$header_html = apply_filters( 'qpfw_pdf_header_html', '', $item );
 		if ( ! empty( $header_html ) ) {
 			$output .= $header_html;
 		}
 		$output .= '<table class="product"><tr><td class="product-title">';
-		$output .= '<h1>' . esc_html__( 'Budget', 'product-budget-configurator' ) . '</h1>';
-		$output .= '<strong>' . esc_html__( 'Date', 'product-budget-configurator' ) . ':</strong> ' . $budget_date . '<br/>';
+		$output .= '<h1>' . esc_html__( 'Budget', 'quote-product-flow' ) . '</h1>';
+		$output .= '<strong>' . esc_html__( 'Date', 'quote-product-flow' ) . ':</strong> ' . $budget_date . '<br/>';
 
 		// Budget ID.
-		$budget_id = isset( $item['pbc_enquiry'] ) ? (int) $item['pbc_enquiry'] : 0;
+		$budget_id = isset( $item['qpfw_enquiry'] ) ? (int) $item['qpfw_enquiry'] : 0;
 		if ( ! empty( $budget_id ) ) {
-			$output .= '<strong>' . esc_html__( 'Budget ID', 'product-budget-configurator' ) . ':</strong> ' . $budget_id . '<br/>';
+			$output .= '<strong>' . esc_html__( 'Budget ID', 'quote-product-flow' ) . ':</strong> ' . $budget_id . '<br/>';
 		}
 
 		// Contact.
 		if ( ! empty( $contact['email'] ) ) {
-			$output .= '<p><strong>' . esc_html__( 'Contact', 'product-budget-configurator' ) . ': ' . $contact['name'] . '</strong>';
+			$output .= '<p><strong>' . esc_html__( 'Contact', 'quote-product-flow' ) . ': ' . $contact['name'] . '</strong>';
 			if ( ! empty( $contact['email'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'Email', 'product-budget-configurator' ) . ':</strong> ' . $contact['email'];
+				$output .= '<br/><strong>' . esc_html__( 'Email', 'quote-product-flow' ) . ':</strong> ' . $contact['email'];
 			}
 			if ( ! empty( $contact['phone'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'Phone', 'product-budget-configurator' ) . ':</strong> ' . $contact['phone'];
+				$output .= '<br/><strong>' . esc_html__( 'Phone', 'quote-product-flow' ) . ':</strong> ' . $contact['phone'];
 			}
 			if ( ! empty( $contact['city'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'City', 'product-budget-configurator' ) . ':</strong> ' . $contact['city'];
+				$output .= '<br/><strong>' . esc_html__( 'City', 'quote-product-flow' ) . ':</strong> ' . $contact['city'];
 			}
 			if ( ! empty( $contact['state'] ) ) {
-				$output .= '<br/><strong>' . esc_html__( 'State', 'product-budget-configurator' ) . ':</strong> ' . $contact['state'] . '';
+				$output .= '<br/><strong>' . esc_html__( 'State', 'quote-product-flow' ) . ':</strong> ' . $contact['state'] . '';
 			}
 			$output .= '</p>';
 		}
 
-		$output .= '<h2>' . esc_html__( 'Characteristics selected', 'product-budget-configurator' ) . '</h2>';
-		$output .= '<p>' . esc_html__( 'Lists of options selected:', 'product-budget-configurator' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
+		$output .= '<h2>' . esc_html__( 'Characteristics selected', 'quote-product-flow' ) . '</h2>';
+		$output .= '<p>' . esc_html__( 'Lists of options selected:', 'quote-product-flow' ) . '</p></td><td class="product-preview"><div class="image-wrap">';
 
 		// Flipped images.
 		$flipped                   = false;
@@ -287,7 +287,7 @@ class PDF {
 				$variation_id    = isset( $details['var']['id'] ) ? (int) $details['var']['id'] : 0;
 				$bg              = ( 0 === ( $i % 2 ) ) ? 'background' : '';
 
-				$variation_type = get_post_meta( $variation_id, 'pbc_field_type', true );
+				$variation_type = get_post_meta( $variation_id, 'qpfw_field_type', true );
 				$variation_type = ! empty( $details['var']['id'] ) ? $details['var']['type'] : $variation_type;
 				$var_price      = isset( $details['var']['price'] ) ? $details['var']['price'] : 0;
 				$price          = (float) str_replace( ',', '.', (string) $var_price );
@@ -320,7 +320,7 @@ class PDF {
 		// Financial block only when prices are allowed for this user/role and the config has a subtotal.
 		$include_financial_summary = $show_prices && $total_price > 0.00001;
 		$include_financial_summary = (bool) apply_filters(
-			'pbc_pdf_show_financial_summary',
+			'qpfw_pdf_show_financial_summary',
 			$include_financial_summary,
 			$item,
 			$total_price,
@@ -330,7 +330,7 @@ class PDF {
 		if ( $include_financial_summary ) {
 			// Summary.
 			$output .= '<br/><br/><table class="summary-total"><tr>';
-			$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'product-budget-configurator' ) . '</td>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Taxes', 'quote-product-flow' ) . '</td>';
 			$output .= '<td class="value right">';
 			if ( $tax > 0 ) {
 				$output .= number_format( $tax, 2, ',', '.' ) . ' €';
@@ -339,7 +339,7 @@ class PDF {
 			$output .= '</tr>';
 
 			// Subtotal.
-			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'product-budget-configurator' ) . '</td>';
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Subtotal', 'quote-product-flow' ) . '</td>';
 			$output .= '<td class="value right">';
 			if ( $total_price > 0 ) {
 				$output .= number_format( $total_price, 2, ',', '.' ) . ' €';
@@ -348,7 +348,7 @@ class PDF {
 			$output .= '</tr>';
 
 			// Quantity.
-			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'product-budget-configurator' ) . '</td>';
+			$output .= '<tr><td class="empty">&nbsp;</td><td class="title right">' . esc_html__( 'Quantity', 'quote-product-flow' ) . '</td>';
 			$output .= '<td class="value right">';
 			if ( $total_price > 0 ) {
 				$output .= number_format( $total_qty, 2, ',', '.' );
@@ -359,7 +359,7 @@ class PDF {
 			// Total.
 			$output .= '<tr>';
 			$color   = CALC::calculate_color_text( $background_total );
-			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'product-budget-configurator' ) . '</td>';
+			$output .= '<td class="empty">&nbsp;</td><td class="title right" style="background-color:' . $background_total . ';color:' . $color . ';">' . esc_html__( 'Total', 'quote-product-flow' ) . '</td>';
 			$output .= '<td class="value right" style="background-color:' . $background_total . ';color:' . $color . ';">';
 			if ( $total_pricevat > 0 ) {
 				$output .= number_format( $total_pricevat, 2, ',', '.' ) . ' €';
@@ -372,11 +372,11 @@ class PDF {
 		// Comments.
 		$comments = isset( $contact['comments'] ) ? sanitize_text_field( $contact['comments'] ) : '';
 		if ( ! empty( $comments ) ) {
-			$output .= '<table class="comments"><tr><td class="title"><p><strong>' . esc_html__( 'Comments', 'product-budget-configurator' ) . '</strong><br/>';
+			$output .= '<table class="comments"><tr><td class="title"><p><strong>' . esc_html__( 'Comments', 'quote-product-flow' ) . '</strong><br/>';
 			$output .= wp_kses_post( $comments ) . '</p></td></tr></table><br/>';
 		}
 
-		$footer_html = apply_filters( 'pbc_pdf_footer_html', '', $item );
+		$footer_html = apply_filters( 'qpfw_pdf_footer_html', '', $item );
 		if ( ! empty( $footer_html ) ) {
 			$output .= $footer_html;
 		}
@@ -435,13 +435,13 @@ class PDF {
 
 			if ( ! empty( $itemv[ $i ]['var']['id'] ) ) {
 				$ss_var       = $itemv[ $i ]['var']['id'];
-				$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
+				$imgprodgroup = get_post_meta( $ss_var, 'qpfw_imgprodgroup', true );
 
 				if ( ! empty( $imgprodgroup ) ) {
 					foreach ( $imgprodgroup as $deps ) {
-						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
+						if ( isset( $deps['qpfw_depvarimgprod'] ) && ! empty( $deps['qpfw_depvarimgprod'] ) && isset( $deps['qpfw_imgprod'] ) ) {
 							$prev_var = array();
-							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+							foreach ( $deps['qpfw_depvarimgprod'] as $depvarimgprod ) {
 								$arr = explode( '|', $depvarimgprod );
 								if ( ! empty( $arr[0] ) && ! empty( $arr[1] ) ) {
 									$prev_var[ (int) $arr[0] ][] = $arr[1];
@@ -451,12 +451,12 @@ class PDF {
 							foreach ( $itemv as $s_phase_key => $svariations ) {
 								if ( isset( $prev_var[ $s_phase_key ] ) &&
 									isset( $itemv[ $s_phase_key ]['var']['id'] ) && in_array( $itemv[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
-									$imgprodid = $deps['pbc_imgprod'][0];
+									$imgprodid = $deps['qpfw_imgprod'][0];
 									break 2;
 								}
 							}
-						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
-							$imgprodid = $deps['pbc_imgprod'][0];
+						} elseif ( ( ! isset( $deps['qpfw_depvarimgprod'] ) || empty( $deps['qpfw_depvarimgprod'] ) ) && isset( $deps['qpfw_imgprod'] ) ) {
+							$imgprodid = $deps['qpfw_imgprod'][0];
 							break;
 						}
 					}

@@ -1,5 +1,5 @@
 /* ===========================
-   PBC Settings - Modern Design
+   QPFW Settings - Modern Design
    =========================== */
 
 /* Notice con color negro */
@@ -13,13 +13,13 @@
 }
 
 /* Main Container */
-.pbc-settings-wrap {
+.qpfw-settings-wrap {
 	width: auto;
 	margin: 20px 20px 20px 0;
 }
 
 /* Header Section */
-.pbc-settings-header {
+.qpfw-settings-header {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: #fff;
 	padding: 30px 40px;
@@ -28,7 +28,7 @@
 	box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
-.pbc-settings-header h1 {
+.qpfw-settings-header h1 {
 	margin: 0 0 10px 0;
 	font-size: 32px;
 	font-weight: 600;
@@ -38,13 +38,13 @@
 	gap: 12px;
 }
 
-.pbc-settings-header h1 .dashicons {
+.qpfw-settings-header h1 .dashicons {
 	font-size: 36px;
 	width: 36px;
 	height: 36px;
 }
 
-.pbc-settings-subtitle {
+.qpfw-settings-subtitle {
 	margin: 0;
 	font-size: 16px;
 	opacity: 0.95;
@@ -52,29 +52,29 @@
 }
 
 /* Settings Container */
-.pbc-settings-container {
+.qpfw-settings-container {
 	display: flex;
 	flex-direction: column;
 	gap: 25px;
 }
 
 /* Two Column Layout */
-.pbc-two-columns {
+.qpfw-two-columns {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 25px;
 	align-items: start;
 }
 
-.pbc-column-left,
-.pbc-column-right {
+.qpfw-column-left,
+.qpfw-column-right {
 	display: flex;
 	flex-direction: column;
 	gap: 25px;
 }
 
 /* Card Styles */
-.pbc-settings-card {
+.qpfw-settings-card {
 	background: #fff;
 	border-radius: 12px;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -83,19 +83,19 @@
 	margin-bottom: 25px;
 }
 
-.pbc-settings-card:hover {
+.qpfw-settings-card:hover {
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 	transform: translateY(-2px);
 }
 
 /* Card Header */
-.pbc-card-header {
+.qpfw-card-header {
 	background: linear-gradient(to right, #f8f9fa, #e9ecef);
 	padding: 20px 30px;
 	border-bottom: 2px solid #e3e6ea;
 }
 
-.pbc-card-header h2 {
+.qpfw-card-header h2 {
 	margin: 0 0 5px 0;
 	font-size: 20px;
 	font-weight: 600;
@@ -105,26 +105,26 @@
 	gap: 10px;
 }
 
-.pbc-card-header h2 .dashicons {
+.qpfw-card-header h2 .dashicons {
 	color: #667eea;
 	font-size: 24px;
 	width: 24px;
 	height: 24px;
 }
 
-.pbc-card-header .description {
+.qpfw-card-header .description {
 	margin: 5px 0 0 34px;
 	color: #6c757d;
 	font-size: 13px;
 }
 
 /* Card Body */
-.pbc-card-body {
+.qpfw-card-body {
 	padding: 30px;
 }
 
 /* Form Grid Layout */
-.pbc-form-grid {
+.qpfw-form-grid {
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 20px;
@@ -175,7 +175,7 @@ input[type="text"],
 input[type="email"],
 input[type="number"],
 select,
-.pbc-select,
+.qpfw-select,
 textarea {
 	width: 100%;
 	padding: 10px 14px;
@@ -190,7 +190,7 @@ input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="number"]:focus,
 select:focus,
-.pbc-select:focus,
+.qpfw-select:focus,
 textarea:focus {
 	border-color: #667eea;
 	outline: none;
@@ -198,7 +198,7 @@ textarea:focus {
 }
 
 select,
-.pbc-select {
+.qpfw-select {
 	cursor: pointer;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
@@ -206,7 +206,7 @@ select,
 	padding-right: 36px;
 }
 
-.pbc_field {
+.qpfw_field {
 	width: 100%;
 }
 
@@ -235,7 +235,7 @@ button.select-image.select-image-selected:hover {
 }
 
 /* Image Preview */
-.pbc_field_preview {
+.qpfw_field_preview {
 	display: inline-block;
 	vertical-align: middle;
 	position: relative;
@@ -245,14 +245,14 @@ button.select-image.select-image-selected:hover {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.pbc_field_preview img {
+.qpfw_field_preview img {
 	margin-right: 0;
 	width: 100%;
 	max-width: 120px;
 	display: block;
 }
 
-.pbc_field_preview_remove {
+.qpfw_field_preview_remove {
 	position: absolute;
 	right: 5px;
 	top: 5px;
@@ -266,18 +266,18 @@ button.select-image.select-image-selected:hover {
 	transition: all 0.2s ease;
 }
 
-.pbc_field_preview:hover .pbc_field_preview_remove {
+.qpfw_field_preview:hover .qpfw_field_preview_remove {
 	display: block;
 }
 
-.pbc_field_preview_remove:hover {
+.qpfw_field_preview_remove:hover {
 	background: rgba(220, 53, 69, 1);
 	transform: scale(1.05);
 }
 
 /* Tables */
 .phases-lists-table,
-.pbc-roles-table {
+.qpfw-roles-table {
 	width: 100%;
 	border-collapse: separate;
 	border-spacing: 0;
@@ -290,15 +290,15 @@ button.select-image.select-image-selected:hover {
 
 .phases-lists-table th,
 .phases-lists-table td,
-.pbc-roles-table th,
-.pbc-roles-table td {
+.qpfw-roles-table th,
+.qpfw-roles-table td {
 	text-align: left;
 	padding: 14px 16px;
 	border-bottom: 1px solid #e9ecef;
 }
 
 .phases-lists-table th,
-.pbc-roles-table th {
+.qpfw-roles-table th {
 	background: rgb(102, 126, 234);
 	color: #fff;
 	font-weight: 600;
@@ -308,17 +308,17 @@ button.select-image.select-image-selected:hover {
 }
 
 .phases-lists-table tr:last-child td,
-.pbc-roles-table tr:last-child td {
+.qpfw-roles-table tr:last-child td {
 	border-bottom: none;
 }
 
 .phases-lists-table tr:nth-child(even) td,
-.pbc-roles-table tr:nth-child(even) td {
+.qpfw-roles-table tr:nth-child(even) td {
 	background: #f8f9fa;
 }
 
 .phases-lists-table tr:hover td,
-.pbc-roles-table tr:hover td {
+.qpfw-roles-table tr:hover td {
 	background: #e7f0ff;
 }
 
@@ -332,16 +332,16 @@ button.select-image.select-image-selected:hover {
 	text-align: center;
 }
 
-.pbc-roles-table input[type="text"] {
+.qpfw-roles-table input[type="text"] {
 	max-width: 100px;
 }
 
-.pbc-roles-table select {
+.qpfw-roles-table select {
 	max-width: 150px;
 }
 
 /* Footer / Save Bar */
-.pbc-settings-footer {
+.qpfw-settings-footer {
 	position: sticky;
 	bottom: 0;
 	background: linear-gradient(to top, #fff 0%, #fff 90%, rgba(255, 255, 255, 0) 100%);
@@ -351,7 +351,7 @@ button.select-image.select-image-selected:hover {
 	z-index: 10;
 }
 
-.pbc-settings-footer .button-hero {
+.qpfw-settings-footer .button-hero {
 	padding: 14px 40px;
 	font-size: 16px;
 	font-weight: 600;
@@ -367,12 +367,12 @@ button.select-image.select-image-selected:hover {
 	gap: 10px;
 }
 
-.pbc-settings-footer .button-hero:hover {
+.qpfw-settings-footer .button-hero:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
 }
 
-.pbc-settings-footer .button-hero .dashicons {
+.qpfw-settings-footer .button-hero .dashicons {
 	font-size: 20px;
 	width: 20px;
 	height: 20px;
@@ -382,7 +382,7 @@ button.select-image.select-image-selected:hover {
 }
 
 /* Price Updater Specific */
-#pbc-percentage-price {
+#qpfw-percentage-price {
 	max-width: 150px;
 	display: inline-block;
 	margin-right: 10px;
@@ -409,18 +409,18 @@ button.select-image.select-image-selected:hover {
 }
 
 /* License Specific Styles */
-.pbc-license-grid {
+.qpfw-license-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 20px;
 	margin-bottom: 20px;
 }
 
-.pbc-license-status {
+.qpfw-license-status {
 	margin: 0 0 20px;
 }
 
-.pbc-license-submit {
+.qpfw-license-submit {
 	padding: 10px 24px !important;
 	font-size: 14px !important;
 	font-weight: 600 !important;
@@ -434,13 +434,13 @@ button.select-image.select-image-selected:hover {
 	height: auto !important;
 }
 
-.pbc-license-submit:hover {
+.qpfw-license-submit:hover {
 	transform: translateY(-2px) !important;
 	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
 	color: #fff !important;
 }
 
-.pbc-status-badge {
+.qpfw-status-badge {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
@@ -452,18 +452,18 @@ button.select-image.select-image-selected:hover {
 	transition: all 0.3s ease;
 }
 
-.pbc-status-badge:hover {
+.qpfw-status-badge:hover {
 	transform: translateY(-1px);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.pbc-status-active {
+.qpfw-status-active {
 	background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
 	color: #155724;
 	border: 2px solid #28a745;
 }
 
-.pbc-status-active .dashicons {
+.qpfw-status-active .dashicons {
 	color: #28a745;
 	font-size: 20px;
 	width: 20px;
@@ -480,27 +480,27 @@ button.select-image.select-image-selected:hover {
 	}
 }
 
-.pbc-status-inactive {
+.qpfw-status-inactive {
 	background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
 	color: #721c24;
 	border: 2px solid #dc3545;
 }
 
-.pbc-status-inactive .dashicons {
+.qpfw-status-inactive .dashicons {
 	color: #dc3545;
 	font-size: 20px;
 	width: 20px;
 	height: 20px;
 }
 
-#pbc_license_product_id {
+#qpfw_license_product_id {
 	background: #f8f9fa;
 	cursor: not-allowed;
 	border-color: #ced4da;
 }
 
 /* License field styling */
-#pbc_license_license_key {
+#qpfw_license_license_key {
 	font-family: 'Courier New', monospace;
 	font-size: 13px;
 	letter-spacing: 0.5px;
@@ -508,13 +508,13 @@ button.select-image.select-image-selected:hover {
 	transition: all 0.3s ease;
 }
 
-#pbc_license_license_key:focus {
+#qpfw_license_license_key:focus {
 	background: #fff;
 	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* License card enhancements */
-.pbc-license-card .pbc-card-header h2 .dashicons {
+.qpfw-license-card .qpfw-card-header h2 .dashicons {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
@@ -523,29 +523,29 @@ button.select-image.select-image-selected:hover {
 }
 
 /* License status field */
-.pbc-license-status-field,
-.pbc-license-key-field {
+.qpfw-license-status-field,
+.qpfw-license-key-field {
 	background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%) !important;
 	border-left: 4px solid #667eea !important;
 	padding: 20px !important;
 	margin: 0 !important;
 }
 
-.pbc-license-status-field:hover,
-.pbc-license-key-field:hover {
+.qpfw-license-status-field:hover,
+.qpfw-license-key-field:hover {
 	background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
 	border-left-color: #764ba2 !important;
 }
 
 /* License actions row */
-.pbc-license-actions {
+.qpfw-license-actions {
 	display: flex;
 	align-items: center;
 	gap: 16px;
 	margin-top: 16px;
 }
 
-.pbc-license-deactivate-label {
+.qpfw-license-deactivate-label {
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -554,7 +554,7 @@ button.select-image.select-image-selected:hover {
 	cursor: pointer;
 }
 
-.pbc-license-deactivate-label input[type="checkbox"] {
+.qpfw-license-deactivate-label input[type="checkbox"] {
 	width: 16px;
 	height: 16px;
 	accent-color: #dc3545;
@@ -563,14 +563,14 @@ button.select-image.select-image-selected:hover {
 }
 
 /* Description links */
-.pbc-card-body .description a {
+.qpfw-card-body .description a {
 	color: #667eea;
 	text-decoration: none;
 	font-weight: 600;
 	transition: color 0.2s ease;
 }
 
-.pbc-card-body .description a:hover {
+.qpfw-card-body .description a:hover {
 	color: #764ba2;
 	text-decoration: underline;
 }
@@ -583,36 +583,36 @@ fieldset label.block .dashicons {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-	.pbc-two-columns {
+	.qpfw-two-columns {
 		grid-template-columns: 1fr;
 	}
 	
-	.pbc-license-grid {
+	.qpfw-license-grid {
 		grid-template-columns: 1fr;
 	}
 }
 
 @media (max-width: 768px) {
-	.pbc-license-grid {
+	.qpfw-license-grid {
 		grid-template-columns: 1fr;
 	}
-	.pbc-settings-header {
+	.qpfw-settings-header {
 		padding: 20px 25px;
 	}
 	
-	.pbc-settings-header h1 {
+	.qpfw-settings-header h1 {
 		font-size: 24px;
 	}
 	
-	.pbc-card-header {
+	.qpfw-card-header {
 		padding: 15px 20px;
 	}
 	
-	.pbc-card-body {
+	.qpfw-card-body {
 		padding: 20px;
 	}
 	
-	.pbc-form-grid {
+	.qpfw-form-grid {
 		gap: 15px;
 	}
 	
@@ -623,17 +623,17 @@ fieldset label.block .dashicons {
 }
 
 /* ---- Toggle Switch ---- */
-.pbc-toggle-row th {
+.qpfw-toggle-row th {
 	vertical-align: middle;
 }
 
-.pbc-toggle-wrap {
+.qpfw-toggle-wrap {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 }
 
-.pbc-toggle {
+.qpfw-toggle {
 	position: relative;
 	display: inline-block;
 	width: 44px;
@@ -641,7 +641,7 @@ fieldset label.block .dashicons {
 	flex-shrink: 0;
 }
 
-.pbc-toggle input[type="checkbox"] {
+.qpfw-toggle input[type="checkbox"] {
 	opacity: 0 !important;
 	width: 0 !important;
 	height: 0 !important;
@@ -652,7 +652,7 @@ fieldset label.block .dashicons {
 	box-shadow: none !important;
 }
 
-.pbc-toggle-slider {
+.qpfw-toggle-slider {
 	position: absolute;
 	inset: 0;
 	background: #ccd0d4;
@@ -661,7 +661,7 @@ fieldset label.block .dashicons {
 	transition: background 0.2s;
 }
 
-.pbc-toggle-slider::before {
+.qpfw-toggle-slider::before {
 	content: '';
 	position: absolute;
 	width: 18px;
@@ -674,20 +674,20 @@ fieldset label.block .dashicons {
 	box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-.pbc-toggle input:checked + .pbc-toggle-slider {
+.qpfw-toggle input:checked + .qpfw-toggle-slider {
 	background: #667eea;
 }
 
-.pbc-toggle input:checked + .pbc-toggle-slider::before {
+.qpfw-toggle input:checked + .qpfw-toggle-slider::before {
 	transform: translateX(20px);
 }
 
-.pbc-toggle input:focus + .pbc-toggle-slider {
+.qpfw-toggle input:focus + .qpfw-toggle-slider {
 	box-shadow: 0 0 0 3px rgba(102,126,234,0.25);
 }
 
 /* Tooltip */
-.pbc-tooltip {
+.qpfw-tooltip {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
@@ -697,7 +697,7 @@ fieldset label.block .dashicons {
 	line-height: 1;
 }
 
-.pbc-tooltip::after {
+.qpfw-tooltip::after {
 	content: attr(data-tip);
 	position: absolute;
 	left: 50%;
@@ -717,7 +717,7 @@ fieldset label.block .dashicons {
 	z-index: 9999;
 }
 
-.pbc-tooltip::before {
+.qpfw-tooltip::before {
 	content: '';
 	position: absolute;
 	left: 50%;
@@ -731,8 +731,8 @@ fieldset label.block .dashicons {
 	z-index: 9999;
 }
 
-.pbc-tooltip:hover::after,
-.pbc-tooltip:hover::before {
+.qpfw-tooltip:hover::after,
+.qpfw-tooltip:hover::before {
 	opacity: 1;
 }
 
@@ -766,7 +766,7 @@ fieldset label.block .dashicons {
 
 /* =============================================
    License Management Styles (Complete & Independent)
-   Based on FormsCRM but standalone for PBC
+   Based on FormsCRM but standalone for QPFW
    ============================================= */
 
 /* License Wrapper - Grid Layout */
@@ -977,7 +977,7 @@ fieldset label.block .dashicons {
 	border-top: 1px solid #e5e7eb;
 }
 
-/* Buttons - PBC Purple Gradient Style */
+/* Buttons - QPFW Purple Gradient Style */
 .formscrm-button {
 	display: inline-flex;
 	align-items: center;
@@ -1054,11 +1054,11 @@ fieldset label.block .dashicons {
 }
 
 /* Pro locked card */
-.pbc-pro-locked .pbc-card-header {
+.qpfw-pro-locked .qpfw-card-header {
 	background: linear-gradient(to right, #f8f9fa, #f0f0f0);
 }
 
-.pbc-pro-badge {
+.qpfw-pro-badge {
 	display: inline-block;
 	font-size: 10px;
 	font-weight: 700;
@@ -1071,18 +1071,18 @@ fieldset label.block .dashicons {
 	line-height: 1.6;
 }
 
-.pbc-pro-overlay-wrap {
+.qpfw-pro-overlay-wrap {
 	position: relative;
 }
 
-.pbc-pro-fields-preview {
+.qpfw-pro-fields-preview {
 	filter: blur(3px);
 	pointer-events: none;
 	user-select: none;
 	opacity: 0.5;
 }
 
-.pbc-pro-overlay {
+.qpfw-pro-overlay {
 	position: absolute;
 	inset: 0;
 	display: flex;
@@ -1097,14 +1097,14 @@ fieldset label.block .dashicons {
 	padding: 20px;
 }
 
-.pbc-pro-lock-icon {
+.qpfw-pro-lock-icon {
 	font-size: 36px !important;
 	width: 36px !important;
 	height: 36px !important;
 	color: #667eea;
 }
 
-.pbc-pro-overlay p {
+.qpfw-pro-overlay p {
 	margin: 0;
 	font-size: 14px;
 	font-weight: 600;

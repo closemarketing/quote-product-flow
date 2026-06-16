@@ -2,7 +2,7 @@
 
 ## Overview
 
-Product Budget Configurator uses a flexible license system based on the same approach as FrontBlocks PRO. The plugin functions even without an active license, while encouraging users to activate their license for full support and updates.
+Quote Product Flow uses a flexible license system based on the same approach as FrontBlocks PRO. The plugin functions even without an active license, while encouraging users to activate their license for full support and updates.
 
 ## License Configuration
 
@@ -86,12 +86,12 @@ add_filter( 'pbc_bypass_license_check', function( $bypass ) {
 
 The plugin provides several helper functions to check license status:
 
-### `pbc_is_license_active()`
+### `qpfw_is_license_active()`
 
 Returns `true` if license is active (or bypassed), `false` otherwise.
 
 ```php
-if ( pbc_is_license_active() ) {
+if ( qpfw_is_license_active() ) {
     // Do something for active licenses
 }
 ```
@@ -116,12 +116,12 @@ switch ( $status ) {
 }
 ```
 
-### `pbc_is_license_registered()`
+### `qpfw_is_license_registered()`
 
 Returns `true` if a license key is registered (regardless of activation status).
 
 ```php
-if ( pbc_is_license_registered() ) {
+if ( qpfw_is_license_registered() ) {
     // User has entered a license key
 }
 ```
@@ -224,7 +224,7 @@ Sites upgrading from v1.x will automatically use the new system:
 The plugin caches license checks for 12 hours. If you need to force a recheck:
 
 ```php
-delete_transient( 'pbc_license_last_check' );
+delete_transient( 'qpfw_license_last_check' );
 ```
 
 ## Support

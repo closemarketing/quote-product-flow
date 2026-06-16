@@ -1,4 +1,6 @@
 <?php
+namespace CLOSE\QProductFlow;
+
 /**
  * SVG Upload Support
  *
@@ -13,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Enable SVG uploads with sanitization for admin
  */
-class PBC_SVG_Support {
+class SvgSupport {
 	/**
 	 * Construct and initialize hooks
 	 */
@@ -206,4 +208,3 @@ class PBC_SVG_Support {
 	}
 }
 
-new PBC_SVG_Support();
