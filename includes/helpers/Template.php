@@ -364,15 +364,16 @@ class Template {
 						}
 
 						// Check if selection changed - if so, clear all subsequent steps.
-						$prev_vars        = isset( $_SESSION[ $qpfw_session_key ][ $key ]['vars'] ) && is_array( $_SESSION[ $qpfw_session_key ][ $key ]['vars'] ) ? $_SESSION[ $qpfw_session_key ][ $key ]['vars'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$prev_vars        = isset( $_SESSION[ $qpfw_session_key ][ $key ]['vars'] ) && is_array( $_SESSION[ $qpfw_session_key ][ $key ]['vars'] ) ? array_map( 'intval', $_SESSION[ $qpfw_session_key ][ $key ]['vars'] ) : array();
 						$prev_vars_sorted = $prev_vars;
 						sort( $prev_vars_sorted );
 						$selected_vars_sorted = $selected_variation_ids;
 						sort( $selected_vars_sorted );
 					if ( $prev_vars_sorted !== $selected_vars_sorted ) {
 							// Selection changed, clear all subsequent steps from session.
-						foreach ( $_SESSION[ $qpfw_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-								if ( (int) $step_key > (int) $key ) {
+						foreach ( array_keys( $_SESSION[ $qpfw_session_key ] ) as $step_key ) {
+								$step_key = (int) $step_key;
+								if ( $step_key > (int) $key ) {
 									unset( $_SESSION[ $qpfw_session_key ][ $step_key ] );
 									// Also clear user meta for logged in users.
 									if ( ! empty( $user_id ) ) {
@@ -384,7 +385,7 @@ class Template {
 
 						$_SESSION[ $qpfw_session_key ][ $key ]['phase']['id']   = $phase_id;
 						$_SESSION[ $qpfw_session_key ][ $key ]['phase']['name'] = $phase_title;
-						$_SESSION[ $qpfw_session_key ][ $key ]['vars']          = $selected_variation_ids; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$_SESSION[ $qpfw_session_key ][ $key ]['vars'] = $selected_variation_ids;
 						$_SESSION[ $qpfw_session_key ][ $key ]['var']['name']   = implode( ', ', $variation_names );
 						$_SESSION[ $qpfw_session_key ][ $key ]['var']['type']   = 'multiple';
 						$_SESSION[ $qpfw_session_key ][ $key ]['var']['price']  = $total_price;
@@ -407,9 +408,10 @@ class Template {
 					$prev_var_id = isset( $_SESSION[ $qpfw_session_key ][ $key ]['var']['id'] ) ? (int) $_SESSION[ $qpfw_session_key ][ $key ]['var']['id'] : 0;
 				if ( $prev_var_id > 0 && $prev_var_id !== $variation_id ) {
 						// Selection changed, clear all subsequent steps from session.
-					foreach ( $_SESSION[ $qpfw_session_key ] as $step_key => $step_data ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-						if ( (int) $step_key > (int) $key ) {
-								unset( $_SESSION[ $qpfw_session_key ][ $step_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					foreach ( array_keys( $_SESSION[ $qpfw_session_key ] ) as $step_key ) {
+						$step_key = (int) $step_key;
+						if ( $step_key > (int) $key ) {
+								unset( $_SESSION[ $qpfw_session_key ][ $step_key ] );
 								// Also clear user meta for logged in users.
 								if ( ! empty( $user_id ) ) {
 									delete_user_meta( $user_id, 'qpfw_phase_' . $step_key );
@@ -456,15 +458,15 @@ class Template {
 					$_SESSION[ $qpfw_session_key ][ $key ]['custom_input'][ $variation_id ] = $custom_input_value;
 					// Also append custom input to variation name if not empty.
 					if ( ! empty( $custom_input_value ) ) {
-						$_SESSION[ $qpfw_session_key ][ $key ]['var']['name'] .= ' (' . $custom_input_value . ')';
+						$_SESSION[ $qpfw_session_key ][ $key ]['var']['name'] .= ' (' . sanitize_text_field( $custom_input_value ) . ')';
 					}
 				}
 				}
 			}
 			if ( isset( $_SESSION[ $qpfw_session_key ] ) && is_array( $_SESSION[ $qpfw_session_key ] ) ) {
-				$session_data = $_SESSION[ $qpfw_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$session_data = wp_unslash( $_SESSION[ $qpfw_session_key ] );
 				ksort( $session_data, SORT_NUMERIC );
-				$_SESSION[ $qpfw_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$_SESSION[ $qpfw_session_key ] = $session_data;
 			}
 		} elseif ( isset( $_POST['qpfw_direct_input'] ) && 'next' === $_POST['submit'] ) {
 				// Handle direct input when there are no variations.
@@ -473,7 +475,7 @@ class Template {
 				}
 
 				// Save direct input values.
-				$direct_input_data = wp_unslash( $_POST['qpfw_direct_input'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$direct_input_data = wp_unslash( $_POST['qpfw_direct_input'] );
 				foreach ( $direct_input_data as $key => $direct_input_value ) {
 					$safe_key   = (int) $key;
 					// Get phase info to determine input type.
@@ -513,9 +515,9 @@ class Template {
 
 				// Sort session data.
 				if ( isset( $_SESSION[ $qpfw_session_key ] ) && is_array( $_SESSION[ $qpfw_session_key ] ) ) {
-					$session_data = $_SESSION[ $qpfw_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$session_data = wp_unslash( $_SESSION[ $qpfw_session_key ] );
 					ksort( $session_data, SORT_NUMERIC );
-					$_SESSION[ $qpfw_session_key ] = $session_data; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$_SESSION[ $qpfw_session_key ] = $session_data;
 				}
 			}
 		} elseif ( isset( $_GET['phase'] ) ) {
@@ -572,12 +574,12 @@ class Template {
 					<?php
 					$prev_variations_ids = array();
 					if ( isset( $_SESSION[ $qpfw_session_key ] ) && is_array( $_SESSION[ $qpfw_session_key ] ) ) {
-						$session_data = $_SESSION[ $qpfw_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$session_data = wp_unslash( $_SESSION[ $qpfw_session_key ] );
 						foreach ( $session_data as $step_key => $prev_var ) {
 							if ( isset( $prev_var['var']['id'] ) ) {
 								$var_id = (int) $prev_var['var']['id'];
 								// Use step_key - 1 as index to match with 0-based dependency checking.
-								$prev_variations_ids[ $step_key - 1 ] = $var_id;
+								$prev_variations_ids[ (int) $step_key - 1 ] = $var_id;
 							}
 						}
 					}
@@ -632,7 +634,9 @@ class Template {
 						}
 
 						// Get all question answers from global session.
-						$all_question_answers = isset( $_SESSION['qpfw_questions'] ) ? $_SESSION['qpfw_questions'] : array();
+						$all_question_answers = isset( $_SESSION['qpfw_questions'] ) && is_array( $_SESSION['qpfw_questions'] )
+							? array_map( 'sanitize_text_field', wp_unslash( $_SESSION['qpfw_questions'] ) )
+							: array();
 
 						$variations = array_filter(
 							$variations,
@@ -761,7 +765,7 @@ class Template {
 							isset( $_SESSION[ $qpfw_session_key ][ $cstep ]['vars'] ) &&
 							is_array( $_SESSION[ $qpfw_session_key ][ $cstep ]['vars'] )
 						) {
-							$selected_vars = array_map( 'intval', $_SESSION[ $qpfw_session_key ][ $cstep ]['vars'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+									$selected_vars = array_map( 'intval', $_SESSION[ $qpfw_session_key ][ $cstep ]['vars'] );
 							// Filter to only include valid variations.
 							$selected_vars = array_intersect( $selected_vars, $variations );
 						}
@@ -770,7 +774,7 @@ class Template {
 						isset( $_SESSION[ $qpfw_session_key ] ) &&
 						is_array( $_SESSION[ $qpfw_session_key ] ) &&
 						isset( $_SESSION[ $qpfw_session_key ][ $cstep ]['var']['id'] ) &&
-						in_array( (int) $_SESSION[ $qpfw_session_key ][ $cstep ]['var']['id'], $variations, true ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+							in_array( (int) $_SESSION[ $qpfw_session_key ][ $cstep ]['var']['id'], $variations, true )
 					) {
 						$selected_var = isset( $_SESSION[ $qpfw_session_key ][ $cstep ]['var']['id'] ) ? (int) $_SESSION[ $qpfw_session_key ][ $cstep ]['var']['id'] : 0;
 					} elseif ( ! empty( $non_question_variations ) ) {
@@ -991,7 +995,7 @@ class Template {
 							}
 						}
 					}
-					$session_var_for_image = isset( $_SESSION[ $qpfw_session_key ] ) && is_array( $_SESSION[ $qpfw_session_key ] ) ? $_SESSION[ $qpfw_session_key ] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$session_var_for_image = isset( $_SESSION[ $qpfw_session_key ] ) && is_array( $_SESSION[ $qpfw_session_key ] ) ? wp_unslash( $_SESSION[ $qpfw_session_key ] ) : array();
 					$imgprodurl            = ! empty( $ss_var ) ? CALC::get_image_variation_url( $session_var_for_image, $ss_var ) : '';
 
 					if ( $imgprodurl ) {
@@ -1130,7 +1134,7 @@ class Template {
 		if ( empty( $variations ) ) {
 			return array();
 		}
-		$session_data        = $_SESSION[ $qpfw_session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$session_data = wp_unslash( $_SESSION[ $qpfw_session_key ] );
 		$prev_variations_ids = array();
 		foreach ( $session_data as $step_key => $prev_var ) {
 			if ( isset( $prev_var['var']['id'] ) ) {

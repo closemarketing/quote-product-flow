@@ -79,10 +79,10 @@ class CALC {
 	 * @return bool
 	 */
 	public static function calculate_has_product_preview_image( $session_key ) {
-		if ( empty( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( empty( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
 			return false;
 		}
-		$sess = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$sess = wp_unslash( $_SESSION[ $session_key ] );
 		$to   = count( $sess ) + 1;
 		$ss_var = 0;
 

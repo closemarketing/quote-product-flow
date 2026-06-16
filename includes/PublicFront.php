@@ -27,24 +27,36 @@ class PublicFront {
 	 * Construct of Class
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'qpfw_configurator_session' ) );
+		add_action( 'template_redirect', array( $this, 'maybe_start_session' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_shortcode( 'quote-product-flow', array( $this, 'qpfw_configurator' ) );
 	}
 
 	/**
-	 * Creates session
+	 * Start a PHP session only on pages that contain the configurator shortcode.
+	 *
+	 * Using template_redirect (instead of init) ensures the current post content
+	 * is available so we can check for the shortcode, avoiding site-wide sessions
+	 * that break server-level page caching (Nginx, Varnish, etc.).
 	 *
 	 * @return void
 	 */
-	public function qpfw_configurator_session() {
-		// Skip session on REST API requests to avoid blocking HTTP requests.
+	public function maybe_start_session() {
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			return;
 		}
-		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
+		if ( PHP_SESSION_ACTIVE === session_status() ) {
+			return;
+		}
+		global $post;
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+		if ( ! has_shortcode( $post->post_content, 'quote-product-flow' ) ) {
+			return;
+		}
+		if ( ! headers_sent() ) {
 			session_start();
-			// Release session lock immediately so other requests are not blocked.
 			session_write_close();
 		}
 	}

@@ -34,9 +34,6 @@ class AdminPlugin {
 
 		add_filter( 'disable_months_dropdown', array( $this, 'disable_months_dropdown' ), 10, 2 );
 
-		add_action( 'wp_ajax_qpfw_enquiry_pdf', array( $this, 'qpfw_enquiry_pdf' ) );
-		add_action( 'wp_ajax_nopriv_qpfw_enquiry_pdf', array( $this, 'qpfw_enquiry_pdf' ) );
-
 		add_action( 'wp_ajax_qpfw_restart_process', array( $this, 'qpfw_restart_process' ) );
 		add_action( 'wp_ajax_nopriv_qpfw_restart_process', array( $this, 'qpfw_restart_process' ) );
 
@@ -65,9 +62,10 @@ class AdminPlugin {
 			return;
 		}
 
+		$pro_post_types = apply_filters( 'qpfw_is_pro', false ) ? array( 'qpfw_enquiry' ) : array();
 		$is_qpfw_screen = 'qpfw_menu' === $screen->parent_base
 			|| 'toplevel_page_qpfw_menu' === $screen->base
-			|| in_array( $screen->post_type, array( 'qpfw_variation', 'qpfw_phases', 'qpfw_enquiry' ), true );
+			|| in_array( $screen->post_type, array_merge( array( 'qpfw_variation', 'qpfw_phases' ), $pro_post_types ), true );
 
 		if ( ! $is_qpfw_screen ) {
 			return;

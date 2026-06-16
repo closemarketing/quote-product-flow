@@ -197,7 +197,7 @@ class SHOW {
 					// Get saved answer from session if exists.
 					$saved_answer = '';
 					if ( isset( $_SESSION['qpfw_questions'][ $question_key ] ) ) {
-						$saved_answer = $_SESSION['qpfw_questions'][ $question_key ];
+						$saved_answer = sanitize_text_field( wp_unslash( (string) $_SESSION['qpfw_questions'][ $question_key ] ) );
 					}
 
 					$input_type  = 'number' === $question_input_type ? 'number' : 'text';
