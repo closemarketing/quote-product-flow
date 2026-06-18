@@ -866,6 +866,80 @@ class HelperPostTypes {
 	}
 
 	/**
+	 * Add columns for Phases
+	 *
+	 * @param array $phases_columns Columns.
+	 * @return array
+	 */
+	public function add_new_phases_columns( $phases_columns ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		// Parameter required by WordPress filter hook.
+		unset( $phases_columns );
+		$new_columns['cb']         = '<input type="checkbox" />';
+		$new_columns['title']      = __( 'Phase', 'quote-product-flow' );
+		$new_columns['menu_order'] = __( 'Order', 'quote-product-flow' );
+		$new_columns['variations'] = __( 'Variations', 'quote-product-flow' );
+		$new_columns['shortcode']  = __( 'Shortcode', 'quote-product-flow' );
+
+		return $new_columns;
+	}
+
+	/**
+	 * Manages columns for Budget
+	 *
+	 * @param string  $column_name Name of the column.
+	 * @param integer $id Post ID.
+	 * @return void
+	 */
+	public function manage_phases_columns( $column_name, $id ) {
+		$post        = get_post( $id );
+		$is_multiple = CALC::is_multiple_products();
+
+		switch ( $column_name ) {
+			case 'menu_order':
+				echo isset( $post->menu_order ) ? esc_html( $post->menu_order ) : '';
+				break;
+			case 'variations':
+				// Count variations for this phase.
+				$variations = get_posts(
+					array(
+						'post_type'      => 'qpfw_variation',
+						'posts_per_page' => -1,
+						'meta_key'       => 'qpfw_phase',
+						'meta_value'     => $id,
+						'fields'         => 'ids',
+					)
+				);
+				$count      = ! empty( $variations ) ? count( $variations ) : 0;
+
+				// Create link to variations filtered by this phase.
+				$url = add_query_arg(
+					array(
+						'post_type'         => 'qpfw_variation',
+						'qpfw_filter_phase' => $id,
+					),
+					admin_url( 'edit.php' )
+				);
+
+				if ( $count > 0 ) {
+					echo '<a href="' . esc_url( $url ) . '" title="' . esc_attr__( 'View variations of this phase', 'quote-product-flow' ) . '">';
+					echo esc_html( $count );
+					echo '</a>';
+				} else {
+					echo esc_html( $count );
+				}
+				break;
+			case 'shortcode':
+				$post_parent = $post->post_parent;
+				if ( empty( $post_parent ) && $is_multiple ) {
+					echo '<input type="text" value="[quote-product-flow pid=' . (int) $id . ']" readonly style="min-width:130px"/>';
+				}
+				break;
+			default:
+				break;
+		} // end switch
+	}
+
+	/**
 	 * Add columns for Variations
 	 *
 	 * @param array $phases_columns Columns.

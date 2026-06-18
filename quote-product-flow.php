@@ -117,11 +117,13 @@ use CLOSE\QProductFlow\SvgSupport;
 add_action(
 	'plugins_loaded',
 	function () {
+		// Post types must be registered on every request.
+		new HelperPostTypes();
+
 		// Always load admin.
 		if ( is_admin() ) {
 			new SvgSupport();
 			new AdminPlugin();
-			new HelperPostTypes();
 		}
 
 		// Always load frontend files.
