@@ -240,7 +240,7 @@ Las variaciones-pregunta tienen clases especiales:
 .pbc_question_input:required { /* Campo requerido */ }
 ```
 
-Puedes personalizarlos en `pbc-configurator.css`
+Puedes personalizarlos en `qpfw-configurator.css`
 
 ## Diferencias con el Enfoque Anterior
 
@@ -507,7 +507,7 @@ if ( ! $should_advance ) {
 El sistema incluye protección contra el auto-salto de fases que contienen preguntas:
 
 ```javascript
-// En pbc-configurator.js - después de cargar respuesta AJAX
+// En qpfw-configurator.js - después de cargar respuesta AJAX
 var hasVariations = $('.page-configurator').find('input.pbc_variation').length > 0;
 var hasQuestions = $('.page-configurator').find('.pbc_question_input').length > 0;
 

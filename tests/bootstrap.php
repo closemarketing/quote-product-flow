@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPUnit bootstrap file for Product Budget Configurator
+ * PHPUnit bootstrap file for Quote Product Flow
  *
  * @package Product_Budget_Configurator
  */
@@ -18,20 +18,20 @@ if ( ! defined( 'WP_CORE_DIR' ) ) {
 }
 
 // Define plugin constants that are used throughout the codebase.
-if ( ! defined( 'WPPBC_VERSION' ) ) {
-	define( 'WPPBC_VERSION', '1.0.0' );
+if ( ! defined( 'QPFW_VERSION' ) ) {
+	define( 'QPFW_VERSION', '1.0.0' );
 }
 
-if ( ! defined( 'WPPBC_PLUGIN_URL' ) ) {
-	define( 'WPPBC_PLUGIN_URL', 'http://localhost/wp-content/plugins/product-budget-configurator/' );
+if ( ! defined( 'QPFW_PLUGIN_URL' ) ) {
+	define( 'QPFW_PLUGIN_URL', 'http://localhost/wp-content/plugins/quote-product-flow/' );
 }
 
-if ( ! defined( 'WPPBC_PLUGIN' ) ) {
-	define( 'WPPBC_PLUGIN', TESTS_PLUGIN_DIR . '/pbc.php' );
+if ( ! defined( 'QPFW_PLUGIN' ) ) {
+	define( 'QPFW_PLUGIN', TESTS_PLUGIN_DIR . '/quote-product-flow.php' );
 }
 
-if ( ! defined( 'WPPBC_PLUGIN_PATH' ) ) {
-	define( 'WPPBC_PLUGIN_PATH', TESTS_PLUGIN_DIR . '/' );
+if ( ! defined( 'QPFW_PLUGIN_PATH' ) ) {
+	define( 'QPFW_PLUGIN_PATH', TESTS_PLUGIN_DIR . '/' );
 }
 
 // Give access to tests_add_filter() function.
@@ -59,7 +59,7 @@ function _manually_load_plugin() {
 	require TESTS_PLUGIN_DIR . '/vendor/autoload.php';
 
 	// Load the plugin.
-	require TESTS_PLUGIN_DIR . '/pbc.php';
+	require TESTS_PLUGIN_DIR . '/quote-product-flow.php';
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );

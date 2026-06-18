@@ -8,39 +8,54 @@
  * @version    1.0
  */
 
+namespace CLOSE\QProductFlow;
+
 defined( 'ABSPATH' ) || exit;
 
-use Close\PBC\Helpers\CALC;
+use CLOSE\QProductFlow\Helpers\CALC;
+use CLOSE\QProductFlow\Helpers\Template;
 
 /**
  * Public classes.
  *
  * @since 1.4.0
  */
-class PBC_Public {
+class PublicFront {
 
 	/**
 	 * Construct of Class
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'pbc_configurator_session' ) );
+		add_action( 'template_redirect', array( $this, 'maybe_start_session' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_shortcode( 'pbc', array( $this, 'pbc_configurator' ) );
+		add_shortcode( 'quote-product-flow', array( $this, 'qpfw_configurator' ) );
 	}
 
 	/**
-	 * Creates session
+	 * Start a PHP session only on pages that contain the configurator shortcode.
+	 *
+	 * Using template_redirect (instead of init) ensures the current post content
+	 * is available so we can check for the shortcode, avoiding site-wide sessions
+	 * that break server-level page caching (Nginx, Varnish, etc.).
 	 *
 	 * @return void
 	 */
-	public function pbc_configurator_session() {
-		// Skip session on REST API requests to avoid blocking HTTP requests.
+	public function maybe_start_session() {
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			return;
 		}
-		if ( PHP_SESSION_NONE === session_status() && ! headers_sent() ) {
+		if ( PHP_SESSION_ACTIVE === session_status() ) {
+			return;
+		}
+		global $post;
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+		if ( ! has_shortcode( $post->post_content, 'quote-product-flow' ) ) {
+			return;
+		}
+		if ( ! headers_sent() ) {
 			session_start();
-			// Release session lock immediately so other requests are not blocked.
 			session_write_close();
 		}
 	}
@@ -52,25 +67,25 @@ class PBC_Public {
 	 */
 	public function enqueue_scripts() {
 		wp_register_style(
-			'pbc-public',
-			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.css',
+			'qpfw-public',
+			QPFW_PLUGIN_URL . 'includes/assets/qpfw-configurator.css',
 			array(),
-			WPPBC_VERSION
+			QPFW_VERSION
 		);
 
 		// Support buttons styles.
 		wp_register_style(
-			'pbc-support-buttons',
-			WPPBC_PLUGIN_URL . 'includes/assets/support-buttons-sticky.css',
-			array( 'pbc-public' ),
-			WPPBC_VERSION
+			'qpfw-support-buttons',
+			QPFW_PLUGIN_URL . 'includes/assets/support-buttons-sticky.css',
+			array( 'qpfw-public' ),
+			QPFW_VERSION
 		);
 
 		wp_register_script(
-			'pbc-public',
-			WPPBC_PLUGIN_URL . 'includes/assets/pbc-configurator.js',
+			'qpfw-public',
+			QPFW_PLUGIN_URL . 'includes/assets/qpfw-configurator.js',
 			array( 'jquery' ),
-			WPPBC_VERSION,
+			QPFW_VERSION,
 			true
 		);
 
@@ -80,14 +95,14 @@ class PBC_Public {
 		$show_prices  = CALC::get_show_prices_for_user( $user_role );
 
 		wp_localize_script(
-			'pbc-public',
-			'PBCAjaxAction',
+			'qpfw-public',
+			'QPFWAjaxAction',
 			array(
 				'ajax_url'             => admin_url( 'admin-ajax.php' ),
-				'assets_loading'       => WPPBC_PLUGIN_URL . 'includes/assets/img/loading.gif',
+				'assets_loading'       => QPFW_PLUGIN_URL . 'includes/assets/img/loading.gif',
 				'show_prices'          => $show_prices,
-				'nonce'                => wp_create_nonce( 'pbc-nonce' ),
-				'recommendation_nonce' => wp_create_nonce( 'pbc_recommendation_nonce' ),
+				'nonce'                => wp_create_nonce( 'qpfw-nonce' ),
+				'recommendation_nonce' => wp_create_nonce( 'qpfw_recommendation_nonce' ),
 				'debug'                => defined( 'WP_DEBUG' ) && WP_DEBUG,
 			)
 		);
@@ -99,7 +114,7 @@ class PBC_Public {
 	 * @param array $atts Shortcode attributes.
 	 * @return void
 	 */
-	public function pbc_configurator( $atts = array() ) {
+	public function qpfw_configurator( $atts = array() ) {
 		// Don't render if we're in the Gutenberg editor.
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			return;
@@ -111,19 +126,17 @@ class PBC_Public {
 			}
 		}
 		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
-		wp_enqueue_style( 'pbc-public' );
-		wp_enqueue_style( 'pbc-support-buttons' );
-		wp_enqueue_script( 'pbc-public' );
+		wp_enqueue_style( 'qpfw-public' );
+		wp_enqueue_style( 'qpfw-support-buttons' );
+		wp_enqueue_script( 'qpfw-public' );
 
-		$pbc_atts = shortcode_atts(
+		$qpfw_atts = shortcode_atts(
 			array(
 				'pid'      => 0,
 				'template' => 'wizard', // wizard, vertical.
 			),
 			$atts,
 		);
-		PBC_Template::render( $pbc_atts['pid'], $pbc_atts['template'] );
+		Template::render( $qpfw_atts['pid'], $qpfw_atts['template'] );
 	}
 }
-
-new PBC_Public();

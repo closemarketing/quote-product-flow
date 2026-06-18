@@ -1,80 +1,109 @@
-=== Product Budget Configurator ===
-Contributors: closemarketing, davidperez
-Tags: budget, configurator
-Requires at least: 4.0
-Tested up to: 6.0
-Stable tag: 1.5.3
+=== Quote Product Flow ===
+Contributors: closetechnology, davidperez
+Tags: configurator, budget, pricing, product, calculator
+Requires at least: 5.0
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 2.0.0
+License: GPL-2.0+
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Creates a configurator with all variables.
+Interactive step-by-step product configurator with dynamic pricing, budget generation, and email notifications.
 
 == Description ==
 
-Product Budget Configurator is a powerful WordPress plugin that allows you to create interactive product configurators with multiple phases, variations, and pricing options.
+**Quote Product Flow** lets you build an interactive, multi-step product configurator on your WordPress site. Customers walk through phases, pick variations, and receive a detailed budget — all without leaving the page.
 
-= Key Features =
+= Features =
 
-* **Interactive Configurator**: Step-by-step wizard for product configuration
-* **Multiple Selection**: Allow users to select multiple variations per phase with checkboxes
-* **Hierarchical Products**: Support for multiple products with parent-child relationships
-* **Dynamic Pricing**: Prices per role with discount support
-* **PDF Generation**: Generate and email professional budget PDFs
-* **Image Preview**: Real-time visual preview of selected options
-* **Support Buttons**: Always-visible contact buttons for technical support (phone & email)
-* **Price Visibility**: Control price display per user role
-* **Customizable**: Custom colors, headers, footers, and styling options
-* **Email Notifications**: Send configuration details to clients and administrators
-* **Custom Input Fields**: Add custom input fields to variations and phases
-* **Direct Input Fields**: Add input fields directly to phases without variations (textarea, text, or number with increment/decrement buttons)
+* **Step-by-step wizard** — guide users through configurable phases
+* **Multiple selection per phase** — allow checkbox-style multi-variation selection
+* **Dynamic pricing** — per-variation prices summed in real time
+* **Custom input fields** — attach a textarea to any variation ("Other / specify")
+* **Direct phase inputs** — add text, textarea, or number inputs directly to a phase (no variations needed)
+* **Question mode** — convert a variation into a numeric/text question; answer feeds into dependencies
+* **Dependencies** — show or hide variations based on previous selections
+* **Image preview** — real-time visual preview of selected options
+* **PDF budget generation** — create and email a professional PDF budget
+* **Email notifications** — send configuration details to the client and admin
+* **Support contact buttons** — sticky phone and email buttons throughout the configurator
+* **WhatsApp & email sharing** — share the budget PDF link via WhatsApp or attach it to an email
+* **Import / Export** — CSV import and export of phases and variations
+* **Recommended configurations** — one-click auto-fill based on first-phase selection
+* **Price visibility control** — show or hide prices per user role
+* **Custom colors, header, and footer** — style the configurator to match your brand
+* **Admin budget editor** — manually create or edit budget lines in the enquiry post type
+* **SVG support** — upload SVG files as variation icons
 
-= Multiple Selection Feature =
+= Pro Features =
 
-Enable multiple variations selection per phase, allowing users to select multiple options at once:
-* **Checkbox Mode**: Users can select multiple variations in a single phase
-* **Real-time Updates**: Selected variations appear instantly in the configuration summary
-* **Combined Display**: Multiple selections are displayed as comma-separated names (e.g., "Albañil, Electricista, Otro")
-* **Price Calculation**: Prices from all selected variations are automatically summed
-* **Easy Configuration**: Enable multiple selection mode per phase via the phase settings
+Unlock additional power with [Quote Product Flow Pro](https://close.technology/wordpress-plugins/quote-product-flow/):
 
-To enable: Edit a phase and check the "Allow Multiple Selections" option.
-
-= Support Contact Feature =
-
-Enable sticky support buttons that remain visible throughout the configuration process. Users can quickly contact technical support via:
-* **Phone**: Direct call link (opens phone dialer or FaceTime)
-* **Email**: Opens email client with support address pre-filled
-* Visual notifications confirm when buttons are clicked
-
-Configure support options in the plugin settings under "Support Contact".
-
-= Custom Input Fields =
-
-The plugin supports two types of custom input fields:
-
-**1. Variation Custom Input (Conditional)**
-When editing a variation, you can enable "Show custom input field" checkbox. This will display a textarea field below all variations when that specific variation is selected. Perfect for options like "Other" where users need to specify additional details.
-
-**2. Phase Direct Input (Always Visible)**
-When editing a phase, you can enable "Show direct input field" checkbox. This displays an input field directly without needing variations. You can choose from three input types:
-* **Textarea**: Large multi-line text box (default)
-* **Text**: Single-line text input
-* **Number**: Numeric input with increment/decrement buttons (← and →) that change the value by 1
-
-The number input has a default value of 0 and includes custom styled buttons for easy value adjustment. All input values are saved in the session and included in the final configuration summary.
-
+* **Role-based discounts** — different prices and price visibility per WordPress user role
+* **PDF branding** — custom logo, header, footer, odd-row color, and total-row color in generated PDFs
+* **Custom primary color** — override the configurator accent color from the settings panel
+* **Recommended configurations** — define multiple recommendation sets with one-click auto-fill and dependency validation
+* **Import / Export** — CSV import and export of phases and variations, with dependencies and images preserved as slugs
+* **Enquiries** — budgets saved as a dedicated post type with a full line editor in admin
+* **Admin budget editor** — add or edit budget lines manually or from the variation catalog, supporting question, quantity, fixed price, and multiple-selection line types
+* **Shareable configuration link** — generate a URL that restores a specific configurator session
+* **WhatsApp & email sharing** — share the budget PDF link via WhatsApp or attach it to an email from the configurator
+* **Support contact buttons** — sticky phone and email buttons displayed throughout the configurator
+* **Bulk price updater** — update prices across all variations from a single admin screen
+* **Custom admin notification emails** — override the recipient address(es) per configurator
+* **Priority support** — direct access to the development team
 
 == Installation ==
 
-Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your
-WordPress installation and then activate the Plugin from Plugins page.
+1. Upload the `quote-product-flow` folder to `/wp-content/plugins/` or install via **Plugins > Add New**.
+2. Activate the plugin from the **Plugins** page.
+3. Go to **QuoteProduct** in the admin menu to configure settings.
+4. Add the shortcode `[quote-product-flow]` to any page to display the configurator.
+
+== Frequently Asked Questions ==
+
+= How do I add the configurator to a page? =
+
+Add the shortcode `[quote-product-flow]` to any page or post content.
+
+= Can users select more than one option per step? =
+
+Yes. Edit a phase and enable **Allow Multiple Selections** to let users check multiple variations.
+
+= How do I attach a free-text field to a variation? =
+
+Edit the variation and enable **Show custom input field**. A textarea will appear below all variations when that specific one is selected.
+
+= How do I add an input field directly to a phase? =
+
+Edit the phase and enable **Show direct input field**. Choose from Textarea, Text, or Number input types.
+
+= Does it support dependencies between variations? =
+
+Yes. In the variation editor, use the **Depends of** section to show a variation only when specific other variations are selected.
+
+= Where are budgets saved? =
+
+Budgets are saved as enquiry posts (Pro) and PDF files in `/wp-content/uploads/quote-product-flow/`.
+
+== Screenshots ==
+
+1. Configurator front-end — step-by-step phase selection
+2. Variation editor — fields, pricing, dependencies
+3. Phase editor — settings and direct input options
+4. Plugin settings page — appearance and email options
+5. Budget admin view — enquiry with line editor
 
 == Changelog ==
-= 1.5.3 =
+
+= 2.0.0 =
+* Refactored: Major code refactor for improved performance, maintainability, and extensibility to publish in the WordPress plugin directory.
 * Performance: Preload variation posts, meta and taxonomy terms in batch before render loop, eliminating N+1 queries per variation (200+ plugin queries reduced to 3).
 * Fixed: PHP session lock released immediately after `session_start()` to prevent REST API timeouts.
 * Fixed: Safe access to `wp_count_posts()` result in `is_multiple_products()` to avoid `stdClass::$publish` notice.
 
 = 1.5.2 =
-* Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the budget PDF (filters `pbc_share_email_pdf_*`, `pbc_whatsapp_share_pdf_message`).
+* Changed: WhatsApp share sends the budget PDF link; share-by-email attaches the PDF (filters `pbc_share_email_pdf_*`, `qpfw_whatsapp_share_pdf_message`).
 * Improved: Configurator choice cards — max 4 per row with consistent cell width; mobile 2 columns.
 * Improved: Step navigation — 6 steps per row on desktop, better text contrast; PDF row text color on colored backgrounds.
 * Improved: PDF — centered logo; financial summary hidden when prices are off or subtotal is zero; filter `pbc_pdf_show_financial_summary`.
@@ -88,110 +117,58 @@ WordPress installation and then activate the Plugin from Plugins page.
 * Improved: Presupuestos show phase name and line type metadata consistent with frontend submissions.
 
 = 1.5.0 =
-*  Added: Custom input fields for variations - show textarea when specific variation is selected
-*  Added: Direct input fields for phases - show input directly without variations
-*  Added: Three input types for phases: Textarea (large), Text (single line), and Number (with increment/decrement buttons)
-*  Added: Number input with custom styled buttons (← decrease, → increase) that change value by 1
-*  Added: Default value of 0 for number inputs
-*  Improved: Custom input fields appear below all variations (not inside each variation)
-*  Improved: Input values are saved in session and displayed in configuration summary
-*  Fixed: Form no longer auto-skips steps when direct input fields are present
-*  Added: Multiple selection support per phase with checkboxes
-*  Added: Real-time AJAX updates for multiple checkbox selections
-*  Added: Comma-separated display of multiple selected variations
-*  Added: Automatic price summing for multiple selections
-*  Added: Helper function check_phases_options() for advanced phase validation
-*  Fixed: Variation name display in real-time when selecting multiple options
-*  Fixed: Restored Import/Export menu entry that was missing from admin menu
-*  Fixed: Phase breadcrumb navigation now adapts to long phase names with flexible height
-*  Fixed: Removed padding from phase steps for better visual balance
-*  Improved: All button styles now use high specificity to prevent theme conflicts
-*  Improved: Buttons maintain consistent styling across different WordPress themes
-*  Fixed: Removed arrow decorations (::after) from Back, Restart, and Recommendation buttons
-*  Fixed: Button layout now uses flexbox for proper alignment in a single row
-*  Fixed: Buttons correctly display in row for all states (navigation, calculation, etc.)
-*  Improved: Reduced button size with smaller padding (6px 14px) and font-size (13px)
-*  Fixed: Notice messages now display in black color for better readability
-*  Improved: Modern button styling with rounded corners, shadows, and hover effects
-*  Fixed: Button order maintained consistently: Back > Restart > Recommendation > Next/Calculate
-*  Configurator skip fixed panel.
-*  Settings Page Redesign: Complete visual overhaul with modern card-based layout, purple gradient theme, and improved user experience. License management now integrated directly into settings.
-*  Added: Export/Import page with real-time logging.
-*  Added: Export/Import functionality for phases and variations with slug-based references.
-*  Added: Automatic slug generation for phases and variations.
-*  Added: Export to two separate CSV files (phases and variations).
-*  Added: CSV format with comma-separated complex fields (dependencies, prices, image groups).
-*  Added: Import from separate CSV files with automatic ID mapping.
-*  Added: Real-time log display showing progress during export/import operations.
-*  Added: Support for importing phases and variations independently.
-*  Added: Recommended configurations system with one-click auto-fill
-*  Added: Multiple recommendations based on first-phase selection
-*  Added: Separate admin page for managing recommendations (PBC > Recommendations)
-*  Added: Dependency validation in recommendation admin interface
-*  Added: Collapsible recommendation panels in admin
-*  Added: Real-time dependency filtering in admin editor
-*  Added: Auto-progression through all phases when applying recommendations
-*  Added: Green "Recomendación" button in frontend (appears after first selection)
-*  Added: Automatic budget calculation after recommendation process
-*  Added: Restart button to clear configuration and start from step 1
-*  Added: Side-by-side layout for product preview and summary on calculation page
-*  Added: Support contact buttons (phone and email) always visible in configurator
-*  Added: Settings to enable/disable support buttons and configure phone/email
-*  Added: Visual notification (fade-in) when clicking support buttons
-*  Added: Share configuration via WhatsApp and Email
-*  Added: Variations count column in Phases admin list with clickable links to filter variations by phase
-*  Added: Phase filter dropdown in Variations admin list with auto-submit functionality
-*  Added: Clickable phase links in Variations list that navigate to Phases list with scroll positioning
-*  Fixed: Configurator skip fixed panel
-*  Fixed: Nonce validation issues in AJAX requests
-*  Feature: Support buttons are sticky and always accessible during configuration process
-*  Fixed: Configurator skip fixed panel.
+* Added: Custom input fields for variations — show textarea when specific variation is selected.
+* Added: Direct input fields for phases — show input directly without variations.
+* Added: Three input types for phases: Textarea, Text, and Number (with ← / → increment buttons).
+* Added: Multiple selection support per phase with checkboxes.
+* Added: Real-time AJAX updates for multiple checkbox selections.
+* Added: Recommended configurations system with one-click auto-fill.
+* Added: Support contact buttons (phone and email) always visible in configurator.
+* Added: WhatsApp and email sharing of the budget.
+* Added: Variations count column in Phases admin list.
+* Added: Phase filter in Variations admin list.
+* Fixed: Form no longer auto-skips steps when direct input fields are present.
+* Fixed: Nonce validation issues in AJAX requests.
+* Improved: Modern button styling with flexbox layout and consistent ordering.
 
 = 1.4.1 =
-*  Fixed: Pdfs generation and send emails correctly.
-*  Fixed: Problems with dependencies and phases.
+* Fixed: PDF generation and email sending.
+* Fixed: Dependencies and phase handling.
 
 = 1.4.0 =
-*  Added: You can add hierarchical in products, so you can have different products.
-*  Added: You can select quantity of each products.
-*  Added: Print PDF now saves it internally and gets client data.
-*  Added: Prices per roles discount.
-*  Added: Don't show prices in PDF if the option is not selected. Show them in admin.
-*  Removed: removed the template page option. Now is only shows with shortcode: [pbc].
-*  Removed: removed bullets points.
-*  Added: Price visibility toggle.
-*  Fixed: problems with dependencies and phases.
-*  Fixed: problems with image alpha webp.
+* Added: Hierarchical products (parent-child).
+* Added: Quantity selection per product.
+* Added: PDF saving and client data capture.
+* Added: Role-based price discounts.
+* Added: Price visibility toggle.
+* Removed: Template page option (use shortcode `[quote-product-flow]`).
+* Fixed: Dependencies and phase handling; image alpha/WebP.
 
 = 1.3.1 =
-*  Included Internal libraries.
+* Included internal libraries.
 
 = 1.3.0 =
-*  Option to Print PDF.
+* Option to print PDF.
 
 = 1.2.0 =
-*	Adds subtitle option.
-*  Fix: email without VAT info and total.
-*  Fix: clean session in first step.
+* Added subtitle option.
+* Fixed: email without VAT info and total.
+* Fixed: clean session on first step.
 
 = 1.1.0 =
-*	Coding standards.
-*  Added option to show prices.
-*  Save budgets in /uploads/pbc/
-*  Updated Metabox Group 1.3.14
-*  Added options for header and footer.
-*  Added option for width image preview.
-*  Added sections in variations.
-*  Refactored Classes.
-*  Added options to customize Budget.
-*  Bulk price updater.
-*  Fix: Error option with space not working.
+* Coding standards pass.
+* Added option to show prices.
+* Save budgets in /uploads/pbc/.
+* Added options for header and footer.
+* Added image preview width option.
+* Added variation sections.
+* Bulk price updater.
+* Fixed: option with space not working.
 
 = 1.0 =
-*	First released.
+* First release.
 
+== Upgrade Notice ==
 
-== Links ==
-*	[Closemarketing](https://close.marketing/)
-*	[Closetechnology](https://close.technology/)
-
+= 1.5.2 =
+PDF sharing improvements and layout fixes for configurator cards and step navigation.

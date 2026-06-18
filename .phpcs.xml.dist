@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="Coding Standards for Internal Scanner Tool">
-	<description>Description of Plugin.</description>
+	<description>Quote Product Flow</description>
 
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>reports/*</exclude-pattern>
@@ -10,7 +10,7 @@
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
-	<file>./pbc.php</file>
+	<file>./quote-product-flow.php</file>
 	<file>./includes</file>
 
 	<rule ref="WordPress">
@@ -22,16 +22,7 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="pbc" />
-		</properties>
-	</rule>
-
-	<rule ref="WordPress.Utils.I18nTextDomainFixer">
-		<properties>
-			<property name="old_text_domain" type="array">
-				<element value="" />
-			</property>
-			<property name="new_text_domain" value="pbc" />
+			<property name="text_domain" type="array" value="quote-product-flow" />
 		</properties>
 	</rule>
 

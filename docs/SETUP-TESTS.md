@@ -16,7 +16,7 @@ Se han creado los siguientes archivos para configurar los tests unitarios:
   - Tests para `get_show_prices_for_user()` - Configuración de precios por rol
   - Tests para `get_total_from_enquiry()` - Cálculo de totales
 
-- ✅ `tests/Unit/AdminPluginTest.php` - Tests para PBC_Admin_Plugin
+- ✅ `tests/Unit/AdminPluginTest.php` - Tests para QPFW_Admin_Plugin
   - Tests de instanciación de la clase
   - Tests de hooks registrados
   - Tests de métodos públicos
@@ -37,7 +37,7 @@ Se han creado los siguientes archivos para configurar los tests unitarios:
 ### 1. Instalar Dependencias
 
 ```bash
-cd /Users/davidperez/Web/puertas-alpu/app/public/wp-content/plugins/product-budget-configurator
+cd /Users/davidperez/Web/puertas-alpu/app/public/wp-content/plugins/quote-product-flow
 composer install
 ```
 
@@ -84,7 +84,7 @@ composer test-install   # Instalar entorno de tests de WordPress
 
 Total: **11 tests unitarios**
 
-### Clase PBC_Admin_Plugin
+### Clase QPFW_Admin_Plugin
 - ✅ Instanciación - 1 test
 - ✅ Hooks registrados - 1 test
 - ✅ Métodos públicos - 3 tests
@@ -99,7 +99,7 @@ Para mejorar la cobertura, considera añadir tests para:
 2. **Helpers/ShowParts**: Tests para mostrar partes del configurador
 3. **Helpers/ShowTemplate**: Tests para templates
 4. **PBC_Request**: Tests para manejo de peticiones AJAX
-5. **PBC_Public**: Tests para funcionalidad pública
+5. **QPFW_Public**: Tests para funcionalidad pública
 
 ## 📝 Notas Importantes
 

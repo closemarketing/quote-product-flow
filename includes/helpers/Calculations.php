@@ -8,14 +8,14 @@
  * @version    1.0
  */
 
-namespace Close\PBC\Helpers;
+namespace CLOSE\QProductFlow\Helpers;
 
 defined( 'ABSPATH' ) || exit;
 
-use Close\PBC\Helpers\PDF;
+use CLOSE\QProductFlow\Helpers\PDF;
 
 /**
- * Helper Calculate PBC.
+ * Helper Calculate QPFW.
  *
  * All helpers calculations.
  *
@@ -33,12 +33,12 @@ class CALC {
 		if ( empty( $variation_id ) ) {
 			return '';
 		}
-		$imgprodgroup = get_post_meta( $variation_id, 'pbc_imgprodgroup', true );
+		$imgprodgroup = get_post_meta( $variation_id, 'qpfw_imgprodgroup', true );
 		if ( ! empty( $imgprodgroup ) ) {
 			foreach ( $imgprodgroup as $deps ) {
-				if ( ! empty( $deps['pbc_depvarimgprod'] ) ) {
+				if ( ! empty( $deps['qpfw_depvarimgprod'] ) ) {
 					$prev_var = array();
-					foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+					foreach ( $deps['qpfw_depvarimgprod'] as $depvarimgprod ) {
 						$imgprod_arr = explode( '|', $depvarimgprod );
 						if ( ! empty( $imgprod_arr[0] ) && ! empty( $imgprod_arr[1] ) ) {
 							$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
@@ -49,15 +49,15 @@ class CALC {
 							if ( isset( $prev_var[ $s_phase_key ] ) &&
 							isset( $session_variation[ $s_phase_key ] ) &&
 							in_array( $session_variation[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
-								$imgprod_id = $deps['pbc_imgprod'][0];
+								$imgprod_id = $deps['qpfw_imgprod'][0];
 							} else {
 								$imgprod_id = '';
 								break;
 							}
 						}
 					}
-				} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
-						$imgprod_id = $deps['pbc_imgprod'][0];
+				} elseif ( ( ! isset( $deps['qpfw_depvarimgprod'] ) || empty( $deps['qpfw_depvarimgprod'] ) ) && isset( $deps['qpfw_imgprod'] ) ) {
+						$imgprod_id = $deps['qpfw_imgprod'][0];
 						break;
 				}
 				if ( ! empty( $imgprod_id ) ) {
@@ -75,14 +75,14 @@ class CALC {
 	/**
 	 * Whether the calculate step will render at least one product preview image (same logic as template).
 	 *
-	 * @param string $session_key Session key e.g. pbc_variation_{id}.
+	 * @param string $session_key Session key e.g. qpfw_variation_{id}.
 	 * @return bool
 	 */
 	public static function calculate_has_product_preview_image( $session_key ) {
-		if ( empty( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( empty( $_SESSION[ $session_key ] ) || ! is_array( $_SESSION[ $session_key ] ) ) {
 			return false;
 		}
-		$sess = $_SESSION[ $session_key ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$sess = wp_unslash( $_SESSION[ $session_key ] );
 		$to   = count( $sess ) + 1;
 		$ss_var = 0;
 
@@ -91,12 +91,12 @@ class CALC {
 			$imgprodurl = '';
 			if ( isset( $sess[ $i ]['var']['id'] ) ) {
 				$ss_var       = (int) $sess[ $i ]['var']['id'];
-				$imgprodgroup = get_post_meta( $ss_var, 'pbc_imgprodgroup', true );
+				$imgprodgroup = get_post_meta( $ss_var, 'qpfw_imgprodgroup', true );
 				if ( ! empty( $imgprodgroup ) ) {
 					foreach ( $imgprodgroup as $deps ) {
-						if ( isset( $deps['pbc_depvarimgprod'] ) && ! empty( $deps['pbc_depvarimgprod'] ) && isset( $deps['pbc_imgprod'] ) ) {
+						if ( isset( $deps['qpfw_depvarimgprod'] ) && ! empty( $deps['qpfw_depvarimgprod'] ) && isset( $deps['qpfw_imgprod'] ) ) {
 							$prev_var = array();
-							foreach ( $deps['pbc_depvarimgprod'] as $depvarimgprod ) {
+							foreach ( $deps['qpfw_depvarimgprod'] as $depvarimgprod ) {
 								$imgprod_arr = explode( '|', $depvarimgprod );
 								if ( ! empty( $imgprod_arr[0] ) && ! empty( $imgprod_arr[1] ) ) {
 									$prev_var[ (int) $imgprod_arr[0] ][] = $imgprod_arr[1];
@@ -107,15 +107,15 @@ class CALC {
 									if ( isset( $prev_var[ $s_phase_key ] ) &&
 										isset( $sess[ $s_phase_key ]['var']['id'] ) &&
 										in_array( $sess[ $s_phase_key ]['var']['id'], $prev_var[ $s_phase_key ], true ) ) {
-										$imgprodid = $deps['pbc_imgprod'][0];
+										$imgprodid = $deps['qpfw_imgprod'][0];
 									} else {
 										$imgprodid = '';
 										break;
 									}
 								}
 							}
-						} elseif ( ( ! isset( $deps['pbc_depvarimgprod'] ) || empty( $deps['pbc_depvarimgprod'] ) ) && isset( $deps['pbc_imgprod'] ) ) {
-							$imgprodid = $deps['pbc_imgprod'][0];
+						} elseif ( ( ! isset( $deps['qpfw_depvarimgprod'] ) || empty( $deps['qpfw_depvarimgprod'] ) ) && isset( $deps['qpfw_imgprod'] ) ) {
+							$imgprodid = $deps['qpfw_imgprod'][0];
 							break;
 						}
 						if ( $imgprodid ) {
@@ -147,7 +147,7 @@ class CALC {
 		$metas       = get_post_meta( $post_id );
 		$total_price = 0;
 		foreach ( $metas as $key => $value ) {
-			if ( false !== strpos( $key, 'pbc_price_' ) ) {
+			if ( false !== strpos( $key, 'qpfw_price_' ) ) {
 				$price       = isset( $value[0] ) ? (float) str_replace( ',', '.', $value[0] ) : 0;
 				$total_price = $total_price + $price;
 			}
@@ -205,13 +205,13 @@ class CALC {
 	 */
 	public static function is_multiple_products() {
 		$args          = array(
-			'post_type'      => 'phases',
+			'post_type' => 'qpfw_phases',
 			'posts_per_page' => -1,
 			'post_parent'    => 0,
 			'fields'         => 'ids',
 		);
 		$parent_phases = get_posts( $args );
-		$counts       = wp_count_posts( 'phases' );
+		$counts       = wp_count_posts( 'qpfw_phases' );
 		$total_phases  = isset( $counts->publish ) ? (int) $counts->publish : 0;
 
 		return count( $parent_phases ) !== $total_phases;
@@ -224,7 +224,7 @@ class CALC {
 	 */
 	public static function get_default_parent_phase() {
 		$args          = array(
-			'post_type'   => 'phases',
+			'post_type' => 'qpfw_phases',
 			'numberposts' => 1,
 			'post_parent' => 0,
 			'fields'      => 'ids',
@@ -254,7 +254,7 @@ class CALC {
 		$phase_options = array();
 		$phasescpt     = get_posts(
 			array(
-				'post_type'      => 'phases',
+				'post_type' => 'qpfw_phases',
 				'posts_per_page' => -1,
 				'orderby'        => 'menu_order',
 				'order'          => 'ASC',
@@ -264,7 +264,7 @@ class CALC {
 		foreach ( $phasescpt as $item ) {
 			$children     = get_posts(
 				array(
-					'post_type'      => 'phases',
+					'post_type' => 'qpfw_phases',
 					'post_parent'    => $item->ID,
 					'posts_per_page' => -1,
 					'orderby'        => 'menu_order',
@@ -340,7 +340,7 @@ class CALC {
 			// Check if phase exists and is published.
 			if ( $options['published'] ) {
 				$phase = get_post( $phase_id );
-				if ( ! $phase || 'publish' !== $phase->post_status || 'phases' !== $phase->post_type ) {
+				if ( ! $phase || 'publish' !== $phase->post_status || 'qpfw_phases' !== $phase->post_type ) {
 					$passed    = false;
 					$reasons[] = 'not_published';
 				}
@@ -404,20 +404,14 @@ class CALC {
 	 */
 	public static function get_user_discount_and_role() {
 		$user = wp_get_current_user();
-		if ( ! empty( $user->roles ) ) {
-			$role_slug     = $user->roles[0];
-			$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
-			if ( ! empty( $role_discount ) ) {
-				return [
-					'role'     => $role_slug,
-					'discount' => $role_discount,
-				];
-			}
-		}
-		return [
-			'role'     => '',
-			'discount' => 0,
-		];
+		$role = ! empty( $user->roles ) ? $user->roles[0] : '';
+		return apply_filters(
+			'qpfw_user_discount_and_role',
+			array(
+				'role'     => $role,
+				'discount' => 0,
+			)
+		);
 	}
 
 	/**
@@ -431,19 +425,15 @@ class CALC {
 		$user  = wp_get_current_user();
 		$price = 0;
 
-		$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
+		$pricegroup = get_post_meta( $variation_id, 'qpfw_pricegroup', true );
 		if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
-			$found = array_search( $price_var, array_column( $pricegroup, 'pbc_meaprice', 'pbc_pricem' ), true );
-			if ( false !== $found && isset( $pricegroup[ $found ]['pbc_pricem'] ) ) {
-				$price = (float) $pricegroup[ $found ]['pbc_pricem'];
-			} elseif ( isset( $pricegroup[0]['pbc_pricem'] ) ) {
-				$price = (float) $pricegroup[0]['pbc_pricem'];
-				if ( ! empty( $user->roles ) ) {
-					$role_slug     = $user->roles[0];
-					$role_discount = (int) get_option( 'pbc_discount_user_' . $role_slug, true );
-					if ( ! empty( $role_discount ) ) {
-						$price = $price - ( $price * $role_discount / 100 );
-					}
+			$price = array_search( $price_var, array_column( $pricegroup, 'qpfw_meaprice', 'qpfw_pricem' ), true );
+			if ( false === $price && isset( $pricegroup[0]['qpfw_pricem'] ) ) {
+				$price     = $pricegroup[0]['qpfw_pricem'];
+				$role_slug = ! empty( $user->roles ) ? $user->roles[0] : '';
+				$discount  = (int) apply_filters( 'qpfw_user_discount', 0, $role_slug, $variation_id );
+				if ( $discount > 0 ) {
+					$price = $price - ( $price * $discount / 100 );
 				}
 			}
 		}
@@ -457,28 +447,28 @@ class CALC {
 	 * @return int
 	 */
 	public static function configurator_save_enquiry( $item ) {
-		$contact          = $item['pbc_contact'] ?? [];
+		$contact          = $item['qpfw_contact'] ?? [];
 		$email_field      = ! empty( $contact['email_field'] ) ? sanitize_text_field( $contact['email_field'] ) : '';
 		$name_field       = ! empty( $contact['name_field'] ) ? sanitize_text_field( $contact['name_field'] ) : '';
 		$phone_field      = ! empty( $contact['phone_field'] ) ? sanitize_text_field( $contact['phone_field'] ) : '';
 		$city_field       = ! empty( $contact['city_field'] ) ? sanitize_text_field( $contact['city_field'] ) : '';
 		$state_field      = ! empty( $contact['state_field'] ) ? sanitize_text_field( $contact['state_field'] ) : '';
 		$comments_field   = ! empty( $contact['comments_field'] ) ? sanitize_textarea_field( $contact['comments_field'] ) : '';
-		$pbc_session_key  = ! empty( $item['pbc_session_key'] ) ? sanitize_text_field( $item['pbc_session_key'] ) : '';
-		$pbc_parent_phase = ! empty( $item['pbc_parent_phase'] ) ? (int) $item['pbc_parent_phase'] : 0;
+		$qpfw_session_key  = ! empty( $item['qpfw_session_key'] ) ? sanitize_text_field( $item['qpfw_session_key'] ) : '';
+		$qpfw_parent_phase = ! empty( $item['qpfw_parent_phase'] ) ? (int) $item['qpfw_parent_phase'] : 0;
 
 		$meta = [
-			'pbc_enquiry_name'     => $name_field,
-			'pbc_enquiry_phone'    => $phone_field,
-			'pbc_enquiry_email'    => $email_field,
-			'pbc_enquiry_city'     => $city_field,
-			'pbc_enquiry_state'    => $state_field,
-			'pbc_parent_phase'     => $pbc_parent_phase,
-			'pbc_enquiry_comments' => $comments_field,
+			'qpfw_enquiry_name'     => $name_field,
+			'qpfw_enquiry_phone'    => $phone_field,
+			'qpfw_enquiry_email'    => $email_field,
+			'qpfw_enquiry_city'     => $city_field,
+			'qpfw_enquiry_state'    => $state_field,
+			'qpfw_parent_phase'     => $qpfw_parent_phase,
+			'qpfw_enquiry_comments' => $comments_field,
 		];
 		// Calculate enquiry entries.
 		$i = 0;
-		foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
+		foreach ( $item[ $qpfw_session_key ] as $details ) { // phpcs:ignore
 			if ( ! is_array( $details ) ) {
 				continue;
 			}
@@ -492,10 +482,10 @@ class CALC {
 				foreach ( $details['questions'] as $question_data ) {
 					$variation_name = $question_data['variation_title'] . ': ' . $question_data['answer'];
 
-					$meta[ 'pbc_phase_name_' . $i ] = $phase_name;
-					$meta[ 'pbc_phase_var_' . $i ]  = $variation_name;
-					$meta[ 'pbc_price_' . $i ]      = '-';
-					$meta[ 'pbc_type_' . $i ]       = 'question';
+					$meta[ 'qpfw_phase_name_' . $i ] = $phase_name;
+					$meta[ 'qpfw_phase_var_' . $i ]  = $variation_name;
+					$meta[ 'qpfw_price_' . $i ]      = '-';
+					$meta[ 'qpfw_type_' . $i ]       = 'question';
 					++$i;
 				}
 			} else {
@@ -503,22 +493,22 @@ class CALC {
 				$variation_name = isset( $details['var']['name'] ) ? sanitize_text_field( $details['var']['name'] ) : '';
 				$price          = (float) $details['var']['price'];
 
-				$meta[ 'pbc_phase_name_' . $i ] = $phase_name;
-				$meta[ 'pbc_phase_var_' . $i ]  = $variation_name;
-				$meta[ 'pbc_price_' . $i ]      = number_format( $price, 2, ',', '.' );
-				$meta[ 'pbc_type_' . $i ]       = isset( $details['var']['type'] ) ? sanitize_text_field( $details['var']['type'] ) : '';
+				$meta[ 'qpfw_phase_name_' . $i ] = $phase_name;
+				$meta[ 'qpfw_phase_var_' . $i ]  = $variation_name;
+				$meta[ 'qpfw_price_' . $i ]      = number_format( $price, 2, ',', '.' );
+				$meta[ 'qpfw_type_' . $i ]       = isset( $details['var']['type'] ) ? sanitize_text_field( $details['var']['type'] ) : '';
 				++$i;
 			}
 		}
-		$meta['pbc_total_var'] = $i;
+		$meta['qpfw_total_var'] = $i;
 
-		$title  = __( 'Enquiry', 'pbc' ) . ' - ' . gmdate( 'Y-m-d H:i:s' );
+		$title  = __( 'Enquiry', 'quote-product-flow' ) . ' - ' . gmdate( 'Y-m-d H:i:s' );
 		$title .= ! empty( $name_field ) ? ' - ' . $name_field . '-' . $phone_field : '';
 
 		$enquiry_post = array(
 			'post_title'  => $title,
 			'post_status' => 'publish',
-			'post_type'   => 'enquiry',
+			'post_type'   => 'qpfw_enquiry',
 			'meta_input'  => $meta,
 		);
 		return wp_insert_post( $enquiry_post );
@@ -531,13 +521,13 @@ class CALC {
 	 * @return array
 	 */
 	public static function configurator_result_email_send( $item ) {
-		$email_field     = $item['pbc_contact']['email'] ?? '';
-		$name_field      = $item['pbc_contact']['name'] ?? '';
-		$phone_field     = $item['pbc_contact']['phone'] ?? '';
-		$city_field      = $item['pbc_contact']['city'] ?? '';
-		$state_field     = $item['pbc_contact']['state'] ?? '';
-		$comments_field  = $item['pbc_contact']['comments'] ?? '';
-		$pbc_session_key = $item['pbc_session_key'] ?? '';
+		$email_field     = $item['qpfw_contact']['email'] ?? '';
+		$name_field      = $item['qpfw_contact']['name'] ?? '';
+		$phone_field     = $item['qpfw_contact']['phone'] ?? '';
+		$city_field      = $item['qpfw_contact']['city'] ?? '';
+		$state_field     = $item['qpfw_contact']['state'] ?? '';
+		$comments_field  = $item['qpfw_contact']['comments'] ?? '';
+		$qpfw_session_key = $item['qpfw_session_key'] ?? '';
 
 		$user        = wp_get_current_user();
 		$user_role   = ! empty( $user->roles ) && isset( $user->roles[0] ) ? $user->roles[0] : '';
@@ -547,50 +537,49 @@ class CALC {
 		if ( ! $email_field ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Email field empty!', 'pbc' ),
+				'response' => __( 'Email field empty!', 'quote-product-flow' ),
 			);
 		} elseif ( ! $name_field ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Name field is empty!', 'pbc' ),
+				'response' => __( 'Name field is empty!', 'quote-product-flow' ),
 			);
 		} elseif ( ! $phone_field ) {
 			$result = array(
 				'type'     => 'error',
-				'response' => __( 'Phone field is empty!', 'pbc' ),
+				'response' => __( 'Phone field is empty!', 'quote-product-flow' ),
 			);
 		} else {
 			$emails       = explode( ',', $email_field );
-			$admin_emails = get_option( 'pbc_admin_email_notification' );
-			if ( $admin_emails ) {
-				$admin_emails = explode( ',', $admin_emails );
-				$emails       = array_merge( $emails, $admin_emails );
+			$admin_emails = apply_filters( 'qpfw_admin_notification_emails', array(), $item );
+			if ( ! empty( $admin_emails ) ) {
+				$emails = array_merge( $emails, $admin_emails );
 			}
 			$emails = array_map( 'trim', $emails );
 			$emails = array_unique( $emails );
 			$emails = array_filter( $emails );
 
-			if ( ! isset( $_SESSION[ $pbc_session_key ] ) ) {
+			if ( ! isset( $_SESSION[ $qpfw_session_key ] ) ) {
 				$result = array(
 					'type'     => 'error',
-					'response' => __( 'Configurator not ready!', 'pbc' ),
+					'response' => __( 'Configurator not ready!', 'quote-product-flow' ),
 				);
 			} else {
-				$subject        = __( 'Budget Configurator', 'pbc' ) . ' - ' . get_option( 'blogname' );
-				$message        = '<div><h2>' . __( 'Enquiry details:', 'pbc' ) . '</h2><br/>';
-				$message       .= '<strong>' . __( 'Name:', 'pbc' ) . '</strong>' . $name_field . '<br/>';
-				$message       .= '<strong>' . __( 'Email:', 'pbc' ) . '</strong>' . $email_field . '<br/>';
-				$message       .= '<strong>' . __( 'Phone:', 'pbc' ) . '</strong>' . $phone_field . '<br/>';
-				$message       .= '<strong>' . __( 'City:', 'pbc' ) . '</strong>' . $city_field . '<br/>';
-				$message       .= '<strong>' . __( 'State:', 'pbc' ) . '</strong>' . $state_field . '<br/>';
-				$message       .= '<strong>' . __( 'Comments:', 'pbc' ) . '</strong>' . $comments_field . '<br/>';
+				$subject        = __( 'Budget Configurator', 'quote-product-flow' ) . ' - ' . get_option( 'blogname' );
+				$message        = '<div><h2>' . __( 'Enquiry details:', 'quote-product-flow' ) . '</h2><br/>';
+				$message       .= '<strong>' . __( 'Name:', 'quote-product-flow' ) . '</strong>' . $name_field . '<br/>';
+				$message       .= '<strong>' . __( 'Email:', 'quote-product-flow' ) . '</strong>' . $email_field . '<br/>';
+				$message       .= '<strong>' . __( 'Phone:', 'quote-product-flow' ) . '</strong>' . $phone_field . '<br/>';
+				$message       .= '<strong>' . __( 'City:', 'quote-product-flow' ) . '</strong>' . $city_field . '<br/>';
+				$message       .= '<strong>' . __( 'State:', 'quote-product-flow' ) . '</strong>' . $state_field . '<br/>';
+				$message       .= '<strong>' . __( 'Comments:', 'quote-product-flow' ) . '</strong>' . $comments_field . '<br/>';
 				$message       .= '<br/></div>';
-				$message       .= '<h4>' . __( 'Configuration details:', 'pbc' ) . '</h4><br>';
-				$message       .= '<table><tr><th>' . __( 'Phase', 'pbc' ) . '</th><th>' . __( 'Variation', 'pbc' ) . '</th><th>' . __( 'Price', 'pbc' ) . '</th></tr>';
+				$message       .= '<h4>' . __( 'Configuration details:', 'quote-product-flow' ) . '</h4><br>';
+				$message       .= '<table><tr><th>' . __( 'Phase', 'quote-product-flow' ) . '</th><th>' . __( 'Variation', 'quote-product-flow' ) . '</th><th>' . __( 'Price', 'quote-product-flow' ) . '</th></tr>';
 				$subtotal_price = 0;
 
 				$i = 0;
-			foreach ( $item[ $pbc_session_key ] as $details ) { // phpcs:ignore
+			foreach ( $item[ $qpfw_session_key ] as $details ) { // phpcs:ignore
 					if ( ! is_array( $details ) ) {
 						continue;
 						}
@@ -631,16 +620,16 @@ class CALC {
 				if ( $show_prices ) {
 					$message .= '<table>';
 					$message .= '<tr>';
-					$message .= '<td>' . __( 'Subtotal:', 'pbc' ) . '</td>';
+					$message .= '<td>' . __( 'Subtotal:', 'quote-product-flow' ) . '</td>';
 					$message .= '<td>' . number_format( $subtotal_price, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '<tr>';
-					$message .= '<td>' . __( 'Tax:', 'pbc' ) . '</td>';
+					$message .= '<td>' . __( 'Tax:', 'quote-product-flow' ) . '</td>';
 					$vat      = $subtotal_price * 0.21;
 					$message .= '<td>' . number_format( $vat, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '<tr>';
-					$message .= '<td>' . __( 'Total:', 'pbc' ) . '</td>';
+					$message .= '<td>' . __( 'Total:', 'quote-product-flow' ) . '</td>';
 					$message .= '<td>' . number_format( $subtotal_price + $vat, 2, ',', '.' ) . ' €</td>';
 					$message .= '</tr>';
 					$message .= '</table>';
@@ -649,21 +638,21 @@ class CALC {
 				$message .= '<br>' . get_option( 'blogname' );
 				$headers  = array( 'Content-Type: text/html; charset=UTF-8' );
 
-				// Insert_enquiry Post.
-				$post_id     = self::configurator_save_enquiry( $item );
 				$attachments = array();
 				$pdf_path    = null;
 
-				if ( $post_id ) {
-					$item['pbc_enquiry']     = $post_id;
-					$item['pbc_budget_date'] = gmdate( 'd-m-Y' );
-
-					// Generate PDF and get the file path.
-					$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
-
-					if ( $pdf_path && file_exists( $pdf_path ) ) {
-						$attachments = array( $pdf_path );
+				if ( apply_filters( 'qpfw_save_enquiry', false, $item ) ) {
+					$post_id = self::configurator_save_enquiry( $item );
+					if ( $post_id ) {
+						$item['qpfw_enquiry']     = $post_id;
+						$item['qpfw_budget_date'] = gmdate( 'd-m-Y' );
 					}
+				}
+
+				// Always generate PDF for attachment.
+				$pdf_path = PDF::generate_engine_pdf( $item, 'path' );
+				if ( $pdf_path && file_exists( $pdf_path ) ) {
+					$attachments = array( $pdf_path );
 				}
 
 				// Send email.
@@ -677,12 +666,12 @@ class CALC {
 				if ( ! $mail_sent ) {
 					$result = array(
 						'type'     => 'error',
-						'response' => __( 'Error in sending mail. Please try again!', 'pbc' ),
+						'response' => __( 'Error in sending mail. Please try again!', 'quote-product-flow' ),
 					);
 				} else {
 					$result = array(
 						'type'     => 'success',
-						'response' => __( 'Mail sent!', 'pbc' ),
+						'response' => __( 'Mail sent!', 'quote-product-flow' ),
 					);
 				}
 			}
@@ -699,18 +688,19 @@ class CALC {
 	 * @return string 'yes' or 'no'
 	 */
 	public static function get_show_prices_for_user( $user_role = '' ) {
-		if ( ! empty( $user_role ) ) {
-			$role_setting = get_option( 'pbc_show_prices_user_' . $user_role );
+		$role_override = apply_filters( 'qpfw_show_prices_for_role', null, $user_role );
+		if ( null !== $role_override ) {
+			return 'yes' === $role_override ? 'yes' : 'no';
+		}
 
-			if ( ! empty( $role_setting ) && 'yes' === $role_setting ) {
-				return 'yes';
-			}
-			if ( ! empty( $role_setting ) && 'no' === $role_setting ) {
-				return 'no';
+		if ( ! empty( $user_role ) ) {
+			$role_setting = get_option( 'qpfw_show_prices_user_' . $user_role, null );
+			if ( null !== $role_setting ) {
+				return 'yes' === $role_setting ? 'yes' : 'no';
 			}
 		}
 
-		$global_setting = get_option( 'pbc_show_prices_global', 'yes' );
+		$global_setting = get_option( 'qpfw_show_prices_global', 'yes' );
 		return 'yes' === $global_setting ? 'yes' : 'no';
 	}
 }

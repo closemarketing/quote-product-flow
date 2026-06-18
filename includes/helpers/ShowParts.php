@@ -8,12 +8,12 @@
  * @version    1.0
  */
 
-namespace Close\PBC\Helpers;
+namespace CLOSE\QProductFlow\Helpers;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Helper Calculate PBC.
+ * Helper Calculate QPFW.
  *
  * All helpers calculations.
  *
@@ -48,15 +48,15 @@ class SHOW {
 		if ( 'wizard' === $template ) {
 			echo '<ul>';
 		} elseif ( $allow_multiple ) {
-				echo '<div class="pbc-multiple-selections">';
+				echo '<div class="qpfw-multiple-selections">';
 			} else {
-			echo '<select name="pbc_variation[' . esc_attr( $cstep ) . ']" class="pbc_variation">';
+			echo '<select name="qpfw_variation[' . esc_attr( $cstep ) . ']" class="qpfw_variation">';
 		}
 
 		foreach ( $variations_section as $variation_data ) {
 			$variation_id = (int) $variation_data['id'];
-			$field_type   = get_post_meta( $variation_id, 'pbc_field_type', true );
-			$is_question  = get_post_meta( $variation_id, 'pbc_is_question', true );
+			$field_type   = get_post_meta( $variation_id, 'qpfw_field_type', true );
+			$is_question  = get_post_meta( $variation_id, 'qpfw_is_question', true );
 
 			if ( 'wizard' === $template ) {
 				if ( $actual_variation_tag !== $variation_data['section'] ) {
@@ -65,27 +65,27 @@ class SHOW {
 				}
 				$is_choice_row = ! $is_question && empty( $field_type );
 				?>
-				<li class="variation_list <?php echo $is_question ? 'is-question' : ''; ?><?php echo $is_choice_row ? ' pbc-choice-row' : ''; ?>">
-					<label class="<?php echo $is_choice_row ? 'pbc-choice-label' : ''; ?>">
+				<li class="variation_list <?php echo $is_question ? 'is-question' : ''; ?><?php echo $is_choice_row ? ' qpfw-choice-row' : ''; ?>">
+					<label class="<?php echo $is_choice_row ? 'qpfw-choice-label' : ''; ?>">
 						<?php
-						$imgicon = get_post_meta( $variation_id, 'pbc_imgicon', true );
+						$imgicon = get_post_meta( $variation_id, 'qpfw_imgicon', true );
 						if ( $imgicon && ! $is_choice_row ) {
 							echo '<div class="variation_img">';
-							echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+							echo wp_get_attachment_image( $imgicon, 'qpfw_icon', false );
 							echo '</div>';
 						}
 
 		// Check if this is a question type variation.
 		if ( $is_question ) {
-			$question_key         = get_post_meta( $variation_id, 'pbc_question_key', true );
-			$question_input_type  = get_post_meta( $variation_id, 'pbc_question_input_type', true );
-			$question_placeholder = get_post_meta( $variation_id, 'pbc_question_placeholder', true );
-			$question_required    = get_post_meta( $variation_id, 'pbc_question_required', true );
+			$question_key         = get_post_meta( $variation_id, 'qpfw_question_key', true );
+			$question_input_type  = get_post_meta( $variation_id, 'qpfw_question_input_type', true );
+			$question_placeholder = get_post_meta( $variation_id, 'qpfw_question_placeholder', true );
+			$question_required    = get_post_meta( $variation_id, 'qpfw_question_required', true );
 
 			// Get saved answer from session if exists.
 			$saved_answer = '';
-			if ( isset( $_SESSION['pbc_questions'][ $question_key ] ) ) {
-				$saved_answer = $_SESSION['pbc_questions'][ $question_key ];
+			if ( isset( $_SESSION['qpfw_questions'][ $question_key ] ) ) {
+				$saved_answer = sanitize_text_field( wp_unslash( $_SESSION['qpfw_questions'][ $question_key ] ) );
 			}
 
 			$input_type  = 'number' === $question_input_type ? 'number' : 'text';
@@ -100,9 +100,9 @@ class SHOW {
 			?>
 			<input
 				type="<?php echo esc_attr( $input_type ); ?>"
-				class="pbc_question_input"
-				name="pbc_question[<?php echo esc_attr( $question_key ); ?>]"
-				id="pbc_question_<?php echo esc_attr( $question_key ); ?>"
+				class="qpfw_question_input"
+				name="qpfw_question[<?php echo esc_attr( $question_key ); ?>]"
+				id="qpfw_question_<?php echo esc_attr( $question_key ); ?>"
 				value="<?php echo esc_attr( $saved_answer ); ?>"
 				placeholder="<?php echo esc_attr( $question_placeholder ); ?>"
 				data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
@@ -111,59 +111,59 @@ class SHOW {
 				<?php echo $is_required ? 'required="required"' : ''; ?>
 				<?php echo 'number' === $input_type ? 'step="any"' : ''; ?>
 			/>
-			<input type="hidden" name="pbc_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+			<input type="hidden" name="qpfw_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
 			<?php
 		} elseif ( empty( $field_type ) ) {
 			if ( $allow_multiple ) {
 				?>
-				<input type="checkbox" class="pbc_variation pbc_variation_multiple pbc-option-native" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
-				<span class="pbc-option-card">
+				<input type="checkbox" class="qpfw_variation qpfw_variation_multiple qpfw-option-native" name="qpfw_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+				<span class="qpfw-option-card">
 					<?php
 					if ( $imgicon ) {
 						echo '<div class="variation_img">';
-						echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+						echo wp_get_attachment_image( $imgicon, 'qpfw_icon', false );
 						echo '</div>';
 					}
 					?>
-					<span class="pbc-option-title"><?php echo esc_html( $variation_data['title'] ); ?></span>
+					<span class="qpfw-option-title"><?php echo esc_html( $variation_data['title'] ); ?></span>
 				</span>
 				<?php
 			} else {
 				?>
-				<input type="radio" class="pbc_variation pbc-option-native" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
-				<span class="pbc-option-card">
+				<input type="radio" class="qpfw_variation qpfw-option-native" name="qpfw_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( $variation_id, $s_var, true ); ?> />
+				<span class="qpfw-option-card">
 					<?php
 					if ( $imgicon ) {
 						echo '<div class="variation_img">';
-						echo wp_get_attachment_image( $imgicon, 'pbc_icon', false );
+						echo wp_get_attachment_image( $imgicon, 'qpfw_icon', false );
 						echo '</div>';
 					}
 					?>
-					<span class="pbc-option-title"><?php echo esc_html( $variation_data['title'] ); ?></span>
+					<span class="qpfw-option-title"><?php echo esc_html( $variation_data['title'] ); ?></span>
 				</span>
 				<?php
 			}
 						} elseif ( 'qty' === $field_type ) {
 							$s_var = $s_var === $variation_id ? 1 : $s_var;
 							?>
-							<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
-							<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+							<input type="number" class="qpfw_variation" name="qpfw_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
+							<input type="hidden" name="qpfw_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
 							<?php
 							echo esc_html( $variation_data['title'] );
 						}
 						?>
 					</label>
 					<?php
-					$pricegroup = get_post_meta( $variation_id, 'pbc_pricegroup', true );
-					if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['pbc_meaprice'] ) ) {
+					$pricegroup = get_post_meta( $variation_id, 'qpfw_pricegroup', true );
+					if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['qpfw_meaprice'] ) ) {
 						?>
-						<div class="pbc_pricevarwrap">
-							<select class="pbc_pricevar" name="pbc_pricevar_<?php echo (int) $variation_id; ?>">
+						<div class="qpfw_pricevarwrap">
+							<select class="qpfw_pricevar" name="qpfw_pricevar_<?php echo (int) $variation_id; ?>">
 								<?php
 								foreach ( $pricegroup as $key => $details ) {
-									if ( ! empty( $details['pbc_meaprice'] ) && isset( $details['pbc_pricem'] ) ) {
-										echo '<option value="' . esc_attr( $details['pbc_meaprice'] ) . '">';
-										echo esc_html( $details['pbc_meaprice'] );
+									if ( ! empty( $details['qpfw_meaprice'] ) && isset( $details['qpfw_pricem'] ) ) {
+										echo '<option value="' . esc_attr( $details['qpfw_meaprice'] ) . '">';
+										echo esc_html( $details['qpfw_meaprice'] );
 										echo '</option>';
 									}
 								}
@@ -172,14 +172,14 @@ class SHOW {
 						</div>
 						<?php
 					}
-					$pbc_descopt = get_post_meta( $variation_id, 'pbc_descopt', true );
-					if ( $pbc_descopt ) {
+					$qpfw_descopt = get_post_meta( $variation_id, 'qpfw_descopt', true );
+					if ( $qpfw_descopt ) {
 						?>
-						<p class="pbc_descopt"><?php echo wp_kses_post( wpautop( $pbc_descopt ) ); ?></p>
+						<p class="qpfw_descopt"><?php echo wp_kses_post( wpautop( $qpfw_descopt ) ); ?></p>
 						<?php
 					}
 					// Check if this variation needs custom input and store it.
-					$show_custom_input = get_post_meta( $variation_id, 'pbc_show_custom_input', true );
+					$show_custom_input = get_post_meta( $variation_id, 'qpfw_show_custom_input', true );
 					if ( $show_custom_input ) {
 						$variations_with_input[] = $variation_id;
 					}
@@ -189,22 +189,22 @@ class SHOW {
 			} elseif ( 'vertical' === $template ) {
 				// Check if this is a question type variation.
 				if ( $is_question ) {
-					$question_key         = get_post_meta( $variation_id, 'pbc_question_key', true );
-					$question_input_type  = get_post_meta( $variation_id, 'pbc_question_input_type', true );
-					$question_placeholder = get_post_meta( $variation_id, 'pbc_question_placeholder', true );
-					$question_required    = get_post_meta( $variation_id, 'pbc_question_required', true );
+					$question_key         = get_post_meta( $variation_id, 'qpfw_question_key', true );
+					$question_input_type  = get_post_meta( $variation_id, 'qpfw_question_input_type', true );
+					$question_placeholder = get_post_meta( $variation_id, 'qpfw_question_placeholder', true );
+					$question_required    = get_post_meta( $variation_id, 'qpfw_question_required', true );
 
 					// Get saved answer from session if exists.
 					$saved_answer = '';
-					if ( isset( $_SESSION['pbc_questions'][ $question_key ] ) ) {
-						$saved_answer = $_SESSION['pbc_questions'][ $question_key ];
+					if ( isset( $_SESSION['qpfw_questions'][ $question_key ] ) ) {
+						$saved_answer = sanitize_text_field( wp_unslash( (string) $_SESSION['qpfw_questions'][ $question_key ] ) );
 					}
 
 					$input_type  = 'number' === $question_input_type ? 'number' : 'text';
 					$is_required = ! empty( $question_required ) && '1' === $question_required;
 					?>
 					<div class="variation-question-item">
-						<label class="variation-question-label" for="pbc_question_<?php echo esc_attr( $question_key ); ?>">
+						<label class="variation-question-label" for="qpfw_question_<?php echo esc_attr( $question_key ); ?>">
 							<?php
 				echo esc_html( $variation_data['title'] );
 				if ( $is_required ) {
@@ -214,9 +214,9 @@ class SHOW {
 			</label>
 			<input
 				type="<?php echo esc_attr( $input_type ); ?>"
-				class="pbc_question_input"
-				name="pbc_question[<?php echo esc_attr( $question_key ); ?>]"
-				id="pbc_question_<?php echo esc_attr( $question_key ); ?>"
+				class="qpfw_question_input"
+				name="qpfw_question[<?php echo esc_attr( $question_key ); ?>]"
+				id="qpfw_question_<?php echo esc_attr( $question_key ); ?>"
 				value="<?php echo esc_attr( $saved_answer ); ?>"
 				placeholder="<?php echo esc_attr( $question_placeholder ); ?>"
 				data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
@@ -225,15 +225,15 @@ class SHOW {
 				<?php echo $is_required ? 'required="required"' : ''; ?>
 				<?php echo 'number' === $input_type ? 'step="any"' : ''; ?>
 			/>
-			<input type="hidden" name="pbc_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+			<input type="hidden" name="qpfw_question_variation_id[<?php echo esc_attr( $question_key ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
 		</div>
 		<?php
 	} elseif ( empty( $field_type ) ) {
 		if ( $allow_multiple ) {
 			?>
-			<label class="pbc-checkbox-option">
-				<input type="checkbox" class="pbc_variation pbc_variation_multiple pbc-option-native" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
-				<span class="pbc-checkbox-option-text"><?php echo esc_html( $variation_data['title'] ); ?></span>
+			<label class="qpfw-checkbox-option">
+				<input type="checkbox" class="qpfw_variation qpfw_variation_multiple qpfw-option-native" name="qpfw_variation[<?php echo esc_attr( $cstep ); ?>][]" value="<?php echo esc_attr( $variation_id ); ?>" <?php checked( in_array( $variation_id, $selected_vars, true ), true, true ); ?> />
+				<span class="qpfw-checkbox-option-text"><?php echo esc_html( $variation_data['title'] ); ?></span>
 			</label>
 			<?php
 		} else {
@@ -250,8 +250,8 @@ class SHOW {
 				} elseif ( 'qty' === $field_type ) {
 					$s_var = $s_var === $variation_id ? 1 : $s_var;
 					?>
-					<input type="number" class="pbc_variation" name="pbc_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
-					<input type="hidden" name="pbc_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
+					<input type="number" class="qpfw_variation" name="qpfw_variation[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo (int) $s_var; ?>" />
+					<input type="hidden" name="qpfw_variation_id[<?php echo esc_attr( $cstep ); ?>]" value="<?php echo esc_attr( $variation_id ); ?>" />
 					<?php
 					echo esc_html( $variation_data['title'] );
 				}
@@ -275,7 +275,7 @@ class SHOW {
 			if ( PHP_SESSION_NONE !== session_status() && isset( $_SESSION ) ) {
 				// Try to get from session - we need to check all possible session keys.
 				foreach ( $_SESSION as $session_key => $session_data ) {
-					if ( is_string( $session_key ) && 0 === strpos( $session_key, 'pbc_variation_' ) ) {
+					if ( is_string( $session_key ) && 0 === strpos( $session_key, 'qpfw_variation_' ) ) {
 						if ( isset( $session_data[ $cstep ]['var']['id'] ) ) {
 							$selected_variation_id = (int) $session_data[ $cstep ]['var']['id'];
 							if ( in_array( $selected_variation_id, $variations_with_input, true ) ) {
@@ -295,7 +295,7 @@ class SHOW {
 				// Get saved value for current selection if not already set.
 				if ( empty( $saved_value ) && PHP_SESSION_NONE !== session_status() && isset( $_SESSION ) ) {
 					foreach ( $_SESSION as $session_key => $session_data ) {
-						if ( is_string( $session_key ) && 0 === strpos( $session_key, 'pbc_variation_' ) ) {
+						if ( is_string( $session_key ) && 0 === strpos( $session_key, 'qpfw_variation_' ) ) {
 							if ( isset( $session_data[ $cstep ]['custom_input'][ $selected_variation_id ] ) ) {
 								$saved_value = sanitize_textarea_field( $session_data[ $cstep ]['custom_input'][ $selected_variation_id ] );
 							}
@@ -306,12 +306,12 @@ class SHOW {
 
 			// Show input wrapper for all variations that need it, JavaScript will show/hide the correct one.
 			?>
-			<div class="pbc-custom-input-wrapper" data-variation-ids="<?php echo esc_attr( implode( ',', $variations_with_input ) ); ?>" style="<?php echo $should_show ? '' : 'display: none;'; ?>">
+			<div class="qpfw-custom-input-wrapper" data-variation-ids="<?php echo esc_attr( implode( ',', $variations_with_input ) ); ?>" style="<?php echo $should_show ? '' : 'display: none;'; ?>">
 				<textarea 
-					class="pbc-custom-input" 
+					class="qpfw-custom-input" 
 					data-step="<?php echo esc_attr( $cstep ); ?>"
 					rows="3"
-					placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'pbc' ); ?>"
+					placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'quote-product-flow' ); ?>"
 				><?php echo esc_textarea( $saved_value ); ?></textarea>
 			</div>
 			<?php
@@ -321,20 +321,20 @@ class SHOW {
 	/**
 	 * Calculate summary and show.
 	 *
-	 * @param string $pbc_session_key Session key.
+	 * @param string $qpfw_session_key Session key.
 	 * @param int    $cstep Current step.
 	 * @param array  $phases Phases.
 	 *
 	 * @return void
 	 */
-	public static function calculation_summary( $pbc_session_key, $cstep, $phases ) {
-		if ( ! isset( $_SESSION ) && ! isset( $_SESSION[ $pbc_session_key ] ) && is_array( $_SESSION[ $pbc_session_key ] ) ) {
+	public static function calculation_summary( $qpfw_session_key, $cstep, $phases ) {
+		if ( ! isset( $_SESSION ) && ! isset( $_SESSION[ $qpfw_session_key ] ) && is_array( $_SESSION[ $qpfw_session_key ] ) ) {
 			return;
 		}
 		?>
 		<div class="configurator_summary">
 			<?php
-			$role = isset( $_SESSION[ $pbc_session_key ]['role_slug'] ) ? sanitize_key( $_SESSION[ $pbc_session_key ]['role_slug'] ) : '';
+			$role = isset( $_SESSION[ $qpfw_session_key ]['role_slug'] ) ? sanitize_key( $_SESSION[ $qpfw_session_key ]['role_slug'] ) : '';
 			if ( $role ) {
 				$role_names = wp_roles()->get_names();
 				$role_name  = isset( $role_names[ $role ] ) ? $role_names[ $role ] : $role;
@@ -343,7 +343,7 @@ class SHOW {
 				<?php
 			}
 			?>
-			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'pbc' ); ?></h2>
+			<h2 class="title"><?php esc_html_e( 'Actual Configuration', 'quote-product-flow' ); ?></h2>
 		<table>
 			<?php
 			$user            = wp_get_current_user();
@@ -355,13 +355,13 @@ class SHOW {
 
 			$total_price = 0;
 			for ( $i = 1; $i <= $count; $i++ ) {
-				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+				if ( ! isset( $_SESSION[ $qpfw_session_key ][ $i ] ) ) {
 					continue;
 				}
-				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
-				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
-				$var_type     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ) : '';
-				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'pbc_field_type', true );
+				$var_price    = ! empty( $_SESSION[ $qpfw_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $qpfw_session_key ][ $i ]['var']['price'] : 0;
+				$variation_id = isset( $_SESSION[ $qpfw_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $qpfw_session_key ][ $i ]['var']['id'] : 0;
+				$var_type     = isset( $_SESSION[ $qpfw_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $qpfw_session_key ][ $i ]['var']['type'] ) ) : '';
+				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'qpfw_field_type', true );
 				if ( 'calculate' === $cstep && empty( $field_type ) && 'direct_input' !== $var_type ) {
 					$total_price += (float) $var_price;
 				} elseif ( 'calculate' === $cstep && 'qty' === $field_type ) {
@@ -375,13 +375,13 @@ class SHOW {
 					$show_price_column = ( $total_price > 0.00001 );
 				} else {
 					for ( $j = 1; $j <= $count; $j++ ) {
-						if ( ! isset( $_SESSION[ $pbc_session_key ][ $j ] ) ) {
+						if ( ! isset( $_SESSION[ $qpfw_session_key ][ $j ] ) ) {
 							continue;
 						}
-						if ( isset( $_SESSION[ $pbc_session_key ][ $j ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $j ]['questions'] ) ) {
+						if ( isset( $_SESSION[ $qpfw_session_key ][ $j ]['questions'] ) && is_array( $_SESSION[ $qpfw_session_key ][ $j ]['questions'] ) ) {
 							continue;
 						}
-						$step_price = isset( $_SESSION[ $pbc_session_key ][ $j ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $j ]['var']['price'] : 0;
+						$step_price = isset( $_SESSION[ $qpfw_session_key ][ $j ]['var']['price'] ) ? (float) $_SESSION[ $qpfw_session_key ][ $j ]['var']['price'] : 0;
 						if ( $step_price > 0.00001 ) {
 							$show_price_column = true;
 							break;
@@ -389,28 +389,30 @@ class SHOW {
 					}
 				}
 			}
-			$show_price_column = (bool) apply_filters( 'pbc_summary_show_price_column', $show_price_column, $pbc_session_key, $cstep, $total_price, $show_price_ui );
+			$show_price_column = (bool) apply_filters( 'qpfw_summary_show_price_column', $show_price_column, $qpfw_session_key, $cstep, $total_price, $show_price_ui );
 
 			for ( $i = 1; $i <= $count; $i++ ) {
-				if ( ! isset( $_SESSION[ $pbc_session_key ][ $i ] ) ) {
+				if ( ! isset( $_SESSION[ $qpfw_session_key ][ $i ] ) ) {
 					continue;
 				}
 				$phase_key    = $i;
-				$var_name     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['var']['name'] ) ) : '';
-				$var_price    = ! empty( $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $pbc_session_key ][ $i ]['var']['price'] : 0;
-				$phase_name   = isset( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['phase']['name'] ) ) : '';
-				$variation_id = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $pbc_session_key ][ $i ]['var']['id'] : 0;
-				$var_type     = isset( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $pbc_session_key ][ $i ]['var']['type'] ) ) : '';
-				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'pbc_field_type', true );
+				$var_name     = isset( $_SESSION[ $qpfw_session_key ][ $i ]['var']['name'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $qpfw_session_key ][ $i ]['var']['name'] ) ) : '';
+				$var_price    = ! empty( $_SESSION[ $qpfw_session_key ][ $i ]['var']['price'] ) ? (float) $_SESSION[ $qpfw_session_key ][ $i ]['var']['price'] : 0;
+				$phase_name   = isset( $_SESSION[ $qpfw_session_key ][ $i ]['phase']['name'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $qpfw_session_key ][ $i ]['phase']['name'] ) ) : '';
+				$variation_id = isset( $_SESSION[ $qpfw_session_key ][ $i ]['var']['id'] ) ? (int) $_SESSION[ $qpfw_session_key ][ $i ]['var']['id'] : 0;
+				$var_type     = isset( $_SESSION[ $qpfw_session_key ][ $i ]['var']['type'] ) ? sanitize_text_field( wp_unslash( $_SESSION[ $qpfw_session_key ][ $i ]['var']['type'] ) ) : '';
+				$field_type   = 'direct_input' === $var_type ? '' : get_post_meta( $variation_id, 'qpfw_field_type', true );
 
-				$has_multiple_questions = isset( $_SESSION[ $pbc_session_key ][ $i ]['questions'] ) && is_array( $_SESSION[ $pbc_session_key ][ $i ]['questions'] );
+				$has_multiple_questions = isset( $_SESSION[ $qpfw_session_key ][ $i ]['questions'] ) && is_array( $_SESSION[ $qpfw_session_key ][ $i ]['questions'] );
 
 				if ( $has_multiple_questions ) {
-					foreach ( $_SESSION[ $pbc_session_key ][ $i ]['questions'] as $question_data ) {
+					foreach ( $_SESSION[ $qpfw_session_key ][ $i ]['questions'] as $question_data ) {
+						$question_title  = sanitize_text_field( wp_unslash( $question_data['variation_title'] ?? '' ) );
+						$question_answer = sanitize_text_field( wp_unslash( $question_data['answer'] ?? '' ) );
 						?>
 					<tr class="variation_selected phase-<?php echo esc_attr( $phase_key ); ?> question-row">
 						<td class="name">
-							<?php echo esc_html( $phase_key . '. ' . $question_data['variation_title'] . ': ' . $question_data['answer'] ); ?>
+							<?php echo esc_html( $phase_key . '. ' . $question_title . ': ' . $question_answer ); ?>
 						</td>
 						<?php if ( $show_price_column ) { ?>
 						<td class="price">-</td>
@@ -449,11 +451,11 @@ class SHOW {
 			if ( 'calculate' === $cstep && $show_price_ui && $total_price > 0.00001 ) {
 				?>
 					<tr class="variation_selected phase-total_price">
-						<td class="name"><?php esc_html_e( 'Total', 'pbc' ); ?></td>
+						<td class="name"><?php esc_html_e( 'Total', 'quote-product-flow' ); ?></td>
 						<td class="price"><?php echo esc_html( number_format( $total_price, 2, ',', '.' ) . ' €' ); ?></td>
 					</tr>
 					<tr class="variation_selected phase-total_price">
-						<td class="name"><?php esc_html_e( 'VAT not included', 'pbc' ); ?></td>
+						<td class="name"><?php esc_html_e( 'VAT not included', 'quote-product-flow' ); ?></td>
 						<td class="price"></td>
 					</tr>
 				<?php } ?>
@@ -512,10 +514,10 @@ class SHOW {
 				$prev_button = '';
 			} elseif ( 'calculate' === $cstep ) {
 				$prev_step   = count( $phases );
-				$prev_button = __( 'Back', 'pbc' );
+				$prev_button = __( 'Back', 'quote-product-flow' );
 			} else {
 				$prev_step   = $cstep - 1;
-				$prev_button = __( 'Back', 'pbc' );
+				$prev_button = __( 'Back', 'quote-product-flow' );
 			}
 
 			if ( 'calculate' === $cstep ) {
@@ -523,17 +525,17 @@ class SHOW {
 				$next_button = '';
 			} elseif ( count( $phases ) === $cstep ) {
 				$next_step   = 'calculate';
-				$next_button = __( 'Calculate', 'pbc' );
+				$next_button = __( 'Calculate', 'quote-product-flow' );
 			} else {
 				$next_step   = $cstep + 1;
-				$next_button = __( 'Next', 'pbc' );
+				$next_button = __( 'Next', 'quote-product-flow' );
 			}
 
 			// Check if there are recommended variations configured.
-			$variations_recommended = get_option( 'pbc_variations_recommended', array() );
+			$variations_recommended = get_option( 'qpfw_variations_recommended', array() );
 			$has_recommendations    = ! empty( $variations_recommended );
 			?>
-			<input type="hidden" name="pbc_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
+			<input type="hidden" name="qpfw_current_phase" value="<?php echo esc_attr( $cstep ); ?>"/>
 			<?php if ( $prev_step && $prev_button ) { ?>
 			<div class="prev">
 				<input type="hidden" name="prev_phase" value="<?php echo esc_attr( $prev_step ); ?>"/>
@@ -542,12 +544,12 @@ class SHOW {
 			<?php } ?>
 			<?php if ( $cstep > 1 ) { ?>
 			<div class="restart">
-				<button type="button" id="pbc-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'pbc' ); ?></button>
+				<button type="button" id="qpfw-restart-process" class="btn btn-restart"><?php esc_html_e( 'Restart', 'quote-product-flow' ); ?></button>
 			</div>
 			<?php } ?>
 			<?php if ( 1 === $cstep && $has_recommendations ) { ?>
 			<div class="recommendation" style="display:none;">
-				<button type="button" id="pbc-load-recommendation" class="btn btn-recommendation"><?php esc_html_e( 'Recommendation', 'pbc' ); ?></button>
+				<button type="button" id="qpfw-load-recommendation" class="btn btn-recommendation"><?php esc_html_e( 'Recommendation', 'quote-product-flow' ); ?></button>
 			</div>
 			<?php } ?>
 			<div class="next">
