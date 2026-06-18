@@ -311,7 +311,7 @@ class SHOW {
 					class="qpfw-custom-input" 
 					data-step="<?php echo esc_attr( $cstep ); ?>"
 					rows="3"
-					placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'quote-product-flow' ); ?>"
+					placeholder="<?php echo esc_attr__( 'Write here...', 'quote-product-flow' ); ?>"
 				><?php echo esc_textarea( $saved_value ); ?></textarea>
 			</div>
 			<?php

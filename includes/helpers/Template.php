@@ -826,7 +826,7 @@ class Template {
 											class="qpfw-direct-input qpfw-direct-input-textarea"
 											name="qpfw_direct_input[<?php echo esc_attr( $cstep ); ?>]"
 											rows="5"
-											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'quote-product-flow' ); ?>"
+											placeholder="<?php echo esc_attr__( 'Write here...', 'quote-product-flow' ); ?>"
 										><?php echo esc_textarea( $saved_value ); ?></textarea>
 									<?php } elseif ( 'number' === $input_type ) { ?>
 										<div class="qpfw-number-input-wrapper">
@@ -852,7 +852,7 @@ class Template {
 											class="qpfw-direct-input qpfw-direct-input-text"
 											name="qpfw_direct_input[<?php echo esc_attr( $cstep ); ?>]"
 											value="<?php echo esc_attr( $saved_value ); ?>"
-											placeholder="<?php echo esc_attr__( 'Escribe aquí...', 'quote-product-flow' ); ?>"
+											placeholder="<?php echo esc_attr__( 'Write here...', 'quote-product-flow' ); ?>"
 										/>
 									<?php } ?>
 								</div>
