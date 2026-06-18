@@ -1,5 +1,5 @@
 === Quote Product Flow ===
-Contributors: closetechnology, davidperez
+Contributors: closetechnology, davidperez, alexcm13
 Tags: configurator, budget, pricing, product, calculator
 Requires at least: 5.0
 Tested up to: 7.0
