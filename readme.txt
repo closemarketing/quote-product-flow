@@ -39,16 +39,25 @@ Interactive step-by-step product configurator with dynamic pricing, budget gener
 
 Unlock additional power with [Quote Product Flow Pro](https://close.technology/wordpress-plugins/quote-product-flow/):
 
-* **Role-based discounts** — different prices per WordPress user role
-* **PDF branding** — custom logo, colors, and layout in generated PDFs
-* **Advanced recommendations** — multiple recommendation sets with dependency validation
+* **Role-based discounts** — different prices and price visibility per WordPress user role
+* **PDF branding** — custom logo, header, footer, odd-row color, and total-row color in generated PDFs
+* **Custom primary color** — override the configurator accent color from the settings panel
+* **Recommended configurations** — define multiple recommendation sets with one-click auto-fill and dependency validation
+* **Import / Export** — CSV import and export of phases and variations, with dependencies and images preserved as slugs
+* **Enquiries** — budgets saved as a dedicated post type with a full line editor in admin
+* **Admin budget editor** — add or edit budget lines manually or from the variation catalog, supporting question, quantity, fixed price, and multiple-selection line types
+* **Shareable configuration link** — generate a URL that restores a specific configurator session
+* **WhatsApp & email sharing** — share the budget PDF link via WhatsApp or attach it to an email from the configurator
+* **Support contact buttons** — sticky phone and email buttons displayed throughout the configurator
+* **Bulk price updater** — update prices across all variations from a single admin screen
+* **Custom admin notification emails** — override the recipient address(es) per configurator
 * **Priority support** — direct access to the development team
 
 == Installation ==
 
 1. Upload the `quote-product-flow` folder to `/wp-content/plugins/` or install via **Plugins > Add New**.
 2. Activate the plugin from the **Plugins** page.
-3. Go to **PBC** in the admin menu to configure settings.
+3. Go to **QuoteProduct** in the admin menu to configure settings.
 4. Add the shortcode `[quote-product-flow]` to any page to display the configurator.
 
 == Frequently Asked Questions ==
@@ -75,7 +84,7 @@ Yes. In the variation editor, use the **Depends of** section to show a variation
 
 = Where are budgets saved? =
 
-Budgets are saved as custom posts (enquiries) and PDF files in `/wp-content/uploads/pbc/`.
+Budgets are saved as enquiry posts (Pro) and PDF files in `/wp-content/uploads/quote-product-flow/`.
 
 == Screenshots ==
 
@@ -88,6 +97,7 @@ Budgets are saved as custom posts (enquiries) and PDF files in `/wp-content/uplo
 == Changelog ==
 
 = 2.0.0 =
+* Refactored: Major code refactor for improved performance, maintainability, and extensibility to publish in the WordPress plugin directory.
 * Performance: Preload variation posts, meta and taxonomy terms in batch before render loop, eliminating N+1 queries per variation (200+ plugin queries reduced to 3).
 * Fixed: PHP session lock released immediately after `session_start()` to prevent REST API timeouts.
 * Fixed: Safe access to `wp_count_posts()` result in `is_multiple_products()` to avoid `stdClass::$publish` notice.
