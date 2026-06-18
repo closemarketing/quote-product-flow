@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use CLOSE\QProductFlow\Helpers\CALC;
 use CLOSE\QProductFlow\Helpers\PDF;
+use CLOSE\QProductFlow\Helpers\Template;
 
 /**
  * Class for admin

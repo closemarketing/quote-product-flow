@@ -12,6 +12,8 @@ namespace CLOSE\QProductFlow;
 
 defined( 'ABSPATH' ) || exit;
 
+use DOMDocument;
+
 /**
  * Enable SVG uploads with sanitization for admin
  */

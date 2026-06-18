@@ -27,7 +27,7 @@ if ( ! defined( 'QPFW_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'QPFW_PLUGIN' ) ) {
-	define( 'QPFW_PLUGIN', TESTS_PLUGIN_DIR . '/qpfw.php' );
+	define( 'QPFW_PLUGIN', TESTS_PLUGIN_DIR . '/quote-product-flow.php' );
 }
 
 if ( ! defined( 'QPFW_PLUGIN_PATH' ) ) {
@@ -59,7 +59,7 @@ function _manually_load_plugin() {
 	require TESTS_PLUGIN_DIR . '/vendor/autoload.php';
 
 	// Load the plugin.
-	require TESTS_PLUGIN_DIR . '/qpfw.php';
+	require TESTS_PLUGIN_DIR . '/quote-product-flow.php';
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
