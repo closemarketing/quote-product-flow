@@ -141,7 +141,9 @@ class SvgSupport {
 		}
 
 		// Remove event handlers and dangerous attributes.
-		$this->remove_dangerous_attributes( $dom );
+		// Pass documentElement (XML_ELEMENT_NODE) so the recursive walker actually enters the tree.
+		// Passing $dom directly returns immediately because DOMDocument has nodeType XML_DOCUMENT_NODE (9).
+		$this->remove_dangerous_attributes( $dom->documentElement ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		return $dom->saveXML( $dom->documentElement ) ? $dom->saveXML( $dom->documentElement ) : false; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	}
