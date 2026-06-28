@@ -28,7 +28,8 @@ class PDF {
 	 * @return string|null
 	 */
 	public static function generate_engine_pdf( $item = array(), $type_return = 'path' ) {
-		$filename      = __( 'budget', 'quote-product-flow' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '.pdf';
+		$token         = bin2hex( random_bytes( 16 ) );
+		$filename      = __( 'budget', 'quote-product-flow' ) . '-' . sanitize_title( get_bloginfo( 'name' ) ) . '-' . gmdate( 'Y-m-d-H-i' ) . '-' . $token . '.pdf';
 		$dirname       = self::get_budget_base_dir( 'path' );
 		$filename_path = $dirname . $filename;
 
