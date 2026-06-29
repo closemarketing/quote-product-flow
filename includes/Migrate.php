@@ -350,60 +350,77 @@ function qpfw_repair_stale_phase_refs() {
 	);
 	$stats['deduped_rows'] = $deduped;
 
-	// ── 7. Remove qpfw_depends items referencing non-existent variations ───────
+	// ── 7. Remap qpfw_depends IDs from old production IDs to current local IDs ─
+	// When data is imported from a production site and variations receive new
+	// auto-increment IDs, the qpfw_depends values still reference the original
+	// production IDs. We resolve the mapping via the post guid field, which
+	// WordPress preserves from the source site and embeds the original ID as
+	// the ?p=N query parameter.
+	//
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-	$dep_rows = $wpdb->get_results(
-		"SELECT meta_id, meta_value
-		 FROM {$wpdb->postmeta}
-		 WHERE meta_key   = 'qpfw_depends'
-		   AND meta_value NOT IN ('a:0:{}', '')"
+	$guid_map_rows = $wpdb->get_results(
+		"SELECT
+		     CAST(SUBSTRING_INDEX(guid, 'p=', -1) AS UNSIGNED) AS old_id,
+		     ID AS new_id
+		 FROM {$wpdb->posts}
+		 WHERE post_type IN ('qpfw_variation', 'variation')
+		   AND post_status != 'trash'
+		   AND guid LIKE '%p=%'
+		   AND CAST(SUBSTRING_INDEX(guid, 'p=', -1) AS UNSIGNED) != ID"
 	);
 
-	foreach ( $dep_rows as $row ) {
-		$depends = maybe_unserialize( $row->meta_value );
-		if ( ! is_array( $depends ) || empty( $depends ) ) {
-			continue;
+	$id_remap = array();
+	foreach ( $guid_map_rows as $gm ) {
+		$old = (int) $gm->old_id;
+		$new = (int) $gm->new_id;
+		if ( $old > 0 && $new > 0 ) {
+			$id_remap[ $old ] = $new;
 		}
+	}
 
-		$clean   = array();
-		$changed = false;
+	if ( ! empty( $id_remap ) ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		$dep_rows = $wpdb->get_results(
+			"SELECT meta_id, meta_value
+			 FROM {$wpdb->postmeta}
+			 WHERE meta_key   = 'qpfw_depends'
+			   AND meta_value NOT IN ('a:0:{}', '')"
+		);
 
-		foreach ( $depends as $dep ) {
-			if ( ! is_array( $dep ) || empty( $dep['qpfw_depvar'] ) ) {
-				$changed = true;
+		foreach ( $dep_rows as $row ) {
+			$depends = maybe_unserialize( $row->meta_value );
+			if ( ! is_array( $depends ) || empty( $depends ) ) {
 				continue;
 			}
-			$parts  = explode( '|', $dep['qpfw_depvar'] );
-			$var_id = isset( $parts[1] ) ? (int) $parts[1] : 0;
-			if ( $var_id <= 0 ) {
-				$changed = true;
-				continue;
-			}
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-			$exists = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts}
-					 WHERE ID = %d AND post_type = 'qpfw_variation'",
-					$var_id
-				)
-			);
-			if ( $exists ) {
-				$clean[] = $dep;
-			} else {
-				$changed = true;
-			}
-		}
 
-		if ( $changed ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update(
-				$wpdb->postmeta,
-				array( 'meta_value' => maybe_serialize( array_values( $clean ) ) ),
-				array( 'meta_id' => (int) $row->meta_id ),
-				array( '%s' ),
-				array( '%d' )
-			);
-			$stats['fixed_depends']++;
+			$new_depends = array();
+			$changed     = false;
+
+			foreach ( $depends as $dep ) {
+				if ( ! is_array( $dep ) || empty( $dep['qpfw_depvar'] ) ) {
+					$new_depends[] = $dep;
+					continue;
+				}
+				$parts  = explode( '|', $dep['qpfw_depvar'] );
+				$var_id = isset( $parts[1] ) ? (int) $parts[1] : 0;
+				if ( $var_id > 0 && isset( $id_remap[ $var_id ] ) ) {
+					$dep['qpfw_depvar'] = $parts[0] . '|' . $id_remap[ $var_id ];
+					$changed = true;
+				}
+				$new_depends[] = $dep;
+			}
+
+			if ( $changed ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->update(
+					$wpdb->postmeta,
+					array( 'meta_value' => maybe_serialize( array_values( $new_depends ) ) ),
+					array( 'meta_id' => (int) $row->meta_id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+				$stats['fixed_depends']++;
+			}
 		}
 	}
 

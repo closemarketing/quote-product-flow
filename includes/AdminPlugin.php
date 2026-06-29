@@ -359,14 +359,14 @@ class AdminPlugin {
 									<strong><?php echo (int) $r_phases; ?></strong> <?php esc_html_e( 'phase references fixed', 'quote-product-flow' ); ?>,
 									<strong><?php echo (int) $r_created; ?></strong> <?php esc_html_e( 'new phases created', 'quote-product-flow' ); ?>,
 									<strong><?php echo (int) $r_deduped; ?></strong> <?php esc_html_e( 'duplicate meta rows removed', 'quote-product-flow' ); ?>,
-									<strong><?php echo (int) $r_depends; ?></strong> <?php esc_html_e( 'broken dependency entries cleared', 'quote-product-flow' ); ?>.
+									<strong><?php echo (int) $r_depends; ?></strong> <?php esc_html_e( 'dependency entries remapped to current IDs', 'quote-product-flow' ); ?>.
 								</p>
 							</div>
 						<?php endif; ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<input type="hidden" name="action" value="qpfw_run_repair" />
 							<?php wp_nonce_field( 'qpfw_run_repair' ); ?>
-							<button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'This will repair broken phase references and remove duplicate meta data. Dependencies referencing deleted variations will be cleared. Continue?', 'quote-product-flow' ); ?>');">
+							<button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'This will repair broken phase references, remove duplicate meta data, and remap dependency IDs from old production IDs to current local IDs. Continue?', 'quote-product-flow' ); ?>');">
 								<span class="dashicons dashicons-tools" style="vertical-align: middle;"></span>
 								<?php esc_html_e( 'Run Repair Now', 'quote-product-flow' ); ?>
 							</button>
