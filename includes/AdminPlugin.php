@@ -38,7 +38,7 @@ class AdminPlugin {
 		add_action( 'wp_ajax_nopriv_qpfw_restart_process', array( $this, 'qpfw_restart_process' ) );
 
 		add_action( 'admin_post_qpfw_run_migration', array( $this, 'handle_run_migration' ) );
-		add_action( 'admin_post_qpfw_run_repair',    array( $this, 'handle_run_repair' ) );
+		add_action( 'admin_post_qpfw_run_repair', array( $this, 'handle_run_repair' ) );
 	}
 
 	/**
@@ -347,7 +347,7 @@ class AdminPlugin {
 						<?php
 						// phpcs:disable WordPress.Security.NonceVerification.Recommended
 						if ( isset( $_GET['qpfw_repair'] ) && '1' === $_GET['qpfw_repair'] ) :
-							$r_phases  = isset( $_GET['qpfw_repair_phases'] )  ? (int) $_GET['qpfw_repair_phases']  : 0;
+							$r_phases  = isset( $_GET['qpfw_repair_phases'] ) ? (int) $_GET['qpfw_repair_phases'] : 0;
 							$r_created = isset( $_GET['qpfw_repair_created'] ) ? (int) $_GET['qpfw_repair_created'] : 0;
 							$r_deduped = isset( $_GET['qpfw_repair_deduped'] ) ? (int) $_GET['qpfw_repair_deduped'] : 0;
 							$r_depends = isset( $_GET['qpfw_repair_depends'] ) ? (int) $_GET['qpfw_repair_depends'] : 0;

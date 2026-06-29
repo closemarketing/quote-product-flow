@@ -2,6 +2,8 @@
 /**
  * Data migration and repair utilities (1.x → 2.0.0+)
  *
+ * Functions provided:
+ *
  * qpfw_migrate_cpt_slugs()       – Standard migration: renames PBC post types,
  *                                   taxonomy and meta keys to qpfw_* prefixes.
  *                                   Runs once; safe to re-run via the admin button.
@@ -313,7 +315,7 @@ function qpfw_repair_stale_phase_refs() {
 				if ( ! is_wp_error( $new_id ) && $new_id > 0 ) {
 					$old_to_new[ $old_id ]    = $new_id;
 					$title_to_new_id[ $title ] = $new_id;
-					$stats['created_phases']++;
+					++$stats['created_phases'];
 				}
 			}
 		}
@@ -419,7 +421,7 @@ function qpfw_repair_stale_phase_refs() {
 					array( '%s' ),
 					array( '%d' )
 				);
-				$stats['fixed_depends']++;
+				++$stats['fixed_depends'];
 			}
 		}
 	}
