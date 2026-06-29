@@ -38,6 +38,7 @@ class AdminPlugin {
 		add_action( 'wp_ajax_nopriv_qpfw_restart_process', array( $this, 'qpfw_restart_process' ) );
 
 		add_action( 'admin_post_qpfw_run_migration', array( $this, 'handle_run_migration' ) );
+		add_action( 'admin_post_qpfw_run_repair', array( $this, 'handle_run_repair' ) );
 	}
 
 	/**
@@ -329,6 +330,45 @@ class AdminPlugin {
 							<button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'This will migrate legacy post type data. Continue?', 'quote-product-flow' ); ?>');">
 								<span class="dashicons dashicons-database-import" style="vertical-align: middle;"></span>
 								<?php esc_html_e( 'Run Migration Now', 'quote-product-flow' ); ?>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Repair Phase References -->
+			<div class="qpfw-settings-container" style="margin-top: 20px;">
+				<div class="qpfw-settings-card">
+					<div class="qpfw-card-header">
+						<h2><span class="dashicons dashicons-tools"></span> <?php esc_html_e( 'Repair Phase References', 'quote-product-flow' ); ?></h2>
+						<p class="description"><?php esc_html_e( 'Use this if phases were deleted and recreated after migration (variations show wrong or missing phase). It detects broken phase references, maps them to the correct current phases using enquiry history, creates missing phases, removes duplicate meta entries and clears dependency references to deleted variations.', 'quote-product-flow' ); ?></p>
+					</div>
+					<div class="qpfw-card-body">
+						<?php
+						// phpcs:disable WordPress.Security.NonceVerification.Recommended
+						if ( isset( $_GET['qpfw_repair'] ) && '1' === $_GET['qpfw_repair'] ) :
+							$r_phases  = isset( $_GET['qpfw_repair_phases'] ) ? (int) $_GET['qpfw_repair_phases'] : 0;
+							$r_created = isset( $_GET['qpfw_repair_created'] ) ? (int) $_GET['qpfw_repair_created'] : 0;
+							$r_deduped = isset( $_GET['qpfw_repair_deduped'] ) ? (int) $_GET['qpfw_repair_deduped'] : 0;
+							$r_depends = isset( $_GET['qpfw_repair_depends'] ) ? (int) $_GET['qpfw_repair_depends'] : 0;
+							// phpcs:enable WordPress.Security.NonceVerification.Recommended
+							?>
+							<div class="notice notice-success inline">
+								<p>
+									<?php esc_html_e( 'Repair completed:', 'quote-product-flow' ); ?>
+									<strong><?php echo (int) $r_phases; ?></strong> <?php esc_html_e( 'phase references fixed', 'quote-product-flow' ); ?>,
+									<strong><?php echo (int) $r_created; ?></strong> <?php esc_html_e( 'new phases created', 'quote-product-flow' ); ?>,
+									<strong><?php echo (int) $r_deduped; ?></strong> <?php esc_html_e( 'duplicate meta rows removed', 'quote-product-flow' ); ?>,
+									<strong><?php echo (int) $r_depends; ?></strong> <?php esc_html_e( 'dependency entries remapped to current IDs', 'quote-product-flow' ); ?>.
+								</p>
+							</div>
+						<?php endif; ?>
+						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+							<input type="hidden" name="action" value="qpfw_run_repair" />
+							<?php wp_nonce_field( 'qpfw_run_repair' ); ?>
+							<button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'This will repair broken phase references, remove duplicate meta data, and remap dependency IDs from old production IDs to current local IDs. Continue?', 'quote-product-flow' ); ?>');">
+								<span class="dashicons dashicons-tools" style="vertical-align: middle;"></span>
+								<?php esc_html_e( 'Run Repair Now', 'quote-product-flow' ); ?>
 							</button>
 						</form>
 					</div>
@@ -739,8 +779,35 @@ class AdminPlugin {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'            => 'qpfw_menu',
-					'qpfw_migration'  => '1',
+					'page'           => 'qpfw_menu',
+					'qpfw_migration' => '1',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Handle repair button submission.
+	 */
+	public function handle_run_repair() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'quote-product-flow' ) );
+		}
+		check_admin_referer( 'qpfw_run_repair' );
+
+		$stats = qpfw_repair_stale_phase_refs();
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'                => 'qpfw_menu',
+					'qpfw_repair'         => '1',
+					'qpfw_repair_phases'  => $stats['fixed_phases'],
+					'qpfw_repair_created' => $stats['created_phases'],
+					'qpfw_repair_deduped' => $stats['deduped_rows'],
+					'qpfw_repair_depends' => $stats['fixed_depends'],
 				),
 				admin_url( 'admin.php' )
 			)

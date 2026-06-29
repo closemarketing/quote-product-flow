@@ -1020,12 +1020,17 @@ class HelperPostTypes {
 				foreach ( $depends_group as $depends_item ) {
 					$depvar         = explode( '|', $depends_item['qpfw_depvar'] );
 					$variation_id   = isset( $depvar[1] ) ? (int) $depvar[1] : 0;
-					$variation_post = get_post( $variation_id );
-					$phase_id_dp    = get_post_meta( $variation_id, 'qpfw_phase', true );
-					$phase_post_dp  = get_post( $phase_id_dp );
-					$phase_order    = '';
-					$phase_order   .= CALC::adds_zero( $phase_post_dp->menu_order );
-					echo esc_html( $phase_order ) . ' - ' . esc_html( $phase_post_dp->post_title ) . ' - ';
+					$variation_post = $variation_id ? get_post( $variation_id ) : null;
+					if ( ! $variation_post ) {
+						echo esc_html( $depends_item['qpfw_depvar'] ) . '<br/>';
+						continue;
+					}
+					$phase_id_dp   = get_post_meta( $variation_id, 'qpfw_phase', true );
+					$phase_post_dp = $phase_id_dp ? get_post( $phase_id_dp ) : null;
+					if ( $phase_post_dp ) {
+						echo esc_html( CALC::adds_zero( $phase_post_dp->menu_order ) ) . ' - ';
+						echo esc_html( $phase_post_dp->post_title ) . ' - ';
+					}
 					echo esc_html( $variation_post->post_title ) . '<br/>';
 				}
 				break;
