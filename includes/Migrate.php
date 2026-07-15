@@ -204,10 +204,11 @@ function qpfw_repair_stale_phase_refs() {
 	);
 
 	$stats = array(
-		'fixed_phases'   => 0,
-		'created_phases' => 0,
-		'deduped_rows'   => 0,
-		'fixed_depends'  => 0,
+		'fixed_phases'      => 0,
+		'created_phases'    => 0,
+		'deduped_rows'      => 0,
+		'fixed_depends'     => 0,
+		'fixed_pricegroups' => 0,
 	);
 
 	if ( ! empty( $broken_phase_ids ) ) {
@@ -423,6 +424,45 @@ function qpfw_repair_stale_phase_refs() {
 				);
 				++$stats['fixed_depends'];
 			}
+		}
+	}
+
+	// ── 8. Clean up corrupted qpfw_pricegroup rows (all-empty duplicates from doubling bug) ──
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+	$pg_rows = $wpdb->get_results(
+		"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'qpfw_pricegroup' AND meta_value NOT IN ('a:0:{}','')"
+	);
+	foreach ( $pg_rows as $pg_row ) {
+		$pg = maybe_unserialize( $pg_row->meta_value );
+		if ( ! is_array( $pg ) || empty( $pg ) ) {
+			continue;
+		}
+		$clean   = array();
+		$changed = false;
+		foreach ( $pg as $entry ) {
+			if ( ! is_array( $entry ) ) {
+				$clean[] = $entry;
+				continue;
+			}
+			$meaprice = isset( $entry['qpfw_meaprice'] ) ? $entry['qpfw_meaprice'] : null;
+			$pricem   = isset( $entry['qpfw_pricem'] ) ? $entry['qpfw_pricem'] : null;
+			// Drop rows where both fields exist but are both empty strings (doubling-bug artifact).
+			if ( '' === $meaprice && '' === $pricem ) {
+				$changed = true;
+				continue;
+			}
+			$clean[] = $entry;
+		}
+		if ( $changed ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$wpdb->postmeta,
+				array( 'meta_value' => maybe_serialize( array_values( $clean ) ) ),
+				array( 'meta_id' => (int) $pg_row->meta_id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+			++$stats['fixed_pricegroups'];
 		}
 	}
 

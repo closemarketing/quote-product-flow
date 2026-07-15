@@ -309,8 +309,10 @@ jQuery(document).ready(function($) {
 	$(document).on('click', '.qpfw-add-row', function() {
 		var tableId = $(this).data('table');
 		var tplId   = $(this).data('tpl');
-		var tpl     = $('#' + tplId).html();
-		$('#' + tableId + ' tbody').append(tpl);
+		var tbody   = $('#' + tableId + ' tbody');
+		var idx     = tbody.find('tr').length;
+		var tpl     = $('#' + tplId).html().replace(/__IDX__/g, idx);
+		tbody.append(tpl);
 	});
 
 	$(document).on('click', '.qpfw-remove-row', function() {

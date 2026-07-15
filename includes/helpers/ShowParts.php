@@ -155,22 +155,31 @@ class SHOW {
 					</label>
 					<?php
 					$pricegroup = get_post_meta( $variation_id, 'qpfw_pricegroup', true );
-					if ( ! empty( $pricegroup ) && isset( $pricegroup[0]['qpfw_meaprice'] ) ) {
-						?>
-						<div class="qpfw_pricevarwrap">
-							<select class="qpfw_pricevar" name="qpfw_pricevar_<?php echo (int) $variation_id; ?>">
-								<?php
-								foreach ( $pricegroup as $key => $details ) {
-									if ( ! empty( $details['qpfw_meaprice'] ) && isset( $details['qpfw_pricem'] ) ) {
-										echo '<option value="' . esc_attr( $details['qpfw_meaprice'] ) . '">';
-										echo esc_html( $details['qpfw_meaprice'] );
-										echo '</option>';
+					if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
+						$has_labeled = false;
+						foreach ( $pricegroup as $pg_row ) {
+							if ( ! empty( $pg_row['qpfw_meaprice'] ) ) {
+								$has_labeled = true;
+								break;
+							}
+						}
+						if ( $has_labeled ) {
+							?>
+							<div class="qpfw_pricevarwrap">
+								<select class="qpfw_pricevar" name="qpfw_pricevar_<?php echo (int) $variation_id; ?>">
+									<?php
+									foreach ( $pricegroup as $details ) {
+										if ( ! empty( $details['qpfw_meaprice'] ) && isset( $details['qpfw_pricem'] ) ) {
+											echo '<option value="' . esc_attr( $details['qpfw_meaprice'] ) . '">';
+											echo esc_html( $details['qpfw_meaprice'] );
+											echo '</option>';
+										}
 									}
-								}
-								?>
-							</select>
-						</div>
-						<?php
+									?>
+								</select>
+							</div>
+							<?php
+						}
 					}
 					$qpfw_descopt = get_post_meta( $variation_id, 'qpfw_descopt', true );
 					if ( $qpfw_descopt ) {

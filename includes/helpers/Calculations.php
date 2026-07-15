@@ -428,15 +428,24 @@ class CALC {
 		$pricegroup = get_post_meta( $variation_id, 'qpfw_pricegroup', true );
 		if ( ! empty( $pricegroup ) && is_array( $pricegroup ) ) {
 			$price = array_search( $price_var, array_column( $pricegroup, 'qpfw_meaprice', 'qpfw_pricem' ), true );
-			if ( false === $price && isset( $pricegroup[0]['qpfw_pricem'] ) ) {
-				$price     = $pricegroup[0]['qpfw_pricem'];
-				$role_slug = ! empty( $user->roles ) ? $user->roles[0] : '';
-				$discount  = (int) apply_filters( 'qpfw_user_discount', 0, $role_slug, $variation_id );
-				if ( $discount > 0 ) {
-					$price = $price - ( $price * $discount / 100 );
+			if ( false === $price || '' === $price ) {
+				// Fallback: use the first row that has a non-empty pricem value.
+				$price = false;
+				foreach ( $pricegroup as $pg_row ) {
+					if ( ! empty( $pg_row['qpfw_pricem'] ) ) {
+						$price     = $pg_row['qpfw_pricem'];
+						$role_slug = ! empty( $user->roles ) ? $user->roles[0] : '';
+						$discount  = (int) apply_filters( 'qpfw_user_discount', 0, $role_slug, $variation_id );
+						if ( $discount > 0 ) {
+							$price = $price - ( $price * $discount / 100 );
+						}
+						break;
+					}
 				}
 			}
 		}
+		// Handle comma as decimal separator (Spanish format: "142,80").
+		$price = str_replace( ',', '.', (string) $price );
 		return (float) $price;
 	}
 

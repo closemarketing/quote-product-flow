@@ -347,10 +347,11 @@ class AdminPlugin {
 						<?php
 						// phpcs:disable WordPress.Security.NonceVerification.Recommended
 						if ( isset( $_GET['qpfw_repair'] ) && '1' === $_GET['qpfw_repair'] ) :
-							$r_phases  = isset( $_GET['qpfw_repair_phases'] ) ? (int) $_GET['qpfw_repair_phases'] : 0;
-							$r_created = isset( $_GET['qpfw_repair_created'] ) ? (int) $_GET['qpfw_repair_created'] : 0;
-							$r_deduped = isset( $_GET['qpfw_repair_deduped'] ) ? (int) $_GET['qpfw_repair_deduped'] : 0;
-							$r_depends = isset( $_GET['qpfw_repair_depends'] ) ? (int) $_GET['qpfw_repair_depends'] : 0;
+							$r_phases      = isset( $_GET['qpfw_repair_phases'] ) ? (int) $_GET['qpfw_repair_phases'] : 0;
+							$r_created     = isset( $_GET['qpfw_repair_created'] ) ? (int) $_GET['qpfw_repair_created'] : 0;
+							$r_deduped     = isset( $_GET['qpfw_repair_deduped'] ) ? (int) $_GET['qpfw_repair_deduped'] : 0;
+							$r_depends     = isset( $_GET['qpfw_repair_depends'] ) ? (int) $_GET['qpfw_repair_depends'] : 0;
+							$r_pricegroups = isset( $_GET['qpfw_repair_pricegroups'] ) ? (int) $_GET['qpfw_repair_pricegroups'] : 0;
 							// phpcs:enable WordPress.Security.NonceVerification.Recommended
 							?>
 							<div class="notice notice-success inline">
@@ -359,7 +360,8 @@ class AdminPlugin {
 									<strong><?php echo (int) $r_phases; ?></strong> <?php esc_html_e( 'phase references fixed', 'quote-product-flow' ); ?>,
 									<strong><?php echo (int) $r_created; ?></strong> <?php esc_html_e( 'new phases created', 'quote-product-flow' ); ?>,
 									<strong><?php echo (int) $r_deduped; ?></strong> <?php esc_html_e( 'duplicate meta rows removed', 'quote-product-flow' ); ?>,
-									<strong><?php echo (int) $r_depends; ?></strong> <?php esc_html_e( 'dependency entries remapped to current IDs', 'quote-product-flow' ); ?>.
+									<strong><?php echo (int) $r_depends; ?></strong> <?php esc_html_e( 'dependency entries remapped to current IDs', 'quote-product-flow' ); ?>,
+									<strong><?php echo (int) $r_pricegroups; ?></strong> <?php esc_html_e( 'corrupted price groups cleaned', 'quote-product-flow' ); ?>.
 								</p>
 							</div>
 						<?php endif; ?>
@@ -804,10 +806,11 @@ class AdminPlugin {
 				array(
 					'page'                => 'qpfw_menu',
 					'qpfw_repair'         => '1',
-					'qpfw_repair_phases'  => $stats['fixed_phases'],
-					'qpfw_repair_created' => $stats['created_phases'],
-					'qpfw_repair_deduped' => $stats['deduped_rows'],
-					'qpfw_repair_depends' => $stats['fixed_depends'],
+					'qpfw_repair_phases'       => $stats['fixed_phases'],
+					'qpfw_repair_created'      => $stats['created_phases'],
+					'qpfw_repair_deduped'      => $stats['deduped_rows'],
+					'qpfw_repair_depends'      => $stats['fixed_depends'],
+					'qpfw_repair_pricegroups'  => $stats['fixed_pricegroups'],
 				),
 				admin_url( 'admin.php' )
 			)

@@ -395,13 +395,13 @@ class HelperPostTypes {
 						'qpfw_pricem' => '',
 					),
 				);
-				foreach ( $price_rows as $row ) :
+				foreach ( $price_rows as $pri => $row ) :
 					$meaprice = isset( $row['qpfw_meaprice'] ) ? $row['qpfw_meaprice'] : '';
 					$pricem   = isset( $row['qpfw_pricem'] ) ? $row['qpfw_pricem'] : '';
 				?>
 				<tr>
-					<td><input type="text" name="qpfw_pricegroup[][qpfw_meaprice]" value="<?php echo esc_attr( $meaprice ); ?>" class="widefat" /></td>
-					<td><input type="text" name="qpfw_pricegroup[][qpfw_pricem]" value="<?php echo esc_attr( $pricem ); ?>" class="widefat" placeholder="0" /></td>
+					<td><input type="text" name="qpfw_pricegroup[<?php echo (int) $pri; ?>][qpfw_meaprice]" value="<?php echo esc_attr( $meaprice ); ?>" class="widefat" /></td>
+					<td><input type="text" name="qpfw_pricegroup[<?php echo (int) $pri; ?>][qpfw_pricem]" value="<?php echo esc_attr( $pricem ); ?>" class="widefat" placeholder="0" /></td>
 					<td><button type="button" class="button-link-delete qpfw-remove-row"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button></td>
 				</tr>
 				<?php endforeach; ?>
@@ -409,8 +409,8 @@ class HelperPostTypes {
 		</table>
 		<script type="text/template" id="qpfw-pricegroup-tpl">
 			<tr>
-				<td><input type="text" name="qpfw_pricegroup[][qpfw_meaprice]" value="" class="widefat" /></td>
-				<td><input type="text" name="qpfw_pricegroup[][qpfw_pricem]" value="" class="widefat" placeholder="0" /></td>
+				<td><input type="text" name="qpfw_pricegroup[__IDX__][qpfw_meaprice]" value="" class="widefat" /></td>
+				<td><input type="text" name="qpfw_pricegroup[__IDX__][qpfw_pricem]" value="" class="widefat" placeholder="0" /></td>
 				<td><button type="button" class="button-link-delete qpfw-remove-row"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button></td>
 			</tr>
 		</script>
@@ -579,24 +579,24 @@ class HelperPostTypes {
 					'='  => __( 'Equal (=)', 'quote-product-flow' ),
 					'!=' => __( 'Not equal (!=)', 'quote-product-flow' ),
 				);
-				foreach ( $qdep_rows as $row ) :
+				foreach ( $qdep_rows as $qdi => $row ) :
 					$qkey = isset( $row['qpfw_question_key_ref'] ) ? $row['qpfw_question_key_ref'] : '';
 					$qop  = isset( $row['qpfw_question_operator'] ) ? $row['qpfw_question_operator'] : '>';
 					$qval = isset( $row['qpfw_question_value'] ) ? $row['qpfw_question_value'] : '';
 				?>
 				<tr>
 					<td>
-						<input type="text" name="qpfw_question_depends[][qpfw_question_key_ref]" value="<?php echo esc_attr( $qkey ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'e.g. house_m2', 'quote-product-flow' ); ?>" />
+						<input type="text" name="qpfw_question_depends[<?php echo (int) $qdi; ?>][qpfw_question_key_ref]" value="<?php echo esc_attr( $qkey ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'e.g. house_m2', 'quote-product-flow' ); ?>" />
 					</td>
 					<td>
-						<select name="qpfw_question_depends[][qpfw_question_operator]">
+						<select name="qpfw_question_depends[<?php echo (int) $qdi; ?>][qpfw_question_operator]">
 							<?php foreach ( $operator_options as $oval => $olabel ) : ?>
 								<option value="<?php echo esc_attr( $oval ); ?>"<?php selected( $qop, $oval ); ?>><?php echo esc_html( $olabel ); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</td>
 					<td>
-						<input type="text" name="qpfw_question_depends[][qpfw_question_value]" value="<?php echo esc_attr( $qval ); ?>" class="widefat" />
+						<input type="text" name="qpfw_question_depends[<?php echo (int) $qdi; ?>][qpfw_question_value]" value="<?php echo esc_attr( $qval ); ?>" class="widefat" />
 					</td>
 					<td><button type="button" class="button-link-delete qpfw-remove-row"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button></td>
 				</tr>
@@ -605,15 +605,15 @@ class HelperPostTypes {
 		</table>
 		<script type="text/template" id="qpfw-qdepends-tpl">
 			<tr>
-				<td><input type="text" name="qpfw_question_depends[][qpfw_question_key_ref]" value="" class="widefat" placeholder="<?php esc_attr_e( 'e.g. house_m2', 'quote-product-flow' ); ?>" /></td>
+				<td><input type="text" name="qpfw_question_depends[__IDX__][qpfw_question_key_ref]" value="" class="widefat" placeholder="<?php esc_attr_e( 'e.g. house_m2', 'quote-product-flow' ); ?>" /></td>
 				<td>
-					<select name="qpfw_question_depends[][qpfw_question_operator]">
+					<select name="qpfw_question_depends[__IDX__][qpfw_question_operator]">
 						<?php foreach ( $operator_options as $oval => $olabel ) : ?>
 							<option value="<?php echo esc_attr( $oval ); ?>"><?php echo esc_html( $olabel ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
-				<td><input type="text" name="qpfw_question_depends[][qpfw_question_value]" value="" class="widefat" /></td>
+				<td><input type="text" name="qpfw_question_depends[__IDX__][qpfw_question_value]" value="" class="widefat" /></td>
 				<td><button type="button" class="button-link-delete qpfw-remove-row"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button></td>
 			</tr>
 		</script>
