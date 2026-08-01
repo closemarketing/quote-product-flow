@@ -242,13 +242,15 @@ class CalcTest extends WP_UnitTestCase {
 	public function test_get_user_discount_and_role_no_discount_set() {
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
-		delete_option( 'pbc_discount_user_subscriber' );
+		// Set to 0 explicitly: get_option() defaults to true when absent, so (int)true=1 is truthy.
+		update_option( 'pbc_discount_user_subscriber', 0 );
 
 		$result = CALC::get_user_discount_and_role();
 
 		$this->assertEquals( '', $result['role'] );
 		$this->assertEquals( 0, $result['discount'] );
 
+		delete_option( 'pbc_discount_user_subscriber' );
 		wp_set_current_user( 0 );
 	}
 
@@ -334,7 +336,8 @@ class CalcTest extends WP_UnitTestCase {
 	public function test_get_price_variation_no_discount_when_not_set() {
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
-		delete_option( 'pbc_discount_user_subscriber' );
+		// Set to 0 explicitly: get_option() defaults to true when absent, so (int)true=1 is truthy.
+		update_option( 'pbc_discount_user_subscriber', 0 );
 
 		$post_id = $this->factory->post->create( array( 'post_type' => 'variation' ) );
 		update_post_meta(
