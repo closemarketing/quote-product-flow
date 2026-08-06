@@ -223,6 +223,30 @@ class CheckPhasesTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that a nonexistent phase ID with published=false is treated as passing
+	 * the parent check (get_post returns null so the parent guard is skipped).
+	 *
+	 * @return void
+	 */
+	public function test_nonexistent_phase_with_skip_published_passes_parent_silently() {
+		$fake_id = 999998;
+
+		$result = CALC::check_phases_options(
+			array( $fake_id ),
+			array(
+				'published' => false,
+				'parent'    => 0,
+			)
+		);
+
+		// When published check is disabled and get_post() returns null,
+		// the parent guard ($phase && ...) is also skipped → phase "passes".
+		$this->assertTrue( $result['valid'] );
+		$this->assertContains( $fake_id, $result['passed_ids'] );
+		$this->assertEmpty( $result['details'][ $fake_id ]['reasons'] );
+	}
+
+	/**
 	 * Test top-level phase passes when parent option is explicitly 0.
 	 *
 	 * @return void

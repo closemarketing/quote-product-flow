@@ -437,12 +437,12 @@ class CalcTest extends WP_UnitTestCase {
 		$session_key = 'pbc_variation_test1';
 		$item        = array(
 			'pbc_contact'      => array(
-				'email_field'    => 'test@example.com',
-				'name_field'     => 'Test User',
-				'phone_field'    => '123456789',
-				'city_field'     => 'Barcelona',
-				'state_field'    => 'Catalonia',
-				'comments_field' => 'Test comment',
+				'email'    => 'test@example.com',
+				'name'     => 'Test User',
+				'phone'    => '123456789',
+				'city'     => 'Barcelona',
+				'state'    => 'Catalonia',
+				'comments' => 'Test comment',
 			),
 			'pbc_session_key'  => $session_key,
 			'pbc_parent_phase' => 0,
@@ -477,9 +477,9 @@ class CalcTest extends WP_UnitTestCase {
 		$session_key = 'pbc_variation_test2';
 		$item        = array(
 			'pbc_contact'      => array(
-				'email_field' => 'q@example.com',
-				'name_field'  => 'Question User',
-				'phone_field' => '987654321',
+				'email' => 'q@example.com',
+				'name'  => 'Question User',
+				'phone' => '987654321',
 			),
 			'pbc_session_key'  => $session_key,
 			'pbc_parent_phase' => 0,
