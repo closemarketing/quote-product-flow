@@ -329,6 +329,28 @@ jQuery(document).ready(function($) {
 		$(this).closest('.qpfw-depends-item').remove();
 	});
 
+	// Depends grid: toggle between "specific variation" and "by title" mode.
+	$(document).on('change', '.qpfw-dep-mode', function() {
+		var $row   = $(this).closest('.qpfw-depends-item');
+		var $idSel = $row.find('.qpfw-dep-id');
+		var $title = $row.find('.qpfw-dep-title');
+		if ('title' === $(this).val()) {
+			$idSel.hide().prop('disabled', true);
+			$title.show().prop('disabled', false);
+		} else {
+			$title.hide().prop('disabled', true);
+			$idSel.show().prop('disabled', false);
+		}
+	});
+
+	// Depends grid: prefix "by title" values with "title:" right before the form is submitted.
+	$('#post').on('submit', function() {
+		$('.qpfw-dep-title:not([disabled])').each(function() {
+			var value = $.trim($(this).val());
+			$(this).val(value === '' ? '' : 'title:' + value);
+		});
+	});
+
 	// Add imgprodgroup row.
 	$(document).on('click', '#qpfw-add-imgprodgroup-row', function() {
 		var tbody   = $('#qpfw-imgprodgroup-table tbody');

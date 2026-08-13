@@ -224,6 +224,36 @@ class HelperPostTypes {
 	}
 
 	/**
+	 * Render one row of the "Depends of" repeatable group.
+	 *
+	 * @param string $depvar      Raw stored qpfw_depvar value (empty for a fresh row).
+	 * @param bool   $is_title    Whether this row is currently in "by title" mode.
+	 * @param string $title_value Title text when in "by title" mode.
+	 * @param array  $var_options Options for the specific-variation select.
+	 * @return string HTML markup.
+	 */
+	private function render_depend_row( $depvar, $is_title, $title_value, $var_options ) {
+		ob_start();
+		?>
+		<div class="qpfw-depends-item" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+			<select class="qpfw-dep-mode" style="flex:0 0 130px;">
+				<option value="id"<?php selected( ! $is_title ); ?>><?php esc_html_e( 'Specific variation', 'quote-product-flow' ); ?></option>
+				<option value="title"<?php selected( $is_title ); ?>><?php esc_html_e( 'By title', 'quote-product-flow' ); ?></option>
+			</select>
+			<select name="qpfw_depends[][qpfw_depvar]" class="qpfw-dep-id" style="flex:1;min-width:0;<?php echo $is_title ? 'display:none;' : ''; ?>"<?php echo $is_title ? ' disabled' : ''; ?>>
+				<option value=""><?php esc_html_e( 'Not depends of variation', 'quote-product-flow' ); ?></option>
+				<?php foreach ( $var_options as $vval => $vlabel ) : ?>
+					<option value="<?php echo esc_attr( $vval ); ?>"<?php selected( $depvar, $vval ); ?>><?php echo esc_html( $vlabel ); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<input type="text" name="qpfw_depends[][qpfw_depvar]" class="qpfw-dep-title widefat" style="flex:1;min-width:0;<?php echo $is_title ? '' : 'display:none;'; ?>"<?php echo $is_title ? '' : ' disabled'; ?> value="<?php echo esc_attr( $is_title ? $title_value : '' ); ?>" placeholder="<?php esc_attr_e( 'Ej: 130x150', 'quote-product-flow' ); ?>" />
+			<button type="button" class="button-link-delete qpfw-remove-dep" style="white-space:nowrap;flex-shrink:0;"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
 	 * Render the variation metabox.
 	 *
 	 * @param WP_Post $post Post object.
@@ -418,36 +448,23 @@ class HelperPostTypes {
 
 		<?php /* ---- DEPENDS GROUP ---- */ ?>
 		<h3 style="padding:8px 0 6px;border-bottom:1px solid #ddd;"><?php esc_html_e( 'Depends of', 'quote-product-flow' ); ?></h3>
-		<div id="qpfw-depends-table" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 12px;margin-bottom:8px;overflow:hidden;">
+		<p class="description"><?php esc_html_e( '"By title" matches every variation across all models whose title is exactly the text you type (e.g. "130x150"), without picking them one by one.', 'quote-product-flow' ); ?></p>
+		<div id="qpfw-depends-table" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
 			<?php
 			$dep_rows = ! empty( $qpfw_depends ) ? $qpfw_depends : array();
 			if ( empty( $dep_rows ) ) {
 				$dep_rows = array( array( 'qpfw_depvar' => '' ) );
 			}
 			foreach ( $dep_rows as $row ) :
-				$depvar = isset( $row['qpfw_depvar'] ) ? $row['qpfw_depvar'] : '';
+				$depvar      = isset( $row['qpfw_depvar'] ) ? $row['qpfw_depvar'] : '';
+				$is_title    = 0 === strpos( $depvar, 'title:' );
+				$title_value = $is_title ? substr( $depvar, strlen( 'title:' ) ) : '';
+				echo $this->render_depend_row( $depvar, $is_title, $title_value, $var_options ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			endforeach;
 			?>
-			<div class="qpfw-depends-item" style="display:flex;gap:4px;align-items:center;">
-				<select name="qpfw_depends[][qpfw_depvar]" style="flex:1;min-width:0;">
-					<option value=""><?php esc_html_e( 'Not depends of variation', 'quote-product-flow' ); ?></option>
-					<?php foreach ( $var_options as $vval => $vlabel ) : ?>
-						<option value="<?php echo esc_attr( $vval ); ?>"<?php selected( $depvar, $vval ); ?>><?php echo esc_html( $vlabel ); ?></option>
-					<?php endforeach; ?>
-				</select>
-				<button type="button" class="button-link-delete qpfw-remove-dep" style="white-space:nowrap;flex-shrink:0;"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button>
-			</div>
-			<?php endforeach; ?>
 		</div>
 		<script type="text/template" id="qpfw-depends-tpl">
-			<div class="qpfw-depends-item" style="display:flex;gap:4px;align-items:center;">
-				<select name="qpfw_depends[][qpfw_depvar]" style="flex:1;min-width:0;">
-					<option value=""><?php esc_html_e( 'Not depends of variation', 'quote-product-flow' ); ?></option>
-					<?php foreach ( $var_options as $vval => $vlabel ) : ?>
-						<option value="<?php echo esc_attr( $vval ); ?>"><?php echo esc_html( $vlabel ); ?></option>
-					<?php endforeach; ?>
-				</select>
-				<button type="button" class="button-link-delete qpfw-remove-dep" style="white-space:nowrap;flex-shrink:0;"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button>
-			</div>
+			<?php echo $this->render_depend_row( '', false, '', $var_options ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</script>
 		<p><button type="button" class="button" id="qpfw-add-dep-row"><?php esc_html_e( 'Add dependency', 'quote-product-flow' ); ?></button></p>
 

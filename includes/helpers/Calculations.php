@@ -245,6 +245,85 @@ class CALC {
 	}
 
 	/**
+	 * Gets all variation IDs whose post_title matches exactly (case-insensitive).
+	 *
+	 * Used by "depends by title" so a single dependency row can match every
+	 * variation named the same way across all models (e.g. "130x150").
+	 *
+	 * @param string $title Exact variation title to match.
+	 * @return array<int>
+	 */
+	public static function get_variation_ids_by_title( $title ) {
+		$title = trim( $title );
+		if ( '' === $title ) {
+			return array();
+		}
+		$cache_key = 'qpfw_var_ids_by_title_' . md5( $title );
+		$cached    = wp_cache_get( $cache_key, 'qpfw' );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+		$ids = get_posts(
+			array(
+				'post_type'      => 'qpfw_variation',
+				'posts_per_page' => -1,
+				'title'          => $title,
+				'fields'         => 'ids',
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+			)
+		);
+		$ids = array_map( 'intval', $ids );
+		wp_cache_set( $cache_key, $ids, 'qpfw', 300 );
+		return $ids;
+	}
+
+	/**
+	 * Expands one qpfw_depends row into a map of step order => variation IDs.
+	 *
+	 * Supports two row formats:
+	 * - "order|variation_id"  (single specific variation, legacy format)
+	 * - "title:some title"    (every variation across all models/phases whose
+	 *                          title matches exactly, resolved to their own
+	 *                          step order)
+	 *
+	 * @param string $depvar       Raw qpfw_depvar value.
+	 * @param array  $phases_order menu_order per phase (parallel to $phases).
+	 * @return array<int,array<int>> Map of step order => variation IDs.
+	 */
+	public static function expand_depend_row( $depvar, $phases_order ) {
+		$result = array();
+		if ( ! is_string( $depvar ) || '' === $depvar ) {
+			return $result;
+		}
+
+		if ( 0 === strpos( $depvar, 'title:' ) ) {
+			$title = substr( $depvar, strlen( 'title:' ) );
+			foreach ( self::get_variation_ids_by_title( $title ) as $matched_id ) {
+				$matched_phase_id = get_post_meta( $matched_id, 'qpfw_phase', true );
+				$matched_phase    = get_post( $matched_phase_id );
+				if ( ! $matched_phase ) {
+					continue;
+				}
+				$order = array_search( (int) $matched_phase->menu_order, $phases_order, true );
+				if ( false !== $order ) {
+					$result[ $order ][] = $matched_id;
+				}
+			}
+			return $result;
+		}
+
+		$arr = explode( '|', $depvar );
+		if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
+			$order = array_search( (int) $arr[0], $phases_order, true );
+			if ( false !== $order ) {
+				$result[ $order ][] = (int) $arr[1];
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * Gets the phases options
 	 *
 	 * @return array

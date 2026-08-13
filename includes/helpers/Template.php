@@ -618,10 +618,11 @@ class Template {
 							if ( ! empty( $depends ) ) {
 								$variations_depends[ $variation_id ] = array();
 								foreach ( $depends as $depend ) {
-									$arr = explode( '|', $depend['qpfw_depvar'] );
-									if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-										$order = array_search( (int) $arr[0], $phases_order, true );
-										$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
+									$expanded = CALC::expand_depend_row( $depend['qpfw_depvar'], $phases_order );
+									foreach ( $expanded as $order => $ids ) {
+										foreach ( $ids as $depend_id ) {
+											$variations_depends[ $variation_id ][ $order ][] = $depend_id;
+										}
 									}
 								}
 							}
@@ -1148,11 +1149,10 @@ class Template {
 			if ( ! empty( $depends ) ) {
 				$variations_depends[ $variation_id ] = array();
 				foreach ( $depends as $depend ) {
-					$arr = explode( '|', $depend['qpfw_depvar'] );
-					if ( isset( $arr[0] ) && isset( $arr[1] ) ) {
-						$order = array_search( (int) $arr[0], $phases_order, true );
-						if ( false !== $order ) {
-							$variations_depends[ $variation_id ][ $order ][] = (int) $arr[1];
+					$expanded = CALC::expand_depend_row( $depend['qpfw_depvar'], $phases_order );
+					foreach ( $expanded as $order => $ids ) {
+						foreach ( $ids as $depend_id ) {
+							$variations_depends[ $variation_id ][ $order ][] = $depend_id;
 						}
 					}
 				}
