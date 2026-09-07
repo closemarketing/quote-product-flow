@@ -196,4 +196,23 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Test expand_depend_row title format only includes matches whose phase
+	 * menu_order is present in phases_order, skipping the rest.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_title_format_skips_phase_not_in_order() {
+		$phase_a = $this->create_phase( 1 );
+		$phase_b = $this->create_phase( 9 ); // Not present in $phases_order below.
+
+		$variation_a = $this->create_variation( '130x150', $phase_a );
+		$this->create_variation( '130x150', $phase_b );
+
+		$phases_order = array( 1, 2 );
+
+		$result = CALC::expand_depend_row( 'title:130x150', $phases_order );
+
+		$this->assertSame( array( 0 => array( $variation_a ) ), $result );
+	}
 }
