@@ -154,4 +154,20 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array(), $result );
 	}
 
+	/**
+	 * Test expand_depend_row title format resolves a single matching variation
+	 * to its own phase's step order.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_title_format_single_match() {
+		$phase_id     = $this->create_phase( 2 );
+		$variation_id = $this->create_variation( '130x150', $phase_id );
+		$phases_order = array( 1, 2, 3 );
+
+		$result = CALC::expand_depend_row( 'title:130x150', $phases_order );
+
+		$this->assertSame( array( 1 => array( $variation_id ) ), $result );
+	}
+
 }
