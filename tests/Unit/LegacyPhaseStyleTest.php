@@ -82,4 +82,34 @@ class LegacyPhaseStyleTest extends WP_UnitTestCase {
 		$this->assertSame( '0', get_post_meta( $post_id, 'qpfw_legacy_style', true ) );
 	}
 
+	/**
+	 * Test variations_content wizard output omits the choice-row/choice-label
+	 * classes when legacy_style is true, but keeps them when legacy_style is false.
+	 *
+	 * @return void
+	 */
+	public function test_variations_content_omits_choice_row_classes_when_legacy_style() {
+		$variations_section = array(
+			array(
+				'id'      => 0,
+				'section' => 'Options',
+				'title'   => 'Choice A',
+			),
+		);
+
+		ob_start();
+		SHOW::variations_content( $variations_section, 0, 1, 'wizard', false, true );
+		$legacy_output = ob_get_clean();
+
+		ob_start();
+		SHOW::variations_content( $variations_section, 0, 1, 'wizard', false, false );
+		$normal_output = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'qpfw-choice-row', $legacy_output, 'Legacy style output should not have the choice-row class' );
+		$this->assertStringNotContainsString( 'qpfw-choice-label', $legacy_output, 'Legacy style output should not have the choice-label class' );
+
+		$this->assertStringContainsString( 'qpfw-choice-row', $normal_output, 'Non-legacy output should have the choice-row class' );
+		$this->assertStringContainsString( 'qpfw-choice-label', $normal_output, 'Non-legacy output should have the choice-label class' );
+	}
+
 }
