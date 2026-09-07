@@ -31,4 +31,23 @@ test.describe( 'Phase "Old style options" checkbox', () => {
 		await page.goto( `/wp-admin/post.php?post=${ phaseId }&action=edit` );
 		await expect( checkbox( page ) ).toBeChecked();
 	} );
+
+	test( 'persists unchecked state across save + reload', async ( { page } ) => {
+		await page.goto( `/wp-admin/post.php?post=${ phaseId }&action=edit` );
+
+		// First check and save it, so unchecking is a real state change.
+		await checkbox( page ).check();
+		await page.click( '#publish' );
+		await page.waitForURL( /post\.php\?post=\d+&action=edit/ );
+
+		await page.goto( `/wp-admin/post.php?post=${ phaseId }&action=edit` );
+		await expect( checkbox( page ) ).toBeChecked();
+
+		await checkbox( page ).uncheck();
+		await page.click( '#publish' );
+		await page.waitForURL( /post\.php\?post=\d+&action=edit/ );
+
+		await page.goto( `/wp-admin/post.php?post=${ phaseId }&action=edit` );
+		await expect( checkbox( page ) ).not.toBeChecked();
+	} );
 } );
