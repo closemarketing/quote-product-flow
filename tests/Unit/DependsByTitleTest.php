@@ -68,4 +68,13 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array(), CALC::get_variation_ids_by_title( '   ' ) );
 	}
 
+	/**
+	 * Test get_variation_ids_by_title returns empty array when nothing matches.
+	 *
+	 * @return void
+	 */
+	public function test_get_variation_ids_by_title_no_match() {
+		$this->assertSame( array(), CALC::get_variation_ids_by_title( 'no-such-variation-title-xyz' ) );
+	}
+
 }
