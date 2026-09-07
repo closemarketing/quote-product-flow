@@ -28,10 +28,11 @@ class SHOW {
 	 * @param int    $cstep Current step.
 	 * @param string $template Template.
 	 * @param bool   $allow_multiple Allow multiple selections.
+	 * @param bool   $legacy_style Use the old option style (big image, no card box).
 	 *
 	 * @return void
 	 */
-	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard', $allow_multiple = false ) {
+	public static function variations_content( $variations_section, $s_var, $cstep, $template = 'wizard', $allow_multiple = false, $legacy_style = false ) {
 		$actual_variation_tag  = '';
 		$variations_with_input = array(); // Store variations that need custom input.
 
@@ -63,7 +64,7 @@ class SHOW {
 					echo '</ul><h2>' . esc_html( $variation_data['section'] ) . '</h2><ul>';
 					$actual_variation_tag = $variation_data['section'];
 				}
-				$is_choice_row = ! $is_question && empty( $field_type );
+				$is_choice_row = ! $is_question && empty( $field_type ) && ! $legacy_style;
 				?>
 				<li class="variation_list <?php echo $is_question ? 'is-question' : ''; ?><?php echo $is_choice_row ? ' qpfw-choice-row' : ''; ?>">
 					<label class="<?php echo $is_choice_row ? 'qpfw-choice-label' : ''; ?>">
