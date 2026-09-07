@@ -791,10 +791,11 @@ class Template {
 					// If all variations are questions, $selected_var remains 0 (no auto-selection).
 
 					if ( ! empty( $variations_section ) ) {
+						$legacy_style = (bool) get_post_meta( $phase_id, 'qpfw_legacy_style', true );
 						if ( $allow_multiple ) {
-							SHOW::variations_content( $variations_section, $selected_vars, $cstep, $template, true );
+							SHOW::variations_content( $variations_section, $selected_vars, $cstep, $template, true, $legacy_style );
 						} else {
-							SHOW::variations_content( $variations_section, $selected_var, $cstep, $template, false );
+							SHOW::variations_content( $variations_section, $selected_var, $cstep, $template, false, $legacy_style );
 						}
 					}
 					} else {
