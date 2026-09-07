@@ -59,4 +59,25 @@ class RenderDependRowTest extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Test render_depend_row shows an enabled specific-variation select and
+	 * hides the disabled title input when in "specific variation" mode.
+	 *
+	 * @return void
+	 */
+	public function test_render_depend_row_id_mode_shows_visible_variation_select() {
+		$html = $this->render_row( '55', false, '', array( '55' => 'Some Variation' ) );
+
+		$this->assertStringContainsString(
+			'class="qpfw-dep-id" style="flex:1;min-width:0;">',
+			$html,
+			'Specific-variation select should be visible and enabled in id mode'
+		);
+		$this->assertStringContainsString(
+			'class="qpfw-dep-title widefat" style="flex:1;min-width:0;display:none;" disabled value=""',
+			$html,
+			'Title input should be hidden and disabled in id mode'
+		);
+		$this->assertStringContainsString( 'Some Variation', $html, 'The specific-variation options should be rendered' );
+	}
 }
