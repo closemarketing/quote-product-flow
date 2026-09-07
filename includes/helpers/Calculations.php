@@ -324,6 +324,55 @@ class CALC {
 	}
 
 	/**
+	 * Gets the "order by title" map configured in the global settings page.
+	 *
+	 * Lets a title (e.g. "Medida pequeña") be given a display order once,
+	 * so it sorts first/second/etc. in every phase across every model that
+	 * has a variation with that exact title, instead of setting the order
+	 * on every single one of those variations by hand.
+	 *
+	 * @return array<string,int> Map of title => order.
+	 */
+	public static function get_order_by_title_map() {
+		$rows = get_option( 'qpfw_order_by_title' );
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+		$map = array();
+		foreach ( $rows as $row ) {
+			$title = isset( $row['qpfw_order_title'] ) ? trim( (string) $row['qpfw_order_title'] ) : '';
+			if ( '' === $title || ! isset( $row['qpfw_order_value'] ) ) {
+				continue;
+			}
+			$map[ $title ] = (int) $row['qpfw_order_value'];
+		}
+		return $map;
+	}
+
+	/**
+	 * Resolves the effective display order for one variation.
+	 *
+	 * The global "order by title" map (set once in the settings page) wins
+	 * when the variation's title matches one of its entries; otherwise
+	 * falls back to the variation's own qpfw_display_order meta (set per
+	 * phase in that phase's "Variations order" list), defaulting to 0.
+	 *
+	 * @param int    $variation_id Variation post ID.
+	 * @param string $title        Variation title (passed in to avoid a
+	 *                             repeat get_the_title() call by callers
+	 *                             that already have it).
+	 * @return int
+	 */
+	public static function get_variation_display_order( $variation_id, $title ) {
+		$by_title = self::get_order_by_title_map();
+		if ( isset( $by_title[ $title ] ) ) {
+			return $by_title[ $title ];
+		}
+		$own_order = get_post_meta( $variation_id, 'qpfw_display_order', true );
+		return '' === $own_order ? 0 : (int) $own_order;
+	}
+
+	/**
 	 * Gets the phases options
 	 *
 	 * @return array

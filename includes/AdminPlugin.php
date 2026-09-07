@@ -274,6 +274,11 @@ class AdminPlugin {
 					</div>
 				</div>
 
+				<!-- Order by title -->
+				<div class="qpfw-settings-container" style="margin-top: 20px;">
+					<?php $this->render_order_by_title_section(); ?>
+				</div>
+
 				<!-- Upgrade to Pro Card -->
 				<?php if ( ! apply_filters( 'qpfw_is_pro', false ) ) : ?>
 				<div class="qpfw-settings-container" style="margin-top: 20px;">
@@ -411,6 +416,26 @@ class AdminPlugin {
 				}
 			}
 
+			$order_by_title = array();
+			if ( isset( $_POST['qpfw_order_by_title'] ) && is_array( $_POST['qpfw_order_by_title'] ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$raw_order_rows = wp_unslash( $_POST['qpfw_order_by_title'] );
+				foreach ( $raw_order_rows as $row ) {
+					if ( ! is_array( $row ) ) {
+						continue;
+					}
+					$title = isset( $row['qpfw_order_title'] ) ? trim( sanitize_text_field( $row['qpfw_order_title'] ) ) : '';
+					if ( '' === $title ) {
+						continue;
+					}
+					$order_by_title[] = array(
+						'qpfw_order_title' => $title,
+						'qpfw_order_value' => isset( $row['qpfw_order_value'] ) ? (int) $row['qpfw_order_value'] : 0,
+					);
+				}
+			}
+			update_option( 'qpfw_order_by_title', $order_by_title );
+
 				do_action( 'qpfw_save_admin_settings', map_deep( wp_unslash( $_POST ), 'sanitize_text_field' ) );
 		}
 
@@ -540,6 +565,63 @@ class AdminPlugin {
 					<?php
 				}
 				?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the "Order by title" settings card.
+	 *
+	 * Lets a variation title (e.g. "Medida pequeña") be given a display
+	 * order once, applying to every variation with that exact title across
+	 * every phase/model, instead of setting it phase by phase.
+	 *
+	 * @return void
+	 */
+	public function render_order_by_title_section() {
+		$rows = get_option( 'qpfw_order_by_title' );
+		if ( ! is_array( $rows ) || empty( $rows ) ) {
+			$rows = array(
+				array(
+					'qpfw_order_title' => '',
+					'qpfw_order_value' => '',
+				),
+			);
+		}
+		?>
+		<div class="qpfw-settings-card">
+			<div class="qpfw-card-header">
+				<h2><span class="dashicons dashicons-sort"></span> <?php esc_html_e( 'Order by title', 'quote-product-flow' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'Give a display order to every variation sharing an exact title, across all phases and models at once. Takes priority over the per-phase order set on the phase edit screen. Lower numbers show first; same number falls back to alphabetical order.', 'quote-product-flow' ); ?></p>
+			</div>
+			<div class="qpfw-card-body">
+				<table class="widefat striped qpfw-repeatable" id="qpfw-order-by-title-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Variation title', 'quote-product-flow' ); ?></th>
+							<th style="width:110px;"><?php esc_html_e( 'Order', 'quote-product-flow' ); ?></th>
+							<th style="width:60px;"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $rows as $ri => $row ) : ?>
+							<tr>
+								<td><input type="text" class="widefat" name="qpfw_order_by_title[<?php echo (int) $ri; ?>][qpfw_order_title]" value="<?php echo esc_attr( isset( $row['qpfw_order_title'] ) ? $row['qpfw_order_title'] : '' ); ?>" placeholder="<?php esc_attr_e( 'Ej: Medida pequeña', 'quote-product-flow' ); ?>" /></td>
+								<td><input type="number" step="1" class="small-text" name="qpfw_order_by_title[<?php echo (int) $ri; ?>][qpfw_order_value]" value="<?php echo esc_attr( isset( $row['qpfw_order_value'] ) ? $row['qpfw_order_value'] : '' ); ?>" placeholder="0" /></td>
+								<td><button type="button" class="button-link-delete qpfw-remove-row"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<script type="text/template" id="qpfw-order-by-title-tpl">
+					<tr>
+						<td><input type="text" class="widefat" name="qpfw_order_by_title[__IDX__][qpfw_order_title]" value="" placeholder="<?php esc_attr_e( 'Ej: Medida pequeña', 'quote-product-flow' ); ?>" /></td>
+						<td><input type="number" step="1" class="small-text" name="qpfw_order_by_title[__IDX__][qpfw_order_value]" value="" placeholder="0" /></td>
+						<td><button type="button" class="button-link-delete qpfw-remove-row"><?php esc_html_e( 'Remove', 'quote-product-flow' ); ?></button></td>
+					</tr>
+				</script>
+				<p><button type="button" class="button qpfw-add-row" data-table="qpfw-order-by-title-table" data-tpl="qpfw-order-by-title-tpl"><?php esc_html_e( 'Add title order', 'quote-product-flow' ); ?></button></p>
 			</div>
 		</div>
 		<?php

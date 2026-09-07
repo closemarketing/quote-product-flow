@@ -220,6 +220,10 @@
 
 .variation_img img {
   min-width: 120px;
+  max-height: 170px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .hidden {
@@ -550,8 +554,11 @@
 }
 
 .phase_variations ul li.qpfw-choice-row .qpfw-option-card .variation_img img {
-  max-height: 56px;
+  max-height: 96px;
+  max-width: 100%;
   width: auto;
+  height: auto;
+  object-fit: contain;
   display: block;
   margin: 0 auto;
 }
@@ -664,24 +671,51 @@
   margin-right: 20px;
 }
 
-.product_preview .image-wrap:has(img) {
-  padding-top: 64px;
-}
-
-.page-configurator-vertical .product_preview .image-wrap:has(img) {
-  padding-top: 32px;
-}
-
-.product_preview .image-wrap img:first-child {
+.product_preview .image-wrap {
   position: relative;
 }
 
-.product_preview .image-wrap img {
+/*
+ * margin-top, not padding-top: an absolutely positioned child's top:0
+ * anchors to the padding box of its containing block, so padding here
+ * would only push the (normal-flow) first image down, not the absolutely
+ * positioned overlays after it - they'd land 64px too high, which was the
+ * actual cause of the "cut/duplicated" preview bug. margin shifts the
+ * whole box before either kind of child is laid out, so both align.
+ */
+.product_preview .image-wrap:has(img) {
+  margin-top: 64px;
+}
+
+.page-configurator-vertical .product_preview .image-wrap:has(img) {
+  margin-top: 32px;
+}
+
+/*
+ * Layered composite: each selected phase adds an overlay <img> on top of the
+ * previous ones (door base + hardware/finish photos). The first image sets
+ * the box size in normal flow; every image after it is absolutely
+ * positioned to fill that exact same box via object-fit, so mismatched
+ * source photo ratios can't stretch or spill past the bottom (the bug this
+ * replaces: overlays used to size themselves from their own aspect ratio,
+ * so a taller overlay would overflow and read as a duplicated slice).
+ */
+.product_preview .image-wrap img:first-child {
+  position: relative;
+  display: block;
   width: 100%;
   max-width: 200px;
+  height: auto;
+  object-fit: contain;
+}
+
+.product_preview .image-wrap img:not(:first-child) {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 200px;
+  object-fit: contain;
 }
 
 .configurator_form_action {

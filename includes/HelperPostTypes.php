@@ -647,6 +647,7 @@ class HelperPostTypes {
 	public function render_phase_metabox( $post ) {
 		$post_id                 = $post->ID;
 		$qpfw_phase_note          = get_post_meta( $post_id, 'qpfw_phase_note', true );
+		$qpfw_legacy_style        = (bool) get_post_meta( $post_id, 'qpfw_legacy_style', true );
 		$qpfw_allow_multiple      = (bool) get_post_meta( $post_id, 'qpfw_allow_multiple_selections', true );
 		$qpfw_show_direct_input   = (bool) get_post_meta( $post_id, 'qpfw_show_direct_input', true );
 		$qpfw_direct_input_type   = get_post_meta( $post_id, 'qpfw_direct_input_type', true );
@@ -673,6 +674,15 @@ class HelperPostTypes {
 					);
 					?>
 					<p class="description"><?php esc_html_e( 'Add a note that will be displayed between phase elements', 'quote-product-flow' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Old style options', 'quote-product-flow' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="qpfw_legacy_style" value="1" <?php checked( $qpfw_legacy_style ); ?> />
+						<?php esc_html_e( 'Show the old option style in this phase: bigger images without a card box around each option', 'quote-product-flow' ); ?>
+					</label>
 				</td>
 			</tr>
 			<tr>
@@ -704,6 +714,46 @@ class HelperPostTypes {
 				</td>
 			</tr>
 		</table>
+
+		<?php /* ---- VARIATIONS ORDER ---- */ ?>
+		<h3 style="padding:8px 0 6px;border-bottom:1px solid #ddd;"><?php esc_html_e( 'Variations order', 'quote-product-flow' ); ?></h3>
+		<p class="description">
+			<?php esc_html_e( 'Lower numbers show first. Give the same number to variations you want treated as tied — ties fall back to alphabetical order. To set an order once for a title shared across many models (e.g. always show "Medida pequeña" first everywhere), use "Order by title" in the plugin settings page instead of setting it here one by one.', 'quote-product-flow' ); ?>
+		</p>
+		<?php
+		$phase_variations = get_posts(
+			array(
+				'post_type'      => 'qpfw_variation',
+				'posts_per_page' => -1,
+				'meta_key'       => 'qpfw_phase',
+				'meta_value'     => $post_id,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+			)
+		);
+		if ( ! empty( $phase_variations ) ) :
+			?>
+			<table class="widefat striped" style="max-width:500px;">
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Variation', 'quote-product-flow' ); ?></th>
+						<th style="width:110px;"><?php esc_html_e( 'Order', 'quote-product-flow' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ( $phase_variations as $var_item ) : ?>
+						<tr>
+							<td><?php echo esc_html( $var_item->post_title ); ?></td>
+							<td>
+								<input type="number" step="1" class="small-text" name="qpfw_display_order[<?php echo (int) $var_item->ID; ?>]" value="<?php echo esc_attr( get_post_meta( $var_item->ID, 'qpfw_display_order', true ) ); ?>" placeholder="0" />
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php else : ?>
+			<p class="description"><?php esc_html_e( 'No variations belong to this phase yet.', 'quote-product-flow' ); ?></p>
+		<?php endif; ?>
 		<?php
 		wp_add_inline_script(
 			'qpfw-admin-scripts',
@@ -867,6 +917,9 @@ class HelperPostTypes {
 		$phase_note = isset( $_POST['qpfw_phase_note'] ) ? wp_kses_post( wp_unslash( $_POST['qpfw_phase_note'] ) ) : '';
 		update_post_meta( $post_id, 'qpfw_phase_note', $phase_note );
 
+		$legacy_style = isset( $_POST['qpfw_legacy_style'] ) ? 1 : 0;
+		update_post_meta( $post_id, 'qpfw_legacy_style', $legacy_style );
+
 		$allow_multiple = isset( $_POST['qpfw_allow_multiple_selections'] ) ? 1 : 0;
 		update_post_meta( $post_id, 'qpfw_allow_multiple_selections', $allow_multiple );
 
@@ -880,6 +933,19 @@ class HelperPostTypes {
 			$direct_input_type = 'textarea';
 		}
 		update_post_meta( $post_id, 'qpfw_direct_input_type', $direct_input_type );
+
+		// Per-variation display order, only for variations that actually belong to this phase.
+		if ( isset( $_POST['qpfw_display_order'] ) && is_array( $_POST['qpfw_display_order'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$raw_order = wp_unslash( $_POST['qpfw_display_order'] );
+			foreach ( $raw_order as $variation_id => $order_value ) {
+				$variation_id = (int) $variation_id;
+				if ( $variation_id <= 0 || (int) get_post_meta( $variation_id, 'qpfw_phase', true ) !== $post_id ) {
+					continue;
+				}
+				update_post_meta( $variation_id, 'qpfw_display_order', (int) $order_value );
+			}
+		}
 	}
 
 	/**
