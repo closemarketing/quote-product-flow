@@ -647,6 +647,7 @@ class HelperPostTypes {
 	public function render_phase_metabox( $post ) {
 		$post_id                 = $post->ID;
 		$qpfw_phase_note          = get_post_meta( $post_id, 'qpfw_phase_note', true );
+		$qpfw_legacy_style        = (bool) get_post_meta( $post_id, 'qpfw_legacy_style', true );
 		$qpfw_allow_multiple      = (bool) get_post_meta( $post_id, 'qpfw_allow_multiple_selections', true );
 		$qpfw_show_direct_input   = (bool) get_post_meta( $post_id, 'qpfw_show_direct_input', true );
 		$qpfw_direct_input_type   = get_post_meta( $post_id, 'qpfw_direct_input_type', true );
@@ -673,6 +674,15 @@ class HelperPostTypes {
 					);
 					?>
 					<p class="description"><?php esc_html_e( 'Add a note that will be displayed between phase elements', 'quote-product-flow' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Old style options', 'quote-product-flow' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="qpfw_legacy_style" value="1" <?php checked( $qpfw_legacy_style ); ?> />
+						<?php esc_html_e( 'Show the old option style in this phase: bigger images without a card box around each option', 'quote-product-flow' ); ?>
+					</label>
 				</td>
 			</tr>
 			<tr>
@@ -866,6 +876,9 @@ class HelperPostTypes {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$phase_note = isset( $_POST['qpfw_phase_note'] ) ? wp_kses_post( wp_unslash( $_POST['qpfw_phase_note'] ) ) : '';
 		update_post_meta( $post_id, 'qpfw_phase_note', $phase_note );
+
+		$legacy_style = isset( $_POST['qpfw_legacy_style'] ) ? 1 : 0;
+		update_post_meta( $post_id, 'qpfw_legacy_style', $legacy_style );
 
 		$allow_multiple = isset( $_POST['qpfw_allow_multiple_selections'] ) ? 1 : 0;
 		update_post_meta( $post_id, 'qpfw_allow_multiple_selections', $allow_multiple );
