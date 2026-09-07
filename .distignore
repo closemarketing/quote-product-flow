@@ -14,6 +14,8 @@ circle.yml
 node_modules/
 package.json
 package-lock.json
+playwright.config.ts
+.tools/
 
 # Testing
 phpcs.xml.dist
@@ -23,6 +25,9 @@ phpstan.neon.dist
 phpunit.xml.dist
 .phplint.yml
 tests/
+tests-e2e/
+test-results/
+playwright-report/
 bin/
 
 # AI
