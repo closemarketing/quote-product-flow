@@ -141,4 +141,17 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array(), $result );
 	}
 
+	/**
+	 * Test expand_depend_row title format returns empty array when nothing matches.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_title_format_no_match() {
+		$phases_order = array( 1, 2 );
+
+		$result = CALC::expand_depend_row( 'title:no-such-title-xyz', $phases_order );
+
+		$this->assertSame( array(), $result );
+	}
+
 }
