@@ -61,3 +61,15 @@ export async function updatePostMeta(
 ): Promise< void > {
 	await wp( [ 'post', 'meta', 'update', String( id ), key, value ] );
 }
+
+/**
+ * Updates a WP option to an arbitrary JSON-serializable value (array/object
+ * included), via WP-CLI's --format=json.
+ */
+export async function updateOptionJson( key: string, value: unknown ): Promise< void > {
+	await wp( [ 'option', 'update', key, JSON.stringify( value ), '--format=json' ] );
+}
+
+export async function deleteOption( key: string ): Promise< void > {
+	await wp( [ 'option', 'delete', key ] );
+}
