@@ -114,4 +114,17 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array(), CALC::expand_depend_row( '', array( 1, 2, 3 ) ) );
 	}
 
+	/**
+	 * Test expand_depend_row resolves the legacy "order|id" format.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_legacy_format_resolves_step_order() {
+		$phases_order = array( 1, 2, 3 );
+
+		$result = CALC::expand_depend_row( '2|55', $phases_order );
+
+		$this->assertSame( array( 1 => array( 55 ) ), $result );
+	}
+
 }
