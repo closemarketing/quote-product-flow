@@ -94,4 +94,22 @@ class VariationDependsSaveTest extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Test save_variation_meta does nothing when the nonce is missing or invalid.
+	 *
+	 * @return void
+	 */
+	public function test_save_variation_meta_does_nothing_without_valid_nonce() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+
+		$_POST['qpfw_variation_nonce'] = 'not-a-valid-nonce';
+		$_POST['qpfw_depends']         = array(
+			array( 'qpfw_depvar' => 'title:130x150' ),
+		);
+
+		$this->helper->save_variation_meta( $post_id, get_post( $post_id ) );
+
+		$this->assertSame( '', get_post_meta( $post_id, 'qpfw_depends', true ) );
+	}
+
 }
