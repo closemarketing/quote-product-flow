@@ -112,4 +112,40 @@ class LegacyPhaseStyleTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'qpfw-choice-label', $normal_output, 'Non-legacy output should have the choice-label class' );
 	}
 
+	/**
+	 * Test variations_content renders the variation icon image wrapper one
+	 * extra time in legacy style.
+	 *
+	 * The markup contains two possible spots for the "variation_img" wrapper:
+	 * one gated by `$imgicon && ! $is_choice_row` right before the option
+	 * label, and one inside the option card that is always rendered when the
+	 * variation has an icon. Legacy style forces $is_choice_row to false, so
+	 * the gated wrapper additionally appears, for a total of two occurrences
+	 * instead of one.
+	 *
+	 * @return void
+	 */
+	public function test_variations_content_renders_extra_icon_wrapper_in_legacy_style() {
+		$variation_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+		update_post_meta( $variation_id, 'qpfw_imgicon', '999999' );
+
+		$variations_section = array(
+			array(
+				'id'      => $variation_id,
+				'section' => 'Options',
+				'title'   => 'Choice A',
+			),
+		);
+
+		ob_start();
+		SHOW::variations_content( $variations_section, 0, 1, 'wizard', false, true );
+		$legacy_output = ob_get_clean();
+
+		ob_start();
+		SHOW::variations_content( $variations_section, 0, 1, 'wizard', false, false );
+		$normal_output = ob_get_clean();
+
+		$this->assertSame( 2, substr_count( $legacy_output, 'variation_img' ), 'Legacy style should render the icon image wrapper twice (gated + card)' );
+		$this->assertSame( 1, substr_count( $normal_output, 'variation_img' ), 'Non-legacy (choice-row) style should render the icon image wrapper only once (card)' );
+	}
 }
