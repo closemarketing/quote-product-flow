@@ -66,4 +66,20 @@ class LegacyPhaseStyleTest extends WP_UnitTestCase {
 		$this->assertSame( '1', get_post_meta( $post_id, 'qpfw_legacy_style', true ) );
 	}
 
+	/**
+	 * Test save_phase_meta persists qpfw_legacy_style as 0 when the checkbox is absent.
+	 *
+	 * @return void
+	 */
+	public function test_save_phase_meta_persists_legacy_style_as_0_when_unchecked() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_phases' ) );
+
+		$_POST['qpfw_phase_nonce'] = wp_create_nonce( 'qpfw_phase_save' );
+		unset( $_POST['qpfw_legacy_style'] );
+
+		$this->helper->save_phase_meta( $post_id, get_post( $post_id ) );
+
+		$this->assertSame( '0', get_post_meta( $post_id, 'qpfw_legacy_style', true ) );
+	}
+
 }
