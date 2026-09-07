@@ -77,4 +77,18 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array(), CALC::get_variation_ids_by_title( 'no-such-variation-title-xyz' ) );
 	}
 
+	/**
+	 * Test get_variation_ids_by_title matches exactly and case-insensitively.
+	 *
+	 * @return void
+	 */
+	public function test_get_variation_ids_by_title_matches_case_insensitively() {
+		$phase_id     = $this->create_phase( 1 );
+		$variation_id = $this->create_variation( 'Test Title Case', $phase_id );
+
+		$result = CALC::get_variation_ids_by_title( 'test title case' );
+
+		$this->assertSame( array( $variation_id ), $result );
+	}
+
 }
