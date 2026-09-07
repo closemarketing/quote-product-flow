@@ -725,21 +725,24 @@ class Template {
 										'fields' => 'all',
 									)
 								);
+								$variation_title       = get_the_title( $variation_id );
 								$variations_section[] = array(
 									'id'      => $variation_id,
 									'section' => isset( $term_list[0]->name ) ? $term_list[0]->name : '',
-									'title'   => get_the_title( $variation_id ),
+									'title'   => $variation_title,
+									'order'   => CALC::get_variation_display_order( $variation_id, $variation_title ),
 								);
 							}
 
 							// Order by sections and title.
 							foreach ( $variations_section as $key => $val ) {
 									$temp_arr['section'][ $key ] = $val['section'];
+									$temp_arr['order'][ $key ]   = $val['order'];
 									$temp_arr['title'][ $key ]   = $val['title'];
 							}
-							// Sort by section asc and then title asc.
-							if ( ! empty( $temp_arr['section'] ) && ! empty( $temp_arr['title'] ) ) {
-								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
+							// Sort by section asc, then display order asc, then title asc as a tie-break.
+							if ( ! empty( $temp_arr['section'] ) && ! empty( $temp_arr['order'] ) && ! empty( $temp_arr['title'] ) ) {
+								array_multisort( $temp_arr['section'], SORT_ASC, $temp_arr['order'], SORT_ASC, $temp_arr['title'], SORT_ASC, $variations_section );
 				}
 
 					// Check if phase allows multiple selections.
