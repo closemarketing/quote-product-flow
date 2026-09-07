@@ -675,12 +675,20 @@
   position: relative;
 }
 
+/*
+ * margin-top, not padding-top: an absolutely positioned child's top:0
+ * anchors to the padding box of its containing block, so padding here
+ * would only push the (normal-flow) first image down, not the absolutely
+ * positioned overlays after it - they'd land 64px too high, which was the
+ * actual cause of the "cut/duplicated" preview bug. margin shifts the
+ * whole box before either kind of child is laid out, so both align.
+ */
 .product_preview .image-wrap:has(img) {
-  padding-top: 64px;
+  margin-top: 64px;
 }
 
 .page-configurator-vertical .product_preview .image-wrap:has(img) {
-  padding-top: 32px;
+  margin-top: 32px;
 }
 
 /*
@@ -694,6 +702,7 @@
  */
 .product_preview .image-wrap img:first-child {
   position: relative;
+  display: block;
   width: 100%;
   max-width: 200px;
   height: auto;
