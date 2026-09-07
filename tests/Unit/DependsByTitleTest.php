@@ -91,4 +91,18 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array( $variation_id ), $result );
 	}
 
+	/**
+	 * Test get_variation_ids_by_title does not match a partial title.
+	 *
+	 * @return void
+	 */
+	public function test_get_variation_ids_by_title_does_not_match_partial_title() {
+		$phase_id = $this->create_phase( 1 );
+		$this->create_variation( '130x150 Extra', $phase_id );
+
+		$result = CALC::get_variation_ids_by_title( '130x150' );
+
+		$this->assertSame( array(), $result );
+	}
+
 }
