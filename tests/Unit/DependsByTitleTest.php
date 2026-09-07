@@ -170,4 +170,30 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array( 1 => array( $variation_id ) ), $result );
 	}
 
+	/**
+	 * Test expand_depend_row title format resolves matches across two different
+	 * phases into two different step-order keys, each with their own variation id.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_title_format_matches_across_two_phases() {
+		$phase_a = $this->create_phase( 1 );
+		$phase_b = $this->create_phase( 2 );
+
+		$variation_a = $this->create_variation( '130x150', $phase_a );
+		$variation_b = $this->create_variation( '130x150', $phase_b );
+
+		$phases_order = array( 1, 2 );
+
+		$result = CALC::expand_depend_row( 'title:130x150', $phases_order );
+
+		$this->assertSame(
+			array(
+				0 => array( $variation_a ),
+				1 => array( $variation_b ),
+			),
+			$result
+		);
+	}
+
 }
