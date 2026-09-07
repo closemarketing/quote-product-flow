@@ -105,4 +105,13 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array(), $result );
 	}
 
+	/**
+	 * Test expand_depend_row returns empty array for an empty depvar.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_empty_depvar() {
+		$this->assertSame( array(), CALC::expand_depend_row( '', array( 1, 2, 3 ) ) );
+	}
+
 }
