@@ -73,4 +73,25 @@ class VariationDependsSaveTest extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Test save_variation_meta persists a legacy "order|id" depvar row verbatim.
+	 *
+	 * @return void
+	 */
+	public function test_save_variation_meta_persists_legacy_depvar_verbatim() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+
+		$_POST['qpfw_variation_nonce'] = wp_create_nonce( 'qpfw_variation_save' );
+		$_POST['qpfw_depends']         = array(
+			array( 'qpfw_depvar' => '2|55' ),
+		);
+
+		$this->helper->save_variation_meta( $post_id, get_post( $post_id ) );
+
+		$this->assertSame(
+			array( array( 'qpfw_depvar' => '2|55' ) ),
+			get_post_meta( $post_id, 'qpfw_depends', true )
+		);
+	}
+
 }
