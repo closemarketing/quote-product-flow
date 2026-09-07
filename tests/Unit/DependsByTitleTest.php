@@ -127,4 +127,18 @@ class DependsByTitleTest extends WP_UnitTestCase {
 		$this->assertSame( array( 1 => array( 55 ) ), $result );
 	}
 
+	/**
+	 * Test expand_depend_row legacy format returns empty array when the phase
+	 * menu_order is not present in phases_order.
+	 *
+	 * @return void
+	 */
+	public function test_expand_depend_row_legacy_format_menu_order_not_found() {
+		$phases_order = array( 1, 2, 3 );
+
+		$result = CALC::expand_depend_row( '9|55', $phases_order );
+
+		$this->assertSame( array(), $result );
+	}
+
 }
