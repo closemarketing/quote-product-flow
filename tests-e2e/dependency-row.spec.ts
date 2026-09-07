@@ -101,4 +101,23 @@ test.describe( 'Variation depends-of row', () => {
 			await deletePost( phaseId );
 		}
 	} );
+
+	test( '"Add dependency" and "Remove" buttons add/remove rows in the DOM', async ( { page } ) => {
+		await page.goto( `/wp-admin/post.php?post=${ variationId }&action=edit` );
+
+		const rows = page.locator( '.qpfw-depends-item' );
+		const initialCount = await rows.count();
+
+		await page.click( '#qpfw-add-dep-row' );
+		await expect( rows ).toHaveCount( initialCount + 1 );
+
+		await page.click( '#qpfw-add-dep-row' );
+		await expect( rows ).toHaveCount( initialCount + 2 );
+
+		await rows.last().locator( '.qpfw-remove-dep' ).click();
+		await expect( rows ).toHaveCount( initialCount + 1 );
+
+		await rows.last().locator( '.qpfw-remove-dep' ).click();
+		await expect( rows ).toHaveCount( initialCount );
+	} );
 } );
