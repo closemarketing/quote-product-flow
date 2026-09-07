@@ -112,4 +112,24 @@ class VariationDependsSaveTest extends WP_UnitTestCase {
 		$this->assertSame( '', get_post_meta( $post_id, 'qpfw_depends', true ) );
 	}
 
+	/**
+	 * Test save_variation_meta does nothing for a user without edit_post capability.
+	 *
+	 * @return void
+	 */
+	public function test_save_variation_meta_does_nothing_without_edit_capability() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+
+		$subscriber_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		$_POST['qpfw_variation_nonce'] = wp_create_nonce( 'qpfw_variation_save' );
+		$_POST['qpfw_depends']         = array(
+			array( 'qpfw_depvar' => 'title:130x150' ),
+		);
+
+		$this->helper->save_variation_meta( $post_id, get_post( $post_id ) );
+
+		$this->assertSame( '', get_post_meta( $post_id, 'qpfw_depends', true ) );
+	}
 }
