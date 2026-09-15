@@ -113,19 +113,21 @@ class LegacyPhaseStyleTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test variations_content renders the variation icon image wrapper one
-	 * extra time in legacy style.
+	 * Test variations_content renders the variation icon image wrapper
+	 * exactly once, in both legacy and non-legacy style.
 	 *
-	 * The markup contains two possible spots for the "variation_img" wrapper:
-	 * one gated by `$imgicon && ! $is_choice_row` right before the option
-	 * label, and one inside the option card that is always rendered when the
-	 * variation has an icon. Legacy style forces $is_choice_row to false, so
-	 * the gated wrapper additionally appears, for a total of two occurrences
-	 * instead of one.
+	 * Regression test: the markup used to have two spots that could render
+	 * the "variation_img" wrapper - one gated by `$imgicon && ! $is_choice_row`
+	 * right before the option label, and one inside the option card that is
+	 * always rendered when the variation has an icon. Since legacy style
+	 * forces $is_choice_row to false, the first (gated) wrapper additionally
+	 * fired there, duplicating every variation's image on screen. The gated
+	 * wrapper was removed; the option card's own image render now covers
+	 * both styles, CSS alone deciding how big it renders.
 	 *
 	 * @return void
 	 */
-	public function test_variations_content_renders_extra_icon_wrapper_in_legacy_style() {
+	public function test_variations_content_renders_icon_image_wrapper_only_once() {
 		$variation_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
 		update_post_meta( $variation_id, 'qpfw_imgicon', '999999' );
 
@@ -145,7 +147,7 @@ class LegacyPhaseStyleTest extends WP_UnitTestCase {
 		SHOW::variations_content( $variations_section, 0, 1, 'wizard', false, false );
 		$normal_output = ob_get_clean();
 
-		$this->assertSame( 2, substr_count( $legacy_output, 'variation_img' ), 'Legacy style should render the icon image wrapper twice (gated + card)' );
-		$this->assertSame( 1, substr_count( $normal_output, 'variation_img' ), 'Non-legacy (choice-row) style should render the icon image wrapper only once (card)' );
+		$this->assertSame( 1, substr_count( $legacy_output, 'variation_img' ), 'Legacy style must not duplicate the icon image wrapper' );
+		$this->assertSame( 1, substr_count( $normal_output, 'variation_img' ), 'Non-legacy (choice-row) style should render the icon image wrapper only once' );
 	}
 }
