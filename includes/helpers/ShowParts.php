@@ -70,11 +70,6 @@ class SHOW {
 					<label class="<?php echo $is_choice_row ? 'qpfw-choice-label' : ''; ?>">
 						<?php
 						$imgicon = get_post_meta( $variation_id, 'qpfw_imgicon', true );
-						if ( $imgicon && ! $is_choice_row ) {
-							echo '<div class="variation_img">';
-							echo wp_get_attachment_image( $imgicon, 'qpfw_icon', false );
-							echo '</div>';
-						}
 
 		// Check if this is a question type variation.
 		if ( $is_question ) {
