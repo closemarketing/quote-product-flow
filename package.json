@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/closemarketing/quote-product-flow#readme",
   "devDependencies": {
-    "@playwright/test": "^1.44.0"
+    "@playwright/test": "^1.63.0"
   }
 }
