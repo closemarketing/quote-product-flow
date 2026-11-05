@@ -30,9 +30,9 @@ PBC has been updated to use a new license system that matches FrontBlocks PRO's 
 ### ✅ New Helper Functions
 
 ```php
-pbc_is_license_active()     // Check if license is active
+qpfw_is_license_active()     // Check if license is active
 pbc_get_license_status()    // Get status: 'active', 'expired', 'inactive'
-pbc_is_license_registered() // Check if license key exists
+qpfw_is_license_registered() // Check if license key exists
 pbc_get_stored_license_key()// Get the license key
 pbc_get_license_data()      // Get all license data
 pbc_has_license_expired()   // Check if license expired
@@ -111,10 +111,10 @@ add_action( 'admin_notices', function() {
 The plugin now uses these constants (defined in `pbc.php`):
 
 ```php
-WPPBC_LICENSE_API_URL        = 'https://close.technology/'
-WPPBC_LICENSE_API_KEY        = 'ck_857ef2cf419641b2741ed4ea4d5a750aa979113a'
-WPPBC_LICENSE_API_SECRET     = 'cs_851fd6126de05a967fc8abb949afe74344faee71'
-WPPBC_LICENSE_PRODUCT_UUID   = 'PBC-5E973533-1688-43CD-B151-ABC2C639B336'
+WPQPFW_LICENSE_API_URL        = 'https://close.technology/'
+WPQPFW_LICENSE_API_KEY        = 'ck_857ef2cf419641b2741ed4ea4d5a750aa979113a'
+WPQPFW_LICENSE_API_SECRET     = 'cs_851fd6126de05a967fc8abb949afe74344faee71'
+WPQPFW_LICENSE_PRODUCT_UUID   = 'PBC-5E973533-1688-43CD-B151-ABC2C639B336'
 ```
 
 ## Database Options
@@ -122,8 +122,8 @@ WPPBC_LICENSE_PRODUCT_UUID   = 'PBC-5E973533-1688-43CD-B151-ABC2C639B336'
 The plugin stores license data using these option keys:
 
 ```
-product-budget-configurator_license_apikey      // License key
-product-budget-configurator_license_activated   // Status: Activated/Deactivated/Expired
+quote-product-flow_license_apikey      // License key
+quote-product-flow_license_activated   // Status: Activated/Deactivated/Expired
 ```
 
 ## API Compatibility
@@ -146,7 +146,7 @@ product-budget-configurator_license_activated   // Status: Activated/Deactivated
 
 ```html
 <!-- Only shown to logged-in administrators -->
-<div class="pbc-license-notice">
+<div class="qpfw-license-notice">
     Demo Mode - Activate your license to remove this notice
 </div>
 
@@ -193,7 +193,7 @@ product-budget-configurator_license_activated   // Status: Activated/Deactivated
 
 ```php
 // Simple check
-if ( pbc_is_license_active() ) {
+if ( qpfw_is_license_active() ) {
     // Do something
 }
 
@@ -263,7 +263,7 @@ add_filter( 'pbc_bypass_license_check', function( $bypass ) {
 **Solution:**
 1. Verify filter is in mu-plugin or theme
 2. Check filter priority (should be early)
-3. Verify function exists: `function_exists('pbc_is_license_active')`
+3. Verify function exists: `function_exists('qpfw_is_license_active')`
 
 ## Migration Checklist
 

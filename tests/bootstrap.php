@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPUnit bootstrap file for Product Budget Configurator
+ * PHPUnit bootstrap file for Quote Product Flow
  *
  * @package Product_Budget_Configurator
  */
@@ -41,8 +41,8 @@ function _manually_load_plugin() {
 	// Load composer autoloader.
 	require TESTS_PLUGIN_DIR . '/vendor/autoload.php';
 
-	// Load the plugin — pbc.php defines all WPPBC_* constants itself.
-	require TESTS_PLUGIN_DIR . '/pbc.php';
+	// Load the plugin — quote-product-flow.php defines all QPFW_* constants itself.
+	require TESTS_PLUGIN_DIR . '/quote-product-flow.php';
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
@@ -52,14 +52,14 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 tests_add_filter(
 	'init',
 	function() {
-		if ( ! post_type_exists( 'phases' ) ) {
-			register_post_type( 'phases', array( 'public' => false, 'hierarchical' => true ) );
+		if ( ! post_type_exists( 'qpfw_phases' ) ) {
+			register_post_type( 'qpfw_phases', array( 'public' => false, 'hierarchical' => true ) );
 		}
-		if ( ! post_type_exists( 'variation' ) ) {
-			register_post_type( 'variation', array( 'public' => false, 'hierarchical' => false ) );
+		if ( ! post_type_exists( 'qpfw_variation' ) ) {
+			register_post_type( 'qpfw_variation', array( 'public' => false, 'hierarchical' => false ) );
 		}
-		if ( ! post_type_exists( 'enquiry' ) ) {
-			register_post_type( 'enquiry', array( 'public' => false, 'hierarchical' => false ) );
+		if ( ! post_type_exists( 'qpfw_enquiry' ) ) {
+			register_post_type( 'qpfw_enquiry', array( 'public' => false, 'hierarchical' => false ) );
 		}
 	}
 );

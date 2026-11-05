@@ -7,9 +7,9 @@
  * @package Product_Budget_Configurator
  */
 
-namespace Close\PBC\Tests\Unit;
+namespace CLOSE\QProductFlow\Tests\Unit;
 
-use Close\PBC\Helpers\CALC;
+use CLOSE\QProductFlow\Helpers\CALC;
 use WP_UnitTestCase;
 
 /**
@@ -38,14 +38,14 @@ class CheckPhasesTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Helper: create a 'phases' post and track it for cleanup.
+	 * Helper: create a 'qpfw_phases' post and track it for cleanup.
 	 *
 	 * @param array $args wp_insert_post-compatible args merged onto safe defaults.
 	 * @return int Created post ID.
 	 */
 	private function create_phase( $args = array() ) {
 		$defaults = array(
-			'post_type'   => 'phases',
+			'post_type'   => 'qpfw_phases',
 			'post_status' => 'publish',
 			'post_title'  => 'Test Phase',
 			'post_parent' => 0,

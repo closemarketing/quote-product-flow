@@ -12,3 +12,13 @@ node_modules/
 
 # PHPUnit
 .phpunit.result.cache
+
+# Playwright E2E
+test-results/
+playwright-report/
+.playwright/
+.env
+tests-e2e/.auth/
+
+# Local tooling (wp-cli.phar etc.)
+.tools/

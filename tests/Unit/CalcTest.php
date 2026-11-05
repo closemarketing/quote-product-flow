@@ -7,9 +7,9 @@
  * @package Product_Budget_Configurator
  */
 
-namespace Close\PBC\Tests\Unit;
+namespace CLOSE\QProductFlow\Tests\Unit;
 
-use Close\PBC\Helpers\CALC;
+use CLOSE\QProductFlow\Helpers\CALC;
 use WP_UnitTestCase;
 
 /**
@@ -80,13 +80,13 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_no_role() {
 		// Set global setting to yes.
-		update_option( 'pbc_show_prices_global', 'yes' );
+		update_option( 'qpfw_show_prices_global', 'yes' );
 
 		$result = CALC::get_show_prices_for_user( '' );
 		$this->assertEquals( 'yes', $result, 'Should return global setting when no role provided' );
 
 		// Clean up.
-		delete_option( 'pbc_show_prices_global' );
+		delete_option( 'qpfw_show_prices_global' );
 	}
 
 	/**
@@ -96,15 +96,15 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_with_role_setting() {
 		// Set global to no but specific role to yes.
-		update_option( 'pbc_show_prices_global', 'no' );
-		update_option( 'pbc_show_prices_user_administrator', 'yes' );
+		update_option( 'qpfw_show_prices_global', 'no' );
+		update_option( 'qpfw_show_prices_user_administrator', 'yes' );
 
 		$result = CALC::get_show_prices_for_user( 'administrator' );
 		$this->assertEquals( 'yes', $result, 'Should return role specific setting over global' );
 
 		// Clean up.
-		delete_option( 'pbc_show_prices_global' );
-		delete_option( 'pbc_show_prices_user_administrator' );
+		delete_option( 'qpfw_show_prices_global' );
+		delete_option( 'qpfw_show_prices_user_administrator' );
 	}
 
 	/**
@@ -114,13 +114,13 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_fallback_to_global() {
 		// Set only global setting.
-		update_option( 'pbc_show_prices_global', 'yes' );
+		update_option( 'qpfw_show_prices_global', 'yes' );
 
 		$result = CALC::get_show_prices_for_user( 'subscriber' );
 		$this->assertEquals( 'yes', $result, 'Should fall back to global when role has no specific setting' );
 
 		// Clean up.
-		delete_option( 'pbc_show_prices_global' );
+		delete_option( 'qpfw_show_prices_global' );
 	}
 
 	/**
@@ -130,7 +130,7 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_show_prices_for_user_default_yes() {
 		// Make sure no settings exist.
-		delete_option( 'pbc_show_prices_global' );
+		delete_option( 'qpfw_show_prices_global' );
 
 		$result = CALC::get_show_prices_for_user( '' );
 		$this->assertEquals( 'yes', $result, 'Should default to yes when no settings exist' );
@@ -146,9 +146,9 @@ class CalcTest extends WP_UnitTestCase {
 		$post_id = $this->factory->post->create();
 
 		// Add some price meta fields.
-		add_post_meta( $post_id, 'pbc_price_1', '100.50' );
-		add_post_meta( $post_id, 'pbc_price_2', '50,25' );
-		add_post_meta( $post_id, 'pbc_price_3', '25.00' );
+		add_post_meta( $post_id, 'qpfw_price_1', '100.50' );
+		add_post_meta( $post_id, 'qpfw_price_2', '50,25' );
+		add_post_meta( $post_id, 'qpfw_price_3', '25.00' );
 
 		$total = CALC::get_total_from_enquiry( $post_id );
 
@@ -223,14 +223,20 @@ class CalcTest extends WP_UnitTestCase {
 	public function test_get_user_discount_and_role_with_discount() {
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
-		update_option( 'pbc_discount_user_subscriber', 20 );
+
+		add_filter(
+			'qpfw_user_discount_and_role',
+			function() {
+				return array( 'role' => 'subscriber', 'discount' => 20 );
+			}
+		);
 
 		$result = CALC::get_user_discount_and_role();
 
 		$this->assertEquals( 'subscriber', $result['role'] );
 		$this->assertEquals( 20, $result['discount'] );
 
-		delete_option( 'pbc_discount_user_subscriber' );
+		remove_all_filters( 'qpfw_user_discount_and_role' );
 		wp_set_current_user( 0 );
 	}
 
@@ -242,15 +248,12 @@ class CalcTest extends WP_UnitTestCase {
 	public function test_get_user_discount_and_role_no_discount_set() {
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
-		// Set to 0 explicitly: get_option() defaults to true when absent, so (int)true=1 is truthy.
-		update_option( 'pbc_discount_user_subscriber', 0 );
 
 		$result = CALC::get_user_discount_and_role();
 
-		$this->assertEquals( '', $result['role'] );
+		$this->assertEquals( 'subscriber', $result['role'] );
 		$this->assertEquals( 0, $result['discount'] );
 
-		delete_option( 'pbc_discount_user_subscriber' );
 		wp_set_current_user( 0 );
 	}
 
@@ -261,7 +264,7 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_price_variation_no_pricegroup_returns_zero() {
 		wp_set_current_user( 0 );
-		$post_id = $this->factory->post->create( array( 'post_type' => 'variation' ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
 
 		$price = CALC::get_price_variation( $post_id, '' );
 
@@ -277,14 +280,14 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_price_variation_returns_base_price() {
 		wp_set_current_user( 0 );
-		$post_id = $this->factory->post->create( array( 'post_type' => 'variation' ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
 		update_post_meta(
 			$post_id,
-			'pbc_pricegroup',
+			'qpfw_pricegroup',
 			array(
 				array(
-					'pbc_pricem'   => '150.00',
-					'pbc_meaprice' => 'unit',
+					'qpfw_pricem'   => '150.00',
+					'qpfw_meaprice' => 'unit',
 				),
 			)
 		);
@@ -304,16 +307,17 @@ class CalcTest extends WP_UnitTestCase {
 	public function test_get_price_variation_applies_role_discount() {
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
-		update_option( 'pbc_discount_user_subscriber', 10 );
 
-		$post_id = $this->factory->post->create( array( 'post_type' => 'variation' ) );
+		add_filter( 'qpfw_user_discount', function() { return 10; } );
+
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
 		update_post_meta(
 			$post_id,
-			'pbc_pricegroup',
+			'qpfw_pricegroup',
 			array(
 				array(
-					'pbc_pricem'   => '200.00',
-					'pbc_meaprice' => 'unit',
+					'qpfw_pricem'   => '200.00',
+					'qpfw_meaprice' => 'unit',
 				),
 			)
 		);
@@ -323,7 +327,7 @@ class CalcTest extends WP_UnitTestCase {
 		// 200 - 10% = 180.
 		$this->assertEquals( 180.0, $price );
 
-		delete_option( 'pbc_discount_user_subscriber' );
+		remove_all_filters( 'qpfw_user_discount' );
 		wp_delete_post( $post_id, true );
 		wp_set_current_user( 0 );
 	}
@@ -336,17 +340,15 @@ class CalcTest extends WP_UnitTestCase {
 	public function test_get_price_variation_no_discount_when_not_set() {
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
-		// Set to 0 explicitly: get_option() defaults to true when absent, so (int)true=1 is truthy.
-		update_option( 'pbc_discount_user_subscriber', 0 );
 
-		$post_id = $this->factory->post->create( array( 'post_type' => 'variation' ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
 		update_post_meta(
 			$post_id,
-			'pbc_pricegroup',
+			'qpfw_pricegroup',
 			array(
 				array(
-					'pbc_pricem'   => '100.00',
-					'pbc_meaprice' => 'unit',
+					'qpfw_pricem'   => '100.00',
+					'qpfw_meaprice' => 'unit',
 				),
 			)
 		);
@@ -375,8 +377,8 @@ class CalcTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_is_multiple_products_flat_hierarchy() {
-		$phase1 = $this->factory->post->create( array( 'post_type' => 'phases', 'post_parent' => 0 ) );
-		$phase2 = $this->factory->post->create( array( 'post_type' => 'phases', 'post_parent' => 0 ) );
+		$phase1 = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
+		$phase2 = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
 
 		$result = CALC::is_multiple_products();
 
@@ -392,8 +394,8 @@ class CalcTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_is_multiple_products_with_nested_phases() {
-		$parent = $this->factory->post->create( array( 'post_type' => 'phases', 'post_parent' => 0 ) );
-		$child  = $this->factory->post->create( array( 'post_type' => 'phases', 'post_parent' => $parent ) );
+		$parent = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
+		$child  = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => $parent ) );
 
 		$result = CALC::is_multiple_products();
 
@@ -419,7 +421,7 @@ class CalcTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_default_parent_phase_returns_top_level_phase() {
-		$phase_id = $this->factory->post->create( array( 'post_type' => 'phases', 'post_parent' => 0 ) );
+		$phase_id = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
 
 		$result = CALC::get_default_parent_phase();
 
@@ -434,9 +436,9 @@ class CalcTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_configurator_save_enquiry_creates_post() {
-		$session_key = 'pbc_variation_test1';
+		$session_key = 'qpfw_variation_test1';
 		$item        = array(
-			'pbc_contact'      => array(
+			'qpfw_contact'      => array(
 				'email'    => 'test@example.com',
 				'name'     => 'Test User',
 				'phone'    => '123456789',
@@ -444,9 +446,9 @@ class CalcTest extends WP_UnitTestCase {
 				'state'    => 'Catalonia',
 				'comments' => 'Test comment',
 			),
-			'pbc_session_key'  => $session_key,
-			'pbc_parent_phase' => 0,
-			$session_key       => array(
+			'qpfw_session_key'  => $session_key,
+			'qpfw_parent_phase' => 0,
+			$session_key        => array(
 				1 => array(
 					'phase' => array( 'name' => 'Phase One' ),
 					'var'   => array( 'name' => 'Option A', 'price' => 100.00, 'type' => 'price' ),
@@ -457,13 +459,13 @@ class CalcTest extends WP_UnitTestCase {
 		$post_id = CALC::configurator_save_enquiry( $item );
 
 		$this->assertGreaterThan( 0, $post_id, 'Should return a valid post ID' );
-		$this->assertEquals( 'enquiry', get_post_type( $post_id ) );
-		$this->assertEquals( 'test@example.com', get_post_meta( $post_id, 'pbc_enquiry_email', true ) );
-		$this->assertEquals( 'Test User', get_post_meta( $post_id, 'pbc_enquiry_name', true ) );
-		$this->assertEquals( '123456789', get_post_meta( $post_id, 'pbc_enquiry_phone', true ) );
-		$this->assertEquals( 'Phase One', get_post_meta( $post_id, 'pbc_phase_name_0', true ) );
-		$this->assertEquals( 'Option A', get_post_meta( $post_id, 'pbc_phase_var_0', true ) );
-		$this->assertEquals( 'price', get_post_meta( $post_id, 'pbc_type_0', true ) );
+		$this->assertEquals( 'qpfw_enquiry', get_post_type( $post_id ) );
+		$this->assertEquals( 'test@example.com', get_post_meta( $post_id, 'qpfw_enquiry_email', true ) );
+		$this->assertEquals( 'Test User', get_post_meta( $post_id, 'qpfw_enquiry_name', true ) );
+		$this->assertEquals( '123456789', get_post_meta( $post_id, 'qpfw_enquiry_phone', true ) );
+		$this->assertEquals( 'Phase One', get_post_meta( $post_id, 'qpfw_phase_name_0', true ) );
+		$this->assertEquals( 'Option A', get_post_meta( $post_id, 'qpfw_phase_var_0', true ) );
+		$this->assertEquals( 'price', get_post_meta( $post_id, 'qpfw_type_0', true ) );
 
 		wp_delete_post( $post_id, true );
 	}
@@ -474,16 +476,16 @@ class CalcTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_configurator_save_enquiry_with_multiple_questions() {
-		$session_key = 'pbc_variation_test2';
+		$session_key = 'qpfw_variation_test2';
 		$item        = array(
-			'pbc_contact'      => array(
+			'qpfw_contact'      => array(
 				'email' => 'q@example.com',
 				'name'  => 'Question User',
 				'phone' => '987654321',
 			),
-			'pbc_session_key'  => $session_key,
-			'pbc_parent_phase' => 0,
-			$session_key       => array(
+			'qpfw_session_key'  => $session_key,
+			'qpfw_parent_phase' => 0,
+			$session_key        => array(
 				1 => array(
 					'phase'     => array( 'name' => 'Questions Phase' ),
 					'questions' => array(
@@ -497,11 +499,11 @@ class CalcTest extends WP_UnitTestCase {
 		$post_id = CALC::configurator_save_enquiry( $item );
 
 		$this->assertGreaterThan( 0, $post_id );
-		$this->assertEquals( 'question', get_post_meta( $post_id, 'pbc_type_0', true ) );
-		$this->assertEquals( 'Color: Red', get_post_meta( $post_id, 'pbc_phase_var_0', true ) );
-		$this->assertEquals( 'question', get_post_meta( $post_id, 'pbc_type_1', true ) );
-		$this->assertEquals( 'Size: Large', get_post_meta( $post_id, 'pbc_phase_var_1', true ) );
-		$this->assertEquals( 2, (int) get_post_meta( $post_id, 'pbc_total_var', true ) );
+		$this->assertEquals( 'question', get_post_meta( $post_id, 'qpfw_type_0', true ) );
+		$this->assertEquals( 'Color: Red', get_post_meta( $post_id, 'qpfw_phase_var_0', true ) );
+		$this->assertEquals( 'question', get_post_meta( $post_id, 'qpfw_type_1', true ) );
+		$this->assertEquals( 'Size: Large', get_post_meta( $post_id, 'qpfw_phase_var_1', true ) );
+		$this->assertEquals( 2, (int) get_post_meta( $post_id, 'qpfw_total_var', true ) );
 
 		wp_delete_post( $post_id, true );
 	}
@@ -513,8 +515,8 @@ class CalcTest extends WP_UnitTestCase {
 	 */
 	public function test_get_total_from_enquiry_with_comma_decimal() {
 		$post_id = $this->factory->post->create();
-		add_post_meta( $post_id, 'pbc_price_0', '1500,75' );
-		add_post_meta( $post_id, 'pbc_price_1', '250,00' );
+		add_post_meta( $post_id, 'qpfw_price_0', '1500,75' );
+		add_post_meta( $post_id, 'qpfw_price_1', '250,00' );
 
 		$total = CALC::get_total_from_enquiry( $post_id );
 

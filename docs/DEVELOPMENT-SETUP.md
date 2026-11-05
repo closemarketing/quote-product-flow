@@ -1,6 +1,6 @@
 # Development Setup
 
-This document explains how to set up Product Budget Configurator for local development and testing.
+This document explains how to set up Quote Product Flow for local development and testing.
 
 ## Bypassing License Check
 
@@ -87,7 +87,7 @@ Create a must-use plugin at `wp-content/mu-plugins/pbc-dev-mode.php`:
  */
 
 // Only load if PBC is active
-if ( ! function_exists( 'pbc_is_license_active' ) ) {
+if ( ! function_exists( 'qpfw_is_license_active' ) ) {
     return;
 }
 
@@ -176,10 +176,10 @@ During development, you might need to clear the license check cache:
 
 ```php
 // Clear license cache
-delete_transient( 'pbc_license_last_check' );
+delete_transient( 'qpfw_license_last_check' );
 
 // Or via WP-CLI
-wp transient delete pbc_license_last_check
+wp transient delete qpfw_license_last_check
 ```
 
 ### Reset All PBC Data
@@ -215,7 +215,7 @@ function pbc_dev_reset_all_data() {
     $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'pbc_%'" );
     
     // Clear transients
-    delete_transient( 'pbc_license_last_check' );
+    delete_transient( 'qpfw_license_last_check' );
     
     echo "PBC data reset complete!";
 }
@@ -229,7 +229,7 @@ Useful WP-CLI commands for development:
 
 ```bash
 # Check plugin status
-wp plugin status product-budget-configurator
+wp plugin status quote-product-flow
 
 # List all phases
 wp post list --post_type=phases
@@ -241,11 +241,11 @@ wp post list --post_type=variation
 wp export --post_type=phases,variation
 
 # Check option values
-wp option get pbc_license_activated
-wp option get pbc_license_apikey
+wp option get qpfw_license_activated
+wp option get qpfw_license_apikey
 
 # Clear transients
-wp transient delete pbc_license_last_check
+wp transient delete qpfw_license_last_check
 ```
 
 ## Debugging Tips
@@ -258,8 +258,8 @@ Add this to any page to see current license status:
 <?php
 if ( function_exists( 'pbc_get_license_status' ) ) {
     echo 'License Status: ' . pbc_get_license_status() . '<br>';
-    echo 'Is Active: ' . ( pbc_is_license_active() ? 'Yes' : 'No' ) . '<br>';
-    echo 'Is Registered: ' . ( pbc_is_license_registered() ? 'Yes' : 'No' ) . '<br>';
+    echo 'Is Active: ' . ( qpfw_is_license_active() ? 'Yes' : 'No' ) . '<br>';
+    echo 'Is Registered: ' . ( qpfw_is_license_registered() ? 'Yes' : 'No' ) . '<br>';
     echo 'License Key: ' . pbc_get_stored_license_key() . '<br>';
 }
 ?>
@@ -295,7 +295,7 @@ if ( isset( $_GET['pbc_debug'] ) && current_user_can( 'manage_options' ) ) {
 ### Bypass filter not working
 
 1. Make sure the filter is added before `plugins_loaded` priority 100
-2. Check that the function exists: `function_exists( 'pbc_is_license_active' )`
+2. Check that the function exists: `function_exists( 'qpfw_is_license_active' )`
 3. Clear all caches (WordPress, opcache, object cache)
 4. Check for typos in filter name
 
@@ -303,7 +303,7 @@ if ( isset( $_GET['pbc_debug'] ) && current_user_can( 'manage_options' ) ) {
 
 ```php
 // Force clear all PBC transients
-delete_transient( 'pbc_license_last_check' );
+delete_transient( 'qpfw_license_last_check' );
 wp_cache_flush();
 ```
 

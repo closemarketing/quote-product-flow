@@ -1,6 +1,6 @@
-# Testing Guide for Product Budget Configurator
+# Testing Guide for Quote Product Flow
 
-Este documento describe cómo configurar y ejecutar tests unitarios para el plugin Product Budget Configurator.
+Este documento describe cómo configurar y ejecutar tests unitarios para el plugin Quote Product Flow.
 
 ## Requisitos Previos
 
@@ -101,7 +101,7 @@ tests/
 ├── bootstrap.php          # Carga WordPress y el plugin
 ├── Unit/                  # Tests unitarios
 │   ├── CalcTest.php      # Tests para clase CALC
-│   └── AdminPluginTest.php # Tests para PBC_Admin_Plugin
+│   └── AdminPluginTest.php # Tests para QPFW_Admin_Plugin
 └── phpstan-bootstrap.php  # Bootstrap para PHPStan (análisis estático)
 ```
 
@@ -117,10 +117,10 @@ Ejemplo:
 
 ```php
 <?php
-namespace Close\PBC\Tests\Unit;
+namespace Close\QPFW\Tests\Unit;
 
 use WP_UnitTestCase;
-use Close\PBC\Helpers\CALC;
+use Close\QPFW\Helpers\CALC;
 
 class CalcTest extends WP_UnitTestCase {
     
