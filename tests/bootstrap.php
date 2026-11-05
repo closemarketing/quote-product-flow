@@ -17,23 +17,6 @@ if ( ! defined( 'WP_CORE_DIR' ) ) {
 	define( 'WP_CORE_DIR', $_wp_core_dir );
 }
 
-// Define plugin constants that are used throughout the codebase.
-if ( ! defined( 'QPFW_VERSION' ) ) {
-	define( 'QPFW_VERSION', '1.0.0' );
-}
-
-if ( ! defined( 'QPFW_PLUGIN_URL' ) ) {
-	define( 'QPFW_PLUGIN_URL', 'http://localhost/wp-content/plugins/quote-product-flow/' );
-}
-
-if ( ! defined( 'QPFW_PLUGIN' ) ) {
-	define( 'QPFW_PLUGIN', TESTS_PLUGIN_DIR . '/quote-product-flow.php' );
-}
-
-if ( ! defined( 'QPFW_PLUGIN_PATH' ) ) {
-	define( 'QPFW_PLUGIN_PATH', TESTS_PLUGIN_DIR . '/' );
-}
-
 // Give access to tests_add_filter() function.
 require_once WP_CORE_DIR . '/wp-includes/plugin.php';
 
@@ -58,12 +41,28 @@ function _manually_load_plugin() {
 	// Load composer autoloader.
 	require TESTS_PLUGIN_DIR . '/vendor/autoload.php';
 
-	// Load the plugin.
+	// Load the plugin — quote-product-flow.php defines all QPFW_* constants itself.
 	require TESTS_PLUGIN_DIR . '/quote-product-flow.php';
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
+// Register custom post types needed by the plugin for the test environment.
+// The plugin only registers CPTs inside is_admin(), which is false during tests.
+tests_add_filter(
+	'init',
+	function() {
+		if ( ! post_type_exists( 'qpfw_phases' ) ) {
+			register_post_type( 'qpfw_phases', array( 'public' => false, 'hierarchical' => true ) );
+		}
+		if ( ! post_type_exists( 'qpfw_variation' ) ) {
+			register_post_type( 'qpfw_variation', array( 'public' => false, 'hierarchical' => false ) );
+		}
+		if ( ! post_type_exists( 'qpfw_enquiry' ) ) {
+			register_post_type( 'qpfw_enquiry', array( 'public' => false, 'hierarchical' => false ) );
+		}
+	}
+);
+
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
-
