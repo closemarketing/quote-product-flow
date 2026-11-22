@@ -173,5 +173,357 @@ class CalcTest extends WP_UnitTestCase {
 		// Clean up.
 		wp_delete_post( $post_id, true );
 	}
+
+	/**
+	 * Test adds_zero pads single-digit numbers with a leading zero.
+	 *
+	 * @return void
+	 */
+	public function test_adds_zero_with_single_digit() {
+		$this->assertEquals( '05', CALC::adds_zero( 5 ) );
+	}
+
+	/**
+	 * Test adds_zero leaves double-digit numbers unchanged.
+	 *
+	 * @return void
+	 */
+	public function test_adds_zero_with_double_digit() {
+		$this->assertEquals( 10, CALC::adds_zero( 10 ) );
+	}
+
+	/**
+	 * Test adds_zero with zero value.
+	 *
+	 * @return void
+	 */
+	public function test_adds_zero_with_zero() {
+		$this->assertEquals( '00', CALC::adds_zero( 0 ) );
+	}
+
+	/**
+	 * Test get_user_discount_and_role returns empty data when no user is logged in.
+	 *
+	 * @return void
+	 */
+	public function test_get_user_discount_and_role_no_logged_in_user() {
+		wp_set_current_user( 0 );
+
+		$result = CALC::get_user_discount_and_role();
+
+		$this->assertEquals( '', $result['role'] );
+		$this->assertEquals( 0, $result['discount'] );
+	}
+
+	/**
+	 * Test get_user_discount_and_role returns role and discount when set.
+	 *
+	 * @return void
+	 */
+	public function test_get_user_discount_and_role_with_discount() {
+		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+
+		add_filter(
+			'qpfw_user_discount_and_role',
+			function() {
+				return array( 'role' => 'subscriber', 'discount' => 20 );
+			}
+		);
+
+		$result = CALC::get_user_discount_and_role();
+
+		$this->assertEquals( 'subscriber', $result['role'] );
+		$this->assertEquals( 20, $result['discount'] );
+
+		remove_all_filters( 'qpfw_user_discount_and_role' );
+		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * Test get_user_discount_and_role returns empty data when role has no discount configured.
+	 *
+	 * @return void
+	 */
+	public function test_get_user_discount_and_role_no_discount_set() {
+		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+
+		$result = CALC::get_user_discount_and_role();
+
+		$this->assertEquals( 'subscriber', $result['role'] );
+		$this->assertEquals( 0, $result['discount'] );
+
+		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * Test get_price_variation returns 0 when no pricegroup meta exists.
+	 *
+	 * @return void
+	 */
+	public function test_get_price_variation_no_pricegroup_returns_zero() {
+		wp_set_current_user( 0 );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+
+		$price = CALC::get_price_variation( $post_id, '' );
+
+		$this->assertEquals( 0.0, $price );
+
+		wp_delete_post( $post_id, true );
+	}
+
+	/**
+	 * Test get_price_variation returns base price from first pricegroup entry.
+	 *
+	 * @return void
+	 */
+	public function test_get_price_variation_returns_base_price() {
+		wp_set_current_user( 0 );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+		update_post_meta(
+			$post_id,
+			'qpfw_pricegroup',
+			array(
+				array(
+					'qpfw_pricem'   => '150.00',
+					'qpfw_meaprice' => 'unit',
+				),
+			)
+		);
+
+		$price = CALC::get_price_variation( $post_id, 'nonexistent' );
+
+		$this->assertEquals( 150.0, $price );
+
+		wp_delete_post( $post_id, true );
+	}
+
+	/**
+	 * Test get_price_variation applies role discount to base price.
+	 *
+	 * @return void
+	 */
+	public function test_get_price_variation_applies_role_discount() {
+		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+
+		add_filter( 'qpfw_user_discount', function() { return 10; } );
+
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+		update_post_meta(
+			$post_id,
+			'qpfw_pricegroup',
+			array(
+				array(
+					'qpfw_pricem'   => '200.00',
+					'qpfw_meaprice' => 'unit',
+				),
+			)
+		);
+
+		$price = CALC::get_price_variation( $post_id, 'nonexistent' );
+
+		// 200 - 10% = 180.
+		$this->assertEquals( 180.0, $price );
+
+		remove_all_filters( 'qpfw_user_discount' );
+		wp_delete_post( $post_id, true );
+		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * Test get_price_variation: no discount applied when user has no role discount.
+	 *
+	 * @return void
+	 */
+	public function test_get_price_variation_no_discount_when_not_set() {
+		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+
+		$post_id = $this->factory->post->create( array( 'post_type' => 'qpfw_variation' ) );
+		update_post_meta(
+			$post_id,
+			'qpfw_pricegroup',
+			array(
+				array(
+					'qpfw_pricem'   => '100.00',
+					'qpfw_meaprice' => 'unit',
+				),
+			)
+		);
+
+		$price = CALC::get_price_variation( $post_id, 'nonexistent' );
+
+		$this->assertEquals( 100.0, $price );
+
+		wp_delete_post( $post_id, true );
+		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * Test is_multiple_products returns false when no phases exist.
+	 *
+	 * @return void
+	 */
+	public function test_is_multiple_products_no_phases() {
+		$result = CALC::is_multiple_products();
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test is_multiple_products returns false when all phases are top-level.
+	 *
+	 * @return void
+	 */
+	public function test_is_multiple_products_flat_hierarchy() {
+		$phase1 = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
+		$phase2 = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
+
+		$result = CALC::is_multiple_products();
+
+		$this->assertFalse( $result );
+
+		wp_delete_post( $phase1, true );
+		wp_delete_post( $phase2, true );
+	}
+
+	/**
+	 * Test is_multiple_products returns true when child phases exist.
+	 *
+	 * @return void
+	 */
+	public function test_is_multiple_products_with_nested_phases() {
+		$parent = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
+		$child  = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => $parent ) );
+
+		$result = CALC::is_multiple_products();
+
+		$this->assertTrue( $result );
+
+		wp_delete_post( $child, true );
+		wp_delete_post( $parent, true );
+	}
+
+	/**
+	 * Test get_default_parent_phase returns 0 when no phases exist.
+	 *
+	 * @return void
+	 */
+	public function test_get_default_parent_phase_no_phases() {
+		$result = CALC::get_default_parent_phase();
+		$this->assertEquals( 0, $result );
+	}
+
+	/**
+	 * Test get_default_parent_phase returns the first top-level phase ID.
+	 *
+	 * @return void
+	 */
+	public function test_get_default_parent_phase_returns_top_level_phase() {
+		$phase_id = $this->factory->post->create( array( 'post_type' => 'qpfw_phases', 'post_parent' => 0 ) );
+
+		$result = CALC::get_default_parent_phase();
+
+		$this->assertEquals( $phase_id, $result );
+
+		wp_delete_post( $phase_id, true );
+	}
+
+	/**
+	 * Test configurator_save_enquiry creates an enquiry post with correct meta.
+	 *
+	 * @return void
+	 */
+	public function test_configurator_save_enquiry_creates_post() {
+		$session_key = 'qpfw_variation_test1';
+		$item        = array(
+			'qpfw_contact'      => array(
+				'email'    => 'test@example.com',
+				'name'     => 'Test User',
+				'phone'    => '123456789',
+				'city'     => 'Barcelona',
+				'state'    => 'Catalonia',
+				'comments' => 'Test comment',
+			),
+			'qpfw_session_key'  => $session_key,
+			'qpfw_parent_phase' => 0,
+			$session_key        => array(
+				1 => array(
+					'phase' => array( 'name' => 'Phase One' ),
+					'var'   => array( 'name' => 'Option A', 'price' => 100.00, 'type' => 'price' ),
+				),
+			),
+		);
+
+		$post_id = CALC::configurator_save_enquiry( $item );
+
+		$this->assertGreaterThan( 0, $post_id, 'Should return a valid post ID' );
+		$this->assertEquals( 'qpfw_enquiry', get_post_type( $post_id ) );
+		$this->assertEquals( 'test@example.com', get_post_meta( $post_id, 'qpfw_enquiry_email', true ) );
+		$this->assertEquals( 'Test User', get_post_meta( $post_id, 'qpfw_enquiry_name', true ) );
+		$this->assertEquals( '123456789', get_post_meta( $post_id, 'qpfw_enquiry_phone', true ) );
+		$this->assertEquals( 'Phase One', get_post_meta( $post_id, 'qpfw_phase_name_0', true ) );
+		$this->assertEquals( 'Option A', get_post_meta( $post_id, 'qpfw_phase_var_0', true ) );
+		$this->assertEquals( 'price', get_post_meta( $post_id, 'qpfw_type_0', true ) );
+
+		wp_delete_post( $post_id, true );
+	}
+
+	/**
+	 * Test configurator_save_enquiry stores multiple questions format correctly.
+	 *
+	 * @return void
+	 */
+	public function test_configurator_save_enquiry_with_multiple_questions() {
+		$session_key = 'qpfw_variation_test2';
+		$item        = array(
+			'qpfw_contact'      => array(
+				'email' => 'q@example.com',
+				'name'  => 'Question User',
+				'phone' => '987654321',
+			),
+			'qpfw_session_key'  => $session_key,
+			'qpfw_parent_phase' => 0,
+			$session_key        => array(
+				1 => array(
+					'phase'     => array( 'name' => 'Questions Phase' ),
+					'questions' => array(
+						array( 'variation_title' => 'Color', 'answer' => 'Red' ),
+						array( 'variation_title' => 'Size', 'answer' => 'Large' ),
+					),
+				),
+			),
+		);
+
+		$post_id = CALC::configurator_save_enquiry( $item );
+
+		$this->assertGreaterThan( 0, $post_id );
+		$this->assertEquals( 'question', get_post_meta( $post_id, 'qpfw_type_0', true ) );
+		$this->assertEquals( 'Color: Red', get_post_meta( $post_id, 'qpfw_phase_var_0', true ) );
+		$this->assertEquals( 'question', get_post_meta( $post_id, 'qpfw_type_1', true ) );
+		$this->assertEquals( 'Size: Large', get_post_meta( $post_id, 'qpfw_phase_var_1', true ) );
+		$this->assertEquals( 2, (int) get_post_meta( $post_id, 'qpfw_total_var', true ) );
+
+		wp_delete_post( $post_id, true );
+	}
+
+	/**
+	 * Test get_total_from_enquiry handles comma as decimal separator correctly.
+	 *
+	 * @return void
+	 */
+	public function test_get_total_from_enquiry_with_comma_decimal() {
+		$post_id = $this->factory->post->create();
+		add_post_meta( $post_id, 'qpfw_price_0', '1500,75' );
+		add_post_meta( $post_id, 'qpfw_price_1', '250,00' );
+
+		$total = CALC::get_total_from_enquiry( $post_id );
+
+		// 1500.75 + 250.00 = 1750.75.
+		$this->assertEquals( 1750.75, $total );
+
+		wp_delete_post( $post_id, true );
+	}
 }
 

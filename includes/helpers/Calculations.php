@@ -584,13 +584,13 @@ class CALC {
 	 * @return int
 	 */
 	public static function configurator_save_enquiry( $item ) {
-		$contact          = $item['qpfw_contact'] ?? [];
-		$email_field      = ! empty( $contact['email_field'] ) ? sanitize_text_field( $contact['email_field'] ) : '';
-		$name_field       = ! empty( $contact['name_field'] ) ? sanitize_text_field( $contact['name_field'] ) : '';
-		$phone_field      = ! empty( $contact['phone_field'] ) ? sanitize_text_field( $contact['phone_field'] ) : '';
-		$city_field       = ! empty( $contact['city_field'] ) ? sanitize_text_field( $contact['city_field'] ) : '';
-		$state_field      = ! empty( $contact['state_field'] ) ? sanitize_text_field( $contact['state_field'] ) : '';
-		$comments_field   = ! empty( $contact['comments_field'] ) ? sanitize_textarea_field( $contact['comments_field'] ) : '';
+		$contact           = $item['qpfw_contact'] ?? [];
+		$email_field       = ! empty( $contact['email'] ) ? sanitize_text_field( $contact['email'] ) : '';
+		$name_field        = ! empty( $contact['name'] ) ? sanitize_text_field( $contact['name'] ) : '';
+		$phone_field       = ! empty( $contact['phone'] ) ? sanitize_text_field( $contact['phone'] ) : '';
+		$city_field        = ! empty( $contact['city'] ) ? sanitize_text_field( $contact['city'] ) : '';
+		$state_field       = ! empty( $contact['state'] ) ? sanitize_text_field( $contact['state'] ) : '';
+		$comments_field    = ! empty( $contact['comments'] ) ? sanitize_textarea_field( $contact['comments'] ) : '';
 		$qpfw_session_key  = ! empty( $item['qpfw_session_key'] ) ? sanitize_text_field( $item['qpfw_session_key'] ) : '';
 		$qpfw_parent_phase = ! empty( $item['qpfw_parent_phase'] ) ? (int) $item['qpfw_parent_phase'] : 0;
 
