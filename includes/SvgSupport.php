@@ -141,7 +141,9 @@ class SvgSupport {
 		}
 
 		// Remove event handlers and dangerous attributes.
-		$this->remove_dangerous_attributes( $dom );
+		if ( $dom->documentElement ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$this->remove_dangerous_attributes( $dom->documentElement ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		}
 
 		return $dom->saveXML( $dom->documentElement ) ? $dom->saveXML( $dom->documentElement ) : false; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	}
