@@ -2,7 +2,7 @@
 Contributors: closetechnology, davidperez, alexcm13
 Tags: configurator, budget, pricing, product, calculator
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.2
 Requires PHP: 7.4
 Stable tag: 2.0.0
 License: GPL-2.0+
